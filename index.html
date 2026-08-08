@@ -95,6 +95,7 @@
   .grid.c4 { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
   label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--text-secondary); }
   label.field span.u { color: var(--text-muted); font-weight: 400; }
+  label.field .field-caption { display: block; line-height: 1.35; }
   input[type=number], input[type=text], select {
     padding: 6px 8px;
     border: 1px solid var(--border);
@@ -175,6 +176,46 @@
   .kpi .l { font-size: 12px; color: var(--text-secondary); }
   .kpi .v { font-size: 22px; font-weight: 650; margin-top: 2px; }
   .kpi .s { font-size: 12px; color: var(--text-muted); }
+  /* Help popovers */
+  button.help {
+    width: 15px; height: 15px; padding: 0;
+    border: 1px solid var(--baseline); border-radius: 50%;
+    background: transparent; color: var(--text-muted);
+    font-size: 10px; line-height: 1; cursor: pointer;
+    margin-left: 5px; vertical-align: 1px; font-weight: 700;
+  }
+  button.help:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+  .popover {
+    position: fixed; z-index: 60; max-width: 300px;
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; font-size: 12.5px;
+    color: var(--text-secondary); box-shadow: 0 6px 24px rgba(0,0,0,0.22);
+    display: none;
+  }
+  .popover b { color: var(--text-primary); }
+  /* Guided tour */
+  .tour-backdrop { position: fixed; inset: 0; z-index: 90; }
+  .tour-hole {
+    position: fixed; z-index: 91; border-radius: 12px;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.55), 0 0 0 3px var(--series-1);
+    pointer-events: none; transition: all .25s ease;
+  }
+  .tour-card {
+    position: fixed; z-index: 92; width: min(400px, calc(100vw - 32px));
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 18px 14px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+  }
+  .tour-card h4 { margin: 0 0 6px; font-size: 14px; }
+  .tour-card p { margin: 0 0 12px; font-size: 13px; color: var(--text-secondary); }
+  .tour-card .tour-nav { display: flex; align-items: center; gap: 8px; }
+  .tour-card .tour-step { font-size: 11px; color: var(--text-muted); margin-right: auto; }
+  .banner {
+    background: var(--accent-wash); border: 1px solid var(--series-1);
+    border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 14px;
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce) { .tour-hole { transition: none; } }
 </style>
 </head>
 <body>
@@ -184,15 +225,22 @@
 </header>
 <main>
 
-<section class="card">
+<section class="card" id="toolbarCard">
   <div class="toolbar">
     <button class="btn primary" id="btnRecalc">Recalculate</button>
+    <button class="btn" id="btnTour">▸ Take the tour</button>
+    <button class="btn" id="btnExample">Load worked example</button>
     <button class="btn" id="btnExportJson">Export scenario (JSON)</button>
     <button class="btn" id="btnImportJson">Import scenario</button>
     <input type="file" id="fileImport" accept=".json" style="display:none">
     <button class="btn" id="btnExportCsv">Download results (CSV)</button>
     <button class="btn" id="btnReset">Reset to workbook seed</button>
     <span class="note" id="saveNote">Changes auto-save to this browser.</span>
+  </div>
+  <div class="banner" id="exampleBanner">
+    <b>Worked example loaded.</b> Costs, work-zone details, and truck percentages are illustrative
+    demo values for a 5-mile, 2-lane-per-direction rehabilitation — realistic in scale but not from
+    any real project. Replace them with your own estimates before using results for decisions.
   </div>
 </section>
 
@@ -242,6 +290,13 @@
   <div id="resultsTable"></div>
   <p class="note" style="margin-top:8px">NPV in thousands of dollars, discounted to the beginning of the analysis period. EUAC = equivalent uniform annual cost. Lowest total NPV shown in bold.</p>
   <div id="warnings"></div>
+  <div id="interpretation" style="margin-top:14px"></div>
+</section>
+
+<section class="card" id="sensitivity">
+  <h2>5 &middot; Discount-Rate Sensitivity</h2>
+  <p class="note" style="margin-top:-6px;margin-bottom:12px">Total NPV ($1000) for each alternative, recomputed across a range of discount rates. If the winner changes, the ranking depends on an assumption reasonable people disagree about.</p>
+  <div id="sensitivityBody"></div>
 </section>
 
 <section class="card charts">
@@ -281,6 +336,30 @@
       <li><b>Simplifications vs full RealCost 2.5.7CA</b>: deterministic only (no Monte Carlo simulation); no COZEEP/TMP cost modules; free-flow speed taken as the posted speed limit; queue speed handled through the deterministic queuing diagram rather than the forced-flow speed curve; work-zone closures assumed on all work-zone days.</li>
     </ul>
   </details>
+</section>
+
+<section class="card">
+  <h2>Credits &amp; Disclaimer</h2>
+  <p style="font-size:13px;color:var(--text-secondary);margin-top:0">
+    The life-cycle cost analysis methodology implemented here was developed by the
+    <b>Federal Highway Administration</b> (RealCost, and FHWA's <i>Life-Cycle Cost Analysis in Pavement
+    Design</i>, publication FHWA-SA-98-079) and adapted for California by the
+    <b>California Department of Transportation</b> (RealCost 2.5.7CA, Caltrans Division of Maintenance,
+    Pavement Program). The added-time, added-cost, and idling tables and the speed&ndash;volume relationship
+    are from the FHWA Technical Bulletin referenced in the RealCost documentation. Default hourly traffic
+    distributions derive from MicroBENCOST.
+  </p>
+  <p style="font-size:13px;color:var(--text-secondary)">
+    This is an <b>independent, unofficial reimplementation</b> written from the published methodology and
+    the input structure of the RealCost workbook. It is not produced, reviewed, endorsed, or supported by
+    FHWA or Caltrans, and it is not a certified substitute for the official RealCost tool. Results should
+    be verified against official RealCost before being used in project decisions, funding requests, or
+    any submittal where an approved LCCA tool is required.
+  </p>
+  <p class="note">
+    Official RealCost downloads and documentation: FHWA (fhwa.dot.gov, Pavement LCCA) and
+    Caltrans (dot.ca.gov, Division of Maintenance &mdash; Pavement).
+  </p>
 </section>
 
 </main>
@@ -378,7 +457,69 @@ const SEED = {
 // Annual maintenance ($1000) from workbook: Alt2 activity 5 = 1
 SEED.alternatives[1].activities[4].annualMaint = 1;
 
+/* Worked example — illustrative values for a 5-mile, 2-lanes-per-direction rehab.
+   Realistic in scale (rough Caltrans-era unit costs) but not from any real project. */
+function buildExample() {
+  const E = JSON.parse(JSON.stringify(SEED));
+  E.pctCar = 88; E.pctSut = 7; E.pctCt = 5;
+  const set = (a, i, vals) => Object.assign(E.alternatives[a].activities[i], vals);
+  const wz = (dur, open, len) => ({ wzDuration: dur, lanesOpen: open, wzLength: len });
+  // Alt 1 — 40-yr lane replacement: expensive once, long life
+  set(0, 0, { agencyCost: 32000, ...wz(200, 1, 5) });
+  set(0, 1, { agencyCost: 4200, ...wz(25, 1, 5) });
+  set(0, 2, { agencyCost: 5600, ...wz(35, 1, 5) });
+  // Alt 2 — HMA 20-yr cycle: cheaper, repeats often
+  set(1, 0, { agencyCost: 13500, ...wz(90, 1, 5) });
+  set(1, 1, { agencyCost: 3800, ...wz(20, 1, 5) });
+  set(1, 2, { agencyCost: 14800, ...wz(90, 1, 5) });
+  set(1, 3, { agencyCost: 3800, ...wz(20, 1, 5) });
+  set(1, 4, { agencyCost: 16200, ...wz(90, 1, 5) });
+  // Alt 3 — HMA w/ RHMA: ~8% premium, longer lives
+  set(2, 0, { agencyCost: 14600, ...wz(90, 1, 5) });
+  set(2, 1, { agencyCost: 4100, ...wz(22, 1, 5) });
+  set(2, 2, { agencyCost: 16000, ...wz(90, 1, 5) });
+  set(2, 3, { agencyCost: 4100, ...wz(22, 1, 5) });
+  // Alt 4 — 20-yr lane replacement
+  set(3, 0, { agencyCost: 24500, ...wz(150, 1, 5) });
+  set(3, 1, { agencyCost: 3900, ...wz(20, 1, 5) });
+  set(3, 2, { agencyCost: 5200, ...wz(30, 1, 5) });
+  set(3, 3, { agencyCost: 5600, ...wz(30, 1, 5) });
+  return E;
+}
+
+/* Plain-language help for jargon-heavy fields */
+const HELP = {
+  discountRate: "<b>Discount rate</b> converts future dollars to today's dollars. Caltrans LCCA procedures use a real (inflation-free) rate — historically around 3–4%. A higher rate favors alternatives that defer spending.",
+  analysisPeriod: "<b>Analysis period</b> is the window all alternatives are compared over. It should be long enough to include at least one rehabilitation of the longest-lived alternative — Caltrans typically uses 20–55 years.",
+  includeUser: "<b>User costs</b> are delays and vehicle costs the traveling public incurs in work zones. Including them rewards alternatives that close lanes less often or for fewer days.",
+  agencyRSL: "<b>Remaining service life credit</b>: if the last treatment still has unused life when the analysis ends, part of its cost is credited back, so alternatives aren't penalized for finishing the period with fresh pavement.",
+  userRSL: "Same idea as the agency credit, applied to the last activity's work-zone user cost.",
+  votCar: "<b>Value of time</b> converts an hour of delay into dollars. These defaults came from the source workbook; Caltrans publishes updated values periodically.",
+  aadt: "<b>AADT</b> — annual average daily traffic, both directions combined, in the construction year. The single biggest driver of user costs.",
+  growth: "Traffic compounds at this rate each year, so later rehab cycles see heavier traffic and bigger work-zone impacts.",
+  maxAadt: "Growth stops at this cap — representing the corridor reaching capacity.",
+  ffCap: "<b>Free-flow capacity</b> — vehicles per hour per lane the road carries under normal conditions. Freeways are typically ~2,000–2,200 vphpl.",
+  qdCap: "<b>Queue dissipation capacity</b> — the discharge rate while a standing queue clears after a closure ends. Slightly below free-flow capacity (~1,800 vphpl) because traffic accelerates from a stop.",
+  hourlyDist: "How the day's traffic spreads across 24 hours. The double-peak shape is typical of commuter corridors; the custom option came from the source workbook.",
+  maxQueue: "If the predicted queue exceeds this length, a warning appears — long queues mean the closure plan needs rethinking (more open lanes, different hours, or off-peak work).",
+  speedLimit: "Used as the normal travel speed for computing how much time vehicles lose slowing to work-zone speed.",
+  lanes: "Lanes in <i>each</i> direction under normal operation.",
+  pctCar: "Vehicle class split. Trucks matter: their value of time is ~2.5× higher and their stop-and-go operating costs are far higher.",
+  // activity fields
+  agencyCost: "What the agency pays for this treatment, in thousands of dollars. From your cost estimate or historical bid prices.",
+  serviceLife: "Years until the next treatment is needed. Drives both the M&R schedule and the remaining-service-life credit.",
+  annualMaint: "Routine yearly maintenance (crack sealing, patching) while this treatment is in service, $1000s per year.",
+  wzDuration: "Total days with an active work zone for this treatment. Multiplies the daily user cost, so it's the biggest user-cost lever.",
+  lanesOpen: "Lanes kept open per direction during closure hours. Fewer open lanes → lower capacity → queues form sooner.",
+  wzLength: "Length of the reduced-speed zone, miles.",
+  wzSpeed: "Posted speed through the work zone. The gap between this and the normal limit sets the per-vehicle delay.",
+  wzCap: "Capacity per open lane inside the work zone — typically ~1,200–1,500 vphpl, below normal capacity because of narrow lanes and barriers.",
+  closIn: "Hours of day (24-h clock) when the closure is in place, comma-separated ranges. \"20-24, 0-5\" means 8 pm to 5 am — overnight work. During these hours capacity drops to the work-zone value.",
+  closOut: "Same as inbound closures, for the opposite direction."
+};
+
 const STORE_KEY = "realcost-lcca-v1";
+const TOUR_KEY = "realcost-lcca-toured";
 let S = loadScenario();
 let activeAlt = 0;
 
@@ -569,6 +710,58 @@ const GLOBAL_FIELDS = ["analysisPeriod","startYear","discountRate","includeUser"
   "votCar","votSut","votCt","aadt","growth","maxAadt","pctCar","pctSut","pctCt",
   "speedLimit","lanes","ffCap","qdCap","hourlyDist","maxQueue"];
 
+/* Help popovers ---------------------------------------------------------- */
+const popover = document.createElement("div");
+popover.className = "popover";
+document.body.appendChild(popover);
+let popoverOpen = null;
+
+function closePopover() { popover.style.display = "none"; popoverOpen = null; }
+document.addEventListener("click", e => {
+  if (popoverOpen && !popover.contains(e.target) && !e.target.classList.contains("help")) closePopover();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closePopover(); if (tour.active) tour.end(); } });
+
+function attachHelp(labelEl, key) {
+  if (!HELP[key] || labelEl.querySelector("button.help")) return;
+  const b = document.createElement("button");
+  b.className = "help";
+  b.type = "button";
+  b.textContent = "?";
+  b.setAttribute("aria-label", "What is this?");
+  b.onclick = ev => {
+    ev.stopPropagation();
+    if (popoverOpen === key) return closePopover();
+    popover.innerHTML = HELP[key];
+    popover.style.display = "block";
+    const r = b.getBoundingClientRect();
+    const w = popover.offsetWidth, h = popover.offsetHeight;
+    let x = Math.min(r.left, innerWidth - w - 12);
+    let y = r.bottom + 8;
+    if (y + h > innerHeight - 12) y = Math.max(12, r.top - h - 8);
+    popover.style.left = Math.max(12, x) + "px";
+    popover.style.top = y + "px";
+    popoverOpen = key;
+  };
+  // Wrap the caption (all nodes before the control) in one row so the button
+  // sits beside the text instead of becoming its own flex row.
+  const control = labelEl.querySelector("input, select");
+  const row = document.createElement("span");
+  row.className = "field-caption";
+  while (labelEl.firstChild && labelEl.firstChild !== control) row.appendChild(labelEl.firstChild);
+  row.appendChild(b);
+  labelEl.prepend(row);
+}
+
+function decorateHelp(root) {
+  root.querySelectorAll("label.field").forEach(lab => {
+    const inp = lab.querySelector("input, select");
+    if (!inp) return;
+    const key = inp.id || inp.dataset.f;
+    attachHelp(lab, key);
+  });
+}
+
 function bindGlobals() {
   const sel = $("hourlyDist");
   sel.innerHTML = Object.keys(DISTRIBUTIONS).map(k => `<option>${k}</option>`).join("");
@@ -580,6 +773,7 @@ function bindGlobals() {
       refresh();
     });
   }
+  decorateHelp(document);
 }
 
 function renderTabs() {
@@ -603,6 +797,102 @@ function textToClosures(t) {
     return [m[0] || 0, m[1] || 0];
   }).filter(p => !(p[0] === p[1]));
 }
+
+/* Guided tour ------------------------------------------------------------ */
+const TOUR_STEPS = [
+  { sel: null, title: "Welcome — this compares pavement strategies over decades",
+    body: "Life-cycle cost analysis answers one question: of several rehabilitation strategies, which costs the least over the whole analysis period once future spending is discounted to today's dollars? Cheapest to build is often not cheapest to own. This walkthrough takes about a minute." },
+  { sel: "#btnExample", title: "Start with the worked example",
+    body: "The app opens seeded with the four alternatives from the source workbook, but with zero costs — so every result is zero. Click <b>Load worked example</b> at any point to fill in realistic demo numbers and see the whole thing come alive." },
+  { sel: "#analysisPeriod", title: "Set the ground rules once",
+    body: "The analysis period and discount rate apply to every alternative equally. The discount rate is what makes this an <i>economic</i> comparison rather than a sum of costs — a dollar spent in 2060 is worth far less than one spent today. Every field with a <b>?</b> explains itself in plain language." },
+  { sel: "#aadt", title: "Traffic drives the user costs",
+    body: "If you include user costs, this section decides how painful each work zone is. Traffic volume, the truck mix, and how the day's traffic is distributed across 24 hours all feed the queuing model." },
+  { sel: "#altTabs", title: "Each alternative is a sequence of treatments",
+    body: "A strategy isn't one action — it's a schedule. Alternative 1 might be one expensive long-life reconstruction; Alternative 2 might be a cheaper overlay repeated three times. Switch tabs to edit each one." },
+  { sel: "#altPanel", title: "For each treatment, cost and work zone",
+    body: "The <b>agency cost</b> and <b>service life</b> drive the economics. The <b>work-zone fields</b> — duration in days, lanes left open, and closure hours — drive the user costs. Try changing closure hours from overnight to daytime and watch user costs jump." },
+  { sel: "#kpiRow", title: "Read the results here",
+    body: "The lowest total NPV wins. <b>EUAC</b> restates that same NPV as a level annual payment, which is often easier to defend in a budget conversation. Both include user costs when you've enabled them." },
+  { sel: "#npvChart", title: "See where the money goes",
+    body: "The stacked bars split agency cost from user cost. A strategy can win on agency cost and still lose overall if it closes lanes far more often — that trade-off is the entire point of running LCCA." },
+  { sel: "#hourlyChart", title: "Inspect any work zone hour by hour",
+    body: "This shows demand against capacity for a single closure. Where the blue demand line crosses above the orange capacity line, a queue forms (green). This is where you diagnose <i>why</i> an alternative's user costs are high." },
+  { sel: "#sensitivity", title: "Test how solid your answer is",
+    body: "The discount rate is the assumption people argue about most. This table re-runs every alternative across a range of rates — if the winner changes, say so in your report rather than presenting one number as settled." },
+  { sel: null, title: "That's the tour",
+    body: "Enter your own costs, or load the worked example to experiment. Everything auto-saves in this browser, and you can export a scenario as JSON to share or archive. The <b>Methodology</b> panel at the bottom documents every formula and its source." }
+];
+
+const tour = {
+  active: false, i: 0, backdrop: null, hole: null, card: null,
+  start() {
+    this.active = true; this.i = 0;
+    this.backdrop = document.createElement("div");
+    this.backdrop.className = "tour-backdrop";
+    this.backdrop.onclick = () => this.end();
+    this.hole = document.createElement("div");
+    this.hole.className = "tour-hole";
+    this.card = document.createElement("div");
+    this.card.className = "tour-card";
+    document.body.append(this.backdrop, this.hole, this.card);
+    this.show();
+  },
+  show() {
+    const step = TOUR_STEPS[this.i];
+    const target = step.sel ? document.querySelector(step.sel) : null;
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+    setTimeout(() => {
+      if (!this.active) return;
+      if (target) {
+        const r = target.getBoundingClientRect();
+        const pad = 8;
+        Object.assign(this.hole.style, {
+          display: "block",
+          left: (r.left - pad) + "px", top: (r.top - pad) + "px",
+          width: (r.width + pad * 2) + "px", height: (r.height + pad * 2) + "px"
+        });
+      } else {
+        this.hole.style.display = "none";
+      }
+      this.card.innerHTML = `
+        <h4>${step.title}</h4>
+        <p>${step.body}</p>
+        <div class="tour-nav">
+          <span class="tour-step">Step ${this.i + 1} of ${TOUR_STEPS.length}</span>
+          <button class="btn" data-act="skip">Skip</button>
+          ${this.i > 0 ? '<button class="btn" data-act="prev">Back</button>' : ""}
+          <button class="btn primary" data-act="next">${this.i === TOUR_STEPS.length - 1 ? "Done" : "Next"}</button>
+        </div>`;
+      this.card.querySelectorAll("button").forEach(b => {
+        b.onclick = () => {
+          const a = b.dataset.act;
+          if (a === "next") { this.i++; this.i >= TOUR_STEPS.length ? this.end() : this.show(); }
+          else if (a === "prev") { this.i--; this.show(); }
+          else this.end();
+        };
+      });
+      // position card near the hole, else centered
+      const cw = this.card.offsetWidth, ch = this.card.offsetHeight;
+      if (target) {
+        const r = target.getBoundingClientRect();
+        let top = r.bottom + 16;
+        if (top + ch > innerHeight - 12) top = Math.max(12, r.top - ch - 16);
+        let left = Math.min(Math.max(12, r.left), innerWidth - cw - 12);
+        Object.assign(this.card.style, { top: top + "px", left: left + "px", transform: "none" });
+      } else {
+        Object.assign(this.card.style, { top: "50%", left: "50%", transform: "translate(-50%,-50%)" });
+      }
+    }, target ? 320 : 0);
+  },
+  end() {
+    this.active = false;
+    [this.backdrop, this.hole, this.card].forEach(el => el && el.remove());
+    try { localStorage.setItem(TOUR_KEY, "1"); } catch (e) {}
+  }
+};
 
 function renderAltPanel() {
   const alt = S.alternatives[activeAlt];
@@ -653,6 +943,8 @@ function renderAltPanel() {
     };
     panel.appendChild(div);
   });
+
+  decorateHelp(panel);
 
   const add = document.createElement("button");
   add.className = "btn";
@@ -709,6 +1001,8 @@ function renderResults(all) {
   });
   html += "</tbody></table></div>";
   $("resultsTable").innerHTML = html;
+  renderInterpretation(all, best);
+  renderSensitivity();
   // Warnings
   const warns = [];
   const totalCost = all.reduce((s, x) => s + x.res.undiscAgency, 0);
@@ -718,6 +1012,86 @@ function renderResults(all) {
     if (qMiles > S.maxQueue && S.maxQueue > 0) warns.push(`${x.alt.name}: predicted queue ≈ ${qMiles.toFixed(1)} mi exceeds the ${S.maxQueue} mi maximum.`);
   });
   $("warnings").innerHTML = warns.map(w => `<p class="warn">⚠ ${w}</p>`).join("");
+}
+
+/* Plain-language reading of the results */
+function renderInterpretation(all, best) {
+  const el = $("interpretation");
+  if (!el) return;
+  const live = all.filter(x => x.res.totalNPV > 0);
+  if (live.length < 2) {
+    el.innerHTML = `<p class="note">Enter agency construction costs for at least two alternatives (or click
+      <b>Load worked example</b>) to see a written comparison here.</p>`;
+    return;
+  }
+  const sorted = [...all].sort((a, b) => a.res.totalNPV - b.res.totalNPV);
+  const win = sorted[0], runner = sorted[1];
+  const gap = runner.res.totalNPV - win.res.totalNPV;
+  const gapPct = runner.res.totalNPV > 0 ? (gap / runner.res.totalNPV) * 100 : 0;
+  const cheapestFirstCost = [...all].sort((a, b) =>
+    (a.alt.activities[0]?.agencyCost || 0) - (b.alt.activities[0]?.agencyCost || 0))[0];
+  const userShare = win.res.totalNPV > 0 ? (win.res.userNPV / win.res.totalNPV) * 100 : 0;
+
+  const bits = [];
+  bits.push(`<b>${win.alt.name}</b> has the lowest life-cycle cost at ${money(win.res.totalNPV)}k NPV
+    (${money(win.res.euac)}k per year as an EUAC), beating ${runner.alt.name} by ${money(gap)}k
+    &mdash; about ${gapPct.toFixed(0)}%.`);
+  if (gapPct < 10) {
+    bits.push(`That margin is under 10%, which is inside the noise of typical cost-estimate accuracy.
+      Treat these two as effectively tied and decide on other grounds &mdash; constructability, risk,
+      traffic impacts, or funding timing.`);
+  }
+  if (cheapestFirstCost.alt !== win.alt) {
+    bits.push(`Note that <b>${cheapestFirstCost.alt.name}</b> has the lower initial construction cost but
+      does not win on life-cycle cost &mdash; the classic LCCA result, and the reason the analysis is worth running.`);
+  }
+  if (S.includeUser === "Yes" && userShare > 1) {
+    bits.push(`User costs make up ${userShare.toFixed(0)}% of the winner's total. ${userShare > 40
+      ? "That is a large share, so the ranking is sensitive to your work-zone assumptions &mdash; check closure hours and durations carefully."
+      : "Agency cost is doing most of the work in this comparison."}`);
+  } else if (S.includeUser !== "Yes") {
+    bits.push(`User costs are currently excluded, so this ranking reflects agency spending only.
+      Turning them on will penalize alternatives with more frequent or longer lane closures.`);
+  }
+  el.innerHTML = `<h3 style="margin-top:0">What this means</h3>` + bits.map(b => `<p>${b}</p>`).join("");
+}
+
+/* Discount-rate sensitivity: does the winner survive a different rate? */
+function renderSensitivity() {
+  const el = $("sensitivityBody");
+  if (!el) return;
+  const rates = [2, 3, 3.2, 4, 5, 6];
+  const saved = S.discountRate;
+  const rows = rates.map(r => {
+    S.discountRate = r;
+    const all = computeAll();
+    const bestIdx = all.reduce((m, x, i) => x.res.totalNPV < all[m].res.totalNPV ? i : m, 0);
+    return { r, all, bestIdx };
+  });
+  S.discountRate = saved;
+  const anyCost = rows.some(row => row.all.some(x => x.res.totalNPV > 0));
+  if (!anyCost) {
+    el.innerHTML = `<p class="note">Enter costs (or load the worked example) to see how the ranking responds to the discount rate.</p>`;
+    return;
+  }
+  const winners = new Set(rows.map(r => r.bestIdx));
+  let html = `<div style="overflow-x:auto"><table class="data"><thead><tr><th>Discount rate</th>`;
+  S.alternatives.forEach((a, i) => {
+    html += `<th><span class="swatch" style="background:var(${ALT_COLORS[i % 4]})"></span>${a.name.length > 18 ? a.name.slice(0, 17) + "…" : a.name}</th>`;
+  });
+  html += `<th>Lowest cost</th></tr></thead><tbody>`;
+  rows.forEach(row => {
+    html += `<tr${row.r === saved ? ' style="background:var(--accent-wash)"' : ""}><td>${row.r}%${row.r === saved ? " (current)" : ""}</td>`;
+    row.all.forEach((x, i) => {
+      html += `<td${i === row.bestIdx ? ' style="font-weight:650"' : ""}>${money(x.res.totalNPV)}</td>`;
+    });
+    html += `<td>${row.all[row.bestIdx].alt.name.length > 18 ? row.all[row.bestIdx].alt.name.slice(0, 17) + "…" : row.all[row.bestIdx].alt.name}</td></tr>`;
+  });
+  html += `</tbody></table></div>`;
+  html += winners.size === 1
+    ? `<p class="note" style="margin-top:8px">✓ The same alternative wins at every rate tested &mdash; the ranking is robust to this assumption.</p>`
+    : `<p class="warn" style="margin-top:8px">⚠ The winner changes with the discount rate. Report this explicitly rather than presenting a single ranking as settled.</p>`;
+  el.innerHTML = html;
 }
 
 function svgEl(tag, attrs) {
@@ -926,6 +1300,15 @@ $("btnReset").onclick = () => {
   }
 };
 $("btnRecalc").onclick = () => refresh();
+$("btnTour").onclick = () => { if (!tour.active) tour.start(); };
+$("btnExample").onclick = () => {
+  S = buildExample();
+  activeAlt = 0;
+  initUI();
+  refresh();
+  $("exampleBanner").style.display = "block";
+  $("kpiRow").scrollIntoView({ behavior: "smooth", block: "center" });
+};
 
 /* ============================================================
    Boot
@@ -952,6 +1335,19 @@ function initUI() {
 initUI();
 refresh();
 window.addEventListener("resize", () => refresh());
+
+// First-time visitors get pointed at the tour rather than dropped into a form.
+try {
+  if (!localStorage.getItem(TOUR_KEY)) {
+    const b = $("exampleBanner");
+    b.innerHTML = `<b>First time here?</b> This tool compares pavement rehabilitation strategies by
+      life-cycle cost. Take the <button class="btn" id="bannerTour" style="margin:0 2px">▸ one-minute tour</button>
+      or <button class="btn" id="bannerExample" style="margin:0 2px">load the worked example</button> to see it in action.`;
+    b.style.display = "block";
+    $("bannerTour").onclick = () => { b.style.display = "none"; tour.start(); };
+    $("bannerExample").onclick = () => { b.style.display = "none"; $("btnExample").click(); };
+  }
+} catch (e) {}
 </script>
 </body>
 </html>
