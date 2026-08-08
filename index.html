@@ -1,0 +1,957 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RealCost LCCA Dashboard — Pavement Life-Cycle Cost Analysis</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --series-1: #2a78d6;  /* agency / alt 1 */
+    --series-2: #eb6834;  /* user / alt 2 */
+    --series-3: #1baf7a;  /* alt 3 */
+    --series-4: #eda100;  /* alt 4 */
+    --good: #0ca30c;
+    --critical: #d03b3b;
+    --input-bg: #ffffff;
+    --accent-wash: rgba(42,120,214,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface-1: #1a1a19;
+      --page: #0d0d0d;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #898781;
+      --grid: #2c2c2a;
+      --baseline: #383835;
+      --border: rgba(255,255,255,0.10);
+      --series-1: #3987e5;
+      --series-2: #d95926;
+      --series-3: #199e70;
+      --series-4: #c98500;
+      --good: #0ca30c;
+      --critical: #d03b3b;
+      --input-bg: #232322;
+      --accent-wash: rgba(57,135,229,0.14);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --page: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --grid: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255,255,255,0.10);
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --good: #0ca30c;
+    --critical: #d03b3b;
+    --input-bg: #232322;
+    --accent-wash: rgba(57,135,229,0.14);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  header {
+    padding: 20px 28px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-1);
+  }
+  header h1 { margin: 0 0 2px; font-size: 20px; font-weight: 650; }
+  header p { margin: 0; color: var(--text-secondary); font-size: 13px; }
+  main { max-width: 1240px; margin: 0 auto; padding: 20px 24px 60px; }
+  section.card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+  }
+  h2 { font-size: 15px; font-weight: 650; margin: 0 0 12px; }
+  h3 { font-size: 13px; font-weight: 650; margin: 14px 0 8px; color: var(--text-secondary); }
+  .grid { display: grid; gap: 10px 18px; }
+  .grid.c3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .grid.c4 { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+  label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--text-secondary); }
+  label.field span.u { color: var(--text-muted); font-weight: 400; }
+  input[type=number], input[type=text], select {
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font: inherit;
+    width: 100%;
+  }
+  input:focus, select:focus { outline: 2px solid var(--series-1); outline-offset: -1px; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tabs button {
+    padding: 7px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .tabs button.active { background: var(--accent-wash); color: var(--text-primary); border-color: var(--series-1); font-weight: 600; }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: baseline; }
+  table.data { border-collapse: collapse; width: 100%; font-size: 13px; }
+  table.data th, table.data td { padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--grid); }
+  table.data th:first-child, table.data td:first-child { text-align: left; }
+  table.data th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
+  table.data td { font-variant-numeric: tabular-nums; }
+  table.data tr.best td { font-weight: 650; }
+  .activity-block { border: 1px solid var(--grid); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
+  .activity-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .activity-head input[type=text] { font-weight: 600; }
+  .row-actions button, .btn {
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .row-actions button:hover, .btn:hover { background: var(--accent-wash); color: var(--text-primary); }
+  .btn.primary { background: var(--series-1); border-color: var(--series-1); color: #fff; font-weight: 600; }
+  .charts { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  .chart-wrap { overflow-x: auto; }
+  .chart-title { font-size: 13px; font-weight: 650; margin-bottom: 2px; }
+  .chart-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); margin: 6px 0 2px; }
+  .legend .item { display: flex; align-items: center; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    z-index: 50;
+    display: none;
+    max-width: 260px;
+  }
+  .tooltip b { font-variant-numeric: tabular-nums; }
+  .note { font-size: 12px; color: var(--text-muted); }
+  .warn { color: var(--critical); font-size: 12px; font-weight: 600; }
+  details.method { font-size: 13px; color: var(--text-secondary); }
+  details.method summary { cursor: pointer; font-weight: 600; color: var(--text-primary); }
+  details.method li { margin: 4px 0; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .kpi {
+    border: 1px solid var(--grid);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .kpi .l { font-size: 12px; color: var(--text-secondary); }
+  .kpi .v { font-size: 22px; font-weight: 650; margin-top: 2px; }
+  .kpi .s { font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pavement Life-Cycle Cost Analysis</h1>
+  <p>Deterministic LCCA dashboard reimplementing FHWA RealCost 2.5 (Caltrans 2.5.7CA) methodology &mdash; agency costs, work-zone user costs, and NPV comparison of rehabilitation alternatives.</p>
+</header>
+<main>
+
+<section class="card">
+  <div class="toolbar">
+    <button class="btn primary" id="btnRecalc">Recalculate</button>
+    <button class="btn" id="btnExportJson">Export scenario (JSON)</button>
+    <button class="btn" id="btnImportJson">Import scenario</button>
+    <input type="file" id="fileImport" accept=".json" style="display:none">
+    <button class="btn" id="btnExportCsv">Download results (CSV)</button>
+    <button class="btn" id="btnReset">Reset to workbook seed</button>
+    <span class="note" id="saveNote">Changes auto-save to this browser.</span>
+  </div>
+</section>
+
+<section class="card">
+  <h2>1 &middot; Economic Variables &amp; Analysis Options</h2>
+  <div class="grid c4">
+    <label class="field">Analysis Period <span class="u">(years)</span><input type="number" id="analysisPeriod" min="1" max="100"></label>
+    <label class="field">Beginning of Analysis<input type="number" id="startYear" min="1990" max="2100"></label>
+    <label class="field">Discount Rate <span class="u">(%)</span><input type="number" id="discountRate" step="0.1"></label>
+    <label class="field">Include User Costs<select id="includeUser"><option>Yes</option><option>No</option></select></label>
+    <label class="field">Agency Remaining Service Life Credit<select id="agencyRSL"><option>No</option><option>Yes</option></select></label>
+    <label class="field">User Cost Remaining Service Life Credit<select id="userRSL"><option>Yes</option><option>No</option></select></label>
+    <label class="field">VOT &mdash; Passenger Cars <span class="u">($/hr)</span><input type="number" id="votCar" step="0.1"></label>
+    <label class="field">VOT &mdash; Single-Unit Trucks <span class="u">($/hr)</span><input type="number" id="votSut" step="0.1"></label>
+    <label class="field">VOT &mdash; Combination Trucks <span class="u">($/hr)</span><input type="number" id="votCt" step="0.1"></label>
+  </div>
+</section>
+
+<section class="card">
+  <h2>2 &middot; Traffic Data</h2>
+  <div class="grid c4">
+    <label class="field">AADT, Construction Year <span class="u">(both directions)</span><input type="number" id="aadt" min="0"></label>
+    <label class="field">Annual Traffic Growth <span class="u">(%)</span><input type="number" id="growth" step="0.1"></label>
+    <label class="field">Maximum AADT <span class="u">(cap)</span><input type="number" id="maxAadt" min="0"></label>
+    <label class="field">Cars <span class="u">(% of AADT)</span><input type="number" id="pctCar" step="0.1"></label>
+    <label class="field">Single-Unit Trucks <span class="u">(%)</span><input type="number" id="pctSut" step="0.1"></label>
+    <label class="field">Combination Trucks <span class="u">(%)</span><input type="number" id="pctCt" step="0.1"></label>
+    <label class="field">Normal Speed Limit <span class="u">(mph)</span><input type="number" id="speedLimit"></label>
+    <label class="field">Lanes per Direction <span class="u">(normal)</span><input type="number" id="lanes" min="1"></label>
+    <label class="field">Free-Flow Capacity <span class="u">(vphpl)</span><input type="number" id="ffCap"></label>
+    <label class="field">Queue Dissipation Capacity <span class="u">(vphpl)</span><input type="number" id="qdCap"></label>
+    <label class="field">Hourly Distribution<select id="hourlyDist"></select></label>
+    <label class="field">Max Queue Length <span class="u">(miles, warning)</span><input type="number" id="maxQueue" step="0.5"></label>
+  </div>
+  <p class="note" id="trafficNote"></p>
+</section>
+
+<section class="card">
+  <h2>3 &middot; Alternatives &amp; Activity Sequences</h2>
+  <div class="tabs" id="altTabs"></div>
+  <div id="altPanel"></div>
+</section>
+
+<section class="card">
+  <h2>4 &middot; Results</h2>
+  <div class="kpi-row" id="kpiRow"></div>
+  <div id="resultsTable"></div>
+  <p class="note" style="margin-top:8px">NPV in thousands of dollars, discounted to the beginning of the analysis period. EUAC = equivalent uniform annual cost. Lowest total NPV shown in bold.</p>
+  <div id="warnings"></div>
+</section>
+
+<section class="card charts">
+  <div>
+    <div class="chart-title">Net Present Value by Alternative</div>
+    <div class="chart-sub">Agency and user cost components, $1000s</div>
+    <div class="legend" id="npvLegend"></div>
+    <div class="chart-wrap" id="npvChart"></div>
+  </div>
+  <div>
+    <div class="chart-title">Expenditure Stream</div>
+    <div class="chart-sub">Undiscounted agency costs by year for each alternative, $1000s</div>
+    <div class="chart-wrap" id="streamChart"></div>
+  </div>
+  <div>
+    <div class="chart-title">Work-Zone Hour-by-Hour Demand vs Capacity</div>
+    <div class="chart-sub" id="hourlySub">Select an alternative/activity with a lane closure to inspect queueing.</div>
+    <div class="toolbar" style="margin-bottom:6px">
+      <select id="hourlyAltSel" style="max-width:230px"></select>
+      <select id="hourlyActSel" style="max-width:280px"></select>
+      <select id="hourlyDirSel" style="max-width:150px"><option value="in">Inbound</option><option value="out">Outbound</option></select>
+    </div>
+    <div class="legend" id="hourlyLegend"></div>
+    <div class="chart-wrap" id="hourlyChart"></div>
+  </div>
+</section>
+
+<section class="card">
+  <details class="method">
+    <summary>Methodology, sources, and simplifications</summary>
+    <ul>
+      <li><b>Agency cost NPV</b>: each activity's construction cost is discounted from its year of action; annual maintenance costs are discounted year-by-year over the activity's life within the analysis period. Remaining-service-life credit (when enabled) prorates the last activity's cost by its unused life at the end of the analysis period and credits it as a negative cost in the final year &mdash; the RealCost 2.5 convention.</li>
+      <li><b>User costs</b> follow the FHWA "calculated" work-zone method: hourly demand (AADT &times; hourly distribution &times; directional split) is compared with work-zone capacity during closure hours. Delay components: work-zone traversal delay (reduced speed over the work-zone length), speed-change delay and vehicle operating cost (FHWA Aug-1996 added-time/added-cost tables, CPI-escalated to 2012 as in RealCost 2.5.7CA), queue delay from a deterministic queuing diagram, and idling VOC on queued vehicle-hours. Delay is monetized per vehicle class with the values of time above.</li>
+      <li><b>Hourly distributions</b> are the RealCost built-ins (MicroBENCOST rural/urban, Weekday Double-Peak) plus the custom distribution found in the source workbook's <i>traffic_c</i> sheet, including directional splits by hour.</li>
+      <li><b>Traffic growth</b> compounds annually from the construction year and is capped at Maximum AADT when provided.</li>
+      <li><b>Seeded from</b> <i>RealCostV2.5.7CA 64bit.xlsm</i>: analysis options, values of time, the four alternative M&amp;R sequences (names, years of action, service lives, maintenance costs). Costs and work-zone details that were blank in the workbook default to zero and must be entered for a meaningful comparison.</li>
+      <li><b>Simplifications vs full RealCost 2.5.7CA</b>: deterministic only (no Monte Carlo simulation); no COZEEP/TMP cost modules; free-flow speed taken as the posted speed limit; queue speed handled through the deterministic queuing diagram rather than the forced-flow speed curve; work-zone closures assumed on all work-zone days.</li>
+    </ul>
+  </details>
+</section>
+
+</main>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   Reference data extracted from RealCostV2.5.7CA 64bit.xlsm
+   ============================================================ */
+
+// FHWA added time (hr/1000 stops) and added cost ($/1000 stops, 2012$ CPI-escalated
+// as in RealCost 2.5.7CA "Supplemental Data") indexed by initial speed, 0..80 by 5.
+const SPEEDS = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80];
+const ADDED_TIME = {
+  car: [0,1.02,1.51,2.00,2.49,2.98,3.46,3.94,4.42,4.90,5.37,5.84,6.31,6.78,7.25,7.71,8.17],
+  sut: [0,0.73,1.47,2.20,2.93,3.67,4.40,5.13,5.87,6.60,7.33,8.07,8.80,9.53,10.27,11.00,11.73],
+  ct:  [0,1.10,2.27,3.48,4.76,6.10,7.56,9.19,11.09,13.39,16.37,20.72,27.94,31.605,39.48,47.90,57.68]
+};
+const ADDED_COST = {
+  car: [0,4.104,13.4216,23.0432,33.0448,43.5784,54.872,66.9712,80.104,94.3464,109.9112,126.8744,145.464,165.7104,187.8872,212.0856,238.412],
+  sut: [0,14.06,31.4944,51.5128,73.568,97.2344,121.9496,147.2576,173.2344,197.7216,221.8592,244.5528,272.0496,297.6768,317.7712,341.8024,365.8336],
+  ct:  [0,51.1024,117.7848,197.5544,288.8912,389.9408,498.8792,613.8368,732.9592,854.4528,976.4632,1097.0904,1214.4648,1291.4528,1399.9656,1508.4784,1617.0064]
+};
+const IDLING = { car: 1.0529, sut: 1.1675, ct: 1.2537 }; // $/veh-hr, 2012$
+
+// Hourly distributions: pct = % of AADT in hour, inb = % of that hour inbound.
+const DISTRIBUTIONS = {
+  "Weekday Double-Peak": {
+    pct: [1.16,0.88,0.86,1.07,2.02,3.83,5.63,6.40,6.10,5.52,4.75,4.30,4.30,5.30,6.02,6.24,6.40,6.20,5.76,4.90,4.04,3.59,2.84,1.89],
+    inb: [49,48,46,44,40,45,51,50,52,51,53,51,50,46,50,50,50,51,51,53,49,48,53,52]
+  },
+  "MicroBENCOST Rural": {
+    pct: [1.8,1.5,1.3,1.3,1.5,1.8,2.5,3.5,4.2,5.0,5.4,5.6,5.7,6.4,6.8,7.3,9.3,7.0,5.5,4.7,3.8,3.2,2.6,2.3],
+    inb: [48,48,45,53,53,53,57,56,56,54,51,51,50,52,51,53,49,43,47,47,46,48,48,47]
+  },
+  "MicroBENCOST Urban": {
+    pct: [1.2,0.8,0.7,0.5,0.7,1.7,5.1,7.8,6.3,5.2,4.7,5.3,5.6,5.7,5.9,6.5,7.9,8.5,5.9,3.9,3.3,2.8,2.3,1.7],
+    inb: [47,43,46,48,57,58,63,60,59,55,46,49,50,50,49,46,45,40,46,48,47,47,48,45]
+  },
+  "Custom (workbook traffic_c)": {
+    pct: [0.5,0.9,1.0,0.8,1.2,3.9,4.8,6.5,4.9,4.6,2.5,3.7,3.5,3.9,4.2,4.9,6.2,8.5,8.8,7.5,5.2,4.9,3.9,3.2],
+    inb: [50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50]
+  }
+};
+
+/* ============================================================
+   Scenario seed — from the workbook's Inputs sheet
+   ============================================================ */
+
+function blankActivity(name, year, life) {
+  return {
+    name: name || "", year: year || 2023, agencyCost: 0, serviceLife: life || 0,
+    annualMaint: 0, wzDuration: 0, lanesOpen: 1, wzLength: 1, wzSpeed: 40, wzCap: 1240,
+    closures: { in: [[20,24],[0,5]], out: [[20,24],[0,5]] } // default night work 8pm–5am
+  };
+}
+
+const SEED = {
+  analysisPeriod: 50, startYear: 2023, discountRate: 3.2,
+  includeUser: "Yes", agencyRSL: "No", userRSL: "Yes",
+  votCar: 12.8, votSut: 31.7, votCt: 31.7,
+  aadt: 34800, growth: 1.0, maxAadt: 100000,
+  pctCar: 100, pctSut: 0, pctCt: 0,
+  speedLimit: 65, lanes: 2, ffCap: 2000, qdCap: 1800,
+  hourlyDist: "Weekday Double-Peak", maxQueue: 5,
+  alternatives: [
+    { name: "Alt 1 — 40YR Rehab (Lane Replace)", activities: [
+      blankActivity("40YR REHAB (LANE REPLACE)", 2023, 45),
+      blankActivity("CAPM (CPR C)", 2068, 5),
+      blankActivity("CAPM (CPR B)", 2073, 10)
+    ]},
+    { name: "Alt 2 — HMA Rehab (20yr cycle)", activities: [
+      blankActivity("REHAB HMA (20 YR)", 2023, 18),
+      blankActivity("CAPM HMA", 2041, 5),
+      blankActivity("REHAB HMA (20 YR)", 2046, 18),
+      blankActivity("CAPM HMA", 2064, 5),
+      blankActivity("REHAB HMA (20YR)", 2069, 18)
+    ]},
+    { name: "Alt 3 — HMA w/ RHMA (20yr cycle)", activities: [
+      blankActivity("REHAB HMA W/ RHMA (20YR)", 2023, 21),
+      blankActivity("CAPM HMA W/ RHMA", 2044, 10),
+      blankActivity("REHAB HMA W/ RHMA (20YR)", 2054, 21),
+      blankActivity("CAPM HMA W/ RHMA", 2075, 10)
+    ]},
+    { name: "Alt 4 — 20YR Rehab (Lane Replace)", activities: [
+      blankActivity("20YR REHAB (LANE REPLACE)", 2023, 30),
+      blankActivity("CAPM (PR C)", 2053, 5),
+      blankActivity("CAPM (PR B)", 2058, 10),
+      blankActivity("CAPM (PR A)", 2068, 10)
+    ]}
+  ]
+};
+// Annual maintenance ($1000) from workbook: Alt2 activity 5 = 1
+SEED.alternatives[1].activities[4].annualMaint = 1;
+
+const STORE_KEY = "realcost-lcca-v1";
+let S = loadScenario();
+let activeAlt = 0;
+
+function loadScenario() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return JSON.parse(JSON.stringify(SEED));
+}
+function saveScenario() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) {}
+}
+
+/* ============================================================
+   Engine — deterministic RealCost method
+   ============================================================ */
+
+function interp(table, speed) {
+  const s = Math.max(0, Math.min(80, speed));
+  const i = Math.min(SPEEDS.length - 2, Math.floor(s / 5));
+  const f = (s - SPEEDS[i]) / 5;
+  return table[i] + f * (table[i + 1] - table[i]);
+}
+
+function classShares() {
+  const tot = (S.pctCar + S.pctSut + S.pctCt) || 100;
+  return { car: S.pctCar / tot, sut: S.pctSut / tot, ct: S.pctCt / tot };
+}
+function weighted(obj) {
+  const sh = classShares();
+  return sh.car * obj.car + sh.sut * obj.sut + sh.ct * obj.ct;
+}
+function votWeighted() {
+  return weighted({ car: S.votCar, sut: S.votSut, ct: S.votCt });
+}
+
+function hourClosed(closures, h) {
+  for (const [a, b] of closures) {
+    if (a <= b ? (h >= a && h < b) : (h >= a || h < b)) return true;
+  }
+  return false;
+}
+
+// Daily work-zone user cost ($) for one direction. Returns {cost, maxQueueVeh, detail[24]}
+function directionDailyCost(act, aadtYear, dir) {
+  const dist = DISTRIBUTIONS[S.hourlyDist];
+  const closures = act.closures[dir] || [];
+  const nLanes = S.lanes, nOpen = Math.min(act.lanesOpen, nLanes);
+  const normCap = S.ffCap * nLanes;
+  const wzCapTot = act.wzCap * nOpen;
+  const qdCapTot = S.qdCap * nLanes;
+  const vot = { car: S.votCar, sut: S.votSut, ct: S.votCt };
+  const sh = classShares();
+
+  // WZ traversal delay per vehicle (hr): reduced speed across wz length during closure
+  const wzDelayHr = act.wzSpeed > 0 && S.speedLimit > 0
+    ? Math.max(0, act.wzLength / act.wzSpeed - act.wzLength / S.speedLimit) : 0;
+  // Speed-change delay/VOC per vehicle: slow from limit to wz speed (difference of table values)
+  const scTime = {}, scCost = {}, stopTime = {}, stopCost = {};
+  for (const c of ["car", "sut", "ct"]) {
+    scTime[c] = Math.max(0, interp(ADDED_TIME[c], S.speedLimit) - interp(ADDED_TIME[c], act.wzSpeed)) / 1000;
+    scCost[c] = Math.max(0, interp(ADDED_COST[c], S.speedLimit) - interp(ADDED_COST[c], act.wzSpeed)) / 1000;
+    stopTime[c] = interp(ADDED_TIME[c], S.speedLimit) / 1000;
+    stopCost[c] = interp(ADDED_COST[c], S.speedLimit) / 1000;
+  }
+
+  let queue = 0, cost = 0, maxQ = 0;
+  const detail = [];
+  for (let h = 0; h < 24; h++) {
+    const hourPct = dist.pct[h] / 100;
+    const dirPct = dir === "in" ? dist.inb[h] / 100 : 1 - dist.inb[h] / 100;
+    const demand = aadtYear * hourPct * dirPct;
+    const closed = hourClosed(closures, h);
+    const cap = closed ? wzCapTot : (queue > 0 ? qdCapTot : normCap);
+    const served = Math.min(demand + queue, cap);
+    const qStart = queue;
+    queue = Math.max(0, queue + demand - cap);
+    maxQ = Math.max(maxQ, queue);
+    const queueVehHrs = (qStart + queue) / 2;
+
+    let hourCost = 0;
+    if (closed) {
+      // All vehicles passing the closure: traversal + speed-change (time + VOC)
+      const perVehTime = wzDelayHr;
+      for (const c of ["car", "sut", "ct"]) {
+        const veh = served * sh[c];
+        hourCost += veh * ((perVehTime + scTime[c]) * vot[c] + scCost[c]);
+      }
+    }
+    if (queueVehHrs > 0) {
+      // Queue idling: time at VOT + idling VOC; arrivals into a standing queue incur a full stop
+      for (const c of ["car", "sut", "ct"]) {
+        hourCost += queueVehHrs * sh[c] * (vot[c] + IDLING[c]);
+      }
+      if (queue > qStart) {
+        const newlyQueued = queue - qStart;
+        for (const c of ["car", "sut", "ct"]) {
+          hourCost += newlyQueued * sh[c] * (stopTime[c] * vot[c] + stopCost[c]);
+        }
+      }
+    }
+    cost += hourCost;
+    detail.push({ h, demand, cap, closed, queue, hourCost });
+  }
+  return { cost, maxQ, detail };
+}
+
+function activityUserCost(act, aadtYear) {
+  if (S.includeUser !== "Yes" || act.wzDuration <= 0) return { total: 0, maxQ: 0 };
+  const inb = directionDailyCost(act, aadtYear, "in");
+  const outb = directionDailyCost(act, aadtYear, "out");
+  return { total: (inb.cost + outb.cost) * act.wzDuration / 1000, maxQ: Math.max(inb.maxQ, outb.maxQ) }; // $1000
+}
+
+function aadtInYear(year) {
+  const yrs = year - S.startYear;
+  const grown = S.aadt * Math.pow(1 + S.growth / 100, Math.max(0, yrs));
+  return S.maxAadt > 0 ? Math.min(grown, S.maxAadt) : grown;
+}
+
+function computeAlternative(alt) {
+  const r = S.discountRate / 100;
+  const endYear = S.startYear + S.analysisPeriod;
+  const df = y => Math.pow(1 + r, -(y - S.startYear));
+  let agencyNPV = 0, userNPV = 0, undiscAgency = 0, undiscUser = 0;
+  let maxQ = 0;
+  const stream = {}; // year -> agency cost (undiscounted)
+  const acts = alt.activities.filter(a => a.name && a.year >= S.startYear && a.year < endYear);
+  acts.forEach((act, i) => {
+    // Construction cost
+    agencyNPV += act.agencyCost * df(act.year);
+    undiscAgency += act.agencyCost;
+    stream[act.year] = (stream[act.year] || 0) + act.agencyCost;
+    // Annual maintenance over activity life (within analysis period, until next activity)
+    const next = acts[i + 1];
+    const lifeEnd = Math.min(endYear, next ? next.year : act.year + Math.max(1, act.serviceLife));
+    if (act.annualMaint > 0) {
+      for (let y = act.year + 1; y < lifeEnd; y++) {
+        agencyNPV += act.annualMaint * df(y);
+        undiscAgency += act.annualMaint;
+        stream[y] = (stream[y] || 0) + act.annualMaint;
+      }
+    }
+    // User cost at year of action
+    const uc = activityUserCost(act, aadtInYear(act.year));
+    userNPV += uc.total * df(act.year);
+    undiscUser += uc.total;
+    maxQ = Math.max(maxQ, uc.maxQ);
+  });
+  // Remaining service life credits (last activity prorated at end of analysis)
+  const last = acts[acts.length - 1];
+  let rslNote = "";
+  if (last && last.serviceLife > 0) {
+    const unusedYrs = last.year + last.serviceLife - endYear;
+    if (unusedYrs > 0) {
+      const frac = Math.min(1, unusedYrs / last.serviceLife);
+      if (S.agencyRSL === "Yes") {
+        agencyNPV -= last.agencyCost * frac * df(endYear);
+        rslNote = `Agency RSL credit: ${(frac * 100).toFixed(0)}% of last activity`;
+      }
+      if (S.userRSL === "Yes" && S.includeUser === "Yes") {
+        const uc = activityUserCost(last, aadtInYear(last.year));
+        userNPV -= uc.total * frac * df(endYear);
+      }
+    }
+  }
+  const totalNPV = agencyNPV + userNPV;
+  const crf = r > 0 ? (r * Math.pow(1 + r, S.analysisPeriod)) / (Math.pow(1 + r, S.analysisPeriod) - 1) : 1 / S.analysisPeriod;
+  return { agencyNPV, userNPV, totalNPV, euac: totalNPV * crf, undiscAgency, undiscUser, stream, maxQ, rslNote };
+}
+
+function computeAll() {
+  return S.alternatives.map(a => ({ alt: a, res: computeAlternative(a) }));
+}
+
+/* ============================================================
+   UI — inputs
+   ============================================================ */
+
+const $ = id => document.getElementById(id);
+const fmt = (v, d = 0) => v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const money = v => "$" + fmt(v, 0);
+const ALT_COLORS = ["--series-1", "--series-2", "--series-3", "--series-4"];
+const cvar = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+const GLOBAL_FIELDS = ["analysisPeriod","startYear","discountRate","includeUser","agencyRSL","userRSL",
+  "votCar","votSut","votCt","aadt","growth","maxAadt","pctCar","pctSut","pctCt",
+  "speedLimit","lanes","ffCap","qdCap","hourlyDist","maxQueue"];
+
+function bindGlobals() {
+  const sel = $("hourlyDist");
+  sel.innerHTML = Object.keys(DISTRIBUTIONS).map(k => `<option>${k}</option>`).join("");
+  for (const f of GLOBAL_FIELDS) {
+    const el = $(f);
+    el.value = S[f];
+    el.addEventListener("change", () => {
+      S[f] = el.tagName === "SELECT" ? el.value : parseFloat(el.value) || 0;
+      refresh();
+    });
+  }
+}
+
+function renderTabs() {
+  const tabs = $("altTabs");
+  tabs.innerHTML = "";
+  S.alternatives.forEach((alt, i) => {
+    const b = document.createElement("button");
+    b.className = i === activeAlt ? "active" : "";
+    b.innerHTML = `<span class="swatch" style="background:var(${ALT_COLORS[i % 4]})"></span>${alt.name}`;
+    b.onclick = () => { activeAlt = i; renderTabs(); renderAltPanel(); };
+    tabs.appendChild(b);
+  });
+}
+
+function closuresToText(cl) {
+  return (cl || []).map(([a, b]) => `${a}-${b}`).join(", ");
+}
+function textToClosures(t) {
+  return t.split(",").map(s => s.trim()).filter(Boolean).map(s => {
+    const m = s.split("-").map(Number);
+    return [m[0] || 0, m[1] || 0];
+  }).filter(p => !(p[0] === p[1]));
+}
+
+function renderAltPanel() {
+  const alt = S.alternatives[activeAlt];
+  const panel = $("altPanel");
+  panel.innerHTML = "";
+  const nameField = document.createElement("div");
+  nameField.className = "grid c3";
+  nameField.style.marginBottom = "12px";
+  nameField.innerHTML = `<label class="field">Alternative Name<input type="text" id="altName" value="${alt.name.replace(/"/g, "&quot;")}"></label>`;
+  panel.appendChild(nameField);
+  panel.querySelector("#altName").addEventListener("change", e => {
+    alt.name = e.target.value; renderTabs(); refresh();
+  });
+
+  alt.activities.forEach((act, ai) => {
+    const div = document.createElement("div");
+    div.className = "activity-block";
+    div.innerHTML = `
+      <div class="activity-head">
+        <input type="text" data-f="name" value="${(act.name || "").replace(/"/g, "&quot;")}" placeholder="Activity name" style="flex:1">
+        <div class="row-actions"><button data-del="1">Remove</button></div>
+      </div>
+      <div class="grid c4">
+        <label class="field">Year of Action<input type="number" data-f="year" value="${act.year}"></label>
+        <label class="field">Agency Construction Cost <span class="u">($1000)</span><input type="number" data-f="agencyCost" value="${act.agencyCost}"></label>
+        <label class="field">Service Life <span class="u">(years)</span><input type="number" data-f="serviceLife" value="${act.serviceLife}"></label>
+        <label class="field">Annual Maintenance <span class="u">($1000/yr)</span><input type="number" data-f="annualMaint" value="${act.annualMaint}"></label>
+        <label class="field">Work-Zone Duration <span class="u">(days)</span><input type="number" data-f="wzDuration" value="${act.wzDuration}"></label>
+        <label class="field">Lanes Open per Direction<input type="number" data-f="lanesOpen" value="${act.lanesOpen}" min="1"></label>
+        <label class="field">Work-Zone Length <span class="u">(miles)</span><input type="number" data-f="wzLength" value="${act.wzLength}" step="0.1"></label>
+        <label class="field">Work-Zone Speed <span class="u">(mph)</span><input type="number" data-f="wzSpeed" value="${act.wzSpeed}"></label>
+        <label class="field">Work-Zone Capacity <span class="u">(vphpl)</span><input type="number" data-f="wzCap" value="${act.wzCap}"></label>
+        <label class="field">Inbound Closure Hours <span class="u">(e.g. 20-24, 0-5)</span><input type="text" data-f="closIn" value="${closuresToText(act.closures.in)}"></label>
+        <label class="field">Outbound Closure Hours<input type="text" data-f="closOut" value="${closuresToText(act.closures.out)}"></label>
+      </div>`;
+    div.querySelectorAll("input").forEach(inp => {
+      inp.addEventListener("change", () => {
+        const f = inp.dataset.f;
+        if (f === "name") act.name = inp.value;
+        else if (f === "closIn") act.closures.in = textToClosures(inp.value);
+        else if (f === "closOut") act.closures.out = textToClosures(inp.value);
+        else act[f] = parseFloat(inp.value) || 0;
+        refresh();
+      });
+    });
+    div.querySelector("[data-del]").onclick = () => {
+      alt.activities.splice(ai, 1); renderAltPanel(); refresh();
+    };
+    panel.appendChild(div);
+  });
+
+  const add = document.createElement("button");
+  add.className = "btn";
+  add.textContent = "+ Add activity";
+  add.onclick = () => {
+    const lastY = alt.activities.length ? alt.activities[alt.activities.length - 1].year + 10 : S.startYear;
+    alt.activities.push(blankActivity("New activity", lastY, 10));
+    renderAltPanel(); refresh();
+  };
+  panel.appendChild(add);
+}
+
+/* ============================================================
+   UI — results & charts
+   ============================================================ */
+
+const tooltip = $("tooltip");
+function showTip(html, x, y) {
+  tooltip.innerHTML = html;
+  tooltip.style.display = "block";
+  const pad = 14;
+  const w = tooltip.offsetWidth, hh = tooltip.offsetHeight;
+  let px = x + pad, py = y - hh - 8;
+  if (px + w > innerWidth - 8) px = x - w - pad;
+  if (py < 8) py = y + pad;
+  tooltip.style.left = px + "px";
+  tooltip.style.top = py + "px";
+}
+function hideTip() { tooltip.style.display = "none"; }
+
+function renderResults(all) {
+  const best = all.reduce((m, x, i) => x.res.totalNPV < all[m].res.totalNPV ? i : m, 0);
+  // KPI row
+  $("kpiRow").innerHTML = all.length ? `
+    <div class="kpi"><div class="l">Lowest-cost alternative</div>
+      <div class="v"><span class="swatch" style="background:var(${ALT_COLORS[best % 4]})"></span>${all[best].alt.name}</div>
+      <div class="s">Total NPV ${money(all[best].res.totalNPV)}k &middot; EUAC ${money(all[best].res.euac)}k/yr</div></div>
+    <div class="kpi"><div class="l">Analysis</div>
+      <div class="v">${S.analysisPeriod} yrs</div>
+      <div class="s">${S.startYear}&ndash;${S.startYear + S.analysisPeriod}, discount ${S.discountRate}%</div></div>
+    <div class="kpi"><div class="l">Construction-year traffic</div>
+      <div class="v">${fmt(S.aadt)}</div>
+      <div class="s">AADT, growth ${S.growth}%/yr</div></div>` : "";
+  // Table
+  let html = `<div style="overflow-x:auto"><table class="data"><thead><tr>
+    <th>Alternative</th><th>Agency NPV ($1000)</th><th>User NPV ($1000)</th>
+    <th>Total NPV ($1000)</th><th>EUAC ($1000/yr)</th><th>Undiscounted Agency</th></tr></thead><tbody>`;
+  all.forEach((x, i) => {
+    html += `<tr class="${i === best ? "best" : ""}">
+      <td><span class="swatch" style="background:var(${ALT_COLORS[i % 4]})"></span>${x.alt.name}${i === best ? " ✓" : ""}</td>
+      <td>${money(x.res.agencyNPV)}</td><td>${money(x.res.userNPV)}</td>
+      <td>${money(x.res.totalNPV)}</td><td>${money(x.res.euac)}</td>
+      <td>${money(x.res.undiscAgency)}</td></tr>`;
+  });
+  html += "</tbody></table></div>";
+  $("resultsTable").innerHTML = html;
+  // Warnings
+  const warns = [];
+  const totalCost = all.reduce((s, x) => s + x.res.undiscAgency, 0);
+  if (totalCost === 0) warns.push("All agency construction costs are zero — enter costs in section 3 for a meaningful comparison (the source workbook had none filled in).");
+  all.forEach((x, i) => {
+    const qMiles = x.res.maxQ / (S.lanes * 130); // ~130 veh/mi/lane storage
+    if (qMiles > S.maxQueue && S.maxQueue > 0) warns.push(`${x.alt.name}: predicted queue ≈ ${qMiles.toFixed(1)} mi exceeds the ${S.maxQueue} mi maximum.`);
+  });
+  $("warnings").innerHTML = warns.map(w => `<p class="warn">⚠ ${w}</p>`).join("");
+}
+
+function svgEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const k in attrs) el.setAttribute(k, attrs[k]);
+  return el;
+}
+
+function renderNpvChart(all) {
+  const wrap = $("npvChart");
+  wrap.innerHTML = "";
+  $("npvLegend").innerHTML = `
+    <span class="item"><span class="swatch" style="background:var(--series-1)"></span>Agency cost</span>
+    <span class="item"><span class="swatch" style="background:var(--series-2)"></span>User cost</span>`;
+  const W = Math.max(560, wrap.clientWidth || 560), H = 260;
+  const m = { t: 14, r: 16, b: 54, l: 70 };
+  const svg = svgEl("svg", { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "NPV by alternative" });
+  const maxV = Math.max(1, ...all.map(x => x.res.agencyNPV + Math.max(0, x.res.userNPV)));
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const y = v => m.t + ih - (v / maxV) * ih;
+  // grid
+  for (let i = 0; i <= 4; i++) {
+    const gv = maxV * i / 4;
+    svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: y(gv), y2: y(gv), stroke: cvar("--grid"), "stroke-width": 1 }));
+    const t = svgEl("text", { x: m.l - 8, y: y(gv) + 4, "text-anchor": "end", "font-size": 11, fill: cvar("--text-muted") });
+    t.textContent = fmt(gv);
+    svg.appendChild(t);
+  }
+  const bw = Math.min(72, iw / all.length * 0.5);
+  all.forEach((x, i) => {
+    const cx = m.l + iw * (i + 0.5) / all.length;
+    const aH = (x.res.agencyNPV / maxV) * ih;
+    const uH = (Math.max(0, x.res.userNPV) / maxV) * ih;
+    const agency = svgEl("rect", { x: cx - bw / 2, y: y(x.res.agencyNPV), width: bw, height: Math.max(0, aH), fill: cvar(ALT_COLORS[i % 4] === "--series-1" ? "--series-1" : "--series-1"), rx: 0 });
+    agency.setAttribute("fill", cvar("--series-1"));
+    const user = svgEl("rect", { x: cx - bw / 2, y: y(x.res.agencyNPV + x.res.userNPV) , width: bw, height: Math.max(0, uH - 2), fill: cvar("--series-2") });
+    // 2px surface gap between stacked segments
+    if (uH > 2) user.setAttribute("y", y(x.res.agencyNPV + x.res.userNPV));
+    for (const [rect, label, val] of [[agency, "Agency", x.res.agencyNPV], [user, "User", x.res.userNPV]]) {
+      rect.style.cursor = "pointer";
+      rect.addEventListener("mousemove", e => showTip(
+        `<div>${x.alt.name}</div><div>${label} NPV: <b>${money(val)}k</b></div><div>Total: <b>${money(x.res.totalNPV)}k</b></div>`, e.clientX, e.clientY));
+      rect.addEventListener("mouseleave", hideTip);
+    }
+    svg.appendChild(agency);
+    if (uH > 0.5) svg.appendChild(user);
+    // total label
+    const tl = svgEl("text", { x: cx, y: y(x.res.agencyNPV + Math.max(0, x.res.userNPV)) - 6, "text-anchor": "middle", "font-size": 11, "font-weight": 600, fill: cvar("--text-primary") });
+    tl.textContent = fmt(x.res.totalNPV);
+    svg.appendChild(tl);
+    // x label
+    const xl = svgEl("text", { x: cx, y: H - m.b + 16, "text-anchor": "middle", "font-size": 11, fill: cvar("--text-secondary") });
+    const short = x.alt.name.length > 24 ? x.alt.name.slice(0, 23) + "…" : x.alt.name;
+    xl.textContent = short;
+    svg.appendChild(xl);
+  });
+  svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: y(0), y2: y(0), stroke: cvar("--baseline"), "stroke-width": 1 }));
+  wrap.appendChild(svg);
+}
+
+function renderStreamChart(all) {
+  const wrap = $("streamChart");
+  wrap.innerHTML = "";
+  const years = [];
+  for (let yy = S.startYear; yy <= S.startYear + S.analysisPeriod; yy++) years.push(yy);
+  const maxV = Math.max(1, ...all.flatMap(x => Object.values(x.res.stream)));
+  const rowH = 64, W = Math.max(680, wrap.clientWidth || 680), m = { l: 190, r: 20 };
+  const iw = W - m.l - m.r;
+  const H = rowH * all.length + 30;
+  const svg = svgEl("svg", { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Expenditure stream" });
+  const xf = yy => m.l + iw * (yy - S.startYear) / S.analysisPeriod;
+  all.forEach((x, i) => {
+    const base = rowH * (i + 1) - 14;
+    svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: base, y2: base, stroke: cvar("--baseline"), "stroke-width": 1 }));
+    const lbl = svgEl("text", { x: m.l - 10, y: base - 18, "text-anchor": "end", "font-size": 11, fill: cvar("--text-secondary") });
+    const short = x.alt.name.length > 26 ? x.alt.name.slice(0, 25) + "…" : x.alt.name;
+    lbl.textContent = short;
+    svg.appendChild(lbl);
+    for (const [yy, v] of Object.entries(x.res.stream)) {
+      if (v <= 0) continue;
+      const bh = Math.max(3, (v / maxV) * (rowH - 26));
+      const r = svgEl("rect", { x: xf(+yy) - 3, y: base - bh, width: 6, height: bh, rx: 2, fill: cvar(ALT_COLORS[i % 4]) });
+      r.style.cursor = "pointer";
+      r.addEventListener("mousemove", e => showTip(`<div>${x.alt.name}</div><div>${yy}: <b>${money(v)}k</b></div>`, e.clientX, e.clientY));
+      r.addEventListener("mouseleave", hideTip);
+      svg.appendChild(r);
+    }
+  });
+  // x axis ticks every 10 yrs
+  for (let yy = S.startYear; yy <= S.startYear + S.analysisPeriod; yy += 10) {
+    const t = svgEl("text", { x: xf(yy), y: H - 8, "text-anchor": "middle", "font-size": 11, fill: cvar("--text-muted") });
+    t.textContent = yy;
+    svg.appendChild(t);
+  }
+  wrap.appendChild(svg);
+}
+
+function renderHourlySelectors() {
+  const altSel = $("hourlyAltSel"), actSel = $("hourlyActSel");
+  altSel.innerHTML = S.alternatives.map((a, i) => `<option value="${i}">${a.name}</option>`).join("");
+  const updateActs = () => {
+    const alt = S.alternatives[+altSel.value] || S.alternatives[0];
+    actSel.innerHTML = alt.activities.map((a, i) => `<option value="${i}">${a.name || "Activity " + (i + 1)}</option>`).join("");
+  };
+  updateActs();
+  altSel.onchange = () => { updateActs(); renderHourlyChart(); };
+  actSel.onchange = renderHourlyChart;
+  $("hourlyDirSel").onchange = renderHourlyChart;
+}
+
+function renderHourlyChart() {
+  const wrap = $("hourlyChart");
+  wrap.innerHTML = "";
+  const alt = S.alternatives[+$("hourlyAltSel").value];
+  if (!alt) return;
+  const act = alt.activities[+$("hourlyActSel").value];
+  if (!act) return;
+  const dir = $("hourlyDirSel").value;
+  const res = directionDailyCost(act, aadtInYear(act.year), dir);
+  $("hourlySub").textContent =
+    `${act.name || "Activity"} in ${act.year} — daily ${dir === "in" ? "inbound" : "outbound"} user cost ${money(res.cost)} · peak queue ${fmt(res.maxQ)} veh`;
+  $("hourlyLegend").innerHTML = `
+    <span class="item"><span class="swatch" style="background:var(--series-1)"></span>Hourly demand (veh)</span>
+    <span class="item"><span class="swatch" style="background:var(--series-2)"></span>Capacity (veh/hr)</span>
+    <span class="item"><span class="swatch" style="background:var(--series-3)"></span>Queue (veh)</span>`;
+  const W = Math.max(640, wrap.clientWidth || 640), H = 240;
+  const m = { t: 12, r: 16, b: 30, l: 60 };
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const maxV = Math.max(1, ...res.detail.map(d => Math.max(d.demand, d.cap, d.queue)));
+  const svg = svgEl("svg", { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Hourly demand vs capacity" });
+  const xf = h => m.l + iw * (h + 0.5) / 24;
+  const yf = v => m.t + ih - (v / maxV) * ih;
+  for (let i = 0; i <= 4; i++) {
+    const gv = maxV * i / 4;
+    svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: yf(gv), y2: yf(gv), stroke: cvar("--grid"), "stroke-width": 1 }));
+    const t = svgEl("text", { x: m.l - 8, y: yf(gv) + 4, "text-anchor": "end", "font-size": 11, fill: cvar("--text-muted") });
+    t.textContent = fmt(gv);
+    svg.appendChild(t);
+  }
+  // closed-hours wash
+  res.detail.forEach(d => {
+    if (d.closed) svg.appendChild(svgEl("rect", { x: m.l + iw * d.h / 24, y: m.t, width: iw / 24, height: ih, fill: cvar("--accent-wash") }));
+  });
+  const path = (key, color, dash) => {
+    const dstr = res.detail.map((d, i) => `${i ? "L" : "M"}${xf(d.h).toFixed(1)},${yf(d[key]).toFixed(1)}`).join("");
+    svg.appendChild(svgEl("path", { d: dstr, fill: "none", stroke: cvar(color), "stroke-width": 2, "stroke-dasharray": dash || "none", "stroke-linejoin": "round" }));
+  };
+  path("demand", "--series-1");
+  path("cap", "--series-2", "5,4");
+  path("queue", "--series-3");
+  for (let h = 0; h < 24; h += 4) {
+    const t = svgEl("text", { x: xf(h), y: H - 8, "text-anchor": "middle", "font-size": 11, fill: cvar("--text-muted") });
+    t.textContent = h + ":00";
+    svg.appendChild(t);
+  }
+  // hover
+  const hover = svgEl("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" });
+  hover.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const h = Math.max(0, Math.min(23, Math.floor((e.clientX - rect.left - m.l) / (iw / 24))));
+    const d = res.detail[h];
+    showTip(`<div>${h}:00–${h + 1}:00 ${d.closed ? "· <b>lane closure</b>" : ""}</div>
+      <div>Demand: <b>${fmt(d.demand)}</b> veh</div><div>Capacity: <b>${fmt(d.cap)}</b> veh/hr</div>
+      <div>Queue at end: <b>${fmt(d.queue)}</b> veh</div><div>Hour user cost: <b>${money(d.hourCost)}</b></div>`, e.clientX, e.clientY);
+  });
+  hover.addEventListener("mouseleave", hideTip);
+  svg.appendChild(hover);
+  wrap.appendChild(svg);
+}
+
+/* ============================================================
+   Export / import
+   ============================================================ */
+
+function download(name, text, type) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], { type }));
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+$("btnExportJson").onclick = () => download("lcca-scenario.json", JSON.stringify(S, null, 2), "application/json");
+$("btnImportJson").onclick = () => $("fileImport").click();
+$("fileImport").addEventListener("change", e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  f.text().then(t => {
+    try { S = JSON.parse(t); activeAlt = 0; initUI(); refresh(); }
+    catch (err) { alert("Could not parse scenario file: " + err.message); }
+  });
+});
+$("btnExportCsv").onclick = () => {
+  const all = computeAll();
+  let csv = "Alternative,Agency NPV ($1000),User NPV ($1000),Total NPV ($1000),EUAC ($1000/yr),Undiscounted Agency ($1000)\n";
+  all.forEach(x => {
+    csv += `"${x.alt.name}",${x.res.agencyNPV.toFixed(1)},${x.res.userNPV.toFixed(1)},${x.res.totalNPV.toFixed(1)},${x.res.euac.toFixed(1)},${x.res.undiscAgency.toFixed(1)}\n`;
+  });
+  download("lcca-results.csv", csv, "text/csv");
+};
+$("btnReset").onclick = () => {
+  if (confirm("Discard current inputs and restore the workbook seed?")) {
+    S = JSON.parse(JSON.stringify(SEED));
+    activeAlt = 0;
+    initUI(); refresh();
+  }
+};
+$("btnRecalc").onclick = () => refresh();
+
+/* ============================================================
+   Boot
+   ============================================================ */
+
+function refresh() {
+  saveScenario();
+  const all = computeAll();
+  renderResults(all);
+  renderNpvChart(all);
+  renderStreamChart(all);
+  renderHourlyChart();
+  $("trafficNote").textContent =
+    `Design-year demand example: AADT in ${S.startYear + 20} ≈ ${fmt(aadtInYear(S.startYear + 20))} (growth ${S.growth}%/yr, cap ${fmt(S.maxAadt)}).`;
+}
+
+function initUI() {
+  bindGlobals();
+  renderTabs();
+  renderAltPanel();
+  renderHourlySelectors();
+}
+
+initUI();
+refresh();
+window.addEventListener("resize", () => refresh());
+</script>
+</body>
+</html>
