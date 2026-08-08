@@ -798,6 +798,93 @@
     .sheetwrap { grid-template-columns: minmax(0, 1fr); }
     section.card { box-shadow: none; break-inside: avoid; }
   }
+  /* ---------- Print / PDF report ---------- */
+  #printHeader { display: none; }
+  .cell-input {
+    width: 90px; padding: 3px 6px; font-family: var(--font-mono);
+    font-size: 12px; text-align: right;
+  }
+  @media print {
+    @page { size: letter portrait; margin: 0.6in 0.55in 0.7in; }
+    /* Force the light palette: printers do not want an asphalt background. */
+    :root, :root[data-theme="dark"], :root:not([data-theme="light"]) {
+      --page: #ffffff; --surface-1: #ffffff; --surface-2: #ffffff;
+      --text-primary: #000000; --text-secondary: #222222; --text-muted: #555555;
+      --grid: #cccccc; --baseline: #888888; --border: #bbbbbb; --border-strong: #888888;
+      --accent-wash: #f2f2f2;
+    }
+    html, body { background: #fff !important; color: #000 !important; }
+    body { font-size: 10pt; }
+    /* Chrome that has no place in a report */
+    .cmdbar, .titleblock, .sheet-rail, .banner, .tour-backdrop, .tour-hole, .tour-card,
+    .popover, .act-tools, .drawer, button.help, #btnPrint, .toolbar,
+    #sec-project .note { display: none !important; }
+    .shell { max-width: none; margin: 0; padding: 0; display: block; }
+    .stack { display: block; }
+    .row2 { display: block; }
+    #printHeader { display: block; margin-bottom: 14pt; }
+    .ph-rule { border-top: 2px solid #000; margin: 0 0 7pt; }
+    .ph-rule + .ph-rule, .ph-top + .ph-rule { border-top-width: 1px; margin-top: 7pt; }
+    .ph-top { display: flex; justify-content: space-between; gap: 24pt; align-items: flex-start; }
+    .ph-kicker {
+      font-family: var(--font-cond); text-transform: uppercase; letter-spacing: .1em;
+      font-size: 8pt; color: #444;
+    }
+    .ph-title { font-family: var(--font-cond); font-size: 19pt; margin: 2pt 0 0; letter-spacing: .01em; }
+    .ph-meta { font-family: var(--font-mono); font-size: 8.5pt; line-height: 1.5; text-align: right; white-space: pre-line; }
+    .ph-basis { font-family: var(--font-serif); font-size: 8.5pt; color: #333; margin: 6pt 0 0; }
+    /* Sections become report blocks */
+    .card {
+      border: none !important; box-shadow: none !important; background: #fff !important;
+      padding: 0 !important; margin: 0 0 16pt !important; break-inside: auto;
+    }
+    .sheet-head {
+      border-bottom: 1.5px solid #000 !important; background: none !important;
+      padding: 0 0 3pt !important; margin-bottom: 8pt; break-after: avoid;
+    }
+    .sheet-head h2 { font-size: 11.5pt; }
+    .sheet-tag { display: none; }
+    .sheet-body { padding: 0 !important; }
+    h3 { break-after: avoid; font-size: 10pt; }
+    /* Inputs print as plain values, not form controls */
+    input, select {
+      border: none !important; background: none !important; padding: 0 !important;
+      color: #000 !important; font-weight: 600; -webkit-appearance: none; appearance: none;
+      width: auto !important; min-width: 0;
+    }
+    label.field { break-inside: avoid; }
+    .grid.c4, .grid.c3 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5pt 14pt; }
+    /* On screen only one alternative's editor is visible at a time; the report
+       needs all of them, so the tabs/editor are swapped for a full schedule. */
+    #sec-alts .tabs, #sec-alts #altPanel { display: none !important; }
+    #printSchedule { display: block !important; }
+    #printSchedule .alt-block { break-inside: avoid; margin-bottom: 11pt; }
+    #printSchedule .alt-title {
+      font-family: var(--font-cond); text-transform: uppercase; letter-spacing: .06em;
+      font-size: 10pt; border-bottom: 1px solid #000; padding-bottom: 2pt; margin-bottom: 4pt;
+    }
+    #printSchedule .alt-desc {
+      font-family: var(--font-serif); font-size: 8.5pt; color: #333; margin: 0 0 4pt;
+    }
+    table.data { break-inside: auto; font-size: 9pt; width: 100%; }
+    table.data thead { display: table-header-group; }
+    table.data tr { break-inside: avoid; }
+    table.data th { border-bottom: 1px solid #000; }
+    .table-scroll { overflow: visible !important; }
+    svg { max-width: 100%; height: auto; }
+    .chart-wrap { overflow: visible !important; break-inside: avoid; }
+    #kpiRow { break-inside: avoid; }
+    #sec-results, #sec-charts, #structures { break-before: page; }
+    #sensitivity { break-inside: avoid; }
+    /* Keep the two pricing tables together rather than orphaning the markups */
+    #unitTable { break-inside: avoid; }
+    details.method { display: block; }
+    details.method summary { display: none; }
+    details.method > *:not(summary) { display: block !important; }
+    .alt-note, #interpretation p { max-width: none; }
+    a { text-decoration: none; color: #000; }
+  }
+
 </style>
 </head>
 <body>
@@ -830,6 +917,7 @@
       <button class="btn" id="btnImportJson">Import scenario</button>
       <input type="file" id="fileImport" accept=".json" style="display:none">
       <button class="btn" id="btnExportCsv">Results CSV</button>
+      <button class="btn" id="btnPrint">PDF report</button>
       <button class="btn" id="btnReset">Reset</button>
     </div>
     <span class="note" id="saveNote">Changes auto-save to this browser.</span>
@@ -837,6 +925,20 @@
 </div>
 
 <main class="shell">
+
+  <!-- Report header: hidden on screen, printed at the top of the PDF -->
+  <div id="printHeader" aria-hidden="true">
+    <div class="ph-rule"></div>
+    <div class="ph-top">
+      <div>
+        <div class="ph-kicker">Pavement Life-Cycle Cost Analysis</div>
+        <h1 class="ph-title" id="phTitle">Life-Cycle Cost Analysis</h1>
+      </div>
+      <div class="ph-meta" id="phMeta"></div>
+    </div>
+    <div class="ph-rule"></div>
+    <p class="ph-basis" id="phBasis"></p>
+  </div>
 
   <div class="banner" id="exampleBanner">
     <b>Worked example loaded.</b> Costs, work-zone details, and truck percentages are illustrative
@@ -861,6 +963,23 @@
     </nav>
 
     <div class="stack">
+
+      <section class="card input-sheet" id="sec-project">
+        <div class="sheet-head">
+          <span class="sheet-no">00</span>
+          <h2>Project Identification</h2>
+          <span class="sheet-tag">Input</span>
+        </div>
+        <div class="sheet-body">
+          <div class="grid c4">
+            <label class="field">Project Name<input type="text" id="projName" placeholder="e.g. I-5 Rehabilitation"></label>
+            <label class="field">Route / Post Miles<input type="text" id="projRoute" placeholder="e.g. SR-99, PM 12.4–17.4"></label>
+            <label class="field">County / District<input type="text" id="projCounty" placeholder="e.g. Fresno, D6"></label>
+            <label class="field">Analyzed By<input type="text" id="projBy" placeholder="Name"></label>
+          </div>
+          <p class="note" style="margin-bottom:0">Used on the printed report header. Optional for the analysis itself.</p>
+        </div>
+      </section>
 
       <div class="row2">
         <section class="card input-sheet" id="sec-econ">
@@ -919,6 +1038,8 @@
         <div class="sheet-body">
           <div class="tabs" id="altTabs"></div>
           <div id="altPanel"></div>
+          <!-- Print-only: the full schedule for every alternative -->
+          <div id="printSchedule" style="display:none"></div>
         </div>
       </section>
 
@@ -1098,7 +1219,7 @@ const DISTRIBUTIONS = {
    in place; the markup chain is Caltrans's roadway-items build-up.
    ============================================================ */
 
-const UNIT_COSTS = {           // $/m³, ESTIMATE sheet cells G10:G16
+const UNIT_COSTS_DEFAULT = {   // $/m³, ESTIMATE sheet cells G10:G16
   PCC:   { cost: 200,  label: "PCC — portland cement concrete (JPCP slab)" },
   RSC:   { cost: 600,  label: "RSC — rapid-strength concrete (overnight lane replacement)" },
   FSHCC: { cost: 1000, label: "FSHCC — fast-setting hydraulic cement concrete" },
@@ -1107,11 +1228,20 @@ const UNIT_COSTS = {           // $/m³, ESTIMATE sheet cells G10:G16
   RAC:   { cost: 110,  label: "RAC/RHMA — rubberized asphalt concrete" }
 };
 
-const MARKUPS = {              // ESTIMATE sheet rows 19–33
+const MARKUPS_DEFAULT = {      // ESTIMATE sheet rows 19–33
   earthwork: 0.02, drainage: 0.01, swppp: 0.10, trafficItems: 0.15,
   minor: 0.05, mobilization: 0.10, supplemental: 0.05, contingency: 0.20,
   supporting: 0.19
 };
+const MARKUP_LABELS = {
+  earthwork: "Earthwork", drainage: "Drainage", swppp: "Specialty items / SWPPP",
+  trafficItems: "Traffic items", minor: "Minor items", mobilization: "Mobilization",
+  supplemental: "Supplemental work", contingency: "Contingency", supporting: "Supporting cost"
+};
+// Live values — the scenario owns these so edits persist, export, and import.
+// Populated from the defaults on first load; see syncPricing().
+let UNIT_COSTS = JSON.parse(JSON.stringify(UNIT_COSTS_DEFAULT));
+let MARKUPS = { ...MARKUPS_DEFAULT };
 
 // CAPM unit costs, capm sheet — used for the lighter preservation treatments
 const CAPM_UNITS = {
@@ -1383,6 +1513,38 @@ const TOUR_KEY = "realcost-lcca-toured";
 let S = loadScenario();
 let activeAlt = 0;
 
+/* The scenario owns pricing so that edits survive reloads and travel with
+   an exported JSON. Older saved scenarios simply pick up the defaults. */
+function syncPricing() {
+  if (!S.unitCosts) S.unitCosts = JSON.parse(JSON.stringify(UNIT_COSTS_DEFAULT));
+  if (!S.markups) S.markups = { ...MARKUPS_DEFAULT };
+  // Fill any key added since the scenario was saved
+  for (const k in UNIT_COSTS_DEFAULT) if (!S.unitCosts[k]) S.unitCosts[k] = { ...UNIT_COSTS_DEFAULT[k] };
+  for (const k in MARKUPS_DEFAULT) if (S.markups[k] == null) S.markups[k] = MARKUPS_DEFAULT[k];
+  UNIT_COSTS = S.unitCosts;
+  MARKUPS = S.markups;
+}
+/* When a unit price or markup changes, any activity whose cost was derived from
+   the estimator is re-derived. Costs typed in by hand are left untouched — the
+   presence of an `estimate` record is what marks a cost as estimator-owned. */
+function repriceActivities() {
+  let changed = 0;
+  S.alternatives.forEach(alt => alt.activities.forEach(a => {
+    if (!a.estimate) return;
+    const est = estimateCost(a.estimate.material, a.estimate.thickIn, a.estimate.laneMiles);
+    if (est) {
+      const next = Math.round(est.total);
+      if (next !== a.agencyCost) { a.agencyCost = next; changed++; }
+    }
+  }));
+  return changed;
+}
+function pricingIsCustom() {
+  return Object.keys(UNIT_COSTS_DEFAULT).some(k => UNIT_COSTS[k].cost !== UNIT_COSTS_DEFAULT[k].cost)
+    || Object.keys(MARKUPS_DEFAULT).some(k => MARKUPS[k] !== MARKUPS_DEFAULT[k]);
+}
+syncPricing();
+
 function loadScenario() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
@@ -1563,9 +1725,12 @@ function computeAll() {
 const $ = id => document.getElementById(id);
 const fmt = (v, d = 0) => v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
 const money = v => "$" + fmt(v, 0);
+// Small figures (annual maintenance, thin-lift costs) round to nothing at 0dp.
+const moneyFine = v => "$" + fmt(v, Math.abs(v) < 10 ? 1 : 0);
 const ALT_COLORS = ["--series-1", "--series-2", "--series-3", "--series-4"];
 const cvar = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
+const TEXT_FIELDS = ["projName", "projRoute", "projCounty", "projBy"];
 const GLOBAL_FIELDS = ["analysisPeriod","startYear","discountRate","includeUser","agencyRSL","userRSL",
   "votCar","votSut","votCt","aadt","growth","maxAadt","pctCar","pctSut","pctCt",
   "speedLimit","lanes","ffCap","qdCap","hourlyDist","maxQueue"];
@@ -1651,6 +1816,12 @@ function bindGlobals() {
       S[f] = el.tagName === "SELECT" ? el.value : parseFloat(el.value) || 0;
       refresh();
     });
+  }
+  for (const f of TEXT_FIELDS) {
+    const el = $(f);
+    if (!el) continue;
+    el.value = S[f] || "";
+    el.addEventListener("change", () => { S[f] = el.value; refresh(); });
   }
   decorateHelp(document);
 }
@@ -2441,6 +2612,72 @@ $("btnReset").onclick = () => {
   }
 };
 $("btnRecalc").onclick = () => refresh();
+
+/* Print report. Browsers' "Save as PDF" destination is the PDF generator here —
+   no library, which also means nothing to load past the CSP. */
+/* The full activity schedule for all alternatives — screen shows one at a time,
+   the report needs every one. */
+function fillPrintSchedule() {
+  const el = $("printSchedule");
+  if (!el) return;
+  el.innerHTML = S.alternatives.map(alt => {
+    const rows = alt.activities.filter(a => a.name).map(a => {
+      const est = a.estimate
+        ? `${a.estimate.material} ${a.estimate.thickIn}&Prime; × ${a.estimate.laneMiles} ln-mi`
+        : "entered directly";
+      return `<tr>
+        <td>${a.name}</td><td>${a.year}</td><td>${money(a.agencyCost)}</td>
+        <td>${a.serviceLife}</td><td>${a.annualMaint ? moneyFine(a.annualMaint) : "—"}</td>
+        <td>${a.wzDuration || 0}</td><td>${a.lanesOpen}</td>
+        <td>${closuresToText(a.closures.in) || "—"}</td>
+        <td style="color:#555">${est}</td></tr>`;
+    }).join("");
+    return `<div class="alt-block">
+      <div class="alt-title">${alt.name}</div>
+      ${alt.note ? `<p class="alt-desc">${alt.note}</p>` : ""}
+      <table class="data"><thead><tr>
+        <th>Activity</th><th>Year</th><th>Cost ($1000)</th><th>Life (yr)</th>
+        <th>Maint ($1000/yr)</th><th>WZ days</th><th>Lanes open</th>
+        <th>Closure hrs</th><th>Cost basis</th></tr></thead>
+      <tbody>${rows}</tbody></table>
+    </div>`;
+  }).join("");
+}
+
+function fillPrintHeader() {
+  const all = computeAll();
+  const best = all.reduce((m, x, i) => x.res.totalNPV < all[m].res.totalNPV ? i : m, 0);
+  $("phTitle").textContent = S.projName || "Life-Cycle Cost Analysis";
+  const now = new Date();
+  const stamp = now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+  const meta = [];
+  if (S.projRoute) meta.push(S.projRoute);
+  if (S.projCounty) meta.push(S.projCounty);
+  meta.push(`${S.analysisPeriod}-year analysis, ${S.startYear}–${S.startYear + S.analysisPeriod}`);
+  meta.push(`Discount rate ${S.discountRate}%`);
+  if (S.projBy) meta.push(`Analyzed by ${S.projBy}`);
+  meta.push(stamp);
+  $("phMeta").textContent = meta.join("\n");
+  const winner = all[best];
+  $("phBasis").innerHTML =
+    `Lowest life-cycle cost: <b>${winner.alt.name}</b> at ${money(winner.res.totalNPV)}k NPV ` +
+    `(${money(winner.res.euac)}k/yr EUAC), of ${all.length} alternatives compared. ` +
+    `User costs ${S.includeUser === "Yes" ? "included" : "excluded"}. ` +
+    `Prepared with an independent implementation of the FHWA/Caltrans RealCost methodology` +
+    `${pricingIsCustom() ? "; unit prices edited from the workbook defaults" : "; workbook default unit prices"}. ` +
+    `Not an official FHWA or Caltrans product — verify against official RealCost before use in a submittal.`;
+}
+$("btnPrint").onclick = () => {
+  // Expand the methodology block so it appears in the PDF, then restore state.
+  const det = document.querySelector("details.method");
+  const wasOpen = det && det.open;
+  if (det) det.open = true;
+  fillPrintHeader();
+  fillPrintSchedule();
+  const restore = () => { if (det) det.open = wasOpen; window.removeEventListener("afterprint", restore); };
+  window.addEventListener("afterprint", restore);
+  window.print();
+};
 $("btnTour").onclick = () => { if (!tour.active) tour.start(); };
 $("btnExample").onclick = () => {
   S = buildExample();
@@ -2498,21 +2735,82 @@ function renderStructures() {
   }
   const ut = $("unitTable");
   if (ut) {
-    ut.innerHTML = `<div class="table-scroll"><table class="data" style="max-width:640px">
-      <thead><tr><th>Material</th><th>Unit cost</th><th>Cost per lane-mile at 3&Prime;</th></tr></thead>
-      <tbody>${Object.entries(UNIT_COSTS).map(([k, v]) => {
-        const perLM = layerVolume(3, 1) * v.cost / 1000;
-        return `<tr><td>${v.label}</td><td>$${v.cost}/m³</td><td>${money(perLM)}k</td></tr>`;
-      }).join("")}</tbody></table></div>
-      <p class="note" style="margin-top:8px">Material cost only — the estimator adds earthwork, drainage, SWPPP, traffic items,
-      minor items, mobilization, supplemental work, contingency, and supporting cost on top, which together roughly
-      <b>2.4&times;</b> the bare pavement figure. CAPM treatments price differently (HMA $${CAPM_UNITS.hmaTon}/ton,
-      RHMA $${CAPM_UNITS.rhmaTon}/ton, milling $${CAPM_UNITS.millSY}/SY, grinding $${CAPM_UNITS.grindSY}/SY,
-      traffic handling $${fmtNum(CAPM_UNITS.dailyTrafficHandling)}/day, COZEEP $${fmtNum(CAPM_UNITS.dailyCozeep)}/day).</p>`;
+    const custom = pricingIsCustom();
+    const mult = estimateCost("HMA", 3, 1).total / (layerVolume(3, 1) * UNIT_COSTS.HMA.cost / 1000);
+    ut.innerHTML = `
+      <p class="note" style="margin-top:0">
+        <b>Every figure below is editable.</b> Type over a unit cost or markup to use your own bid prices;
+        estimates recalculate immediately, and the values persist in this browser and travel with an exported scenario.
+        ${custom ? ' <b style="color:var(--critical)">Currently edited from the workbook defaults.</b>' : ""}
+      </p>
+      <div class="table-scroll"><table class="data" style="max-width:760px">
+        <thead><tr><th>Material</th><th>Unit cost ($/m³)</th><th>Workbook default</th><th>Per lane-mile at 3&Prime;</th></tr></thead>
+        <tbody>${Object.entries(UNIT_COSTS).map(([k, v]) => {
+          const perLM = layerVolume(3, 1) * v.cost / 1000;
+          const def = UNIT_COSTS_DEFAULT[k].cost;
+          return `<tr><td>${v.label}</td>
+            <td><input type="number" class="cell-input" data-price="${k}" value="${v.cost}" min="0" step="5"
+                 aria-label="Unit cost for ${k}"></td>
+            <td style="color:var(--text-muted)">$${def}${v.cost !== def ? " •" : ""}</td>
+            <td>${money(perLM)}k</td></tr>`;
+        }).join("")}</tbody></table></div>
+      <h3>Markups applied on top of material cost</h3>
+      <div class="table-scroll"><table class="data" style="max-width:600px">
+        <thead><tr><th>Item</th><th>Percent</th><th>Workbook default</th></tr></thead>
+        <tbody>${Object.entries(MARKUPS).map(([k, v]) => `
+          <tr><td>${MARKUP_LABELS[k] || k}</td>
+            <td><input type="number" class="cell-input" data-markup="${k}" value="${(v * 100).toFixed(1)}" min="0" step="0.5"
+                 aria-label="Markup percent for ${MARKUP_LABELS[k] || k}"></td>
+            <td style="color:var(--text-muted)">${(MARKUPS_DEFAULT[k] * 100).toFixed(1)}%${
+              Math.abs(v - MARKUPS_DEFAULT[k]) > 1e-9 ? " •" : ""}</td></tr>`).join("")}
+        </tbody></table></div>
+      <div class="toolbar" style="margin-top:12px">
+        <button class="btn" id="btnResetPrices"${custom ? "" : " disabled"}>Restore workbook defaults</button>
+        <span class="note" id="repriceNote"></span>
+      </div>
+      <p class="note" style="margin-top:10px">Earthwork through traffic items are shares of the project subtotal; minor items
+      through contingency compound in sequence; supporting cost applies to the roadway total. At present these multiply bare
+      pavement cost by <b>${mult.toFixed(2)}&times;</b>. CAPM treatments price on a different basis
+      (HMA $${CAPM_UNITS.hmaTon}/ton, RHMA $${CAPM_UNITS.rhmaTon}/ton, milling $${CAPM_UNITS.millSY}/SY,
+      grinding $${CAPM_UNITS.grindSY}/SY, traffic handling $${fmtNum(CAPM_UNITS.dailyTrafficHandling)}/day,
+      COZEEP $${fmtNum(CAPM_UNITS.dailyCozeep)}/day) and are applied as fixed activity costs rather than through this table.</p>`;
+    // Re-rendering the table would drop the caret mid-edit, so remember which
+    // cell was focused and restore it after the refresh.
+    const applyPricing = (focusSel) => {
+      const n = repriceActivities();
+      renderAltPanel();
+      refresh();
+      if (n) {
+        const b = $("repriceNote");
+        if (b) b.textContent = `${n} estimated activity cost${n === 1 ? "" : "s"} re-derived at the new prices.`;
+      }
+      if (focusSel) {
+        const el = document.querySelector(focusSel);
+        if (el) { el.focus(); el.select && el.select(); }
+      }
+    };
+    ut.querySelectorAll("[data-price]").forEach(inp => inp.addEventListener("change", () => {
+      const v = parseFloat(inp.value);
+      const k = inp.dataset.price;
+      if (v >= 0) { UNIT_COSTS[k].cost = v; applyPricing(`[data-price="${k}"]`); }
+    }));
+    ut.querySelectorAll("[data-markup]").forEach(inp => inp.addEventListener("change", () => {
+      const v = parseFloat(inp.value);
+      const k = inp.dataset.markup;
+      if (v >= 0) { MARKUPS[k] = v / 100; applyPricing(`[data-markup="${k}"]`); }
+    }));
+    const rb = $("btnResetPrices");
+    if (rb) rb.onclick = () => {
+      S.unitCosts = JSON.parse(JSON.stringify(UNIT_COSTS_DEFAULT));
+      S.markups = { ...MARKUPS_DEFAULT };
+      syncPricing();
+      applyPricing();
+    };
   }
 }
 
 function refresh() {
+  syncPricing();   // any path that replaced S (example, import, reset) rebinds here
   saveScenario();
   const all = computeAll();
   renderResults(all);
@@ -2525,6 +2823,7 @@ function refresh() {
 }
 
 function initUI() {
+  syncPricing();
   bindGlobals();
   renderTabs();
   renderAltPanel();

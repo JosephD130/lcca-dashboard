@@ -68,3 +68,35 @@ published methodology and the input structure of the RealCost workbook. It is
 not produced, reviewed, endorsed, or supported by FHWA or Caltrans, and is not
 a certified substitute for the official tool. Verify results against official
 RealCost before using them in project decisions or submittals.
+
+## Where the pricing lives
+
+Unit costs and markups are **editable in the app** — section 6, "Pavement
+Structures & Cost Basis". Type over any figure; estimates recalculate, any
+activity cost that was derived from the estimator is re-derived, and the values
+persist in the browser and travel with an exported scenario JSON. "Restore
+workbook defaults" reverts.
+
+The seed values come from the source workbook's hidden sheets, and their
+defaults live in the JS constants near the top of the script:
+
+| Constant | What it holds | Source |
+|---|---|---|
+| `UNIT_COSTS_DEFAULT` | material $/m³ (PCC, RSC, FSHCC, LCB, HMA, RAC) | `ESTIMATE` sheet G10:G16 |
+| `MARKUPS_DEFAULT` | earthwork → supporting cost percentages | `ESTIMATE` sheet rows 19–33 |
+| `CAPM_UNITS` | CAPM $/ton, $/SY, $/day rates | `capm` sheet |
+| `STRUCTURES` | layer types and thicknesses | `Rehab_Thick` sheet |
+| `ADDED_TIME` / `ADDED_COST` / `IDLING` | speed-change and idling tables | `Supplemental Data` sheet |
+| `DISTRIBUTIONS` | hourly traffic distributions | `Supplemental Data`, `traffic_c` |
+
+These are the workbook's illustrative example prices, not current bid prices.
+Replace them with Caltrans Contract Cost Data values before real use.
+
+## PDF report
+
+The **PDF report** button opens the browser print dialog; choose "Save as PDF".
+A dedicated print stylesheet produces a seven-page report: title block with
+project identification, all inputs as static values, the full activity schedule
+for every alternative, results and sensitivity tables, pavement cross-sections,
+the unit-price basis, charts, and the methodology and disclaimer. No library is
+involved, so nothing has to load past the artifact CSP.
