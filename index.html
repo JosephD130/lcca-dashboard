@@ -234,10 +234,30 @@
   /* ============================================================
      Sheet layout — collapsible workflow menu + content
      ============================================================ */
-  .shell { max-width: 1460px; margin: 0 auto; padding: 22px 24px 72px; }
+  /* The shell widens as the sidebar retracts, so the content always uses the
+     space the menu gives back. Both the track and the max-width animate. */
+  .shell {
+    max-width: var(--shell-max, 1460px);
+    margin: 0 auto; padding: 22px 24px 72px;
+    transition: max-width .24s ease;
+  }
   .sheetwrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
   @media (min-width: 1060px) {
-    .sheetwrap { grid-template-columns: 232px minmax(0, 1fr); gap: 30px; align-items: start; }
+    :root { --nav-w: 236px; --shell-max: 1460px; }
+    :root.nav-collapsed { --nav-w: 50px; --shell-max: 1660px; }
+    .sheetwrap {
+      grid-template-columns: var(--nav-w) minmax(0, 1fr);
+      gap: 30px; align-items: start;
+      transition: grid-template-columns .24s ease, gap .24s ease;
+    }
+    :root.nav-collapsed .sheetwrap { gap: 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .shell, .sheetwrap { transition: none; }
+  }
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
   }
 
   /* Narrow screens: a Menu button reveals the same nav inline */
@@ -263,10 +283,66 @@
   @media (min-width: 1060px) {
     .sidenav {
       display: block; position: sticky; top: 20px; align-self: start;
-      max-height: calc(100vh - 40px); overflow-y: auto;
+      max-height: calc(100vh - 40px); overflow-y: auto; overflow-x: hidden;
       border-top: 2px solid var(--border-strong);
+      padding: 0; background: none;
     }
   }
+
+  /* Sidebar header with the collapse control */
+  .nav-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; padding: 8px 0 7px; border-bottom: 1px solid var(--grid);
+  }
+  .nav-bar-title {
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .16em; font-weight: 700; font-size: 9.5px;
+    color: var(--text-muted); white-space: nowrap;
+  }
+  .nav-collapse {
+    flex: none; width: 26px; height: 24px; display: grid; place-items: center;
+    background: none; border: 1px solid var(--border); cursor: pointer;
+    color: var(--text-secondary);
+  }
+  .nav-collapse:hover { color: var(--accent); border-color: var(--accent); }
+  .nav-collapse:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .nc-chev {
+    width: 7px; height: 7px;
+    border-left: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translate(1px, -1px);
+    transition: transform .2s ease;
+  }
+  :root.nav-collapsed .nc-chev { transform: rotate(-135deg) translate(1px, -1px); }
+  @media (prefers-reduced-motion: reduce) { .nc-chev { transition: none; } }
+  /* Collapsed: the header keeps only the toggle, centred */
+  :root.nav-collapsed .nav-bar-title { display: none; }
+  :root.nav-collapsed .nav-bar { justify-content: center; }
+
+  /* Mini rail — the three steps, visible only while collapsed */
+  .nav-mini { display: none; }
+  @media (min-width: 1060px) {
+    :root.nav-collapsed .nav-mini { display: grid; gap: 4px; padding: 8px 0; justify-items: center; }
+    :root.nav-collapsed .nav-full { display: none; }
+  }
+  .nav-mini-btn {
+    display: grid; justify-items: center; gap: 3px;
+    width: 100%; padding: 7px 0; cursor: pointer;
+    background: none; border: 0; border-left: 2px solid transparent;
+    color: var(--text-secondary);
+  }
+  .nav-mini-btn span {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+    color: var(--surface-1); background: var(--text-primary);
+    width: 20px; height: 20px; line-height: 20px; text-align: center;
+  }
+  .nav-mini-btn i {
+    font-style: normal; font-family: var(--font-display);
+    text-transform: uppercase; letter-spacing: .04em;
+    font-size: 8px; font-weight: 700; color: var(--text-muted);
+  }
+  .nav-mini-btn:hover span { background: var(--accent); }
+  .nav-mini-btn:hover i { color: var(--accent); }
+  .nav-mini-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
   .nav-group { border-bottom: 1px solid var(--border-strong); }
   .nav-head {
@@ -999,6 +1075,24 @@
 
     <nav class="sidenav" id="sideNav" aria-label="Workflow">
 
+      <div class="nav-bar">
+        <span class="nav-bar-title">Workflow</span>
+        <button class="nav-collapse" id="navCollapse" aria-expanded="true" aria-controls="sideNav"
+                title="Collapse the menu (\\)">
+          <span class="nc-chev" aria-hidden="true"></span>
+          <span class="visually-hidden">Collapse menu</span>
+        </button>
+      </div>
+
+      <!-- Shown only while collapsed: the three steps as a mini rail -->
+      <div class="nav-mini" aria-hidden="true">
+        <button class="nav-mini-btn" data-open="input"><span>1</span><i>Input</i></button>
+        <button class="nav-mini-btn" data-open="output"><span>2</span><i>Output</i></button>
+        <button class="nav-mini-btn" data-open="scenario"><span>3</span><i>Scenario</i></button>
+      </div>
+
+      <div class="nav-full">
+
       <div class="nav-group" data-group="input">
         <button class="nav-head" aria-expanded="true" aria-controls="navInput">
           <span class="nh-step">1</span>
@@ -1050,6 +1144,7 @@
       </div>
 
       <p class="nav-note" id="saveNote">Changes auto-save to this browser.</p>
+      </div><!-- /.nav-full -->
     </nav>
 
     <div class="stack">
@@ -2945,6 +3040,45 @@ try {
       setOpen(next);
       saved[key] = next;
       try { localStorage.setItem(NAV_KEY, JSON.stringify(saved)); } catch (e) {}
+    });
+  });
+
+  /* Desktop: retract the whole sidebar so the content reflows wider. */
+  const COLLAPSE_KEY = "realcost-lcca-nav-collapsed";
+  const root = document.documentElement;
+  const collapseBtn = $("navCollapse");
+  const setCollapsed = on => {
+    root.classList.toggle("nav-collapsed", on);
+    if (collapseBtn) {
+      collapseBtn.setAttribute("aria-expanded", String(!on));
+      collapseBtn.title = on ? "Expand the menu (\\)" : "Collapse the menu (\\)";
+      collapseBtn.querySelector(".visually-hidden").textContent = on ? "Expand menu" : "Collapse menu";
+    }
+    try { localStorage.setItem(COLLAPSE_KEY, on ? "1" : "0"); } catch (e) {}
+    // Charts size themselves to their container, so redraw once the track settles.
+    setTimeout(() => refresh(), 260);
+  };
+  if (localStorage.getItem(COLLAPSE_KEY) === "1") setCollapsed(true);
+  if (collapseBtn) collapseBtn.addEventListener("click", () => setCollapsed(!root.classList.contains("nav-collapsed")));
+  // Backslash toggles, as long as focus isn't in a field
+  document.addEventListener("keydown", e => {
+    if (e.key !== "\\" || e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "SELECT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+    e.preventDefault();
+    setCollapsed(!root.classList.contains("nav-collapsed"));
+  });
+  // Mini-rail buttons expand the sidebar and open the group they name
+  document.querySelectorAll(".nav-mini-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.open;
+      setCollapsed(false);
+      const group = document.querySelector(`.nav-group[data-group="${key}"]`);
+      if (group) {
+        const head = group.querySelector(".nav-head");
+        if (head.getAttribute("aria-expanded") !== "true") head.click();
+        head.focus();
+      }
     });
   });
 
