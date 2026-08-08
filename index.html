@@ -216,6 +216,21 @@
     display: none;
   }
   @media (prefers-reduced-motion: reduce) { .tour-hole { transition: none; } }
+  /* Activity tools + drawers */
+  .act-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+  .drawer:empty { display: none; }
+  .drawer-inner {
+    margin-top: 10px; padding: 14px 16px;
+    border: 1px solid var(--grid); border-radius: 8px;
+    background: var(--accent-wash);
+  }
+  .drawer-inner h4 { margin: 0 0 4px; font-size: 13px; }
+  .drawer-inner .note { margin-top: 0; }
+  /* Structure comparison strip */
+  .struct-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .struct-cell { border: 1px solid var(--grid); border-radius: 8px; padding: 12px 14px; }
+  .struct-cell h4 { margin: 0 0 2px; font-size: 13px; }
+  .struct-cell .sub { font-size: 11.5px; color: var(--text-muted); margin-bottom: 6px; }
 </style>
 </head>
 <body>
@@ -297,6 +312,15 @@
   <h2>5 &middot; Discount-Rate Sensitivity</h2>
   <p class="note" style="margin-top:-6px;margin-bottom:12px">Total NPV ($1000) for each alternative, recomputed across a range of discount rates. If the winner changes, the ranking depends on an assumption reasonable people disagree about.</p>
   <div id="sensitivityBody"></div>
+</section>
+
+<section class="card" id="structures">
+  <h2>6 &middot; Pavement Structures &amp; Cost Basis</h2>
+  <p class="note" style="margin-top:-6px;margin-bottom:14px">What each alternative is actually building, drawn to scale, and the unit prices behind every cost estimate.</p>
+  <h3 style="margin-top:0">Structures in this comparison</h3>
+  <div class="struct-grid" id="structGrid"></div>
+  <h3>Caltrans unit prices used by the estimator</h3>
+  <div id="unitTable"></div>
 </section>
 
 <section class="card charts">
@@ -408,6 +432,132 @@ const DISTRIBUTIONS = {
 };
 
 /* ============================================================
+   Caltrans cost-estimating basis — extracted from the workbook's
+   hidden ESTIMATE and capm sheets. Unit costs are $/m³ of material
+   in place; the markup chain is Caltrans's roadway-items build-up.
+   ============================================================ */
+
+const UNIT_COSTS = {           // $/m³, ESTIMATE sheet cells G10:G16
+  PCC:   { cost: 200,  label: "PCC — portland cement concrete (JPCP slab)" },
+  RSC:   { cost: 600,  label: "RSC — rapid-strength concrete (overnight lane replacement)" },
+  FSHCC: { cost: 1000, label: "FSHCC — fast-setting hydraulic cement concrete" },
+  LCB:   { cost: 150,  label: "LCB — lean concrete base" },
+  HMA:   { cost: 100,  label: "HMA — hot mix asphalt" },
+  RAC:   { cost: 110,  label: "RAC/RHMA — rubberized asphalt concrete" }
+};
+
+const MARKUPS = {              // ESTIMATE sheet rows 19–33
+  earthwork: 0.02, drainage: 0.01, swppp: 0.10, trafficItems: 0.15,
+  minor: 0.05, mobilization: 0.10, supplemental: 0.05, contingency: 0.20,
+  supporting: 0.19
+};
+
+// CAPM unit costs, capm sheet — used for the lighter preservation treatments
+const CAPM_UNITS = {
+  hmaTon: 80, rhmaTon: 100, pccCY: 150, millSY: 16, grindSY: 5,
+  dailyTrafficHandling: 2000, dailyCozeep: 2000, indirect: 0.20, supporting: 0.20
+};
+
+// Volume of one material layer, m³. ESTIMATE!D10: 12ft lane × thickness × length.
+function layerVolume(thicknessIn, laneMiles) {
+  return (12 * 0.3048) * (thicknessIn * 2.54 / 100) * (laneMiles * 1680);
+}
+
+/* Full Caltrans roadway-items estimate. Returns $1000s plus a line-by-line
+   breakdown so the user can see exactly where the number came from. */
+function estimateCost(material, thicknessIn, laneMiles) {
+  const unit = UNIT_COSTS[material];
+  if (!unit || !(thicknessIn > 0) || !(laneMiles > 0)) return null;
+  const vol = layerVolume(thicknessIn, laneMiles);
+  const pavement = vol * unit.cost;
+  const pavementShare = 1 - (MARKUPS.earthwork + MARKUPS.drainage + MARKUPS.swppp + MARKUPS.trafficItems);
+  const scaled = pct => pavement * pct / pavementShare;
+  const lines = [
+    { label: `${material} pavement — ${fmtNum(vol)} m³ @ $${unit.cost}/m³`, amt: pavement },
+    { label: `Earthwork (${(MARKUPS.earthwork * 100).toFixed(0)}%)`, amt: scaled(MARKUPS.earthwork) },
+    { label: `Drainage (${(MARKUPS.drainage * 100).toFixed(0)}%)`, amt: scaled(MARKUPS.drainage) },
+    { label: `Specialty items / SWPPP (${(MARKUPS.swppp * 100).toFixed(0)}%)`, amt: scaled(MARKUPS.swppp) },
+    { label: `Traffic items (${(MARKUPS.trafficItems * 100).toFixed(0)}%)`, amt: scaled(MARKUPS.trafficItems) }
+  ];
+  let running = lines.reduce((s, l) => s + l.amt, 0);
+  lines.push({ label: "Subtotal", amt: running, rule: true });
+  for (const [key, pct] of [["Minor items", MARKUPS.minor], ["Mobilization", MARKUPS.mobilization],
+                            ["Supplemental work", MARKUPS.supplemental], ["Contingency", MARKUPS.contingency]]) {
+    const add = running * pct;
+    lines.push({ label: `${key} (${(pct * 100).toFixed(0)}%)`, amt: add });
+    running += add;
+  }
+  lines.push({ label: "Roadway items total", amt: running, rule: true });
+  const support = running * MARKUPS.supporting;
+  lines.push({ label: `Supporting cost (${(MARKUPS.supporting * 100).toFixed(0)}%)`, amt: support });
+  const total = running + support;
+  lines.push({ label: "Total project cost", amt: total, rule: true, strong: true });
+  return { total: total / 1000, lines, volume: vol, perLaneMile: total / 1000 / laneMiles };
+}
+
+function fmtNum(v) { return v.toLocaleString("en-US", { maximumFractionDigits: 0 }); }
+
+/* Pavement cross-sections — Rehab_Thick sheet, Inland Valley / Type II subgrade
+   / TI 11.5–12 / lateral support. Thicknesses in feet, as stored. */
+const STRUCTURES = {
+  "JPCP over LCB": { kind: "rigid", note: "Caltrans rigid Alternative 1 — jointed plain concrete on lean concrete base",
+    layers: [
+      { name: "JPCP slab", ft: 0.85, mat: "PCC" },
+      { name: "Lean concrete base", ft: 0.35, mat: "LCB" },
+      { name: "Aggregate subbase", ft: 0.60, mat: "AS" },
+      { name: "Compacted subgrade", ft: 0.90, mat: "SG" }
+    ]},
+  "JPCP over HMA base": { kind: "rigid", note: "Caltrans rigid Alternative 2 — concrete slab on asphalt-treated base",
+    layers: [
+      { name: "JPCP slab", ft: 0.85, mat: "PCC" },
+      { name: "HMA-A base", ft: 0.25, mat: "HMA" },
+      { name: "Aggregate subbase", ft: 0.60, mat: "AS" },
+      { name: "Compacted subgrade", ft: 0.90, mat: "SG" }
+    ]},
+  "CRCP over HMA base": { kind: "rigid", note: "Caltrans rigid Alternative 3 — continuously reinforced concrete",
+    layers: [
+      { name: "CRCP slab", ft: 0.80, mat: "PCC" },
+      { name: "HMA-A base", ft: 0.25, mat: "HMA" },
+      { name: "Aggregate subbase", ft: 0.60, mat: "AS" },
+      { name: "Compacted subgrade", ft: 0.90, mat: "SG" }
+    ]},
+  "Full-depth HMA": { kind: "flexible", note: "Flexible structure — full-depth asphalt over aggregate base",
+    layers: [
+      { name: "HMA surface", ft: 0.20, mat: "HMA" },
+      { name: "HMA base", ft: 0.65, mat: "HMA" },
+      { name: "Aggregate base", ft: 0.50, mat: "AB" },
+      { name: "Compacted subgrade", ft: 0.90, mat: "SG" }
+    ]},
+  "HMA with RHMA surface": { kind: "flexible", note: "Flexible with rubberized surface course — thinner surface, same structure",
+    layers: [
+      { name: "RHMA-G surface", ft: 0.15, mat: "RAC" },
+      { name: "HMA base", ft: 0.65, mat: "HMA" },
+      { name: "Aggregate base", ft: 0.50, mat: "AB" },
+      { name: "Compacted subgrade", ft: 0.90, mat: "SG" }
+    ]},
+  "HMA overlay (rehab)": { kind: "flexible", note: "Rehabilitation — mill and overlay on the existing structure",
+    layers: [
+      { name: "HMA overlay", ft: 0.25, mat: "HMA" },
+      { name: "Milled existing HMA", ft: 0.20, mat: "MILL" },
+      { name: "Existing HMA (retained)", ft: 0.55, mat: "OLD" },
+      { name: "Existing base", ft: 0.50, mat: "AB" }
+    ]}
+};
+
+const MAT_FILL = {
+  PCC: { light: "#c9ccd1", dark: "#6f7377", label: "Concrete" },
+  LCB: { light: "#dcd6c4", dark: "#8a8271", label: "Lean concrete" },
+  HMA: { light: "#4a4a4d", dark: "#3a3a3d", label: "Asphalt" },
+  RAC: { light: "#43393f", dark: "#putBack", label: "Rubberized asphalt" },
+  MILL: { light: "#6d6a68", dark: "#55524f", label: "Milled surface" },
+  OLD: { light: "#5c5a58", dark: "#484644", label: "Existing asphalt" },
+  AB: { light: "#b9a887", dark: "#8b7d61", label: "Aggregate base" },
+  AS: { light: "#cbbb9a", dark: "#9a8b6c", label: "Aggregate subbase" },
+  SG: { light: "#a58f76", dark: "#7a684f", label: "Subgrade" }
+};
+MAT_FILL.RAC.dark = "#3a3136";
+
+/* ============================================================
    Scenario seed — from the workbook's Inputs sheet
    ============================================================ */
 
@@ -457,33 +607,77 @@ const SEED = {
 // Annual maintenance ($1000) from workbook: Alt2 activity 5 = 1
 SEED.alternatives[1].activities[4].annualMaint = 1;
 
-/* Worked example — illustrative values for a 5-mile, 2-lanes-per-direction rehab.
-   Realistic in scale (rough Caltrans-era unit costs) but not from any real project. */
+/* ------------------------------------------------------------------
+   Worked example: the classic Caltrans rigid-vs-flexible comparison.
+   Project geometry: 5 centerline miles, 2 lanes each direction
+   = 20 lane-miles. Every construction cost below is COMPUTED by
+   estimateCost() from the workbook's own unit prices and markup chain,
+   so each figure is traceable rather than asserted.
+   ------------------------------------------------------------------ */
+const EXAMPLE_GEOM = { miles: 5, lanesEachDir: 2, laneMiles: 20 };
+
+function exCost(material, thicknessIn, laneMiles) {
+  const e = estimateCost(material, thicknessIn, laneMiles || EXAMPLE_GEOM.laneMiles);
+  return e ? Math.round(e.total) : 0;
+}
+
 function buildExample() {
-  const E = JSON.parse(JSON.stringify(SEED));
-  E.pctCar = 88; E.pctSut = 7; E.pctCt = 5;
-  const set = (a, i, vals) => Object.assign(E.alternatives[a].activities[i], vals);
-  const wz = (dur, open, len) => ({ wzDuration: dur, lanesOpen: open, wzLength: len });
-  // Alt 1 — 40-yr lane replacement: expensive once, long life
-  set(0, 0, { agencyCost: 32000, ...wz(200, 1, 5) });
-  set(0, 1, { agencyCost: 4200, ...wz(25, 1, 5) });
-  set(0, 2, { agencyCost: 5600, ...wz(35, 1, 5) });
-  // Alt 2 — HMA 20-yr cycle: cheaper, repeats often
-  set(1, 0, { agencyCost: 13500, ...wz(90, 1, 5) });
-  set(1, 1, { agencyCost: 3800, ...wz(20, 1, 5) });
-  set(1, 2, { agencyCost: 14800, ...wz(90, 1, 5) });
-  set(1, 3, { agencyCost: 3800, ...wz(20, 1, 5) });
-  set(1, 4, { agencyCost: 16200, ...wz(90, 1, 5) });
-  // Alt 3 — HMA w/ RHMA: ~8% premium, longer lives
-  set(2, 0, { agencyCost: 14600, ...wz(90, 1, 5) });
-  set(2, 1, { agencyCost: 4100, ...wz(22, 1, 5) });
-  set(2, 2, { agencyCost: 16000, ...wz(90, 1, 5) });
-  set(2, 3, { agencyCost: 4100, ...wz(22, 1, 5) });
-  // Alt 4 — 20-yr lane replacement
-  set(3, 0, { agencyCost: 24500, ...wz(150, 1, 5) });
-  set(3, 1, { agencyCost: 3900, ...wz(20, 1, 5) });
-  set(3, 2, { agencyCost: 5200, ...wz(30, 1, 5) });
-  set(3, 3, { agencyCost: 5600, ...wz(30, 1, 5) });
+  const LM = EXAMPLE_GEOM.laneMiles;
+  const A = (name, year, life, material, thickIn, dur, structure, lm) => ({
+    name, year, serviceLife: life, annualMaint: 0,
+    agencyCost: exCost(material, thickIn, lm || LM),
+    wzDuration: dur, lanesOpen: 1, wzLength: EXAMPLE_GEOM.miles, wzSpeed: 55, wzCap: 1340,
+    closures: { in: [[21, 24], [0, 5]], out: [[21, 24], [0, 5]] },
+    estimate: { material, thickIn, laneMiles: lm || LM },
+    structure: structure || null
+  });
+
+  const E = {
+    analysisPeriod: 55, startYear: 2026, discountRate: 3.2,
+    includeUser: "Yes", agencyRSL: "Yes", userRSL: "Yes",
+    votCar: 12.8, votSut: 31.7, votCt: 31.7,
+    aadt: 92000, growth: 1.4, maxAadt: 150000,
+    pctCar: 86, pctSut: 6, pctCt: 8,
+    speedLimit: 65, lanes: 2, ffCap: 2000, qdCap: 1800,
+    hourlyDist: "Weekday Double-Peak", maxQueue: 3,
+    alternatives: [
+      { name: "Rigid — rapid-strength lane replacement",
+        note: "Rapid-strength concrete costs three times as much per cubic metre, but cures overnight so lanes reopen every morning. The whole point of paying the premium is to cut closure days from months to weeks — this alternative exists to test whether that trade pays off.",
+        activities: [
+          A("RSC lane replacement (0.85 ft slab)", 2026, 40, "RSC", 10.2, 55, "JPCP over LCB"),
+          A("CAPM — CPR C (diamond grind + slab replace)", 2066, 10, "PCC", 1.2, 12),
+          A("CAPM — CPR B (joint/slab repair)", 2076, 10, "PCC", 0.8, 10)
+        ]},
+      { name: "Rigid — conventional JPCP",
+        note: "The same 0.85 ft concrete slab in conventional PCC on an asphalt-treated base. A third the material cost of RSC, but conventional curing means far longer lane closures.",
+        activities: [
+          A("JPCP on HMA base (0.85 ft slab)", 2026, 40, "PCC", 10.2, 145, "JPCP over HMA base"),
+          A("CAPM — CPR C", 2066, 10, "PCC", 1.2, 25),
+          A("CAPM — CPR B", 2076, 10, "PCC", 0.8, 20)
+        ]},
+      { name: "Flexible — HMA 20-yr cycle",
+        note: "Conventional asphalt rehabilitation. Low first cost, but the cycle repeats roughly every 20 years with a CAPM in between.",
+        activities: [
+          A("Rehab HMA — mill & overlay (0.25 ft)", 2026, 18, "HMA", 3.0, 75, "HMA overlay (rehab)"),
+          A("CAPM HMA (thin overlay)", 2044, 5, "HMA", 1.2, 18),
+          A("Rehab HMA — mill & overlay", 2049, 18, "HMA", 3.0, 75),
+          A("CAPM HMA (thin overlay)", 2067, 5, "HMA", 1.2, 18),
+          A("Rehab HMA — mill & overlay", 2072, 18, "HMA", 3.0, 75)
+        ]},
+      { name: "Flexible — HMA with RHMA surface",
+        note: "Rubberized surface course: about 10% more per cubic metre but a thinner lift and longer life, so the cycle stretches from 18 to 21 years.",
+        activities: [
+          A("Rehab HMA w/ RHMA-G surface", 2026, 21, "RAC", 2.4, 78, "HMA with RHMA surface"),
+          A("CAPM HMA w/ RHMA", 2047, 10, "RAC", 1.2, 20),
+          A("Rehab HMA w/ RHMA-G surface", 2057, 21, "RAC", 2.4, 78),
+          A("CAPM HMA w/ RHMA", 2078, 10, "RAC", 1.2, 20)
+        ]}
+    ]
+  };
+  // Routine maintenance from the workbook's mr_database, $1000/lane-mile/yr
+  // scaled to this project: rigid needs less than flexible.
+  const maint = [2.2, 2.2, 2.9, 2.7];
+  E.alternatives.forEach((alt, i) => alt.activities.forEach(a => { a.annualMaint = maint[i]; }));
   return E;
 }
 
@@ -506,14 +700,14 @@ const HELP = {
   lanes: "Lanes in <i>each</i> direction under normal operation.",
   pctCar: "Vehicle class split. Trucks matter: their value of time is ~2.5× higher and their stop-and-go operating costs are far higher.",
   // activity fields
-  agencyCost: "What the agency pays for this treatment, in thousands of dollars. From your cost estimate or historical bid prices.",
-  serviceLife: "Years until the next treatment is needed. Drives both the M&R schedule and the remaining-service-life credit.",
-  annualMaint: "Routine yearly maintenance (crack sealing, patching) while this treatment is in service, $1000s per year.",
-  wzDuration: "Total days with an active work zone for this treatment. Multiplies the daily user cost, so it's the biggest user-cost lever.",
+  agencyCost: "__DYNAMIC_COST__",
+  serviceLife: "Years until the next treatment is needed. Caltrans planning lives: <b>HMA overlay 18&ndash;20 yr</b>, <b>RHMA surface ~21 yr</b>, <b>JPCP/CRCP 40 yr</b>, <b>CAPM 5&ndash;10 yr</b>. Drives the M&R schedule and the remaining-service-life credit.",
+  annualMaint: "Routine yearly maintenance (crack sealing, patching) while this treatment is in service, $1000s per year. The workbook's mr_database uses roughly <b>$2,900/lane-mile/yr for HMA rehab</b>, <b>$2,700 for RHMA</b>, <b>$1,100&ndash;3,300 for CAPM</b>, and less for new concrete &mdash; multiply by your lane-miles.",
+  wzDuration: "Total days with an active work zone for this treatment. Multiplies the daily user cost, so it's the biggest user-cost lever. Rough guide: <b>full reconstruction 120&ndash;200 days</b>, <b>mill &amp; overlay 60&ndash;90 days</b>, <b>CAPM 15&ndash;30 days</b> for a 5-mile job.",
   lanesOpen: "Lanes kept open per direction during closure hours. Fewer open lanes → lower capacity → queues form sooner.",
   wzLength: "Length of the reduced-speed zone, miles.",
-  wzSpeed: "Posted speed through the work zone. The gap between this and the normal limit sets the per-vehicle delay.",
-  wzCap: "Capacity per open lane inside the work zone — typically ~1,200–1,500 vphpl, below normal capacity because of narrow lanes and barriers.",
+  wzSpeed: "Posted speed through the work zone. The gap between this and the normal limit sets the per-vehicle delay. Caltrans work zones are typically posted <b>55 mph</b>, or <b>45 mph</b> where workers are close to live traffic.",
+  wzCap: "Capacity per open lane inside the work zone &mdash; typically <b>1,200&ndash;1,500 vphpl</b>, below normal capacity because of narrow lanes and barriers. The HCM default for a single open lane is about 1,340.",
   closIn: "Hours of day (24-h clock) when the closure is in place, comma-separated ranges. \"20-24, 0-5\" means 8 pm to 5 am — overnight work. During these hours capacity drops to the work-zone value.",
   closOut: "Same as inbound closures, for the opposite direction."
 };
@@ -722,6 +916,25 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("keydown", e => { if (e.key === "Escape") { closePopover(); if (tour.active) tour.end(); } });
 
+/* The cost guidance is computed from the estimator itself, so the numbers
+   quoted here can never drift from what the tool actually produces. */
+function costHelpText() {
+  const per = (mat, t) => money(estimateCost(mat, t, 1).total);
+  return `What the agency pays for this treatment, in <b>thousands of dollars</b>.
+    Don't guess &mdash; click <b>Estimate…</b> below to build the number from Caltrans unit prices and markups.
+    <br><br>Per lane-mile, all markups included, at the workbook's unit prices:
+    <table style="margin-top:6px;font-size:12px;border-collapse:collapse">
+      <tr><td style="padding:1px 8px 1px 0">RSC lane replacement, 10&Prime;</td><td><b>${per("RSC", 10.2)}k</b></td></tr>
+      <tr><td style="padding:1px 8px 1px 0">JPCP slab, 10&Prime;</td><td><b>${per("PCC", 10.2)}k</b></td></tr>
+      <tr><td style="padding:1px 8px 1px 0">HMA mill &amp; overlay, 3&Prime;</td><td><b>${per("HMA", 3)}k</b></td></tr>
+      <tr><td style="padding:1px 8px 1px 0">RHMA surface, 2.4&Prime;</td><td><b>${per("RAC", 2.4)}k</b></td></tr>
+      <tr><td style="padding:1px 8px 1px 0">CAPM thin overlay, 1.2&Prime;</td><td><b>${per("HMA", 1.2)}k</b></td></tr>
+    </table>
+    <br><b>Important:</b> these unit prices come from the source workbook's example estimate and are
+    illustrative, not current bid prices. For real work, substitute current values from the
+    <i>Caltrans Contract Cost Data</i> book or your own historical bids.`;
+}
+
 function attachHelp(labelEl, key) {
   if (!HELP[key] || labelEl.querySelector("button.help")) return;
   const b = document.createElement("button");
@@ -732,7 +945,7 @@ function attachHelp(labelEl, key) {
   b.onclick = ev => {
     ev.stopPropagation();
     if (popoverOpen === key) return closePopover();
-    popover.innerHTML = HELP[key];
+    popover.innerHTML = HELP[key] === "__DYNAMIC_COST__" ? costHelpText() : HELP[key];
     popover.style.display = "block";
     const r = b.getBoundingClientRect();
     const w = popover.offsetWidth, h = popover.offsetHeight;
@@ -796,6 +1009,163 @@ function textToClosures(t) {
     const m = s.split("-").map(Number);
     return [m[0] || 0, m[1] || 0];
   }).filter(p => !(p[0] === p[1]));
+}
+
+/* Cost estimator drawer -------------------------------------------------- */
+function openEstimator(act, drawer, ai) {
+  if (drawer.dataset.open === "estimate") { drawer.innerHTML = ""; drawer.dataset.open = ""; return; }
+  drawer.dataset.open = "estimate";
+  const e0 = act.estimate || { material: "HMA", thickIn: 3, laneMiles: 20 };
+  drawer.innerHTML = `
+    <div class="drawer-inner">
+      <h4>Build the cost from Caltrans unit prices</h4>
+      <p class="note">Quantity = 12 ft lane width × thickness × length, priced per cubic metre, then run through
+        Caltrans's roadway-items markup chain. This is the method in the source workbook's <i>ESTIMATE</i> sheet.</p>
+      <div class="grid c4" style="margin-bottom:10px">
+        <label class="field"><span class="field-caption">Material</span>
+          <select data-e="material">${Object.entries(UNIT_COSTS).map(([k, v]) =>
+            `<option value="${k}"${k === e0.material ? " selected" : ""}>${k} — $${v.cost}/m³</option>`).join("")}</select></label>
+        <label class="field"><span class="field-caption">Thickness (inches)</span>
+          <input type="number" data-e="thickIn" value="${e0.thickIn}" step="0.1" min="0"></label>
+        <label class="field"><span class="field-caption">Length (lane-miles)</span>
+          <input type="number" data-e="laneMiles" value="${e0.laneMiles}" step="1" min="0"></label>
+        <label class="field"><span class="field-caption">&nbsp;</span>
+          <button class="btn primary" data-e="apply">Use this cost</button></label>
+      </div>
+      <div data-e="out"></div>
+    </div>`;
+  const out = drawer.querySelector('[data-e="out"]');
+  const read = () => ({
+    material: drawer.querySelector('[data-e="material"]').value,
+    thickIn: parseFloat(drawer.querySelector('[data-e="thickIn"]').value) || 0,
+    laneMiles: parseFloat(drawer.querySelector('[data-e="laneMiles"]').value) || 0
+  });
+  const draw = () => {
+    const p = read();
+    const est = estimateCost(p.material, p.thickIn, p.laneMiles);
+    if (!est) { out.innerHTML = `<p class="note">Enter a thickness and length to see the estimate.</p>`; return; }
+    out.innerHTML = `
+      <table class="data" style="max-width:520px">
+        <tbody>${est.lines.map(l => `
+          <tr${l.rule ? ' style="border-top:1px solid var(--baseline)"' : ""}>
+            <td${l.strong ? ' style="font-weight:650"' : ""}>${l.label}</td>
+            <td${l.strong ? ' style="font-weight:650"' : ""}>${money(l.amt)}</td></tr>`).join("")}
+        </tbody>
+      </table>
+      <p class="note" style="margin-top:8px">
+        <b>${money(est.total)}k</b> total → <b>${money(est.perLaneMile)}k per lane-mile</b>.
+        Volume ${fmtNum(est.volume)} m³.</p>`;
+  };
+  drawer.querySelectorAll('[data-e="material"],[data-e="thickIn"],[data-e="laneMiles"]').forEach(el => {
+    el.addEventListener("input", draw);
+    el.addEventListener("change", draw);
+  });
+  drawer.querySelector('[data-e="apply"]').onclick = () => {
+    const p = read();
+    const est = estimateCost(p.material, p.thickIn, p.laneMiles);
+    if (!est) return;
+    act.agencyCost = Math.round(est.total);
+    act.estimate = p;
+    renderAltPanel();
+    refresh();
+  };
+  draw();
+}
+
+/* Pavement structure drawer + cross-section drawing ---------------------- */
+function openStructure(act, drawer, ai) {
+  if (drawer.dataset.open === "structure") { drawer.innerHTML = ""; drawer.dataset.open = ""; return; }
+  drawer.dataset.open = "structure";
+  const current = act.structure || "Full-depth HMA";
+  drawer.innerHTML = `
+    <div class="drawer-inner">
+      <h4>Pavement structure</h4>
+      <p class="note">Layer types and thicknesses from the workbook's <i>Rehab_Thick</i> table
+        (Inland Valley, Type II subgrade, TI 11.5–12, with lateral support).</p>
+      <label class="field" style="max-width:320px;margin-bottom:10px"><span class="field-caption">Structure</span>
+        <select data-s="pick">${Object.keys(STRUCTURES).map(k =>
+          `<option${k === current ? " selected" : ""}>${k}</option>`).join("")}</select></label>
+      <div data-s="fig"></div>
+    </div>`;
+  const fig = drawer.querySelector('[data-s="fig"]');
+  const pick = drawer.querySelector('[data-s="pick"]');
+  const draw = () => {
+    act.structure = pick.value;
+    fig.innerHTML = "";
+    fig.appendChild(pavementSection(pick.value));
+    saveScenario();
+  };
+  pick.onchange = draw;
+  draw();
+}
+
+/* Scale cross-section drawing of a pavement structure. */
+function pavementSection(key) {
+  const st = STRUCTURES[key];
+  const wrap = document.createElement("div");
+  if (!st) return wrap;
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches
+    && document.documentElement.getAttribute("data-theme") !== "light"
+    || document.documentElement.getAttribute("data-theme") === "dark";
+  const totalFt = st.layers.reduce((s, l) => s + l.ft, 0);
+  const W = 620, padL = 176, padR = 130, padT = 26, padB = 30;
+  const iw = W - padL - padR;
+  const scale = 260 / totalFt;              // px per foot
+  const H = padT + totalFt * scale + padB;
+  const svg = svgEl("svg", { width: "100%", viewBox: `0 0 ${W} ${H}`,
+    role: "img", "aria-label": `Cross-section of ${key}` });
+  // Sky/shoulder ground line
+  let y = padT;
+  st.layers.forEach(layer => {
+    const h = layer.ft * scale;
+    const mat = MAT_FILL[layer.mat] || MAT_FILL.SG;
+    const fill = dark ? mat.dark : mat.light;
+    svg.appendChild(svgEl("rect", { x: padL, y, width: iw, height: h,
+      fill, stroke: cvar("--surface-1"), "stroke-width": 1.5 }));
+    // hatch aggregate/subgrade layers so they read without relying on color
+    if (["AB", "AS", "SG"].includes(layer.mat)) {
+      for (let gx = padL + 6; gx < padL + iw - 2; gx += 13) {
+        for (let gy = y + 6; gy < y + h - 2; gy += 11) {
+          svg.appendChild(svgEl("circle", { cx: gx + (gy % 22 < 11 ? 0 : 6), cy: gy, r: 1.5,
+            fill: dark ? "rgba(255,255,255,.20)" : "rgba(0,0,0,.18)" }));
+        }
+      }
+    }
+    if (layer.mat === "MILL") {
+      for (let gx = padL; gx < padL + iw; gx += 9) {
+        svg.appendChild(svgEl("path", { d: `M${gx},${y + h} l4.5,-6 l4.5,6`, fill: "none",
+          stroke: dark ? "rgba(255,255,255,.22)" : "rgba(0,0,0,.22)", "stroke-width": 1 }));
+      }
+    }
+    // layer name (left) and thickness (right)
+    const nm = svgEl("text", { x: padL - 12, y: y + h / 2 + 4, "text-anchor": "end",
+      "font-size": 12, fill: cvar("--text-secondary") });
+    nm.textContent = layer.name;
+    svg.appendChild(nm);
+    const th = svgEl("text", { x: padL + iw + 12, y: y + h / 2 + 4, "font-size": 12,
+      fill: cvar("--text-muted") });
+    th.textContent = `${layer.ft.toFixed(2)} ft (${(layer.ft * 12).toFixed(1)}″)`;
+    svg.appendChild(th);
+    y += h;
+  });
+  // Total depth dimension line
+  svg.appendChild(svgEl("line", { x1: padL - 6, x2: padL - 6, y1: padT, y2: y,
+    stroke: cvar("--baseline"), "stroke-width": 1 }));
+  // Surface label
+  const surf = svgEl("text", { x: padL + 6, y: padT - 8, "font-size": 11, fill: cvar("--text-muted") });
+  surf.textContent = "▲ traffic surface";
+  svg.appendChild(surf);
+  const tot = svgEl("text", { x: padL + iw + 12, y: y + 18, "font-size": 12,
+    "font-weight": 600, fill: cvar("--text-primary") });
+  tot.textContent = `${totalFt.toFixed(2)} ft total`;
+  svg.appendChild(tot);
+  wrap.appendChild(svg);
+  const cap = document.createElement("p");
+  cap.className = "note";
+  cap.style.marginTop = "4px";
+  cap.textContent = st.note;
+  wrap.appendChild(cap);
+  return wrap;
 }
 
 /* Guided tour ------------------------------------------------------------ */
@@ -928,6 +1298,24 @@ function renderAltPanel() {
         <label class="field">Inbound Closure Hours <span class="u">(e.g. 20-24, 0-5)</span><input type="text" data-f="closIn" value="${closuresToText(act.closures.in)}"></label>
         <label class="field">Outbound Closure Hours<input type="text" data-f="closOut" value="${closuresToText(act.closures.out)}"></label>
       </div>`;
+    // Cost estimator + structure viewer, wired under the cost field
+    const tools = document.createElement("div");
+    tools.className = "act-tools";
+    tools.innerHTML = `
+      <button class="btn" data-tool="estimate">Estimate cost…</button>
+      <button class="btn" data-tool="structure">${act.structure ? "View" : "Choose"} pavement structure…</button>
+      <span class="note" data-costnote></span>`;
+    div.appendChild(tools);
+    const drawer = document.createElement("div");
+    drawer.className = "drawer";
+    div.appendChild(drawer);
+    const note = tools.querySelector("[data-costnote]");
+    if (act.estimate) {
+      note.innerHTML = `from ${act.estimate.material} ${act.estimate.thickIn}″ × ${act.estimate.laneMiles} lane-mi`;
+    }
+    tools.querySelector('[data-tool="estimate"]').onclick = () => openEstimator(act, drawer, ai);
+    tools.querySelector('[data-tool="structure"]').onclick = () => openStructure(act, drawer, ai);
+
     div.querySelectorAll("input").forEach(inp => {
       inp.addEventListener("change", () => {
         const f = inp.dataset.f;
@@ -1314,6 +1702,47 @@ $("btnExample").onclick = () => {
    Boot
    ============================================================ */
 
+/* Structures in play + the unit-price reference */
+function renderStructures() {
+  const grid = $("structGrid");
+  if (!grid) return;
+  const used = [];
+  S.alternatives.forEach((alt, i) => {
+    const withStruct = alt.activities.find(a => a.structure);
+    if (withStruct && !used.some(u => u.key === withStruct.structure)) {
+      used.push({ key: withStruct.structure, alt: alt.name, idx: i });
+    }
+  });
+  if (!used.length) {
+    grid.innerHTML = `<p class="note">No structures assigned yet. Open an activity and click
+      <b>Choose pavement structure…</b>, or load the worked example to see the rigid and flexible sections side by side.</p>`;
+  } else {
+    grid.innerHTML = "";
+    used.forEach(u => {
+      const cell = document.createElement("div");
+      cell.className = "struct-cell";
+      cell.innerHTML = `<h4><span class="swatch" style="background:var(${ALT_COLORS[u.idx % 4]})"></span>${u.key}</h4>
+        <div class="sub">${u.alt}</div>`;
+      cell.appendChild(pavementSection(u.key));
+      grid.appendChild(cell);
+    });
+  }
+  const ut = $("unitTable");
+  if (ut) {
+    ut.innerHTML = `<div style="overflow-x:auto"><table class="data" style="max-width:640px">
+      <thead><tr><th>Material</th><th>Unit cost</th><th>Cost per lane-mile at 3&Prime;</th></tr></thead>
+      <tbody>${Object.entries(UNIT_COSTS).map(([k, v]) => {
+        const perLM = layerVolume(3, 1) * v.cost / 1000;
+        return `<tr><td>${v.label}</td><td>$${v.cost}/m³</td><td>${money(perLM)}k</td></tr>`;
+      }).join("")}</tbody></table></div>
+      <p class="note" style="margin-top:8px">Material cost only — the estimator adds earthwork, drainage, SWPPP, traffic items,
+      minor items, mobilization, supplemental work, contingency, and supporting cost on top, which together roughly
+      <b>2.4&times;</b> the bare pavement figure. CAPM treatments price differently (HMA $${CAPM_UNITS.hmaTon}/ton,
+      RHMA $${CAPM_UNITS.rhmaTon}/ton, milling $${CAPM_UNITS.millSY}/SY, grinding $${CAPM_UNITS.grindSY}/SY,
+      traffic handling $${fmtNum(CAPM_UNITS.dailyTrafficHandling)}/day, COZEEP $${fmtNum(CAPM_UNITS.dailyCozeep)}/day).</p>`;
+  }
+}
+
 function refresh() {
   saveScenario();
   const all = computeAll();
@@ -1321,6 +1750,7 @@ function refresh() {
   renderNpvChart(all);
   renderStreamChart(all);
   renderHourlyChart();
+  renderStructures();
   $("trafficNote").textContent =
     `Design-year demand example: AADT in ${S.startYear + 20} ≈ ${fmt(aadtInYear(S.startYear + 20))} (growth ${S.growth}%/yr, cap ${fmt(S.maxAadt)}).`;
 }
