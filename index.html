@@ -229,60 +229,120 @@
   /* ============================================================
      Sticky command bar
      ============================================================ */
-  .commandbar {
-    position: sticky; top: 0; z-index: 40;
-    background: var(--surface-1);
-    border-bottom: 1px solid var(--border-strong);
-    box-shadow: 0 1px 0 var(--border), 0 6px 18px -14px rgba(0,0,0,.5);
-  }
-  .commandbar .cb-inner {
-    max-width: 1460px; margin: 0 auto; padding: 9px 24px;
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  }
   .toolbar { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
-  .cb-inner #saveNote { margin-left: auto; }
 
   /* ============================================================
-     Sheet layout — index rail + content
+     Sheet layout — collapsible workflow menu + content
      ============================================================ */
   .shell { max-width: 1460px; margin: 0 auto; padding: 22px 24px 72px; }
-  .sheetwrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
-  @media (min-width: 1180px) {
-    .sheetwrap { grid-template-columns: 176px minmax(0, 1fr); }
+  .sheetwrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  @media (min-width: 1060px) {
+    .sheetwrap { grid-template-columns: 232px minmax(0, 1fr); gap: 30px; align-items: start; }
   }
-  .sheetindex { display: none; }
-  @media (min-width: 1180px) {
-    .sheetindex {
-      display: block; position: sticky; top: 68px; align-self: start;
+
+  /* Narrow screens: a Menu button reveals the same nav inline */
+  .navtoggle {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 9px 14px; cursor: pointer;
+    background: var(--surface-1); color: var(--text-primary);
+    border: 1px solid var(--border-strong); border-radius: 0;
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .1em; font-weight: 700; font-size: var(--fs-xs);
+  }
+  .nt-bars { display: grid; gap: 3px; }
+  .nt-bars i { display: block; width: 15px; height: 2px; background: currentColor; }
+  @media (min-width: 1060px) { .navtoggle { display: none; } }
+
+  .sidenav { display: none; }
+  /* Narrow: the menu drops in as a bordered panel under the toggle */
+  .sidenav.open {
+    display: block; margin-top: 10px;
+    border: 1px solid var(--border-strong); border-top-width: 2px;
+    background: var(--surface-1); padding: 0 14px 12px;
+  }
+  @media (min-width: 1060px) {
+    .sidenav {
+      display: block; position: sticky; top: 20px; align-self: start;
+      max-height: calc(100vh - 40px); overflow-y: auto;
       border-top: 2px solid var(--border-strong);
-      padding-top: 10px;
     }
   }
-  .sheetindex .si-title {
+
+  .nav-group { border-bottom: 1px solid var(--border-strong); }
+  .nav-head {
+    width: 100%; display: grid;
+    grid-template-columns: 22px 1fr 14px; gap: 2px 9px;
+    align-items: center;
+    padding: 11px 4px 10px 0;
+    background: none; border: 0; cursor: pointer; text-align: left;
+    color: var(--text-primary);
+  }
+  .nav-head:hover { color: var(--accent); }
+  .nav-head:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  /* Every cell is placed explicitly: the step and caret both have definite
+     rows, so with auto columns the caret would claim column 2 before the
+     label is ever placed. */
+  .nh-step {
+    grid-column: 1; grid-row: 1 / span 2; align-self: start;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+    color: var(--surface-1); background: var(--text-primary);
+    width: 20px; height: 20px; line-height: 20px; text-align: center;
+    margin-top: 1px;
+  }
+  .nav-head[aria-expanded="true"] .nh-step { background: var(--accent); }
+  .nh-label {
+    grid-column: 2; grid-row: 1;
     font-family: var(--font-display); text-transform: uppercase;
-    letter-spacing: .16em; font-weight: 700; font-size: 9.5px;
-    color: var(--text-muted); margin-bottom: 8px;
+    letter-spacing: .12em; font-weight: 700; font-size: 12.5px;
   }
-  .sheetindex ol { list-style: none; margin: 0; padding: 0; }
-  .sheetindex a {
-    display: grid; grid-template-columns: 26px 1fr; gap: 8px;
-    padding: 5px 6px 5px 0; text-decoration: none;
-    border-bottom: 1px solid var(--grid);
+  .nh-sub {
+    grid-column: 2; grid-row: 2; font-family: var(--font-serif);
+    font-size: 11.5px; color: var(--text-muted); line-height: 1.3;
+  }
+  .nh-caret {
+    grid-column: 3; grid-row: 1 / span 2;
+    width: 8px; height: 8px; justify-self: end;
+    border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg); transition: transform .18s ease;
+    color: var(--text-muted); margin-bottom: 2px;
+  }
+  .nav-head[aria-expanded="false"] .nh-caret { transform: rotate(-45deg); }
+  @media (prefers-reduced-motion: reduce) { .nh-caret { transition: none; } }
+
+  .nav-body { padding: 0 0 10px; }
+  .nav-body[hidden] { display: none; }
+  .nav-body a {
+    display: grid; grid-template-columns: 24px 1fr; gap: 8px;
+    padding: 6px 6px 6px 8px; text-decoration: none;
+    color: var(--text-secondary); border-left: 2px solid transparent;
+  }
+  .nav-body a .n { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); padding-top: 1px; }
+  .nav-body a .t {
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .07em; font-weight: 600; font-size: var(--fs-xs); line-height: 1.25;
+  }
+  .nav-body a:hover { color: var(--text-primary); background: var(--accent-wash); }
+  .nav-body a.on { color: var(--accent); border-left-color: var(--accent); background: var(--accent-wash); }
+  .nav-body a.on .n { color: var(--accent); }
+  .nav-body a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .nav-act {
+    display: block; width: 100%; text-align: left;
+    padding: 7px 8px; margin: 0 0 1px;
+    background: none; border: 0; border-left: 2px solid transparent; cursor: pointer;
     color: var(--text-secondary);
-  }
-  .sheetindex a .n {
-    font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted);
-    padding-top: 1px;
-  }
-  .sheetindex a .t {
     font-family: var(--font-display); text-transform: uppercase;
     letter-spacing: .07em; font-weight: 600; font-size: var(--fs-xs);
-    line-height: 1.25;
   }
-  .sheetindex a:hover { color: var(--text-primary); }
-  .sheetindex a.on { color: var(--accent); box-shadow: inset 2px 0 0 var(--accent); padding-left: 8px; }
-  .sheetindex a.on .n { color: var(--accent); }
-  .sheetindex a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .nav-act:hover { color: var(--text-primary); background: var(--accent-wash); border-left-color: var(--border-strong); }
+  .nav-act:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .nav-act.strong { color: var(--accent); }
+  .nav-act.strong:hover { border-left-color: var(--accent); }
+  .nav-act.danger:hover { color: var(--critical); border-left-color: var(--critical); }
+  .nav-note {
+    font-family: var(--font-serif); font-size: 11.5px;
+    color: var(--text-muted); margin: 12px 0 0; padding: 0 4px;
+  }
 
   .stack { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
   .row2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
@@ -783,8 +843,6 @@
   @media (max-width: 640px) {
     .shell { padding: 16px 14px 56px; }
     .tb-inner { padding: 16px 14px 14px; }
-    .commandbar .cb-inner { padding: 8px 14px; }
-    .cb-inner #saveNote { margin-left: 0; }
     header.titleblock h1 { font-size: var(--fs-lg); }
     dl.tb-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
@@ -794,7 +852,7 @@
      ============================================================ */
   @media print {
     body { background: #fff; color: #000; }
-    .commandbar, .sheetindex, .banner, .tooltip, .popover { display: none !important; }
+    .sidenav, .navtoggle, .banner, .tooltip, .popover { display: none !important; }
     .sheetwrap { grid-template-columns: minmax(0, 1fr); }
     section.card { box-shadow: none; break-inside: avoid; }
   }
@@ -816,7 +874,7 @@
     html, body { background: #fff !important; color: #000 !important; }
     body { font-size: 10pt; }
     /* Chrome that has no place in a report */
-    .cmdbar, .titleblock, .sheet-rail, .banner, .tour-backdrop, .tour-hole, .tour-card,
+    .cmdbar, .titleblock, .sidenav, .navtoggle, .banner, .tour-backdrop, .tour-hole, .tour-card,
     .popover, .act-tools, .drawer, button.help, #btnPrint, .toolbar,
     #sec-project .note { display: none !important; }
     .shell { max-width: none; margin: 0; padding: 0; display: block; }
@@ -907,22 +965,8 @@
   </div>
 </header>
 
-<div class="commandbar" id="toolbarCard">
-  <div class="cb-inner">
-    <div class="toolbar">
-      <button class="btn primary" id="btnRecalc">Recalculate</button>
-      <button class="btn" id="btnTour">Take the tour</button>
-      <button class="btn" id="btnExample">Load worked example</button>
-      <button class="btn" id="btnExportJson">Export scenario</button>
-      <button class="btn" id="btnImportJson">Import scenario</button>
-      <input type="file" id="fileImport" accept=".json" style="display:none">
-      <button class="btn" id="btnExportCsv">Results CSV</button>
-      <button class="btn" id="btnPrint">PDF report</button>
-      <button class="btn" id="btnReset">Reset</button>
-    </div>
-    <span class="note" id="saveNote">Changes auto-save to this browser.</span>
-  </div>
-</div>
+<input type="file" id="fileImport" accept=".json" style="display:none">
+<div id="toolbarCard" hidden></div>
 
 <main class="shell">
 
@@ -948,18 +992,64 @@
 
   <div class="sheetwrap">
 
-    <nav class="sheetindex" aria-label="Sheet index">
-      <div class="si-title">Sheet index</div>
-      <ol>
-        <li><a href="#sec-econ"><span class="n">01</span><span class="t">Economic variables</span></a></li>
-        <li><a href="#sec-traffic"><span class="n">02</span><span class="t">Traffic data</span></a></li>
-        <li><a href="#sec-alts"><span class="n">03</span><span class="t">Alternatives</span></a></li>
-        <li><a href="#sec-results"><span class="n">04</span><span class="t">Results</span></a></li>
-        <li><a href="#sensitivity"><span class="n">05</span><span class="t">Sensitivity</span></a></li>
-        <li><a href="#structures"><span class="n">06</span><span class="t">Structures &amp; prices</span></a></li>
-        <li><a href="#sec-charts"><span class="n">07</span><span class="t">Charts</span></a></li>
-        <li><a href="#sec-method"><span class="n">08</span><span class="t">Method &amp; credits</span></a></li>
-      </ol>
+    <button class="navtoggle" id="navToggle" aria-expanded="false" aria-controls="sideNav">
+      <span class="nt-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>Menu</span>
+    </button>
+
+    <nav class="sidenav" id="sideNav" aria-label="Workflow">
+
+      <div class="nav-group" data-group="input">
+        <button class="nav-head" aria-expanded="true" aria-controls="navInput">
+          <span class="nh-step">1</span>
+          <span class="nh-label">Input</span>
+          <span class="nh-sub">Define the analysis</span>
+          <span class="nh-caret" aria-hidden="true"></span>
+        </button>
+        <div class="nav-body" id="navInput">
+          <a href="#sec-project" data-sec="sec-project"><span class="n">00</span><span class="t">Project identification</span></a>
+          <a href="#sec-econ" data-sec="sec-econ"><span class="n">01</span><span class="t">Economic variables</span></a>
+          <a href="#sec-traffic" data-sec="sec-traffic"><span class="n">02</span><span class="t">Traffic data</span></a>
+          <a href="#sec-alts" data-sec="sec-alts"><span class="n">03</span><span class="t">Alternatives</span></a>
+        </div>
+      </div>
+
+      <div class="nav-group" data-group="output">
+        <button class="nav-head" aria-expanded="true" aria-controls="navOutput">
+          <span class="nh-step">2</span>
+          <span class="nh-label">Output</span>
+          <span class="nh-sub">Read the comparison</span>
+          <span class="nh-caret" aria-hidden="true"></span>
+        </button>
+        <div class="nav-body" id="navOutput">
+          <a href="#sec-results" data-sec="sec-results"><span class="n">04</span><span class="t">Results</span></a>
+          <a href="#sensitivity" data-sec="sensitivity"><span class="n">05</span><span class="t">Sensitivity</span></a>
+          <a href="#structures" data-sec="structures"><span class="n">06</span><span class="t">Structures &amp; prices</span></a>
+          <a href="#sec-charts" data-sec="sec-charts"><span class="n">07</span><span class="t">Charts</span></a>
+          <a href="#sec-method" data-sec="sec-method"><span class="n">08</span><span class="t">Method &amp; credits</span></a>
+        </div>
+      </div>
+
+      <div class="nav-group" data-group="scenario">
+        <button class="nav-head" aria-expanded="true" aria-controls="navScenario">
+          <span class="nh-step">3</span>
+          <span class="nh-label">Scenario</span>
+          <span class="nh-sub">Load, save, share</span>
+          <span class="nh-caret" aria-hidden="true"></span>
+        </button>
+        <div class="nav-body" id="navScenario">
+          <button class="nav-act" id="btnExample">Load worked example</button>
+          <button class="nav-act" id="btnImportJson">Import scenario…</button>
+          <button class="nav-act" id="btnExportJson">Export scenario</button>
+          <button class="nav-act" id="btnExportCsv">Download results CSV</button>
+          <button class="nav-act strong" id="btnPrint">Create PDF report</button>
+          <button class="nav-act" id="btnRecalc">Recalculate</button>
+          <button class="nav-act" id="btnTour">Take the tour</button>
+          <button class="nav-act danger" id="btnReset">Reset everything</button>
+        </div>
+      </div>
+
+      <p class="nav-note" id="saveNote">Changes auto-save to this browser.</p>
     </nav>
 
     <div class="stack">
@@ -2104,9 +2194,12 @@ const tour = {
       const cw = this.card.offsetWidth, ch = this.card.offsetHeight;
       if (target) {
         const r = target.getBoundingClientRect();
+        // Prefer below the target, else above; then clamp hard to the viewport
+        // so a target that scrolled out of view can never carry the card with it.
         let top = r.bottom + 16;
-        if (top + ch > innerHeight - 12) top = Math.max(12, r.top - ch - 16);
-        let left = Math.min(Math.max(12, r.left), innerWidth - cw - 12);
+        if (top + ch > innerHeight - 12) top = r.top - ch - 16;
+        top = Math.min(Math.max(12, top), Math.max(12, innerHeight - ch - 12));
+        let left = Math.min(Math.max(12, r.left), Math.max(12, innerWidth - cw - 12));
         Object.assign(this.card.style, { top: top + "px", left: left + "px", transform: "none" });
       } else {
         Object.assign(this.card.style, { top: "50%", left: "50%", transform: "translate(-50%,-50%)" });
@@ -2834,9 +2927,48 @@ initUI();
 refresh();
 window.addEventListener("resize", () => refresh());
 
-/* Sheet index follows the reader down the plan set. */
+/* Workflow menu: groups expand and collapse, state remembered per visitor. */
+const NAV_KEY = "realcost-lcca-nav";
 try {
-  const links = Array.from(document.querySelectorAll(".sheetindex a"));
+  const saved = JSON.parse(localStorage.getItem(NAV_KEY) || "{}");
+  document.querySelectorAll(".nav-group").forEach(group => {
+    const head = group.querySelector(".nav-head");
+    const body = group.querySelector(".nav-body");
+    const key = group.dataset.group;
+    const setOpen = open => {
+      head.setAttribute("aria-expanded", String(open));
+      body.hidden = !open;
+    };
+    if (key in saved) setOpen(saved[key]);
+    head.addEventListener("click", () => {
+      const next = head.getAttribute("aria-expanded") !== "true";
+      setOpen(next);
+      saved[key] = next;
+      try { localStorage.setItem(NAV_KEY, JSON.stringify(saved)); } catch (e) {}
+    });
+  });
+
+  // Narrow screens: the Menu button reveals the same nav.
+  const nt = $("navToggle"), sn = $("sideNav");
+  if (nt && sn) {
+    nt.addEventListener("click", () => {
+      const open = !sn.classList.contains("open");
+      sn.classList.toggle("open", open);
+      nt.setAttribute("aria-expanded", String(open));
+    });
+    // Jumping to a section should dismiss the overlay menu on narrow screens.
+    sn.addEventListener("click", e => {
+      if (e.target.closest("a") && window.innerWidth < 1060) {
+        sn.classList.remove("open");
+        nt.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+} catch (e) {}
+
+/* The menu follows the reader down the plan set. */
+try {
+  const links = Array.from(document.querySelectorAll(".nav-body a[data-sec]"));
   if (links.length && "IntersectionObserver" in window) {
     const byId = new Map(links.map(a => [a.getAttribute("href").slice(1), a]));
     const visible = new Set();
