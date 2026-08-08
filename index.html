@@ -5,387 +5,1048 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RealCost LCCA Dashboard — Pavement Life-Cycle Cost Analysis</title>
 <style>
+  /* ============================================================
+     PAVEMENT LCCA — visual system
+     Grounded in the construction plan set: title blocks, sheet
+     index, section cuts, dimension strings, MUTCD sign colors.
+     Light palette lives on bare :root; dark redefines tokens only.
+     ============================================================ */
   :root {
     color-scheme: light;
-    --surface-1: #fcfcfb;
-    --page: #f9f9f7;
-    --text-primary: #0b0b0b;
-    --text-secondary: #52514e;
-    --text-muted: #898781;
-    --grid: #e1e0d9;
-    --baseline: #c3c2b7;
-    --border: rgba(11,11,11,0.10);
-    --series-1: #2a78d6;  /* agency / alt 1 */
-    --series-2: #eb6834;  /* user / alt 2 */
-    --series-3: #1baf7a;  /* alt 3 */
-    --series-4: #eda100;  /* alt 4 */
-    --good: #0ca30c;
-    --critical: #d03b3b;
-    --input-bg: #ffffff;
-    --accent-wash: rgba(42,120,214,0.08);
+
+    /* grounds — concrete & drafting vellum */
+    --page:          #e6e8e3;
+    --page-line:     rgba(20,25,26,0.05);
+    --surface-1:     #fafaf8;
+    --surface-2:     #f0f1ec;
+    --surface-3:     #e3e6e0;
+    --input-bg:      #ffffff;
+
+    /* masthead band — asphalt */
+    --band:          #15191a;
+    --band-text:     #f3f5f1;
+    --band-muted:    #9aa39d;
+    --band-line:     rgba(255,255,255,0.16);
+    --stripe:        #dcb545;          /* traffic-marking yellow */
+
+    /* ink */
+    --text-primary:  #14191a;
+    --text-secondary:#4b5552;
+    --text-muted:    #78827d;
+    --border:        rgba(20,25,26,0.14);
+    --border-strong: rgba(20,25,26,0.32);
+    --grid:          #d7dbd5;
+    --baseline:      #98a29c;
+
+    /* accent — MUTCD guide-sign green */
+    --accent:        #0d5c42;
+    --accent-ink:    #ffffff;
+    --accent-wash:   rgba(13,92,66,0.075);
+    --accent-line:   rgba(13,92,66,0.30);
+
+    /* semantic — separate from the accent */
+    --good:          #14804a;
+    --critical:      #b0331c;
+    --warn-wash:     rgba(176,51,28,0.075);
+
+    /* categorical series — validated all-pairs for protan/deutan */
+    --series-1: #2a5fa5;   /* agency cost / demand / Alt 1 */
+    --series-2: #d0691a;   /* user cost / capacity / Alt 2 */
+    --series-3: #2b9e6a;   /* queue / Alt 3 */
+    --series-4: #b02a6f;   /* Alt 4 */
+
+    --shadow: 0 1px 1px rgba(20,25,26,.04), 0 10px 26px -18px rgba(20,25,26,.5);
+
+    /* type roles */
+    --font-display: "Arial Narrow", "Liberation Sans Narrow", "Helvetica Neue Condensed",
+                    "Roboto Condensed", "DejaVu Sans Condensed", system-ui, sans-serif;
+    --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-serif: Charter, "Bitstream Charter", "Iowan Old Style", "Palatino Linotype",
+                  Palatino, Georgia, "Times New Roman", serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo,
+                 Consolas, "DejaVu Sans Mono", monospace;
+
+    /* type scale */
+    --fs-micro: 10.5px;
+    --fs-xs:    11.5px;
+    --fs-sm:    12.5px;
+    --fs-base:  13.5px;
+    --fs-md:    15px;
+    --fs-prose: 14.5px;   /* serif runs small next to the sans at the same px */
+    --fs-lg:    19px;
+    --fs-xl:    25px;
+    --fs-2xl:   34px;
   }
+
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --surface-1: #1a1a19;
-      --page: #0d0d0d;
-      --text-primary: #ffffff;
-      --text-secondary: #c3c2b7;
-      --text-muted: #898781;
-      --grid: #2c2c2a;
-      --baseline: #383835;
-      --border: rgba(255,255,255,0.10);
-      --series-1: #3987e5;
-      --series-2: #d95926;
-      --series-3: #199e70;
-      --series-4: #c98500;
-      --good: #0ca30c;
-      --critical: #d03b3b;
-      --input-bg: #232322;
-      --accent-wash: rgba(57,135,229,0.14);
+      --page:          #101312;
+      --page-line:     rgba(255,255,255,0.028);
+      --surface-1:     #1b1e1d;
+      --surface-2:     #232726;
+      --surface-3:     #2b302e;
+      --input-bg:      #141817;
+      --band:          #212624;
+      --band-text:     #edefec;
+      --band-muted:    #838d88;
+      --band-line:     rgba(255,255,255,0.11);
+      --stripe:        #b99530;
+      --text-primary:  #edefec;
+      --text-secondary:#a8b1ad;
+      --text-muted:    #7c8682;
+      --border:        rgba(255,255,255,0.13);
+      --border-strong: rgba(255,255,255,0.30);
+      --grid:          #2c3130;
+      --baseline:      #4b514f;
+      --accent:        #4fbf93;
+      --accent-ink:    #072019;
+      --accent-wash:   rgba(79,191,147,0.10);
+      --accent-line:   rgba(79,191,147,0.36);
+      --good:          #3fbf7f;
+      --critical:      #e8705a;
+      --warn-wash:     rgba(232,112,90,0.10);
+      --series-1: #5b93d6;
+      --series-2: #cd7b30;
+      --series-3: #2fa875;
+      --series-4: #b83a80;
+      --shadow: 0 1px 1px rgba(0,0,0,.4), 0 12px 30px -20px rgba(0,0,0,.95);
     }
   }
+
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --surface-1: #1a1a19;
-    --page: #0d0d0d;
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #898781;
-    --grid: #2c2c2a;
-    --baseline: #383835;
-    --border: rgba(255,255,255,0.10);
-    --series-1: #3987e5;
-    --series-2: #d95926;
-    --series-3: #199e70;
-    --series-4: #c98500;
-    --good: #0ca30c;
-    --critical: #d03b3b;
-    --input-bg: #232322;
-    --accent-wash: rgba(57,135,229,0.14);
+    --page:          #101312;
+    --page-line:     rgba(255,255,255,0.028);
+    --surface-1:     #1b1e1d;
+    --surface-2:     #232726;
+    --surface-3:     #2b302e;
+    --input-bg:      #141817;
+    --band:          #212624;
+    --band-text:     #edefec;
+    --band-muted:    #838d88;
+    --band-line:     rgba(255,255,255,0.11);
+    --stripe:        #b99530;
+    --text-primary:  #edefec;
+    --text-secondary:#a8b1ad;
+    --text-muted:    #7c8682;
+    --border:        rgba(255,255,255,0.13);
+    --border-strong: rgba(255,255,255,0.30);
+    --grid:          #2c3130;
+    --baseline:      #4b514f;
+    --accent:        #4fbf93;
+    --accent-ink:    #072019;
+    --accent-wash:   rgba(79,191,147,0.10);
+    --accent-line:   rgba(79,191,147,0.36);
+    --good:          #3fbf7f;
+    --critical:      #e8705a;
+    --warn-wash:     rgba(232,112,90,0.10);
+    --series-1: #5b93d6;
+    --series-2: #cd7b30;
+    --series-3: #2fa875;
+    --series-4: #b83a80;
+    --shadow: 0 1px 1px rgba(0,0,0,.4), 0 12px 30px -20px rgba(0,0,0,.95);
   }
+
   * { box-sizing: border-box; }
+
   body {
     margin: 0;
-    background: var(--page);
+    background-color: var(--page);
+    background-image:
+      linear-gradient(var(--page-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--page-line) 1px, transparent 1px);
+    background-size: 34px 34px, 34px 34px;
     color: var(--text-primary);
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    font-size: 14px;
-    line-height: 1.45;
+    font-family: var(--font-ui);
+    font-size: var(--fs-base);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
   }
-  header {
-    padding: 20px 28px 14px;
-    border-bottom: 1px solid var(--border);
+
+  /* ---------- shared type utilities ---------- */
+  .caps {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: .11em;
+    font-weight: 700;
+  }
+  .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  /* ============================================================
+     Masthead — drawing title block
+     ============================================================ */
+  header.titleblock {
+    background: var(--band);
+    color: var(--band-text);
+    border-bottom: 5px solid transparent;
+    border-image: repeating-linear-gradient(90deg,
+        var(--stripe) 0 44px, transparent 44px 88px) 5;
+  }
+  .tb-inner {
+    max-width: 1460px; margin: 0 auto; padding: 20px 24px 18px;
+    display: flex; flex-wrap: wrap; gap: 20px 40px; align-items: flex-end;
+  }
+  .tb-main { flex: 1 1 380px; min-width: 0; }
+  .tb-eyebrow {
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .18em; font-weight: 700; font-size: var(--fs-micro);
+    color: var(--stripe); margin-bottom: 7px;
+  }
+  header.titleblock h1 {
+    margin: 0 0 6px;
+    font-family: var(--font-display);
+    font-size: var(--fs-xl);
+    font-weight: 700;
+    letter-spacing: .015em;
+    line-height: 1.05;
+    text-wrap: balance;
+    color: var(--band-text);
+  }
+  header.titleblock p {
+    margin: 0; max-width: 66ch;
+    font-family: var(--font-serif);
+    font-size: var(--fs-base);
+    line-height: 1.55;
+    color: var(--band-muted);
+  }
+  dl.tb-meta {
+    margin: 0; display: grid; gap: 1px;
+    grid-template-columns: repeat(2, minmax(112px, auto));
+    background: var(--band-line); border: 1px solid var(--band-line);
+  }
+  dl.tb-meta > div { background: var(--band); padding: 7px 12px 8px; }
+  dl.tb-meta dt {
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .13em; font-weight: 700; font-size: 9.5px;
+    color: var(--band-muted); margin-bottom: 2px;
+  }
+  dl.tb-meta dd {
+    margin: 0; font-family: var(--font-mono); font-size: var(--fs-xs);
+    color: var(--band-text); white-space: nowrap;
+  }
+
+  /* ============================================================
+     Sticky command bar
+     ============================================================ */
+  .commandbar {
+    position: sticky; top: 0; z-index: 40;
     background: var(--surface-1);
+    border-bottom: 1px solid var(--border-strong);
+    box-shadow: 0 1px 0 var(--border), 0 6px 18px -14px rgba(0,0,0,.5);
   }
-  header h1 { margin: 0 0 2px; font-size: 20px; font-weight: 650; }
-  header p { margin: 0; color: var(--text-secondary); font-size: 13px; }
-  main { max-width: 1240px; margin: 0 auto; padding: 20px 24px 60px; }
+  .commandbar .cb-inner {
+    max-width: 1460px; margin: 0 auto; padding: 9px 24px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .toolbar { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+  .cb-inner #saveNote { margin-left: auto; }
+
+  /* ============================================================
+     Sheet layout — index rail + content
+     ============================================================ */
+  .shell { max-width: 1460px; margin: 0 auto; padding: 22px 24px 72px; }
+  .sheetwrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  @media (min-width: 1180px) {
+    .sheetwrap { grid-template-columns: 176px minmax(0, 1fr); }
+  }
+  .sheetindex { display: none; }
+  @media (min-width: 1180px) {
+    .sheetindex {
+      display: block; position: sticky; top: 68px; align-self: start;
+      border-top: 2px solid var(--border-strong);
+      padding-top: 10px;
+    }
+  }
+  .sheetindex .si-title {
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .16em; font-weight: 700; font-size: 9.5px;
+    color: var(--text-muted); margin-bottom: 8px;
+  }
+  .sheetindex ol { list-style: none; margin: 0; padding: 0; }
+  .sheetindex a {
+    display: grid; grid-template-columns: 26px 1fr; gap: 8px;
+    padding: 5px 6px 5px 0; text-decoration: none;
+    border-bottom: 1px solid var(--grid);
+    color: var(--text-secondary);
+  }
+  .sheetindex a .n {
+    font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted);
+    padding-top: 1px;
+  }
+  .sheetindex a .t {
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .07em; font-weight: 600; font-size: var(--fs-xs);
+    line-height: 1.25;
+  }
+  .sheetindex a:hover { color: var(--text-primary); }
+  .sheetindex a.on { color: var(--accent); box-shadow: inset 2px 0 0 var(--accent); padding-left: 8px; }
+  .sheetindex a.on .n { color: var(--accent); }
+  .sheetindex a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .stack { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+  .row2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  @media (min-width: 920px) { .row2 { grid-template-columns: 1.05fr 1.35fr; } }
+
+  /* ============================================================
+     Sheets (cards)
+     ============================================================ */
   section.card {
     background: var(--surface-1);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 20px;
-    margin-bottom: 18px;
+    border-radius: 2px;
+    box-shadow: var(--shadow);
+    min-width: 0;
   }
-  h2 { font-size: 15px; font-weight: 650; margin: 0 0 12px; }
-  h3 { font-size: 13px; font-weight: 650; margin: 14px 0 8px; color: var(--text-secondary); }
-  .grid { display: grid; gap: 10px 18px; }
-  .grid.c3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-  .grid.c4 { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
-  label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--text-secondary); }
-  label.field span.u { color: var(--text-muted); font-weight: 400; }
+  .sheet-head {
+    display: flex; align-items: stretch;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .sheet-no {
+    display: flex; align-items: center;
+    font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 700;
+    letter-spacing: .04em; color: var(--accent);
+    padding: 0 11px; border-right: 1px solid var(--border);
+  }
+  .sheet-head h2 {
+    flex: 1 1 auto; min-width: 0; margin: 0; align-self: center;
+    padding: 10px 14px;
+    font-family: var(--font-display); font-weight: 700;
+    font-size: var(--fs-md); letter-spacing: .085em; text-transform: uppercase;
+    color: var(--text-primary); line-height: 1.15;
+  }
+  .sheet-tag {
+    display: flex; align-items: center; white-space: nowrap;
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .15em; font-weight: 700; font-size: 9.5px;
+    color: var(--text-muted);
+    padding: 0 13px; border-left: 1px solid var(--border);
+  }
+  .sheet-body { padding: 16px 18px 18px; }
+  .sheet-body > :first-child { margin-top: 0; }
+  .sheet-body > :last-child { margin-bottom: 0; }
+
+  /* input sheets recede */
+  section.card.input-sheet { background: var(--surface-2); box-shadow: none; }
+  section.card.input-sheet .sheet-head { background: var(--surface-3); }
+  section.card.input-sheet .sheet-body { padding: 14px 16px 16px; }
+
+  /* the results sheet dominates */
+  section.card.result-sheet {
+    border-color: var(--accent-line);
+    box-shadow: 0 1px 1px rgba(20,25,26,.04), 0 16px 40px -22px rgba(13,92,66,.55);
+  }
+  section.card.result-sheet .sheet-head {
+    background: var(--accent-wash);
+    border-bottom-color: var(--accent-line);
+  }
+  section.card.result-sheet .sheet-head h2 { font-size: var(--fs-lg); }
+  section.card.result-sheet .sheet-tag { color: var(--accent); }
+
+  h3 {
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .12em; font-weight: 700; font-size: var(--fs-xs);
+    margin: 20px 0 9px; color: var(--text-secondary);
+  }
+
+  /* ============================================================
+     Forms
+     ============================================================ */
+  .grid { display: grid; gap: 12px 16px; }
+  .grid.c3 { grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); }
+  .grid.c4 { grid-template-columns: repeat(auto-fit, minmax(178px, 1fr)); }
+
+  label.field {
+    display: flex; flex-direction: column; gap: 4px; min-width: 0;
+    font-size: var(--fs-xs); line-height: 1.35; font-weight: 500;
+    color: var(--text-secondary);
+  }
+  label.field span.u {
+    color: var(--text-muted); font-weight: 400;
+    font-family: var(--font-mono); font-size: 10.5px;
+  }
   label.field .field-caption { display: block; line-height: 1.35; }
+
   input[type=number], input[type=text], select {
     padding: 6px 8px;
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 2px;
     background: var(--input-bg);
     color: var(--text-primary);
-    font: inherit;
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums;
     width: 100%;
+    min-width: 0;
   }
-  input:focus, select:focus { outline: 2px solid var(--series-1); outline-offset: -1px; }
-  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-  .tabs button {
-    padding: 7px 14px;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: transparent;
-    color: var(--text-secondary);
-    font: inherit;
-    font-size: 13px;
-    cursor: pointer;
+  input[type=text], select { font-family: var(--font-ui); }
+  input[type=number] { text-align: right; }
+  input:hover, select:hover { border-color: var(--border-strong); }
+  input:focus, select:focus {
+    outline: 2px solid var(--accent); outline-offset: 1px;
+    border-color: var(--accent);
   }
-  .tabs button.active { background: var(--accent-wash); color: var(--text-primary); border-color: var(--series-1); font-weight: 600; }
-  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: baseline; }
-  table.data { border-collapse: collapse; width: 100%; font-size: 13px; }
-  table.data th, table.data td { padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--grid); }
-  table.data th:first-child, table.data td:first-child { text-align: left; }
-  table.data th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
-  table.data td { font-variant-numeric: tabular-nums; }
-  table.data tr.best td { font-weight: 650; }
-  .activity-block { border: 1px solid var(--grid); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
-  .activity-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .activity-head input[type=text] { font-weight: 600; }
+
+  /* ============================================================
+     Buttons — sign-legend caps
+     ============================================================ */
   .row-actions button, .btn {
-    padding: 6px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    padding: 6px 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 2px;
+    background: var(--surface-1);
+    color: var(--text-secondary);
+    font-family: var(--font-display);
+    font-size: var(--fs-xs);
+    font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    cursor: pointer;
+    transition: background .12s ease, color .12s ease, border-color .12s ease;
+  }
+  .row-actions button:hover, .btn:hover {
+    background: var(--accent-wash); color: var(--text-primary);
+    border-color: var(--accent);
+  }
+  .btn:focus-visible, .row-actions button:focus-visible, .tabs button:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+  .btn.primary {
+    background: var(--accent); border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+  .btn.primary:hover { filter: brightness(1.12); color: var(--accent-ink); background: var(--accent); }
+  #btnReset { color: var(--text-muted); border-color: var(--border); }
+  #btnReset:hover { color: var(--critical); border-color: var(--critical); background: var(--warn-wash); }
+  @media (prefers-reduced-motion: reduce) {
+    .row-actions button, .btn { transition: none; }
+  }
+
+  /* ============================================================
+     Tabs — alternative selector
+     ============================================================ */
+  .tabs {
+    display: flex; gap: 0; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border-strong);
+    margin-bottom: 14px;
+  }
+  .tabs button {
+    padding: 8px 13px 7px;
+    border: 1px solid transparent; border-bottom: none;
+    border-radius: 2px 2px 0 0;
     background: transparent;
     color: var(--text-secondary);
-    font: inherit;
-    font-size: 12px;
+    font-family: var(--font-ui); font-size: var(--fs-sm); font-weight: 500;
     cursor: pointer;
+    margin-bottom: -1px;
+    display: flex; align-items: center;
+    max-width: 100%;
   }
-  .row-actions button:hover, .btn:hover { background: var(--accent-wash); color: var(--text-primary); }
-  .btn.primary { background: var(--series-1); border-color: var(--series-1); color: #fff; font-weight: 600; }
-  .charts { display: grid; grid-template-columns: 1fr; gap: 18px; }
-  .chart-wrap { overflow-x: auto; }
-  .chart-title { font-size: 13px; font-weight: 650; margin-bottom: 2px; }
-  .chart-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
-  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); margin: 6px 0 2px; }
-  .legend .item { display: flex; align-items: center; }
-  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
-  .tooltip {
-    position: fixed;
-    pointer-events: none;
+  .tabs button:hover { color: var(--text-primary); background: var(--surface-2); }
+  .tabs button.active {
+    background: var(--surface-1);
+    border-color: var(--border-strong);
+    border-bottom: 1px solid var(--surface-1);
+    color: var(--text-primary); font-weight: 650;
+    box-shadow: inset 0 2px 0 var(--accent);
+  }
+  .swatch {
+    display: inline-block; width: 9px; height: 9px; border-radius: 1px;
+    margin-right: 7px; flex: none;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.14);
+  }
+
+  /* ============================================================
+     Data tables — the ledger
+     ============================================================ */
+  table.data { border-collapse: collapse; width: 100%; }
+  table.data th, table.data td { padding: 7px 10px; text-align: right; }
+  table.data th:first-child, table.data td:first-child { text-align: left; }
+  table.data th {
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .1em; font-weight: 700; font-size: var(--fs-micro);
+    color: var(--text-secondary); vertical-align: bottom;
+    border-bottom: 1px solid var(--border-strong);
+    white-space: nowrap;
+  }
+  table.data td {
+    font-family: var(--font-mono); font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums;
+    border-bottom: 1px solid var(--grid);
+    color: var(--text-primary);
+  }
+  table.data td:first-child { font-family: var(--font-ui); }
+  table.data tbody tr:hover td { background: var(--surface-2); }
+  table.data tr.best td { font-weight: 700; background: var(--accent-wash); }
+  table.data tr.best:hover td { background: var(--accent-wash); }
+  table.data tr.best td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+  .table-scroll { overflow-x: auto; }
+
+  /* ============================================================
+     Activities
+     ============================================================ */
+  #altPanel { min-width: 0; }
+  .activity-block {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--alt-color, var(--baseline));
+    border-radius: 2px;
+    background: var(--surface-2);
+    padding: 12px 14px 13px;
+    margin-bottom: 10px;
+  }
+  .activity-head {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px; margin-bottom: 10px;
+  }
+  .act-seq {
+    font-family: var(--font-mono); font-size: var(--fs-micro); font-weight: 700;
+    letter-spacing: .06em; color: var(--text-muted);
+    border: 1px solid var(--border); border-radius: 2px;
+    padding: 3px 6px; flex: none; background: var(--surface-1);
+  }
+  .activity-head input[type=text] { font-weight: 600; background: var(--surface-1); }
+  .act-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+
+  .drawer:empty { display: none; }
+  .drawer-inner {
+    margin-top: 11px; padding: 14px 16px;
+    border: 1px dashed var(--accent-line); border-radius: 2px;
+    background: var(--surface-1);
+  }
+  .drawer-inner h4 {
+    margin: 0 0 5px;
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .11em; font-weight: 700; font-size: var(--fs-xs);
+    color: var(--text-primary);
+  }
+  .drawer-inner .note { margin-top: 0; }
+
+  /* ============================================================
+     KPI ledger
+     ============================================================ */
+  /* Hairline-joined ledger. Cell rules are box-shadows clipped by the frame,
+     so a half-empty last row stays blank instead of showing grid gaps. */
+  .kpi-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
+    gap: 0; background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+  .kpi {
+    background: var(--surface-1); padding: 13px 15px 14px; min-width: 0;
+    box-shadow: 1px 0 0 var(--border), 0 1px 0 var(--border);
+  }
+  .kpi .l {
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .14em; font-weight: 700; font-size: 9.5px;
+    color: var(--text-muted); margin-bottom: 7px;
+  }
+  .kpi .v {
+    font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+    font-size: var(--fs-lg); font-weight: 600; line-height: 1.15;
+    color: var(--text-primary);
+    display: flex; align-items: baseline; gap: 0;
+  }
+  .kpi .s {
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    color: var(--text-secondary); margin-top: 6px; line-height: 1.45;
+  }
+  .kpi-hero {
+    background-color: var(--surface-1);
+    background-image: linear-gradient(var(--accent-wash), var(--accent-wash));
+    box-shadow: inset 3px 0 0 var(--accent), 1px 0 0 var(--border), 0 1px 0 var(--border);
+  }
+  .kpi-hero .v {
+    font-family: var(--font-ui); font-size: var(--fs-md); font-weight: 650;
+    align-items: center; line-height: 1.3;
+  }
+  .kpi-hero .l { color: var(--accent); }
+  @media (min-width: 780px) { .kpi-hero { grid-column: span 2; } }
+  .pill {
+    display: inline-block; margin-bottom: 7px;
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .13em; font-weight: 700; font-size: 9.5px;
+    padding: 3px 7px; border-radius: 2px;
+    background: var(--accent); color: var(--accent-ink);
+  }
+
+  /* ============================================================
+     Prose — the report voice
+     ============================================================ */
+  #interpretation {
+    border-top: 1px solid var(--border-strong);
+    padding-top: 14px;
+  }
+  #interpretation h3 { margin-top: 0; }
+  #interpretation p {
+    font-family: var(--font-serif); font-size: var(--fs-prose);
+    line-height: 1.6; max-width: 70ch; color: var(--text-secondary);
+    margin: 0 0 11px;
+  }
+  #interpretation p:last-child { margin-bottom: 0; }
+  #interpretation b { color: var(--text-primary); font-weight: 700; }
+  .alt-note {
+    font-family: var(--font-serif); font-size: var(--fs-prose);
+    line-height: 1.55; max-width: 78ch; color: var(--text-secondary);
+    margin: 0 0 14px; padding-left: 11px;
+    border-left: 2px solid var(--border-strong);
+  }
+
+  .note {
+    font-size: var(--fs-xs); color: var(--text-muted); line-height: 1.5;
+  }
+  .warn {
+    color: var(--critical); font-size: var(--fs-xs); font-weight: 600;
+    line-height: 1.5;
+    background: var(--warn-wash); border-left: 3px solid var(--critical);
+    padding: 7px 11px; margin: 10px 0 0; border-radius: 0 2px 2px 0;
+  }
+  /* Repeated warnings group into one advisory block, not a stack of red bars. */
+  #warnings:not(:empty) {
+    margin-top: 14px; padding: 5px 12px 9px;
+    background: var(--warn-wash);
+    border-left: 3px solid var(--critical);
+    border-radius: 0 2px 2px 0;
+  }
+  #warnings .warn { background: none; border-left: 0; padding: 0; margin: 5px 0 0; }
+  .note.ok {
+    color: var(--good); font-weight: 600;
+    background: var(--accent-wash); border-left: 3px solid var(--good);
+    padding: 7px 11px; border-radius: 0 2px 2px 0;
+  }
+
+  .banner {
     background: var(--surface-1);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 10px;
-    font-size: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-    z-index: 50;
+    border-left: 3px solid var(--accent);
+    border-radius: 2px;
+    padding: 11px 14px; font-size: var(--fs-sm); line-height: 1.55;
+    margin-bottom: 20px;
     display: none;
-    max-width: 260px;
+    box-shadow: var(--shadow);
   }
-  .tooltip b { font-variant-numeric: tabular-nums; }
-  .note { font-size: 12px; color: var(--text-muted); }
-  .warn { color: var(--critical); font-size: 12px; font-weight: 600; }
-  details.method { font-size: 13px; color: var(--text-secondary); }
-  details.method summary { cursor: pointer; font-weight: 600; color: var(--text-primary); }
-  details.method li { margin: 4px 0; }
-  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
-  .kpi {
-    border: 1px solid var(--grid);
-    border-radius: 8px;
-    padding: 12px 14px;
+  .banner b { font-weight: 700; }
+
+  details.method { font-family: var(--font-serif); font-size: var(--fs-prose); color: var(--text-secondary); }
+  details.method summary {
+    cursor: pointer;
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .11em; font-weight: 700; font-size: var(--fs-xs);
+    color: var(--text-primary);
   }
-  .kpi .l { font-size: 12px; color: var(--text-secondary); }
-  .kpi .v { font-size: 22px; font-weight: 650; margin-top: 2px; }
-  .kpi .s { font-size: 12px; color: var(--text-muted); }
-  /* Help popovers */
+  details.method summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  details.method ul { margin: 12px 0 0; padding-left: 20px; }
+  details.method li { margin: 9px 0; line-height: 1.6; max-width: 82ch; }
+  details.method b { color: var(--text-primary); }
+
+  .credits p {
+    font-family: var(--font-serif); font-size: var(--fs-prose);
+    line-height: 1.62; color: var(--text-secondary); max-width: 78ch;
+    margin: 0 0 11px;
+  }
+  .credits b { color: var(--text-primary); }
+  .credits .note { font-family: var(--font-ui); }
+
+  /* ============================================================
+     Charts
+     ============================================================ */
+  .charts .sheet-body { display: grid; grid-template-columns: 1fr; gap: 26px; }
+  .chart-block { min-width: 0; }
+  .chart-wrap { overflow-x: auto; }
+  .chart-title {
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .11em; font-weight: 700; font-size: var(--fs-xs);
+    color: var(--text-primary); margin-bottom: 3px;
+  }
+  .chart-sub { font-size: var(--fs-xs); color: var(--text-muted); margin-bottom: 9px; }
+  .legend {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    font-size: var(--fs-xs); color: var(--text-secondary); margin: 8px 0 4px;
+  }
+  .legend .item { display: flex; align-items: center; }
+  svg { display: block; }
+  svg text { font-family: var(--font-ui); }
+  svg text.num, svg text.dim { font-family: var(--font-mono); }
+  svg text.cap {
+    font-family: var(--font-display); text-transform: uppercase; letter-spacing: .1em;
+  }
+
+  /* ============================================================
+     Structures
+     ============================================================ */
+  /* Cross-sections cap out so a full-width drawer doesn't balloon the callouts. */
+  .xsection { max-width: 680px; }
+  .struct-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; }
+  .struct-cell {
+    border: 1px solid var(--border); border-radius: 2px;
+    background: var(--surface-2);
+    padding: 12px 14px 14px; min-width: 0;
+  }
+  .struct-cell h4 {
+    margin: 0 0 3px; display: flex; align-items: center;
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .09em; font-weight: 700; font-size: var(--fs-xs);
+    color: var(--text-primary);
+  }
+  .struct-cell .sub {
+    font-size: var(--fs-micro); color: var(--text-muted); margin-bottom: 9px;
+    font-family: var(--font-mono);
+  }
+  .mat-legend {
+    display: flex; flex-wrap: wrap; gap: 6px 18px;
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid var(--grid);
+  }
+  .mat-legend .item {
+    display: flex; align-items: center; gap: 7px;
+    font-size: var(--fs-micro); color: var(--text-secondary);
+    font-family: var(--font-display); text-transform: uppercase; letter-spacing: .08em;
+    font-weight: 600;
+  }
+  .mat-legend .chip {
+    width: 16px; height: 11px; border-radius: 1px; flex: none;
+    box-shadow: 0 0 0 1px var(--border-strong);
+  }
+
+  /* ============================================================
+     Tooltip, help popovers, tour
+     ============================================================ */
+  .tooltip {
+    position: fixed; pointer-events: none;
+    background: var(--band); color: var(--band-text);
+    border: 1px solid var(--band-line);
+    border-radius: 2px;
+    padding: 8px 10px;
+    font-size: var(--fs-xs); line-height: 1.5;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.35);
+    z-index: 80; display: none; max-width: 268px;
+  }
+  .tooltip b { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
   button.help {
-    width: 15px; height: 15px; padding: 0;
-    border: 1px solid var(--baseline); border-radius: 50%;
+    width: 14px; height: 14px; padding: 0;
+    border: 1px solid var(--baseline); border-radius: 2px;
     background: transparent; color: var(--text-muted);
-    font-size: 10px; line-height: 1; cursor: pointer;
-    margin-left: 5px; vertical-align: 1px; font-weight: 700;
+    font-family: var(--font-mono); font-size: 9.5px; line-height: 1;
+    cursor: pointer; margin-left: 5px; vertical-align: 1px; font-weight: 700;
   }
-  button.help:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+  button.help:hover { color: var(--accent); border-color: var(--accent); }
+  button.help:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
   .popover {
-    position: fixed; z-index: 60; max-width: 300px;
-    background: var(--surface-1); border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 12px; font-size: 12.5px;
-    color: var(--text-secondary); box-shadow: 0 6px 24px rgba(0,0,0,0.22);
+    position: fixed; z-index: 70; max-width: 320px;
+    background: var(--surface-1); border: 1px solid var(--border-strong);
+    border-top: 3px solid var(--accent);
+    border-radius: 2px; padding: 12px 14px;
+    font-family: var(--font-serif); font-size: var(--fs-prose); line-height: 1.55;
+    color: var(--text-secondary); box-shadow: 0 10px 34px rgba(0,0,0,0.26);
     display: none;
   }
   .popover b { color: var(--text-primary); }
-  /* Guided tour */
+  .popover table td { font-family: var(--font-mono); }
+
   .tour-backdrop { position: fixed; inset: 0; z-index: 90; }
   .tour-hole {
-    position: fixed; z-index: 91; border-radius: 12px;
-    box-shadow: 0 0 0 9999px rgba(0,0,0,0.55), 0 0 0 3px var(--series-1);
+    position: fixed; z-index: 91; border-radius: 2px;
+    box-shadow: 0 0 0 9999px rgba(8,12,11,0.62), 0 0 0 2px var(--accent);
     pointer-events: none; transition: all .25s ease;
   }
   .tour-card {
-    position: fixed; z-index: 92; width: min(400px, calc(100vw - 32px));
-    background: var(--surface-1); border: 1px solid var(--border);
-    border-radius: 12px; padding: 16px 18px 14px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+    position: fixed; z-index: 92; width: min(410px, calc(100vw - 32px));
+    background: var(--surface-1); border: 1px solid var(--border-strong);
+    border-top: 4px solid var(--accent);
+    border-radius: 2px; padding: 16px 18px 14px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.42);
   }
-  .tour-card h4 { margin: 0 0 6px; font-size: 14px; }
-  .tour-card p { margin: 0 0 12px; font-size: 13px; color: var(--text-secondary); }
+  .tour-card h4 {
+    margin: 0 0 7px;
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .09em; font-weight: 700; font-size: var(--fs-base);
+    color: var(--text-primary); text-wrap: balance;
+  }
+  .tour-card p {
+    margin: 0 0 13px;
+    font-family: var(--font-serif); font-size: var(--fs-prose); line-height: 1.6;
+    color: var(--text-secondary);
+  }
   .tour-card .tour-nav { display: flex; align-items: center; gap: 8px; }
-  .tour-card .tour-step { font-size: 11px; color: var(--text-muted); margin-right: auto; }
-  .banner {
-    background: var(--accent-wash); border: 1px solid var(--series-1);
-    border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 14px;
-    display: none;
+  .tour-card .tour-step {
+    font-family: var(--font-mono); font-size: var(--fs-micro);
+    color: var(--text-muted); margin-right: auto;
   }
   @media (prefers-reduced-motion: reduce) { .tour-hole { transition: none; } }
-  /* Activity tools + drawers */
-  .act-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
-  .drawer:empty { display: none; }
-  .drawer-inner {
-    margin-top: 10px; padding: 14px 16px;
-    border: 1px solid var(--grid); border-radius: 8px;
-    background: var(--accent-wash);
+
+  /* ============================================================
+     Narrow viewports
+     ============================================================ */
+  @media (max-width: 640px) {
+    .shell { padding: 16px 14px 56px; }
+    .tb-inner { padding: 16px 14px 14px; }
+    .commandbar .cb-inner { padding: 8px 14px; }
+    .cb-inner #saveNote { margin-left: 0; }
+    header.titleblock h1 { font-size: var(--fs-lg); }
+    dl.tb-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
-  .drawer-inner h4 { margin: 0 0 4px; font-size: 13px; }
-  .drawer-inner .note { margin-top: 0; }
-  /* Structure comparison strip */
-  .struct-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-  .struct-cell { border: 1px solid var(--grid); border-radius: 8px; padding: 12px 14px; }
-  .struct-cell h4 { margin: 0 0 2px; font-size: 13px; }
-  .struct-cell .sub { font-size: 11.5px; color: var(--text-muted); margin-bottom: 6px; }
+
+  /* ============================================================
+     Print — results get screenshotted and pasted into reports
+     ============================================================ */
+  @media print {
+    body { background: #fff; color: #000; }
+    .commandbar, .sheetindex, .banner, .tooltip, .popover { display: none !important; }
+    .sheetwrap { grid-template-columns: minmax(0, 1fr); }
+    section.card { box-shadow: none; break-inside: avoid; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>Pavement Life-Cycle Cost Analysis</h1>
-  <p>Deterministic LCCA dashboard reimplementing FHWA RealCost 2.5 (Caltrans 2.5.7CA) methodology &mdash; agency costs, work-zone user costs, and NPV comparison of rehabilitation alternatives.</p>
-</header>
-<main>
 
-<section class="card" id="toolbarCard">
-  <div class="toolbar">
-    <button class="btn primary" id="btnRecalc">Recalculate</button>
-    <button class="btn" id="btnTour">▸ Take the tour</button>
-    <button class="btn" id="btnExample">Load worked example</button>
-    <button class="btn" id="btnExportJson">Export scenario (JSON)</button>
-    <button class="btn" id="btnImportJson">Import scenario</button>
-    <input type="file" id="fileImport" accept=".json" style="display:none">
-    <button class="btn" id="btnExportCsv">Download results (CSV)</button>
-    <button class="btn" id="btnReset">Reset to workbook seed</button>
+<header class="titleblock">
+  <div class="tb-inner">
+    <div class="tb-main">
+      <div class="tb-eyebrow">FHWA RealCost 2.5 &middot; Caltrans 2.5.7CA</div>
+      <h1>Pavement Life-Cycle Cost Analysis</h1>
+      <p>Compare rehabilitation strategies across the whole analysis period &mdash; what the agency
+        pays to build and maintain, what the traveling public pays in work-zone delay, and which
+        alternative costs least once future spending is discounted to today's dollars.</p>
+    </div>
+    <dl class="tb-meta">
+      <div><dt>Method</dt><dd>RealCost 2.5</dd></div>
+      <div><dt>Adaptation</dt><dd>Caltrans 2.5.7CA</dd></div>
+      <div><dt>Model</dt><dd>Deterministic</dd></div>
+      <div><dt>Reported in</dt><dd>NPV, $1000</dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="commandbar" id="toolbarCard">
+  <div class="cb-inner">
+    <div class="toolbar">
+      <button class="btn primary" id="btnRecalc">Recalculate</button>
+      <button class="btn" id="btnTour">Take the tour</button>
+      <button class="btn" id="btnExample">Load worked example</button>
+      <button class="btn" id="btnExportJson">Export scenario</button>
+      <button class="btn" id="btnImportJson">Import scenario</button>
+      <input type="file" id="fileImport" accept=".json" style="display:none">
+      <button class="btn" id="btnExportCsv">Results CSV</button>
+      <button class="btn" id="btnReset">Reset</button>
+    </div>
     <span class="note" id="saveNote">Changes auto-save to this browser.</span>
   </div>
+</div>
+
+<main class="shell">
+
   <div class="banner" id="exampleBanner">
     <b>Worked example loaded.</b> Costs, work-zone details, and truck percentages are illustrative
-    demo values for a 5-mile, 2-lane-per-direction rehabilitation — realistic in scale but not from
+    demo values for a 5-mile, 2-lane-per-direction rehabilitation &mdash; realistic in scale but not from
     any real project. Replace them with your own estimates before using results for decisions.
   </div>
-</section>
 
-<section class="card">
-  <h2>1 &middot; Economic Variables &amp; Analysis Options</h2>
-  <div class="grid c4">
-    <label class="field">Analysis Period <span class="u">(years)</span><input type="number" id="analysisPeriod" min="1" max="100"></label>
-    <label class="field">Beginning of Analysis<input type="number" id="startYear" min="1990" max="2100"></label>
-    <label class="field">Discount Rate <span class="u">(%)</span><input type="number" id="discountRate" step="0.1"></label>
-    <label class="field">Include User Costs<select id="includeUser"><option>Yes</option><option>No</option></select></label>
-    <label class="field">Agency Remaining Service Life Credit<select id="agencyRSL"><option>No</option><option>Yes</option></select></label>
-    <label class="field">User Cost Remaining Service Life Credit<select id="userRSL"><option>Yes</option><option>No</option></select></label>
-    <label class="field">VOT &mdash; Passenger Cars <span class="u">($/hr)</span><input type="number" id="votCar" step="0.1"></label>
-    <label class="field">VOT &mdash; Single-Unit Trucks <span class="u">($/hr)</span><input type="number" id="votSut" step="0.1"></label>
-    <label class="field">VOT &mdash; Combination Trucks <span class="u">($/hr)</span><input type="number" id="votCt" step="0.1"></label>
-  </div>
-</section>
+  <div class="sheetwrap">
 
-<section class="card">
-  <h2>2 &middot; Traffic Data</h2>
-  <div class="grid c4">
-    <label class="field">AADT, Construction Year <span class="u">(both directions)</span><input type="number" id="aadt" min="0"></label>
-    <label class="field">Annual Traffic Growth <span class="u">(%)</span><input type="number" id="growth" step="0.1"></label>
-    <label class="field">Maximum AADT <span class="u">(cap)</span><input type="number" id="maxAadt" min="0"></label>
-    <label class="field">Cars <span class="u">(% of AADT)</span><input type="number" id="pctCar" step="0.1"></label>
-    <label class="field">Single-Unit Trucks <span class="u">(%)</span><input type="number" id="pctSut" step="0.1"></label>
-    <label class="field">Combination Trucks <span class="u">(%)</span><input type="number" id="pctCt" step="0.1"></label>
-    <label class="field">Normal Speed Limit <span class="u">(mph)</span><input type="number" id="speedLimit"></label>
-    <label class="field">Lanes per Direction <span class="u">(normal)</span><input type="number" id="lanes" min="1"></label>
-    <label class="field">Free-Flow Capacity <span class="u">(vphpl)</span><input type="number" id="ffCap"></label>
-    <label class="field">Queue Dissipation Capacity <span class="u">(vphpl)</span><input type="number" id="qdCap"></label>
-    <label class="field">Hourly Distribution<select id="hourlyDist"></select></label>
-    <label class="field">Max Queue Length <span class="u">(miles, warning)</span><input type="number" id="maxQueue" step="0.5"></label>
-  </div>
-  <p class="note" id="trafficNote"></p>
-</section>
+    <nav class="sheetindex" aria-label="Sheet index">
+      <div class="si-title">Sheet index</div>
+      <ol>
+        <li><a href="#sec-econ"><span class="n">01</span><span class="t">Economic variables</span></a></li>
+        <li><a href="#sec-traffic"><span class="n">02</span><span class="t">Traffic data</span></a></li>
+        <li><a href="#sec-alts"><span class="n">03</span><span class="t">Alternatives</span></a></li>
+        <li><a href="#sec-results"><span class="n">04</span><span class="t">Results</span></a></li>
+        <li><a href="#sensitivity"><span class="n">05</span><span class="t">Sensitivity</span></a></li>
+        <li><a href="#structures"><span class="n">06</span><span class="t">Structures &amp; prices</span></a></li>
+        <li><a href="#sec-charts"><span class="n">07</span><span class="t">Charts</span></a></li>
+        <li><a href="#sec-method"><span class="n">08</span><span class="t">Method &amp; credits</span></a></li>
+      </ol>
+    </nav>
 
-<section class="card">
-  <h2>3 &middot; Alternatives &amp; Activity Sequences</h2>
-  <div class="tabs" id="altTabs"></div>
-  <div id="altPanel"></div>
-</section>
+    <div class="stack">
 
-<section class="card">
-  <h2>4 &middot; Results</h2>
-  <div class="kpi-row" id="kpiRow"></div>
-  <div id="resultsTable"></div>
-  <p class="note" style="margin-top:8px">NPV in thousands of dollars, discounted to the beginning of the analysis period. EUAC = equivalent uniform annual cost. Lowest total NPV shown in bold.</p>
-  <div id="warnings"></div>
-  <div id="interpretation" style="margin-top:14px"></div>
-</section>
+      <div class="row2">
+        <section class="card input-sheet" id="sec-econ">
+          <div class="sheet-head">
+            <span class="sheet-no">01</span>
+            <h2>Economic Variables &amp; Options</h2>
+            <span class="sheet-tag">Input</span>
+          </div>
+          <div class="sheet-body">
+            <div class="grid c4">
+              <label class="field">Analysis Period <span class="u">(years)</span><input type="number" id="analysisPeriod" min="1" max="100"></label>
+              <label class="field">Beginning of Analysis<input type="number" id="startYear" min="1990" max="2100"></label>
+              <label class="field">Discount Rate <span class="u">(%)</span><input type="number" id="discountRate" step="0.1"></label>
+              <label class="field">Include User Costs<select id="includeUser"><option>Yes</option><option>No</option></select></label>
+              <label class="field">Agency Remaining Service Life Credit<select id="agencyRSL"><option>No</option><option>Yes</option></select></label>
+              <label class="field">User Cost Remaining Service Life Credit<select id="userRSL"><option>Yes</option><option>No</option></select></label>
+              <label class="field">VOT &mdash; Passenger Cars <span class="u">($/hr)</span><input type="number" id="votCar" step="0.1"></label>
+              <label class="field">VOT &mdash; Single-Unit Trucks <span class="u">($/hr)</span><input type="number" id="votSut" step="0.1"></label>
+              <label class="field">VOT &mdash; Combination Trucks <span class="u">($/hr)</span><input type="number" id="votCt" step="0.1"></label>
+            </div>
+          </div>
+        </section>
 
-<section class="card" id="sensitivity">
-  <h2>5 &middot; Discount-Rate Sensitivity</h2>
-  <p class="note" style="margin-top:-6px;margin-bottom:12px">Total NPV ($1000) for each alternative, recomputed across a range of discount rates. If the winner changes, the ranking depends on an assumption reasonable people disagree about.</p>
-  <div id="sensitivityBody"></div>
-</section>
+        <section class="card input-sheet" id="sec-traffic">
+          <div class="sheet-head">
+            <span class="sheet-no">02</span>
+            <h2>Traffic Data</h2>
+            <span class="sheet-tag">Input</span>
+          </div>
+          <div class="sheet-body">
+            <div class="grid c4">
+              <label class="field">AADT, Construction Year <span class="u">(both directions)</span><input type="number" id="aadt" min="0"></label>
+              <label class="field">Annual Traffic Growth <span class="u">(%)</span><input type="number" id="growth" step="0.1"></label>
+              <label class="field">Maximum AADT <span class="u">(cap)</span><input type="number" id="maxAadt" min="0"></label>
+              <label class="field">Cars <span class="u">(% of AADT)</span><input type="number" id="pctCar" step="0.1"></label>
+              <label class="field">Single-Unit Trucks <span class="u">(%)</span><input type="number" id="pctSut" step="0.1"></label>
+              <label class="field">Combination Trucks <span class="u">(%)</span><input type="number" id="pctCt" step="0.1"></label>
+              <label class="field">Normal Speed Limit <span class="u">(mph)</span><input type="number" id="speedLimit"></label>
+              <label class="field">Lanes per Direction <span class="u">(normal)</span><input type="number" id="lanes" min="1"></label>
+              <label class="field">Free-Flow Capacity <span class="u">(vphpl)</span><input type="number" id="ffCap"></label>
+              <label class="field">Queue Dissipation Capacity <span class="u">(vphpl)</span><input type="number" id="qdCap"></label>
+              <label class="field">Hourly Distribution<select id="hourlyDist"></select></label>
+              <label class="field">Max Queue Length <span class="u">(miles, warning)</span><input type="number" id="maxQueue" step="0.5"></label>
+            </div>
+            <p class="note" id="trafficNote" style="margin-top:12px"></p>
+          </div>
+        </section>
+      </div>
 
-<section class="card" id="structures">
-  <h2>6 &middot; Pavement Structures &amp; Cost Basis</h2>
-  <p class="note" style="margin-top:-6px;margin-bottom:14px">What each alternative is actually building, drawn to scale, and the unit prices behind every cost estimate.</p>
-  <h3 style="margin-top:0">Structures in this comparison</h3>
-  <div class="struct-grid" id="structGrid"></div>
-  <h3>Caltrans unit prices used by the estimator</h3>
-  <div id="unitTable"></div>
-</section>
+      <section class="card" id="sec-alts">
+        <div class="sheet-head">
+          <span class="sheet-no">03</span>
+          <h2>Alternatives &amp; Activity Sequences</h2>
+          <span class="sheet-tag">Input</span>
+        </div>
+        <div class="sheet-body">
+          <div class="tabs" id="altTabs"></div>
+          <div id="altPanel"></div>
+        </div>
+      </section>
 
-<section class="card charts">
-  <div>
-    <div class="chart-title">Net Present Value by Alternative</div>
-    <div class="chart-sub">Agency and user cost components, $1000s</div>
-    <div class="legend" id="npvLegend"></div>
-    <div class="chart-wrap" id="npvChart"></div>
-  </div>
-  <div>
-    <div class="chart-title">Expenditure Stream</div>
-    <div class="chart-sub">Undiscounted agency costs by year for each alternative, $1000s</div>
-    <div class="chart-wrap" id="streamChart"></div>
-  </div>
-  <div>
-    <div class="chart-title">Work-Zone Hour-by-Hour Demand vs Capacity</div>
-    <div class="chart-sub" id="hourlySub">Select an alternative/activity with a lane closure to inspect queueing.</div>
-    <div class="toolbar" style="margin-bottom:6px">
-      <select id="hourlyAltSel" style="max-width:230px"></select>
-      <select id="hourlyActSel" style="max-width:280px"></select>
-      <select id="hourlyDirSel" style="max-width:150px"><option value="in">Inbound</option><option value="out">Outbound</option></select>
+      <section class="card result-sheet" id="sec-results">
+        <div class="sheet-head">
+          <span class="sheet-no">04</span>
+          <h2>Results</h2>
+          <span class="sheet-tag">Output</span>
+        </div>
+        <div class="sheet-body">
+          <div class="kpi-row" id="kpiRow"></div>
+          <div id="resultsTable"></div>
+          <p class="note" style="margin-top:10px">NPV in thousands of dollars, discounted to the beginning of the
+            analysis period. EUAC = equivalent uniform annual cost. Lowest total NPV is marked.</p>
+          <div id="warnings"></div>
+          <div id="interpretation" style="margin-top:18px"></div>
+        </div>
+      </section>
+
+      <section class="card" id="sensitivity">
+        <div class="sheet-head">
+          <span class="sheet-no">05</span>
+          <h2>Discount-Rate Sensitivity</h2>
+          <span class="sheet-tag">Output</span>
+        </div>
+        <div class="sheet-body">
+          <p class="note" style="margin-bottom:12px">Total NPV ($1000) for each alternative, recomputed across a range of
+            discount rates. If the winner changes, the ranking depends on an assumption reasonable people disagree about.</p>
+          <div id="sensitivityBody"></div>
+        </div>
+      </section>
+
+      <section class="card" id="structures">
+        <div class="sheet-head">
+          <span class="sheet-no">06</span>
+          <h2>Pavement Structures &amp; Cost Basis</h2>
+          <span class="sheet-tag">Reference</span>
+        </div>
+        <div class="sheet-body">
+          <p class="note" style="margin-bottom:14px">What each alternative is actually building, drawn to scale, and the
+            unit prices behind every cost estimate.</p>
+          <h3 style="margin-top:0">Structures in this comparison</h3>
+          <div class="struct-grid" id="structGrid"></div>
+          <div class="mat-legend" id="matLegend"></div>
+          <h3>Caltrans unit prices used by the estimator</h3>
+          <div id="unitTable"></div>
+        </div>
+      </section>
+
+      <section class="card charts" id="sec-charts">
+        <div class="sheet-head">
+          <span class="sheet-no">07</span>
+          <h2>Charts</h2>
+          <span class="sheet-tag">Output</span>
+        </div>
+        <div class="sheet-body">
+          <div class="chart-block">
+            <div class="chart-title">Net Present Value by Alternative</div>
+            <div class="chart-sub">Agency and user cost components, $1000s</div>
+            <div class="legend" id="npvLegend"></div>
+            <div class="chart-wrap" id="npvChart"></div>
+          </div>
+          <div class="chart-block">
+            <div class="chart-title">Expenditure Stream</div>
+            <div class="chart-sub">Undiscounted agency costs by year for each alternative, $1000s</div>
+            <div class="chart-wrap" id="streamChart"></div>
+          </div>
+          <div class="chart-block">
+            <div class="chart-title">Work-Zone Hour-by-Hour Demand vs Capacity</div>
+            <div class="chart-sub" id="hourlySub">Select an alternative/activity with a lane closure to inspect queueing.</div>
+            <div class="toolbar" style="margin-bottom:8px">
+              <select id="hourlyAltSel" style="max-width:230px"></select>
+              <select id="hourlyActSel" style="max-width:280px"></select>
+              <select id="hourlyDirSel" style="max-width:150px"><option value="in">Inbound</option><option value="out">Outbound</option></select>
+            </div>
+            <div class="legend" id="hourlyLegend"></div>
+            <div class="chart-wrap" id="hourlyChart"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="sec-method">
+        <div class="sheet-head">
+          <span class="sheet-no">08</span>
+          <h2>Methodology &amp; Credits</h2>
+          <span class="sheet-tag">Reference</span>
+        </div>
+        <div class="sheet-body">
+          <details class="method">
+            <summary>Methodology, sources, and simplifications</summary>
+            <ul>
+              <li><b>Agency cost NPV</b>: each activity's construction cost is discounted from its year of action; annual maintenance costs are discounted year-by-year over the activity's life within the analysis period. Remaining-service-life credit (when enabled) prorates the last activity's cost by its unused life at the end of the analysis period and credits it as a negative cost in the final year &mdash; the RealCost 2.5 convention.</li>
+              <li><b>User costs</b> follow the FHWA "calculated" work-zone method: hourly demand (AADT &times; hourly distribution &times; directional split) is compared with work-zone capacity during closure hours. Delay components: work-zone traversal delay (reduced speed over the work-zone length), speed-change delay and vehicle operating cost (FHWA Aug-1996 added-time/added-cost tables, CPI-escalated to 2012 as in RealCost 2.5.7CA), queue delay from a deterministic queuing diagram, and idling VOC on queued vehicle-hours. Delay is monetized per vehicle class with the values of time above.</li>
+              <li><b>Hourly distributions</b> are the RealCost built-ins (MicroBENCOST rural/urban, Weekday Double-Peak) plus the custom distribution found in the source workbook's <i>traffic_c</i> sheet, including directional splits by hour.</li>
+              <li><b>Traffic growth</b> compounds annually from the construction year and is capped at Maximum AADT when provided.</li>
+              <li><b>Seeded from</b> <i>RealCostV2.5.7CA 64bit.xlsm</i>: analysis options, values of time, the four alternative M&amp;R sequences (names, years of action, service lives, maintenance costs). Costs and work-zone details that were blank in the workbook default to zero and must be entered for a meaningful comparison.</li>
+              <li><b>Simplifications vs full RealCost 2.5.7CA</b>: deterministic only (no Monte Carlo simulation); no COZEEP/TMP cost modules; free-flow speed taken as the posted speed limit; queue speed handled through the deterministic queuing diagram rather than the forced-flow speed curve; work-zone closures assumed on all work-zone days.</li>
+            </ul>
+          </details>
+
+          <div class="credits">
+            <h3>Credits &amp; disclaimer</h3>
+            <p>
+              The life-cycle cost analysis methodology implemented here was developed by the
+              <b>Federal Highway Administration</b> (RealCost, and FHWA's <i>Life-Cycle Cost Analysis in Pavement
+              Design</i>, publication FHWA-SA-98-079) and adapted for California by the
+              <b>California Department of Transportation</b> (RealCost 2.5.7CA, Caltrans Division of Maintenance,
+              Pavement Program). The added-time, added-cost, and idling tables and the speed&ndash;volume relationship
+              are from the FHWA Technical Bulletin referenced in the RealCost documentation. Default hourly traffic
+              distributions derive from MicroBENCOST.
+            </p>
+            <p>
+              This is an <b>independent, unofficial reimplementation</b> written from the published methodology and
+              the input structure of the RealCost workbook. It is not produced, reviewed, endorsed, or supported by
+              FHWA or Caltrans, and it is not a certified substitute for the official RealCost tool. Results should
+              be verified against official RealCost before being used in project decisions, funding requests, or
+              any submittal where an approved LCCA tool is required.
+            </p>
+            <p class="note">
+              Official RealCost downloads and documentation: FHWA (fhwa.dot.gov, Pavement LCCA) and
+              Caltrans (dot.ca.gov, Division of Maintenance &mdash; Pavement).
+            </p>
+          </div>
+        </div>
+      </section>
+
     </div>
-    <div class="legend" id="hourlyLegend"></div>
-    <div class="chart-wrap" id="hourlyChart"></div>
   </div>
-</section>
-
-<section class="card">
-  <details class="method">
-    <summary>Methodology, sources, and simplifications</summary>
-    <ul>
-      <li><b>Agency cost NPV</b>: each activity's construction cost is discounted from its year of action; annual maintenance costs are discounted year-by-year over the activity's life within the analysis period. Remaining-service-life credit (when enabled) prorates the last activity's cost by its unused life at the end of the analysis period and credits it as a negative cost in the final year &mdash; the RealCost 2.5 convention.</li>
-      <li><b>User costs</b> follow the FHWA "calculated" work-zone method: hourly demand (AADT &times; hourly distribution &times; directional split) is compared with work-zone capacity during closure hours. Delay components: work-zone traversal delay (reduced speed over the work-zone length), speed-change delay and vehicle operating cost (FHWA Aug-1996 added-time/added-cost tables, CPI-escalated to 2012 as in RealCost 2.5.7CA), queue delay from a deterministic queuing diagram, and idling VOC on queued vehicle-hours. Delay is monetized per vehicle class with the values of time above.</li>
-      <li><b>Hourly distributions</b> are the RealCost built-ins (MicroBENCOST rural/urban, Weekday Double-Peak) plus the custom distribution found in the source workbook's <i>traffic_c</i> sheet, including directional splits by hour.</li>
-      <li><b>Traffic growth</b> compounds annually from the construction year and is capped at Maximum AADT when provided.</li>
-      <li><b>Seeded from</b> <i>RealCostV2.5.7CA 64bit.xlsm</i>: analysis options, values of time, the four alternative M&amp;R sequences (names, years of action, service lives, maintenance costs). Costs and work-zone details that were blank in the workbook default to zero and must be entered for a meaningful comparison.</li>
-      <li><b>Simplifications vs full RealCost 2.5.7CA</b>: deterministic only (no Monte Carlo simulation); no COZEEP/TMP cost modules; free-flow speed taken as the posted speed limit; queue speed handled through the deterministic queuing diagram rather than the forced-flow speed curve; work-zone closures assumed on all work-zone days.</li>
-    </ul>
-  </details>
-</section>
-
-<section class="card">
-  <h2>Credits &amp; Disclaimer</h2>
-  <p style="font-size:13px;color:var(--text-secondary);margin-top:0">
-    The life-cycle cost analysis methodology implemented here was developed by the
-    <b>Federal Highway Administration</b> (RealCost, and FHWA's <i>Life-Cycle Cost Analysis in Pavement
-    Design</i>, publication FHWA-SA-98-079) and adapted for California by the
-    <b>California Department of Transportation</b> (RealCost 2.5.7CA, Caltrans Division of Maintenance,
-    Pavement Program). The added-time, added-cost, and idling tables and the speed&ndash;volume relationship
-    are from the FHWA Technical Bulletin referenced in the RealCost documentation. Default hourly traffic
-    distributions derive from MicroBENCOST.
-  </p>
-  <p style="font-size:13px;color:var(--text-secondary)">
-    This is an <b>independent, unofficial reimplementation</b> written from the published methodology and
-    the input structure of the RealCost workbook. It is not produced, reviewed, endorsed, or supported by
-    FHWA or Caltrans, and it is not a certified substitute for the official RealCost tool. Results should
-    be verified against official RealCost before being used in project decisions, funding requests, or
-    any submittal where an approved LCCA tool is required.
-  </p>
-  <p class="note">
-    Official RealCost downloads and documentation: FHWA (fhwa.dot.gov, Pavement LCCA) and
-    Caltrans (dot.ca.gov, Division of Maintenance &mdash; Pavement).
-  </p>
-</section>
-
 </main>
 <div class="tooltip" id="tooltip"></div>
 
@@ -544,18 +1205,19 @@ const STRUCTURES = {
     ]}
 };
 
+/* Materials palette — decorative, tuned to how each material actually reads
+   on a cut face: concrete grey-green, aggregates warm, bound layers near-black. */
 const MAT_FILL = {
-  PCC: { light: "#c9ccd1", dark: "#6f7377", label: "Concrete" },
-  LCB: { light: "#dcd6c4", dark: "#8a8271", label: "Lean concrete" },
-  HMA: { light: "#4a4a4d", dark: "#3a3a3d", label: "Asphalt" },
-  RAC: { light: "#43393f", dark: "#putBack", label: "Rubberized asphalt" },
-  MILL: { light: "#6d6a68", dark: "#55524f", label: "Milled surface" },
-  OLD: { light: "#5c5a58", dark: "#484644", label: "Existing asphalt" },
-  AB: { light: "#b9a887", dark: "#8b7d61", label: "Aggregate base" },
-  AS: { light: "#cbbb9a", dark: "#9a8b6c", label: "Aggregate subbase" },
-  SG: { light: "#a58f76", dark: "#7a684f", label: "Subgrade" }
+  PCC: { light: "#c4c8c4", dark: "#6b716e", label: "Concrete" },
+  LCB: { light: "#d8d4c2", dark: "#7d7a68", label: "Lean concrete" },
+  HMA: { light: "#3b3d3e", dark: "#2f3132", label: "Asphalt" },
+  RAC: { light: "#43373d", dark: "#372c32", label: "Rubberized asphalt" },
+  MILL: { light: "#6a6763", dark: "#514e4a", label: "Milled surface" },
+  OLD: { light: "#57544f", dark: "#43403c", label: "Existing asphalt" },
+  AB: { light: "#b8a684", dark: "#88794f", label: "Aggregate base" },
+  AS: { light: "#cdbd99", dark: "#9c8c66", label: "Aggregate subbase" },
+  SG: { light: "#9d8567", dark: "#726048", label: "Subgrade" }
 };
-MAT_FILL.RAC.dark = "#3a3136";
 
 /* ============================================================
    Scenario seed — from the workbook's Inputs sheet
@@ -636,7 +1298,11 @@ function buildExample() {
     analysisPeriod: 55, startYear: 2026, discountRate: 3.2,
     includeUser: "Yes", agencyRSL: "Yes", userRSL: "Yes",
     votCar: 12.8, votSut: 31.7, votCt: 31.7,
-    aadt: 92000, growth: 1.4, maxAadt: 150000,
+    // A four-lane freeway (2 each way) realistically carries ~60k AADT. Higher
+    // than that and a single-lane night closure gridlocks the corridor — the
+    // queue model will say so, correctly, but it isn't a scenario any agency
+    // would permit, so it makes a poor teaching example.
+    aadt: 62000, growth: 1.2, maxAadt: 90000,
     pctCar: 86, pctSut: 6, pctCt: 8,
     speedLimit: 65, lanes: 2, ffCap: 2000, qdCap: 1800,
     hourlyDist: "Weekday Double-Peak", maxQueue: 3,
@@ -656,21 +1322,21 @@ function buildExample() {
           A("CAPM — CPR B", 2076, 10, "PCC", 0.8, 20)
         ]},
       { name: "Flexible — HMA 20-yr cycle",
-        note: "Conventional asphalt rehabilitation. Low first cost, but the cycle repeats roughly every 20 years with a CAPM in between.",
+        note: "Conventional asphalt rehabilitation: mill 3 in and replace with 6 in of new HMA, the depth an 18-year freeway life actually needs. Low first cost, but the cycle repeats with a CAPM in between.",
         activities: [
-          A("Rehab HMA — mill & overlay (0.25 ft)", 2026, 18, "HMA", 3.0, 75, "HMA overlay (rehab)"),
-          A("CAPM HMA (thin overlay)", 2044, 5, "HMA", 1.2, 18),
-          A("Rehab HMA — mill & overlay", 2049, 18, "HMA", 3.0, 75),
-          A("CAPM HMA (thin overlay)", 2067, 5, "HMA", 1.2, 18),
-          A("Rehab HMA — mill & overlay", 2072, 18, "HMA", 3.0, 75)
+          A("Rehab HMA — mill & overlay (6 in)", 2026, 18, "HMA", 6.0, 75, "HMA overlay (rehab)"),
+          A("CAPM HMA (2 in thin overlay)", 2044, 5, "HMA", 2.0, 18),
+          A("Rehab HMA — mill & overlay (6 in)", 2049, 18, "HMA", 6.0, 75),
+          A("CAPM HMA (2 in thin overlay)", 2067, 5, "HMA", 2.0, 18),
+          A("Rehab HMA — mill & overlay (6 in)", 2072, 18, "HMA", 6.0, 75)
         ]},
       { name: "Flexible — HMA with RHMA surface",
-        note: "Rubberized surface course: about 10% more per cubic metre but a thinner lift and longer life, so the cycle stretches from 18 to 21 years.",
+        note: "Rubberized surface course: about 10% more per cubic metre, but RHMA-G is placed in a thinner lift for the same performance and stretches the cycle from 18 to 21 years.",
         activities: [
-          A("Rehab HMA w/ RHMA-G surface", 2026, 21, "RAC", 2.4, 78, "HMA with RHMA surface"),
-          A("CAPM HMA w/ RHMA", 2047, 10, "RAC", 1.2, 20),
-          A("Rehab HMA w/ RHMA-G surface", 2057, 21, "RAC", 2.4, 78),
-          A("CAPM HMA w/ RHMA", 2078, 10, "RAC", 1.2, 20)
+          A("Rehab HMA w/ RHMA-G surface (5 in)", 2026, 21, "RAC", 5.0, 78, "HMA with RHMA surface"),
+          A("CAPM HMA w/ RHMA (2 in)", 2047, 10, "RAC", 2.0, 20),
+          A("Rehab HMA w/ RHMA-G surface (5 in)", 2057, 21, "RAC", 5.0, 78),
+          A("CAPM HMA w/ RHMA (2 in)", 2078, 10, "RAC", 2.0, 20)
         ]}
     ]
   };
@@ -1103,25 +1769,28 @@ function openStructure(act, drawer, ai) {
 function pavementSection(key) {
   const st = STRUCTURES[key];
   const wrap = document.createElement("div");
+  wrap.className = "xsection";
   if (!st) return wrap;
   const dark = matchMedia("(prefers-color-scheme: dark)").matches
     && document.documentElement.getAttribute("data-theme") !== "light"
     || document.documentElement.getAttribute("data-theme") === "dark";
   const totalFt = st.layers.reduce((s, l) => s + l.ft, 0);
-  const W = 620, padL = 176, padR = 130, padT = 26, padB = 30;
+  const W = 640, padL = 168, padR = 168, padT = 30, padB = 26;
   const iw = W - padL - padR;
-  const scale = 260 / totalFt;              // px per foot
+  const scale = 262 / totalFt;              // px per foot
   const H = padT + totalFt * scale + padB;
   const svg = svgEl("svg", { width: "100%", viewBox: `0 0 ${W} ${H}`,
     role: "img", "aria-label": `Cross-section of ${key}` });
-  // Sky/shoulder ground line
+  const hair = cvar("--border-strong");
+  const boundaries = [];
   let y = padT;
   st.layers.forEach(layer => {
     const h = layer.ft * scale;
     const mat = MAT_FILL[layer.mat] || MAT_FILL.SG;
     const fill = dark ? mat.dark : mat.light;
+    boundaries.push(y);
     svg.appendChild(svgEl("rect", { x: padL, y, width: iw, height: h,
-      fill, stroke: cvar("--surface-1"), "stroke-width": 1.5 }));
+      fill, stroke: hair, "stroke-width": 0.75 }));
     // hatch aggregate/subgrade layers so they read without relying on color
     if (["AB", "AS", "SG"].includes(layer.mat)) {
       for (let gx = padL + 6; gx < padL + iw - 2; gx += 13) {
@@ -1137,28 +1806,44 @@ function pavementSection(key) {
           stroke: dark ? "rgba(255,255,255,.22)" : "rgba(0,0,0,.22)", "stroke-width": 1 }));
       }
     }
+    // leader from the layer name to the layer face
+    svg.appendChild(svgEl("line", { x1: padL - 9, x2: padL, y1: y + h / 2, y2: y + h / 2,
+      stroke: cvar("--baseline"), "stroke-width": 0.75 }));
     // layer name (left) and thickness (right)
-    const nm = svgEl("text", { x: padL - 12, y: y + h / 2 + 4, "text-anchor": "end",
-      "font-size": 12, fill: cvar("--text-secondary") });
+    const nm = svgEl("text", { x: padL - 14, y: y + h / 2 + 4, "text-anchor": "end",
+      "font-size": 11.5, fill: cvar("--text-secondary") });
     nm.textContent = layer.name;
     svg.appendChild(nm);
-    const th = svgEl("text", { x: padL + iw + 12, y: y + h / 2 + 4, "font-size": 12,
-      fill: cvar("--text-muted") });
-    th.textContent = `${layer.ft.toFixed(2)} ft (${(layer.ft * 12).toFixed(1)}″)`;
+    const th = svgEl("text", { class: "dim", x: padL + iw + 11, y: y + h / 2 + 4,
+      "font-size": 11, fill: cvar("--text-muted") });
+    th.textContent = `${layer.ft.toFixed(2)}′ · ${(layer.ft * 12).toFixed(1)}″`;
     svg.appendChild(th);
     y += h;
   });
-  // Total depth dimension line
-  svg.appendChild(svgEl("line", { x1: padL - 6, x2: padL - 6, y1: padT, y2: y,
-    stroke: cvar("--baseline"), "stroke-width": 1 }));
-  // Surface label
-  const surf = svgEl("text", { x: padL + 6, y: padT - 8, "font-size": 11, fill: cvar("--text-muted") });
-  surf.textContent = "▲ traffic surface";
+  // Traffic surface — heavier top edge, as on a section cut
+  svg.appendChild(svgEl("line", { x1: padL, x2: padL + iw, y1: padT, y2: padT,
+    stroke: cvar("--text-primary"), "stroke-width": 2 }));
+  const surf = svgEl("text", { class: "cap", x: padL, y: padT - 9, "font-size": 9,
+    "font-weight": 700, fill: cvar("--text-muted") });
+  surf.textContent = "Traffic surface";
   svg.appendChild(surf);
-  const tot = svgEl("text", { x: padL + iw + 12, y: y + 18, "font-size": 12,
-    "font-weight": 600, fill: cvar("--text-primary") });
-  tot.textContent = `${totalFt.toFixed(2)} ft total`;
-  svg.appendChild(tot);
+  // Overall depth dimension string, outboard of the thickness column so it
+  // never runs into the layer callouts on the left.
+  const dx = W - 16, mid = padT + (y - padT) / 2;
+  svg.appendChild(svgEl("line", { x1: dx, x2: dx, y1: padT, y2: y,
+    stroke: cvar("--baseline"), "stroke-width": 1 }));
+  boundaries.concat([y]).forEach(by => {
+    svg.appendChild(svgEl("line", { x1: dx - 3.5, x2: dx + 3.5, y1: by, y2: by,
+      stroke: cvar("--baseline"), "stroke-width": by === padT || by === y ? 1.25 : 0.75 }));
+  });
+  const depthLbl = svgEl("text", { class: "dim", x: dx - 7, y: mid,
+    "text-anchor": "middle", "font-size": 10.5, "font-weight": 600,
+    fill: cvar("--text-primary"), transform: `rotate(-90 ${dx - 7} ${mid})` });
+  depthLbl.textContent = `${totalFt.toFixed(2)} ft total depth`;
+  svg.appendChild(depthLbl);
+  // Subgrade datum
+  svg.appendChild(svgEl("line", { x1: padL - 9, x2: padL + iw + 6, y1: y, y2: y,
+    stroke: cvar("--baseline"), "stroke-width": 1 }));
   wrap.appendChild(svg);
   const cap = document.createElement("p");
   cap.className = "note";
@@ -1268,6 +1953,9 @@ function renderAltPanel() {
   const alt = S.alternatives[activeAlt];
   const panel = $("altPanel");
   panel.innerHTML = "";
+  // Tint the activity cards with the alternative's series color so the tab,
+  // the table row, the chart series and these cards all read as one thing.
+  panel.style.setProperty("--alt-color", cvar(ALT_COLORS[activeAlt % 4]));
   const nameField = document.createElement("div");
   nameField.className = "grid c3";
   nameField.style.marginBottom = "12px";
@@ -1276,12 +1964,19 @@ function renderAltPanel() {
   panel.querySelector("#altName").addEventListener("change", e => {
     alt.name = e.target.value; renderTabs(); refresh();
   });
+  if (alt.note) {
+    const n = document.createElement("p");
+    n.className = "alt-note";
+    n.textContent = alt.note;
+    panel.appendChild(n);
+  }
 
   alt.activities.forEach((act, ai) => {
     const div = document.createElement("div");
     div.className = "activity-block";
     div.innerHTML = `
       <div class="activity-head">
+        <span class="act-seq">A${ai + 1}</span>
         <input type="text" data-f="name" value="${(act.name || "").replace(/"/g, "&quot;")}" placeholder="Activity name" style="flex:1">
         <div class="row-actions"><button data-del="1">Remove</button></div>
       </div>
@@ -1366,18 +2061,25 @@ function hideTip() { tooltip.style.display = "none"; }
 function renderResults(all) {
   const best = all.reduce((m, x, i) => x.res.totalNPV < all[m].res.totalNPV ? i : m, 0);
   // KPI row
+  const live = all.some(x => x.res.totalNPV > 0);
+  const gap = (() => {
+    const s = [...all].sort((a, b) => a.res.totalNPV - b.res.totalNPV);
+    return s.length > 1 && s[1].res.totalNPV > 0 ? s[1].res.totalNPV - s[0].res.totalNPV : 0;
+  })();
   $("kpiRow").innerHTML = all.length ? `
-    <div class="kpi"><div class="l">Lowest-cost alternative</div>
+    <div class="kpi kpi-hero">
+      <div class="l">${live ? '<span class="pill">Lowest life-cycle cost</span>' : "Lowest-cost alternative"}</div>
       <div class="v"><span class="swatch" style="background:var(${ALT_COLORS[best % 4]})"></span>${all[best].alt.name}</div>
-      <div class="s">Total NPV ${money(all[best].res.totalNPV)}k &middot; EUAC ${money(all[best].res.euac)}k/yr</div></div>
-    <div class="kpi"><div class="l">Analysis</div>
-      <div class="v">${S.analysisPeriod} yrs</div>
-      <div class="s">${S.startYear}&ndash;${S.startYear + S.analysisPeriod}, discount ${S.discountRate}%</div></div>
+      <div class="s">Total NPV ${money(all[best].res.totalNPV)}k &middot; EUAC ${money(all[best].res.euac)}k/yr${
+        gap > 0 ? ` &middot; ${money(gap)}k ahead of next` : ""}</div></div>
+    <div class="kpi"><div class="l">Analysis period</div>
+      <div class="v">${S.analysisPeriod} yr</div>
+      <div class="s">${S.startYear}&ndash;${S.startYear + S.analysisPeriod}<br>Discount ${S.discountRate}%</div></div>
     <div class="kpi"><div class="l">Construction-year traffic</div>
       <div class="v">${fmt(S.aadt)}</div>
-      <div class="s">AADT, growth ${S.growth}%/yr</div></div>` : "";
+      <div class="s">AADT, both directions<br>Growth ${S.growth}%/yr</div></div>` : "";
   // Table
-  let html = `<div style="overflow-x:auto"><table class="data"><thead><tr>
+  let html = `<div class="table-scroll"><table class="data"><thead><tr>
     <th>Alternative</th><th>Agency NPV ($1000)</th><th>User NPV ($1000)</th>
     <th>Total NPV ($1000)</th><th>EUAC ($1000/yr)</th><th>Undiscounted Agency</th></tr></thead><tbody>`;
   all.forEach((x, i) => {
@@ -1395,10 +2097,21 @@ function renderResults(all) {
   const warns = [];
   const totalCost = all.reduce((s, x) => s + x.res.undiscAgency, 0);
   if (totalCost === 0) warns.push("All agency construction costs are zero — enter costs in section 3 for a meaningful comparison (the source workbook had none filled in).");
-  all.forEach((x, i) => {
-    const qMiles = x.res.maxQ / (S.lanes * 130); // ~130 veh/mi/lane storage
-    if (qMiles > S.maxQueue && S.maxQueue > 0) warns.push(`${x.alt.name}: predicted queue ≈ ${qMiles.toFixed(1)} mi exceeds the ${S.maxQueue} mi maximum.`);
-  });
+  // Queue warnings: group alternatives that fail together rather than
+  // repeating a near-identical line for each one.
+  const overQueue = all
+    .map(x => ({ name: x.alt.name, mi: x.res.maxQ / (S.lanes * 130) })) // ~130 veh/mi/lane jam storage
+    .filter(q => S.maxQueue > 0 && q.mi > S.maxQueue);
+  if (overQueue.length) {
+    const worst = Math.max(...overQueue.map(q => q.mi));
+    const names = overQueue.length === all.length
+      ? "Every alternative"
+      : overQueue.map(q => q.name).join("; ");
+    warns.push(`${names} exceeds the ${S.maxQueue} mi maximum queue — worst case ≈ ${worst.toFixed(1)} mi. ` +
+      (worst > S.maxQueue * 3
+        ? "A queue this long means the closure plan is not viable as configured: open more lanes, shorten the closure window to true off-peak hours, or stage the work."
+        : "Consider opening an additional lane or shifting the closure window later."));
+  }
   $("warnings").innerHTML = warns.map(w => `<p class="warn">⚠ ${w}</p>`).join("");
 }
 
@@ -1437,6 +2150,12 @@ function renderInterpretation(all, best) {
     bits.push(`User costs make up ${userShare.toFixed(0)}% of the winner's total. ${userShare > 40
       ? "That is a large share, so the ranking is sensitive to your work-zone assumptions &mdash; check closure hours and durations carefully."
       : "Agency cost is doing most of the work in this comparison."}`);
+    if (userShare < 8 && S.includeUser === "Yes") {
+      bits.push(`A user-cost share this small is itself a finding: with work confined to night closures on a
+        corridor of this volume, delay costs never become decisive and the choice comes down to agency spending.
+        Daytime or continuous closures would change that &mdash; try widening the closure hours on an activity
+        and watch the ranking move.`);
+    }
   } else if (S.includeUser !== "Yes") {
     bits.push(`User costs are currently excluded, so this ranking reflects agency spending only.
       Turning them on will penalize alternatives with more frequent or longer lane closures.`);
@@ -1463,7 +2182,7 @@ function renderSensitivity() {
     return;
   }
   const winners = new Set(rows.map(r => r.bestIdx));
-  let html = `<div style="overflow-x:auto"><table class="data"><thead><tr><th>Discount rate</th>`;
+  let html = `<div class="table-scroll"><table class="data"><thead><tr><th>Discount rate</th>`;
   S.alternatives.forEach((a, i) => {
     html += `<th><span class="swatch" style="background:var(${ALT_COLORS[i % 4]})"></span>${a.name.length > 18 ? a.name.slice(0, 17) + "…" : a.name}</th>`;
   });
@@ -1477,7 +2196,7 @@ function renderSensitivity() {
   });
   html += `</tbody></table></div>`;
   html += winners.size === 1
-    ? `<p class="note" style="margin-top:8px">✓ The same alternative wins at every rate tested &mdash; the ranking is robust to this assumption.</p>`
+    ? `<p class="note ok" style="margin-top:10px">✓ The same alternative wins at every rate tested &mdash; the ranking is robust to this assumption.</p>`
     : `<p class="warn" style="margin-top:8px">⚠ The winner changes with the discount rate. Report this explicitly rather than presenting a single ranking as settled.</p>`;
   el.innerHTML = html;
 }
@@ -1494,8 +2213,8 @@ function renderNpvChart(all) {
   $("npvLegend").innerHTML = `
     <span class="item"><span class="swatch" style="background:var(--series-1)"></span>Agency cost</span>
     <span class="item"><span class="swatch" style="background:var(--series-2)"></span>User cost</span>`;
-  const W = Math.max(560, wrap.clientWidth || 560), H = 260;
-  const m = { t: 14, r: 16, b: 54, l: 70 };
+  const W = Math.max(560, wrap.clientWidth || 560), H = 276;
+  const m = { t: 24, r: 16, b: 56, l: 72 };
   const svg = svgEl("svg", { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "NPV by alternative" });
   const maxV = Math.max(1, ...all.map(x => x.res.agencyNPV + Math.max(0, x.res.userNPV)));
   const iw = W - m.l - m.r, ih = H - m.t - m.b;
@@ -1504,7 +2223,7 @@ function renderNpvChart(all) {
   for (let i = 0; i <= 4; i++) {
     const gv = maxV * i / 4;
     svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: y(gv), y2: y(gv), stroke: cvar("--grid"), "stroke-width": 1 }));
-    const t = svgEl("text", { x: m.l - 8, y: y(gv) + 4, "text-anchor": "end", "font-size": 11, fill: cvar("--text-muted") });
+    const t = svgEl("text", { class: "num", x: m.l - 8, y: y(gv) + 4, "text-anchor": "end", "font-size": 10.5, fill: cvar("--text-muted") });
     t.textContent = fmt(gv);
     svg.appendChild(t);
   }
@@ -1513,7 +2232,7 @@ function renderNpvChart(all) {
     const cx = m.l + iw * (i + 0.5) / all.length;
     const aH = (x.res.agencyNPV / maxV) * ih;
     const uH = (Math.max(0, x.res.userNPV) / maxV) * ih;
-    const agency = svgEl("rect", { x: cx - bw / 2, y: y(x.res.agencyNPV), width: bw, height: Math.max(0, aH), fill: cvar(ALT_COLORS[i % 4] === "--series-1" ? "--series-1" : "--series-1"), rx: 0 });
+    const agency = svgEl("rect", { x: cx - bw / 2, y: y(x.res.agencyNPV), width: bw, height: Math.max(0, aH) });
     agency.setAttribute("fill", cvar("--series-1"));
     const user = svgEl("rect", { x: cx - bw / 2, y: y(x.res.agencyNPV + x.res.userNPV) , width: bw, height: Math.max(0, uH - 2), fill: cvar("--series-2") });
     // 2px surface gap between stacked segments
@@ -1527,16 +2246,18 @@ function renderNpvChart(all) {
     svg.appendChild(agency);
     if (uH > 0.5) svg.appendChild(user);
     // total label
-    const tl = svgEl("text", { x: cx, y: y(x.res.agencyNPV + Math.max(0, x.res.userNPV)) - 6, "text-anchor": "middle", "font-size": 11, "font-weight": 600, fill: cvar("--text-primary") });
+    const tl = svgEl("text", { class: "num", x: cx, y: y(x.res.agencyNPV + Math.max(0, x.res.userNPV)) - 7, "text-anchor": "middle", "font-size": 11, "font-weight": 700, fill: cvar("--text-primary") });
     tl.textContent = fmt(x.res.totalNPV);
     svg.appendChild(tl);
-    // x label
-    const xl = svgEl("text", { x: cx, y: H - m.b + 16, "text-anchor": "middle", "font-size": 11, fill: cvar("--text-secondary") });
+    // x label — swatch tick keeps the bar tied to its alternative color
+    svg.appendChild(svgEl("rect", { x: cx - 9, y: H - m.b + 8, width: 18, height: 3,
+      fill: cvar(ALT_COLORS[i % 4]) }));
+    const xl = svgEl("text", { x: cx, y: H - m.b + 24, "text-anchor": "middle", "font-size": 10.5, fill: cvar("--text-secondary") });
     const short = x.alt.name.length > 24 ? x.alt.name.slice(0, 23) + "…" : x.alt.name;
     xl.textContent = short;
     svg.appendChild(xl);
   });
-  svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: y(0), y2: y(0), stroke: cvar("--baseline"), "stroke-width": 1 }));
+  svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: y(0), y2: y(0), stroke: cvar("--baseline"), "stroke-width": 1.25 }));
   wrap.appendChild(svg);
 }
 
@@ -1551,17 +2272,29 @@ function renderStreamChart(all) {
   const H = rowH * all.length + 30;
   const svg = svgEl("svg", { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Expenditure stream" });
   const xf = yy => m.l + iw * (yy - S.startYear) / S.analysisPeriod;
+  // decade hairlines behind the rows — a station grid
+  for (let yy = S.startYear; yy <= S.startYear + S.analysisPeriod; yy += 10) {
+    svg.appendChild(svgEl("line", { x1: xf(yy), x2: xf(yy), y1: 6, y2: H - 22,
+      stroke: cvar("--grid"), "stroke-width": 1 }));
+  }
   all.forEach((x, i) => {
     const base = rowH * (i + 1) - 14;
     svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: base, y2: base, stroke: cvar("--baseline"), "stroke-width": 1 }));
-    const lbl = svgEl("text", { x: m.l - 10, y: base - 18, "text-anchor": "end", "font-size": 11, fill: cvar("--text-secondary") });
+    svg.appendChild(svgEl("rect", { x: m.l - 26, y: base - 25, width: 16, height: 3,
+      fill: cvar(ALT_COLORS[i % 4]) }));
+    const lbl = svgEl("text", { x: m.l - 34, y: base - 21, "text-anchor": "end", "font-size": 10.5, fill: cvar("--text-secondary") });
     const short = x.alt.name.length > 26 ? x.alt.name.slice(0, 25) + "…" : x.alt.name;
     lbl.textContent = short;
     svg.appendChild(lbl);
     for (const [yy, v] of Object.entries(x.res.stream)) {
       if (v <= 0) continue;
-      const bh = Math.max(3, (v / maxV) * (rowH - 26));
-      const r = svgEl("rect", { x: xf(+yy) - 3, y: base - bh, width: 6, height: bh, rx: 2, fill: cvar(ALT_COLORS[i % 4]) });
+      // Routine maintenance is tiny next to a construction event; draw it as a
+      // faint hairline texture so the treatment years still read as spikes.
+      const small = v / maxV < 0.04;
+      const bh = Math.max(small ? 2 : 3, (v / maxV) * (rowH - 26));
+      const r = svgEl("rect", { x: xf(+yy) - (small ? 1 : 3), y: base - bh,
+        width: small ? 2 : 6, height: bh, fill: cvar(ALT_COLORS[i % 4]),
+        "fill-opacity": small ? 0.4 : 1 });
       r.style.cursor = "pointer";
       r.addEventListener("mousemove", e => showTip(`<div>${x.alt.name}</div><div>${yy}: <b>${money(v)}k</b></div>`, e.clientX, e.clientY));
       r.addEventListener("mouseleave", hideTip);
@@ -1570,7 +2303,7 @@ function renderStreamChart(all) {
   });
   // x axis ticks every 10 yrs
   for (let yy = S.startYear; yy <= S.startYear + S.analysisPeriod; yy += 10) {
-    const t = svgEl("text", { x: xf(yy), y: H - 8, "text-anchor": "middle", "font-size": 11, fill: cvar("--text-muted") });
+    const t = svgEl("text", { class: "num", x: xf(yy), y: H - 6, "text-anchor": "middle", "font-size": 10.5, fill: cvar("--text-muted") });
     t.textContent = yy;
     svg.appendChild(t);
   }
@@ -1604,7 +2337,8 @@ function renderHourlyChart() {
   $("hourlyLegend").innerHTML = `
     <span class="item"><span class="swatch" style="background:var(--series-1)"></span>Hourly demand (veh)</span>
     <span class="item"><span class="swatch" style="background:var(--series-2)"></span>Capacity (veh/hr)</span>
-    <span class="item"><span class="swatch" style="background:var(--series-3)"></span>Queue (veh)</span>`;
+    <span class="item"><span class="swatch" style="background:var(--series-3)"></span>Queue (veh)</span>
+    <span class="item"><span class="swatch" style="background:repeating-linear-gradient(45deg,var(--accent-line) 0 1.5px,var(--accent-wash) 1.5px 5px)"></span>Lane closure in effect</span>`;
   const W = Math.max(640, wrap.clientWidth || 640), H = 240;
   const m = { t: 12, r: 16, b: 30, l: 60 };
   const iw = W - m.l - m.r, ih = H - m.t - m.b;
@@ -1612,29 +2346,48 @@ function renderHourlyChart() {
   const svg = svgEl("svg", { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Hourly demand vs capacity" });
   const xf = h => m.l + iw * (h + 0.5) / 24;
   const yf = v => m.t + ih - (v / maxV) * ih;
+  // Work-zone hatch — closure hours read as a hatched region, the way a
+  // temporary traffic-control area is drawn on a plan sheet.
+  const defs = svgEl("defs", {});
+  const pat = svgEl("pattern", { id: "wzHatch", width: 7, height: 7,
+    patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" });
+  pat.appendChild(svgEl("rect", { width: 7, height: 7, fill: cvar("--accent-wash") }));
+  pat.appendChild(svgEl("line", { x1: 0, y1: 0, x2: 0, y2: 7,
+    stroke: cvar("--accent-line"), "stroke-width": 1.5 }));
+  defs.appendChild(pat);
+  svg.appendChild(defs);
+  res.detail.forEach(d => {
+    if (d.closed) svg.appendChild(svgEl("rect", { x: m.l + iw * d.h / 24, y: m.t,
+      width: iw / 24 + 0.5, height: ih, fill: "url(#wzHatch)" }));
+  });
   for (let i = 0; i <= 4; i++) {
     const gv = maxV * i / 4;
     svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: yf(gv), y2: yf(gv), stroke: cvar("--grid"), "stroke-width": 1 }));
-    const t = svgEl("text", { x: m.l - 8, y: yf(gv) + 4, "text-anchor": "end", "font-size": 11, fill: cvar("--text-muted") });
+    const t = svgEl("text", { class: "num", x: m.l - 8, y: yf(gv) + 4, "text-anchor": "end", "font-size": 10.5, fill: cvar("--text-muted") });
     t.textContent = fmt(gv);
     svg.appendChild(t);
   }
-  // closed-hours wash
-  res.detail.forEach(d => {
-    if (d.closed) svg.appendChild(svgEl("rect", { x: m.l + iw * d.h / 24, y: m.t, width: iw / 24, height: ih, fill: cvar("--accent-wash") }));
-  });
+  // Queue is the thing that hurts, so give it an area, not just a stroke.
+  if (res.detail.some(d => d.queue > 0)) {
+    const area = res.detail.map((d, i) => `${i ? "L" : "M"}${xf(d.h).toFixed(1)},${yf(d.queue).toFixed(1)}`).join("")
+      + `L${xf(23).toFixed(1)},${yf(0).toFixed(1)}L${xf(0).toFixed(1)},${yf(0).toFixed(1)}Z`;
+    const fillEl = svgEl("path", { d: area, fill: cvar("--series-3"), "fill-opacity": 0.16, stroke: "none" });
+    svg.appendChild(fillEl);
+  }
   const path = (key, color, dash) => {
     const dstr = res.detail.map((d, i) => `${i ? "L" : "M"}${xf(d.h).toFixed(1)},${yf(d[key]).toFixed(1)}`).join("");
     svg.appendChild(svgEl("path", { d: dstr, fill: "none", stroke: cvar(color), "stroke-width": 2, "stroke-dasharray": dash || "none", "stroke-linejoin": "round" }));
   };
-  path("demand", "--series-1");
-  path("cap", "--series-2", "5,4");
   path("queue", "--series-3");
+  path("cap", "--series-2", "6,4");
+  path("demand", "--series-1");
   for (let h = 0; h < 24; h += 4) {
-    const t = svgEl("text", { x: xf(h), y: H - 8, "text-anchor": "middle", "font-size": 11, fill: cvar("--text-muted") });
-    t.textContent = h + ":00";
+    const t = svgEl("text", { class: "num", x: xf(h), y: H - 8, "text-anchor": "middle", "font-size": 10.5, fill: cvar("--text-muted") });
+    t.textContent = String(h).padStart(2, "0") + ":00";
     svg.appendChild(t);
   }
+  svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: yf(0), y2: yf(0),
+    stroke: cvar("--baseline"), "stroke-width": 1.25 }));
   // hover
   const hover = svgEl("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" });
   hover.addEventListener("mousemove", e => {
@@ -1713,11 +2466,27 @@ function renderStructures() {
       used.push({ key: withStruct.structure, alt: alt.name, idx: i });
     }
   });
+  const legend = $("matLegend");
   if (!used.length) {
     grid.innerHTML = `<p class="note">No structures assigned yet. Open an activity and click
       <b>Choose pavement structure…</b>, or load the worked example to see the rigid and flexible sections side by side.</p>`;
+    if (legend) legend.innerHTML = "";
   } else {
     grid.innerHTML = "";
+    // Materials actually drawn above, in the order they appear
+    if (legend) {
+      const dark = matchMedia("(prefers-color-scheme: dark)").matches
+        && document.documentElement.getAttribute("data-theme") !== "light"
+        || document.documentElement.getAttribute("data-theme") === "dark";
+      const mats = [];
+      used.forEach(u => (STRUCTURES[u.key].layers || []).forEach(l => {
+        if (!mats.includes(l.mat)) mats.push(l.mat);
+      }));
+      legend.innerHTML = mats.map(k => {
+        const m = MAT_FILL[k] || MAT_FILL.SG;
+        return `<span class="item"><span class="chip" style="background:${dark ? m.dark : m.light}"></span>${m.label}</span>`;
+      }).join("");
+    }
     used.forEach(u => {
       const cell = document.createElement("div");
       cell.className = "struct-cell";
@@ -1729,7 +2498,7 @@ function renderStructures() {
   }
   const ut = $("unitTable");
   if (ut) {
-    ut.innerHTML = `<div style="overflow-x:auto"><table class="data" style="max-width:640px">
+    ut.innerHTML = `<div class="table-scroll"><table class="data" style="max-width:640px">
       <thead><tr><th>Material</th><th>Unit cost</th><th>Cost per lane-mile at 3&Prime;</th></tr></thead>
       <tbody>${Object.entries(UNIT_COSTS).map(([k, v]) => {
         const perLM = layerVolume(3, 1) * v.cost / 1000;
@@ -1766,13 +2535,29 @@ initUI();
 refresh();
 window.addEventListener("resize", () => refresh());
 
+/* Sheet index follows the reader down the plan set. */
+try {
+  const links = Array.from(document.querySelectorAll(".sheetindex a"));
+  if (links.length && "IntersectionObserver" in window) {
+    const byId = new Map(links.map(a => [a.getAttribute("href").slice(1), a]));
+    const visible = new Set();
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => e.isIntersecting ? visible.add(e.target.id) : visible.delete(e.target.id));
+      // Exactly one sheet is "current" — the first one still in the band.
+      const current = links.map(a => a.getAttribute("href").slice(1)).find(id => visible.has(id));
+      byId.forEach((a, id) => a.classList.toggle("on", id === current));
+    }, { rootMargin: "-40% 0px -50% 0px" });
+    byId.forEach((a, id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+  }
+} catch (e) {}
+
 // First-time visitors get pointed at the tour rather than dropped into a form.
 try {
   if (!localStorage.getItem(TOUR_KEY)) {
     const b = $("exampleBanner");
     b.innerHTML = `<b>First time here?</b> This tool compares pavement rehabilitation strategies by
-      life-cycle cost. Take the <button class="btn" id="bannerTour" style="margin:0 2px">▸ one-minute tour</button>
-      or <button class="btn" id="bannerExample" style="margin:0 2px">load the worked example</button> to see it in action.`;
+      life-cycle cost. Take the <button class="btn" id="bannerTour" style="margin:0 3px">One-minute tour</button>
+      or <button class="btn" id="bannerExample" style="margin:0 3px">Load the worked example</button> to see it in action.`;
     b.style.display = "block";
     $("bannerTour").onclick = () => { b.style.display = "none"; tour.start(); };
     $("bannerExample").onclick = () => { b.style.display = "none"; $("btnExample").click(); };
