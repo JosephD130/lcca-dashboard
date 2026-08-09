@@ -932,6 +932,109 @@
     .sheetwrap { grid-template-columns: minmax(0, 1fr); }
     section.card { box-shadow: none; break-inside: avoid; }
   }
+  /* ---------- Parameter studio ---------- */
+  .studio {
+    position: fixed; inset: 0; z-index: 80;
+    background: var(--page); display: flex; flex-direction: column;
+  }
+  .studio[hidden] { display: none; }
+  .studio-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 12px 22px; border-bottom: 2px solid var(--border-strong);
+    background: var(--surface-1); flex: none;
+  }
+  .st-kicker {
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .16em; font-size: 9.5px; color: var(--text-muted);
+  }
+  .studio-bar h2 { margin: 1px 0 0; font-size: var(--fs-md); }
+  .studio-body { flex: 1; display: grid; grid-template-columns: minmax(0,1fr); overflow: hidden; }
+  @media (min-width: 900px) { .studio-body { grid-template-columns: 214px minmax(0,1fr); } }
+  .studio-nav {
+    border-right: 1px solid var(--border); padding: 14px 0;
+    overflow-y: auto; display: none;
+  }
+  @media (min-width: 900px) { .studio-nav { display: block; } }
+  .studio-nav button {
+    display: block; width: 100%; text-align: left; cursor: pointer;
+    padding: 9px 14px; background: none; border: 0;
+    border-left: 2px solid transparent; color: var(--text-secondary);
+    font-family: var(--font-display); text-transform: uppercase;
+    letter-spacing: .07em; font-weight: 600; font-size: var(--fs-xs);
+  }
+  .studio-nav button:hover { background: var(--accent-wash); color: var(--text-primary); }
+  .studio-nav button.on { color: var(--accent); border-left-color: var(--accent); background: var(--accent-wash); }
+  .studio-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .studio-main { overflow-y: auto; padding: 20px 24px 60px; }
+  .studio-main > .lede {
+    font-family: var(--font-serif); font-size: var(--fs-prose);
+    color: var(--text-secondary); max-width: 74ch; margin: 0 0 18px; line-height: 1.55;
+  }
+  .dist-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+    gap: 12px; margin-bottom: 22px;
+  }
+  .dist-card {
+    border: 1px solid var(--grid); padding: 10px 12px 8px; cursor: pointer;
+    background: var(--surface-1); text-align: left; position: relative;
+  }
+  .dist-card:hover { border-color: var(--text-secondary); }
+  .dist-card.on { border-color: var(--accent); border-width: 2px; padding: 9px 11px 7px; }
+  .dist-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .dist-card h4 {
+    margin: 0 0 1px; font-size: 12px;
+    font-family: var(--font-display); text-transform: uppercase; letter-spacing: .06em;
+  }
+  .dist-card .peak { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); }
+  .dist-card .pick {
+    position: absolute; top: 8px; right: 10px;
+    font-family: var(--font-display); font-size: 9px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--accent); font-weight: 700;
+  }
+  .hour-editor {
+    display: grid; grid-template-columns: repeat(12, minmax(0,1fr)); gap: 5px;
+    margin: 10px 0 12px;
+  }
+  .hour-editor label { display: grid; gap: 2px; justify-items: center; }
+  .hour-editor span {
+    font-family: var(--font-mono); font-size: 9.5px; color: var(--text-muted);
+  }
+  .hour-editor input {
+    width: 100%; padding: 3px 2px; text-align: center;
+    font-family: var(--font-mono); font-size: 11px;
+  }
+  .studio-cols { display: grid; grid-template-columns: minmax(0,1fr); gap: 22px; }
+  @media (min-width: 1120px) { .studio-cols { grid-template-columns: minmax(0,1.45fr) minmax(0,1fr); } }
+  .studio-panel { border: 1px solid var(--grid); padding: 14px 16px; background: var(--surface-1); }
+  .studio-panel h3 { margin-top: 0; }
+  .hourpick {
+    display: grid; grid-template-columns: repeat(24, minmax(0,1fr)); gap: 2px; margin: 8px 0 6px;
+  }
+  .hourpick button {
+    aspect-ratio: 1 / 2.1; border: 1px solid var(--grid); background: var(--surface-2);
+    cursor: pointer; padding: 0; font-family: var(--font-mono); font-size: 8px;
+    color: var(--text-muted);
+  }
+  .hourpick button.closed { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .hourpick button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .hourpick-scale {
+    display: grid; grid-template-columns: repeat(24, minmax(0,1fr));
+    font-family: var(--font-mono); font-size: 8.5px; color: var(--text-muted);
+  }
+  .best-row {
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+    padding: 8px 0; border-bottom: 1px solid var(--grid);
+  }
+  .best-row .win {
+    font-family: var(--font-display); text-transform: uppercase; font-size: 9px;
+    letter-spacing: .1em; color: var(--accent); font-weight: 700;
+  }
+  .explore-link {
+    background: none; border: 0; padding: 0; margin-left: 6px; cursor: pointer;
+    font: inherit; font-size: 11px; color: var(--accent); text-decoration: underline;
+  }
+  .explore-link:hover { color: var(--text-primary); }
+
   /* ---------- Print / PDF report ---------- */
   #printHeader { display: none; }
   .cell-input {
@@ -1105,6 +1208,7 @@
           <a href="#sec-econ" data-sec="sec-econ"><span class="n">01</span><span class="t">Economic variables</span></a>
           <a href="#sec-traffic" data-sec="sec-traffic"><span class="n">02</span><span class="t">Traffic data</span></a>
           <a href="#sec-alts" data-sec="sec-alts"><span class="n">03</span><span class="t">Alternatives</span></a>
+          <button class="nav-act strong" id="btnStudio">Parameter studio…</button>
         </div>
       </div>
 
@@ -1355,6 +1459,21 @@
   </div>
 </main>
 <div class="tooltip" id="tooltip"></div>
+
+<!-- Parameter studio: a full screen for the inputs that a dropdown can't explain -->
+<div class="studio" id="studio" hidden role="dialog" aria-modal="true" aria-labelledby="studioTitle">
+  <div class="studio-bar">
+    <div>
+      <div class="st-kicker">Parameter studio</div>
+      <h2 id="studioTitle">Hourly traffic distribution</h2>
+    </div>
+    <button class="btn" id="studioClose">Done</button>
+  </div>
+  <div class="studio-body">
+    <nav class="studio-nav" id="studioNav"></nav>
+    <div class="studio-main" id="studioMain"></div>
+  </div>
+</div>
 
 <script>
 "use strict";
@@ -1693,6 +1812,28 @@ const HELP = {
   closOut: "Same as inbound closures, for the opposite direction."
 };
 
+const CUSTOM_DIST_NAME = "Custom (yours)";
+
+/* Distribution lookup. The user's own curve lives on the scenario, so it
+   exports and reloads with everything else. */
+function distFor(name) {
+  if (name === CUSTOM_DIST_NAME && S && S.customDist) return S.customDist;
+  return DISTRIBUTIONS[name] || DISTRIBUTIONS["Weekday Double-Peak"];
+}
+function allDistNames() {
+  const names = Object.keys(DISTRIBUTIONS);
+  if (S && S.customDist) names.push(CUSTOM_DIST_NAME);
+  return names;
+}
+// Notes shown in the studio — what each shape actually represents.
+const DIST_NOTES = {
+  "Weekday Double-Peak": "Two sharp commute peaks with a midday plateau. The default for an urban or suburban commuter corridor, and the shape most Caltrans freeway projects assume.",
+  "MicroBENCOST Rural": "A single broad afternoon rise and a long, flat night. Typical of an interregional route where trips are longer and less tied to a workday.",
+  "MicroBENCOST Urban": "A hard morning spike and an even harder evening one, with very light nights — a dense urban arterial or freeway with heavy peak commuting.",
+  "Custom (workbook traffic_c)": "The distribution found in the source workbook's traffic_c sheet, with a flat 50/50 directional split. Useful for matching an existing RealCost run.",
+  [CUSTOM_DIST_NAME]: "Your own 24-hour profile, built in this studio."
+};
+
 const STORE_KEY = "realcost-lcca-v1";
 const TOUR_KEY = "realcost-lcca-toured";
 let S = loadScenario();
@@ -1773,7 +1914,7 @@ function hourClosed(closures, h) {
 
 // Daily work-zone user cost ($) for one direction. Returns {cost, maxQueueVeh, detail[24]}
 function directionDailyCost(act, aadtYear, dir) {
-  const dist = DISTRIBUTIONS[S.hourlyDist];
+  const dist = distFor(S.hourlyDist);
   const closures = act.closures[dir] || [];
   const nLanes = S.lanes, nOpen = Math.min(act.lanesOpen, nLanes);
   const normCap = S.ffCap * nLanes;
@@ -1991,9 +2132,23 @@ function decorateHelp(root) {
   });
 }
 
+/* "Explore…" opens the studio on the topic that owns this field. */
+function addExplore(fieldId, topic, label) {
+  const el = $(fieldId);
+  if (!el) return;
+  const lab = el.closest("label.field");
+  if (!lab || lab.querySelector(".explore-link")) return;
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "explore-link";
+  b.textContent = label || "explore…";
+  b.onclick = e => { e.preventDefault(); openStudio(topic); };
+  (lab.querySelector(".field-caption") || lab).appendChild(b);
+}
+
 function bindGlobals() {
   const sel = $("hourlyDist");
-  sel.innerHTML = Object.keys(DISTRIBUTIONS).map(k => `<option>${k}</option>`).join("");
+  sel.innerHTML = allDistNames().map(k => `<option>${k}</option>`).join("");
   for (const f of GLOBAL_FIELDS) {
     const el = $(f);
     el.value = S[f];
@@ -2009,6 +2164,10 @@ function bindGlobals() {
     el.addEventListener("change", () => { S[f] = el.value; refresh(); });
   }
   decorateHelp(document);
+  addExplore("hourlyDist", "dist", "see the shapes…");
+  addExplore("ffCap", "capacity", "typical values…");
+  addExplore("qdCap", "capacity", "typical values…");
+  addExplore("votCar", "vot", "explore…");
 }
 
 function renderTabs() {
@@ -2209,6 +2368,496 @@ function pavementSection(key) {
   return wrap;
 }
 
+/* ============================================================
+   Parameter studio — a full screen for inputs a dropdown can't explain
+   ============================================================ */
+
+/* Small 24-hour profile sketch used in the option cards. */
+function distSpark(dist, w, h, highlight) {
+  const svg = svgEl("svg", { width: "100%", viewBox: `0 0 ${w} ${h}`, role: "img",
+    "aria-label": "24-hour traffic profile" });
+  const max = Math.max(...dist.pct) * 1.12;
+  const x = i => (i + 0.5) / 24 * w;
+  const y = v => h - 4 - (v / max) * (h - 12);
+  svg.appendChild(svgEl("line", { x1: 0, x2: w, y1: h - 4, y2: h - 4,
+    stroke: cvar("--baseline"), "stroke-width": 1 }));
+  // area under the curve
+  const pts = dist.pct.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" L");
+  svg.appendChild(svgEl("path", { d: `M${x(0).toFixed(1)},${h - 4} L${pts} L${x(23).toFixed(1)},${h - 4} Z`,
+    fill: cvar("--accent-wash") }));
+  svg.appendChild(svgEl("path", { d: `M${pts}`, fill: "none",
+    stroke: cvar(highlight ? "--accent" : "--series-1"), "stroke-width": 2, "stroke-linejoin": "round" }));
+  // 6-hour ticks
+  [6, 12, 18].forEach(hh => svg.appendChild(svgEl("line", { x1: x(hh), x2: x(hh), y1: h - 4, y2: h - 1,
+    stroke: cvar("--text-muted"), "stroke-width": 1 })));
+  return svg;
+}
+
+function distPeakLabel(dist) {
+  let bi = 0;
+  dist.pct.forEach((v, i) => { if (v > dist.pct[bi]) bi = i; });
+  const night = dist.pct.slice(0, 5).reduce((a, b) => a + b, 0);
+  return `peak ${bi}:00 (${dist.pct[bi].toFixed(1)}%) · 0–5h carries ${night.toFixed(1)}%`;
+}
+
+/* Full 24-hour profile with the directional split and the closure window. */
+function distDetailChart(dist, closures) {
+  const wrap = document.createElement("div");
+  const W = 720, H = 240, m = { t: 14, r: 16, b: 30, l: 46 };
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const svg = svgEl("svg", { width: "100%", viewBox: `0 0 ${W} ${H}`, role: "img",
+    "aria-label": "Hourly share of daily traffic" });
+  const max = Math.max(...dist.pct) * 1.15;
+  const x = i => m.l + iw * (i + 0.5) / 24;
+  const y = v => m.t + ih - (v / max) * ih;
+  for (let i = 0; i <= 4; i++) {
+    const gv = max * i / 4;
+    svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: y(gv), y2: y(gv),
+      stroke: cvar("--grid"), "stroke-width": 1 }));
+    const t = svgEl("text", { x: m.l - 7, y: y(gv) + 4, "text-anchor": "end",
+      "font-size": 10, fill: cvar("--text-muted") });
+    t.textContent = gv.toFixed(1) + "%";
+    svg.appendChild(t);
+  }
+  if (closures) {
+    for (let hh = 0; hh < 24; hh++) {
+      if (hourClosed(closures, hh)) {
+        svg.appendChild(svgEl("rect", { x: m.l + iw * hh / 24, y: m.t, width: iw / 24, height: ih,
+          fill: cvar("--accent-wash") }));
+      }
+    }
+  }
+  // bars for hourly share
+  dist.pct.forEach((v, i) => {
+    const bw = iw / 24 * 0.62;
+    const bh = (v / max) * ih;
+    const r = svgEl("rect", { x: x(i) - bw / 2, y: y(v), width: bw, height: bh, fill: cvar("--series-1") });
+    r.style.cursor = "pointer";
+    r.addEventListener("mousemove", e => showTip(
+      `<div>${i}:00–${i + 1}:00</div><div>Share of AADT: <b>${v.toFixed(2)}%</b></div>` +
+      `<div>Inbound split: <b>${dist.inb[i]}%</b></div>` +
+      (closures && hourClosed(closures, i) ? "<div><b>Lane closure in effect</b></div>" : ""), e.clientX, e.clientY));
+    r.addEventListener("mouseleave", hideTip);
+    svg.appendChild(r);
+  });
+  // directional split line
+  const dpts = dist.inb.map((v, i) => `${x(i).toFixed(1)},${(m.t + ih - (v / 100) * ih).toFixed(1)}`).join(" L");
+  svg.appendChild(svgEl("path", { d: `M${dpts}`, fill: "none", stroke: cvar("--series-2"),
+    "stroke-width": 2, "stroke-dasharray": "5,4" }));
+  for (let hh = 0; hh < 24; hh += 3) {
+    const t = svgEl("text", { x: x(hh), y: H - 9, "text-anchor": "middle",
+      "font-size": 10, fill: cvar("--text-muted") });
+    t.textContent = hh;
+    svg.appendChild(t);
+  }
+  svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: y(0), y2: y(0),
+    stroke: cvar("--baseline"), "stroke-width": 1 }));
+  wrap.appendChild(svg);
+  const lg = document.createElement("div");
+  lg.className = "legend";
+  lg.innerHTML = `<span class="item"><span class="swatch" style="background:var(--series-1)"></span>Share of daily traffic</span>
+    <span class="item"><span class="swatch" style="background:var(--series-2)"></span>Inbound direction (% of that hour)</span>
+    ${closures ? '<span class="item"><span class="swatch" style="background:var(--accent-wash);border:1px solid var(--border)"></span>Your closure window</span>' : ""}`;
+  wrap.appendChild(lg);
+  return wrap;
+}
+
+/* Which activity the studio uses as its worked context. */
+function studioContextActivity() {
+  for (const alt of S.alternatives) {
+    for (const a of alt.activities) if (a.wzDuration > 0 && a.name) return { alt, act: a };
+  }
+  const alt = S.alternatives[0];
+  return alt && alt.activities[0] ? { alt, act: alt.activities[0] } : null;
+}
+
+/* Daily user cost for a candidate distribution / closure set, both directions. */
+function dailyCostFor(act, distName, closures) {
+  const saved = { d: S.hourlyDist, c: act.closures };
+  S.hourlyDist = distName;
+  act.closures = closures;
+  const a = directionDailyCost(act, aadtInYear(act.year), "in");
+  const b = directionDailyCost(act, aadtInYear(act.year), "out");
+  S.hourlyDist = saved.d;
+  act.closures = saved.c;
+  return { cost: a.cost + b.cost, maxQ: Math.max(a.maxQ, b.maxQ) };
+}
+
+const STUDIO_TOPICS = [
+  { id: "dist", label: "Hourly distribution", render: renderStudioDist },
+  { id: "closure", label: "Closure window", render: renderStudioClosure },
+  { id: "capacity", label: "Capacity & speed", render: renderStudioCapacity },
+  { id: "vot", label: "Value of time", render: renderStudioVot }
+];
+let studioTopic = "dist";
+
+function openStudio(topic) {
+  studioTopic = topic || studioTopic;
+  const el = $("studio");
+  el.hidden = false;
+  document.body.style.overflow = "hidden";
+  renderStudio();
+  $("studioClose").focus();
+}
+function closeStudio() {
+  $("studio").hidden = true;
+  document.body.style.overflow = "";
+  initUI();
+  refresh();
+}
+function renderStudio() {
+  const nav = $("studioNav");
+  nav.innerHTML = STUDIO_TOPICS.map(t =>
+    `<button data-topic="${t.id}" class="${t.id === studioTopic ? "on" : ""}">${t.label}</button>`).join("");
+  nav.querySelectorAll("button").forEach(b => b.onclick = () => { studioTopic = b.dataset.topic; renderStudio(); });
+  const t = STUDIO_TOPICS.find(x => x.id === studioTopic) || STUDIO_TOPICS[0];
+  $("studioTitle").textContent = t.label;
+  const main = $("studioMain");
+  main.innerHTML = "";
+  t.render(main);
+  main.scrollTop = 0;
+}
+
+/* ---- Topic: hourly distribution ---- */
+function renderStudioDist(main) {
+  const ctx = studioContextActivity();
+  const lede = document.createElement("p");
+  lede.className = "lede";
+  lede.innerHTML = `An hourly distribution says what share of the day's traffic arrives in each hour.
+    It matters because work-zone user cost is driven almost entirely by <i>when</i> you close a lane
+    relative to when people are actually driving. Pick a shape below to see it drawn, and &mdash; if a
+    work zone is defined &mdash; what it costs per day under your current closure window.`;
+  main.appendChild(lede);
+
+  const grid = document.createElement("div");
+  grid.className = "dist-grid";
+  const names = allDistNames();
+  const costs = {};
+  if (ctx) names.forEach(n => { costs[n] = dailyCostFor(ctx.act, n, ctx.act.closures).cost; });
+  const cheapest = ctx ? names.reduce((m, n) => costs[n] < costs[m] ? n : m, names[0]) : null;
+
+  names.forEach(n => {
+    const d = distFor(n);
+    const card = document.createElement("button");
+    card.className = "dist-card" + (n === S.hourlyDist ? " on" : "");
+    card.innerHTML = `${n === S.hourlyDist ? '<span class="pick">In use</span>' : ""}
+      <h4>${n}</h4><div class="peak">${distPeakLabel(d)}</div>`;
+    card.appendChild(distSpark(d, 250, 62, n === S.hourlyDist));
+    if (ctx) {
+      const c = document.createElement("div");
+      c.className = "peak";
+      c.style.marginTop = "3px";
+      c.innerHTML = `${money(costs[n])}/day${n === cheapest ? ' &middot; <b style="color:var(--accent)">lowest</b>' : ""}`;
+      card.appendChild(c);
+    }
+    card.onclick = () => { S.hourlyDist = n; saveScenario(); renderStudio(); };
+    grid.appendChild(card);
+  });
+  main.appendChild(grid);
+
+  const cols = document.createElement("div");
+  cols.className = "studio-cols";
+
+  const left = document.createElement("div");
+  left.className = "studio-panel";
+  left.innerHTML = `<h3>${S.hourlyDist}</h3>
+    <p class="note" style="margin-top:0">${DIST_NOTES[S.hourlyDist] || ""}</p>`;
+  // distDetailChart shades hours, so it wants the inbound run list, not the {in,out} pair
+  left.appendChild(distDetailChart(distFor(S.hourlyDist), ctx ? ctx.act.closures.in : null));
+  if (ctx) {
+    const p = document.createElement("p");
+    p.className = "note";
+    p.innerHTML = `Costed against <b>${ctx.act.name}</b> (${ctx.alt.name}) in ${ctx.act.year},
+      with ${ctx.act.lanesOpen} lane open and AADT ${fmt(aadtInYear(ctx.act.year))}.`;
+    left.appendChild(p);
+  }
+  cols.appendChild(left);
+
+  // Custom builder
+  const right = document.createElement("div");
+  right.className = "studio-panel";
+  right.innerHTML = `<h3>Build your own</h3>
+    <p class="note" style="margin-top:0">Enter each hour's share of daily traffic. The values do not need to
+    total 100 &mdash; use <b>Normalise</b> and they will be scaled to.</p>`;
+  const base = S.customDist || JSON.parse(JSON.stringify(distFor(S.hourlyDist)));
+  const draft = JSON.parse(JSON.stringify(base));
+  const ed = document.createElement("div");
+  ed.className = "hour-editor";
+  ed.innerHTML = draft.pct.map((v, i) =>
+    `<label><span>${i}</span><input type="number" data-h="${i}" value="${v}" step="0.1" min="0"></label>`).join("");
+  right.appendChild(ed);
+
+  const preview = document.createElement("div");
+  right.appendChild(preview);
+  const sumNote = document.createElement("p");
+  sumNote.className = "note";
+  right.appendChild(sumNote);
+
+  const drawPreview = () => {
+    preview.innerHTML = "";
+    preview.appendChild(distSpark(draft, 380, 74, true));
+    const tot = draft.pct.reduce((a, b) => a + b, 0);
+    sumNote.innerHTML = `Total <b>${tot.toFixed(1)}%</b>${Math.abs(tot - 100) > 0.6
+      ? ' &mdash; <b style="color:var(--critical)">not 100%</b>, normalise before saving.' : " ✓"}`;
+  };
+  ed.querySelectorAll("input").forEach(inp => inp.addEventListener("input", () => {
+    draft.pct[+inp.dataset.h] = parseFloat(inp.value) || 0;
+    drawPreview();
+  }));
+  drawPreview();
+
+  const bar = document.createElement("div");
+  bar.className = "toolbar";
+  bar.style.marginTop = "10px";
+  bar.innerHTML = `<button class="btn" data-a="norm">Normalise to 100%</button>
+    <button class="btn" data-a="copy">Copy the selected shape</button>
+    <button class="btn primary" data-a="save">Save &amp; use</button>`;
+  bar.querySelector('[data-a="norm"]').onclick = () => {
+    const tot = draft.pct.reduce((a, b) => a + b, 0) || 1;
+    draft.pct = draft.pct.map(v => +(v / tot * 100).toFixed(2));
+    ed.querySelectorAll("input").forEach(inp => inp.value = draft.pct[+inp.dataset.h]);
+    drawPreview();
+  };
+  bar.querySelector('[data-a="copy"]').onclick = () => {
+    const src = distFor(S.hourlyDist);
+    draft.pct = src.pct.slice(); draft.inb = src.inb.slice();
+    ed.querySelectorAll("input").forEach(inp => inp.value = draft.pct[+inp.dataset.h]);
+    drawPreview();
+  };
+  bar.querySelector('[data-a="save"]').onclick = () => {
+    const tot = draft.pct.reduce((a, b) => a + b, 0) || 1;
+    S.customDist = { pct: draft.pct.map(v => +(v / tot * 100).toFixed(3)), inb: draft.inb.slice() };
+    S.hourlyDist = CUSTOM_DIST_NAME;
+    saveScenario();
+    renderStudio();
+  };
+  right.appendChild(bar);
+  cols.appendChild(right);
+  main.appendChild(cols);
+}
+
+/* ---- Topic: closure window ---- */
+function renderStudioClosure(main) {
+  const ctx = studioContextActivity();
+  const lede = document.createElement("p");
+  lede.className = "lede";
+  lede.innerHTML = `The hours you close a lane are usually the single biggest lever on user cost &mdash;
+    bigger than the number of days. Click hours below to build a window and watch the daily cost and the
+    peak queue respond, or let the tool search for the cheapest window of the same length.`;
+  main.appendChild(lede);
+  if (!ctx || !ctx.act.wzDuration) {
+    const p = document.createElement("p");
+    p.className = "note";
+    p.textContent = "No activity has a work-zone duration yet. Set one in section 03, or load the worked example.";
+    main.appendChild(p);
+    return;
+  }
+  const act = ctx.act;
+  const closed = new Set();
+  for (let h = 0; h < 24; h++) if (hourClosed(act.closures.in, h)) closed.add(h);
+
+  const cols = document.createElement("div");
+  cols.className = "studio-cols";
+  const left = document.createElement("div");
+  left.className = "studio-panel";
+  left.innerHTML = `<h3>${act.name}</h3>
+    <p class="note" style="margin-top:0">${ctx.alt.name} &middot; ${act.year} &middot;
+      ${act.lanesOpen} of ${S.lanes} lanes open during closure hours</p>`;
+  const pick = document.createElement("div");
+  pick.className = "hourpick";
+  left.appendChild(pick);
+  const scale = document.createElement("div");
+  scale.className = "hourpick-scale";
+  scale.innerHTML = Array.from({ length: 24 }, (_, i) => `<span>${i % 3 === 0 ? i : ""}</span>`).join("");
+  left.appendChild(scale);
+  const readout = document.createElement("div");
+  readout.style.marginTop = "10px";
+  left.appendChild(readout);
+  const chartHost = document.createElement("div");
+  left.appendChild(chartHost);
+  cols.appendChild(left);
+
+  const setsFromClosed = () => {
+    // Contiguous runs, wrapping midnight, as [start,end] pairs
+    const hrs = [...closed].sort((a, b) => a - b);
+    if (!hrs.length) return [];
+    const runs = [];
+    let s = hrs[0], prev = hrs[0];
+    for (let i = 1; i < hrs.length; i++) {
+      if (hrs[i] === prev + 1) { prev = hrs[i]; continue; }
+      runs.push([s, prev + 1]); s = hrs[i]; prev = hrs[i];
+    }
+    runs.push([s, prev + 1]);
+    return runs;
+  };
+
+  const paint = () => {
+    pick.innerHTML = "";
+    for (let h = 0; h < 24; h++) {
+      const b = document.createElement("button");
+      b.className = closed.has(h) ? "closed" : "";
+      b.textContent = h;
+      b.title = `${h}:00–${h + 1}:00`;
+      b.onclick = () => { closed.has(h) ? closed.delete(h) : closed.add(h); paint(); };
+      pick.appendChild(b);
+    }
+    const runs = setsFromClosed();
+    const r = dailyCostFor(act, S.hourlyDist, { in: runs, out: runs });
+    const qMi = r.maxQ / (S.lanes * 130);
+    const totalOverJob = r.cost * act.wzDuration / 1000;
+    readout.innerHTML = `
+      <div class="best-row"><b style="font-size:17px">${money(r.cost)}</b><span class="note">per day</span>
+        <span class="note">· ${money(totalOverJob)}k over ${act.wzDuration} days</span></div>
+      <div class="best-row"><b>${fmt(r.maxQ)}</b><span class="note">peak queued vehicles ≈ ${qMi.toFixed(1)} mi</span>
+        ${qMi > S.maxQueue ? '<span class="win" style="color:var(--critical)">over limit</span>' : ""}</div>
+      <div class="best-row"><b>${closed.size}</b><span class="note">closure hours per day</span></div>`;
+    chartHost.innerHTML = "";
+    chartHost.appendChild(distDetailChart(distFor(S.hourlyDist), runs));
+  };
+  paint();
+
+  // Search: cheapest contiguous window of the same length
+  const right = document.createElement("div");
+  right.className = "studio-panel";
+  right.innerHTML = `<h3>Find the cheapest window</h3>
+    <p class="note" style="margin-top:0">Every contiguous window of the same number of hours is costed and
+    ranked. Shorter windows always cost less per day but stretch the job over more days, so compare like
+    with like before deciding.</p>`;
+  const results = document.createElement("div");
+  right.appendChild(results);
+
+  const search = () => {
+    const n = closed.size || 8;
+    const rows = [];
+    for (let start = 0; start < 24; start++) {
+      const runs = start + n <= 24 ? [[start, start + n]] : [[start, 24], [0, (start + n) - 24]];
+      const r = dailyCostFor(act, S.hourlyDist, { in: runs, out: runs });
+      rows.push({ start, n, runs, cost: r.cost, maxQ: r.maxQ });
+    }
+    rows.sort((a, b) => a.cost - b.cost);
+    results.innerHTML = `<p class="note"><b>${n}-hour</b> windows, cheapest first:</p>` +
+      rows.slice(0, 6).map((r, i) => `
+        <div class="best-row">
+          ${i === 0 ? '<span class="win">Best</span>' : '<span class="win" style="color:var(--text-muted)">#' + (i + 1) + "</span>"}
+          <b>${String(r.start).padStart(2, "0")}:00 → ${String((r.start + n) % 24).padStart(2, "0")}:00</b>
+          <span class="note">${money(r.cost)}/day · peak queue ${fmt(r.maxQ)} veh</span>
+          <button class="explore-link" data-apply="${r.start}">use</button>
+        </div>`).join("");
+    results.querySelectorAll("[data-apply]").forEach(btn => btn.onclick = () => {
+      const start = +btn.dataset.apply;
+      closed.clear();
+      for (let k = 0; k < n; k++) closed.add((start + k) % 24);
+      paint();
+    });
+  };
+  const sbar = document.createElement("div");
+  sbar.className = "toolbar";
+  sbar.style.marginTop = "8px";
+  sbar.innerHTML = `<button class="btn" data-a="search">Rank windows</button>
+    <button class="btn primary" data-a="apply">Apply to this activity</button>`;
+  sbar.querySelector('[data-a="search"]').onclick = search;
+  sbar.querySelector('[data-a="apply"]').onclick = () => {
+    const runs = setsFromClosed();
+    act.closures = { in: runs, out: runs };
+    saveScenario();
+    const done = document.createElement("p");
+    done.className = "note";
+    done.innerHTML = `<b style="color:var(--accent)">Applied to ${act.name}.</b>`;
+    sbar.after(done);
+    setTimeout(() => done.remove(), 3000);
+  };
+  right.appendChild(sbar);
+  search();
+  cols.appendChild(right);
+  main.appendChild(cols);
+}
+
+/* ---- Topic: capacity & speed ---- */
+function renderStudioCapacity(main) {
+  main.innerHTML = `
+    <p class="lede">Capacity decides when a queue forms; speed decides what every non-queued vehicle loses.
+      Both are per-lane figures, and the work-zone values are always lower than normal operating values
+      because of narrow lanes, barriers and merging.</p>
+    <div class="studio-cols">
+      <div class="studio-panel">
+        <h3>Typical values</h3>
+        <div class="table-scroll"><table class="data">
+          <thead><tr><th>Parameter</th><th>Typical</th><th>Where it comes from</th></tr></thead>
+          <tbody>
+            <tr><td>Free-flow capacity</td><td>2,000–2,200 vphpl</td><td>HCM basic freeway segment</td></tr>
+            <tr><td>Queue dissipation capacity</td><td>1,700–1,900 vphpl</td><td>Discharge from a standing queue; below free-flow because traffic accelerates from rest</td></tr>
+            <tr><td>Work-zone capacity, 1 lane open</td><td>1,300–1,400 vphpl</td><td>HCM work-zone default ≈ 1,340</td></tr>
+            <tr><td>Work-zone capacity, 2+ open</td><td>1,400–1,600 vphpl</td><td>Higher per lane when more lanes stay open</td></tr>
+            <tr><td>Work-zone speed</td><td>45–55 mph</td><td>Caltrans posts 55 typically, 45 where workers are near live traffic</td></tr>
+          </tbody></table></div>
+        <p class="note">Your current settings: free-flow <b>${fmt(S.ffCap)}</b>, queue dissipation
+          <b>${fmt(S.qdCap)}</b> vphpl, normal speed <b>${S.speedLimit}</b> mph.</p>
+      </div>
+      <div class="studio-panel">
+        <h3>What a lane closure does to capacity</h3>
+        <p class="note" style="margin-top:0">Directional capacity before and during a closure, at your settings.</p>
+        <div id="capBars"></div>
+      </div>
+    </div>`;
+  const host = main.querySelector("#capBars");
+  const ctx = studioContextActivity();
+  const wzCap = ctx ? ctx.act.wzCap : 1340;
+  const open = ctx ? ctx.act.lanesOpen : 1;
+  const rows = [
+    { l: `Normal — ${S.lanes} lanes`, v: S.ffCap * S.lanes, c: "--series-1" },
+    { l: `Queue discharge — ${S.lanes} lanes`, v: S.qdCap * S.lanes, c: "--series-3" },
+    { l: `Work zone — ${open} open`, v: wzCap * open, c: "--series-2" }
+  ];
+  const max = Math.max(...rows.map(r => r.v));
+  host.innerHTML = rows.map(r => `
+    <div style="margin:9px 0">
+      <div style="display:flex;justify-content:space-between;font-size:12px">
+        <span>${r.l}</span><b style="font-family:var(--font-mono)">${fmt(r.v)} veh/hr</b></div>
+      <div style="height:12px;background:var(--surface-2);margin-top:3px">
+        <div style="height:100%;width:${(r.v / max * 100).toFixed(1)}%;background:var(${r.c})"></div></div>
+    </div>`).join("") +
+    `<p class="note">Closing to ${open} lane leaves
+      <b>${((wzCap * open) / (S.ffCap * S.lanes) * 100).toFixed(0)}%</b> of normal capacity. Any hour whose
+      demand exceeds that line starts a queue, and the queue carries into later hours until it drains.</p>`;
+}
+
+/* ---- Topic: value of time ---- */
+function renderStudioVot(main) {
+  const sh = classShares();
+  main.innerHTML = `
+    <p class="lede">Value of time converts an hour of delay into dollars. It is the multiplier on every
+      hour of delay the model computes, so the ranking of alternatives is only ever as defensible as
+      these three numbers and the vehicle mix beside them.</p>
+    <div class="studio-cols">
+      <div class="studio-panel">
+        <h3>Your values and mix</h3>
+        <div class="table-scroll"><table class="data">
+          <thead><tr><th>Class</th><th>Value of time</th><th>Share of AADT</th><th>Weighted contribution</th></tr></thead>
+          <tbody>
+            <tr><td>Passenger cars</td><td>$${S.votCar.toFixed(2)}/hr</td><td>${(sh.car * 100).toFixed(0)}%</td><td>$${(sh.car * S.votCar).toFixed(2)}</td></tr>
+            <tr><td>Single-unit trucks</td><td>$${S.votSut.toFixed(2)}/hr</td><td>${(sh.sut * 100).toFixed(0)}%</td><td>$${(sh.sut * S.votSut).toFixed(2)}</td></tr>
+            <tr><td>Combination trucks</td><td>$${S.votCt.toFixed(2)}/hr</td><td>${(sh.ct * 100).toFixed(0)}%</td><td>$${(sh.ct * S.votCt).toFixed(2)}</td></tr>
+            <tr style="border-top:1px solid var(--baseline)"><td><b>Blended</b></td><td colspan="2"></td><td><b>$${votWeighted().toFixed(2)}/hr</b></td></tr>
+          </tbody></table></div>
+        <p class="note">Every vehicle-hour of delay the model finds is monetised at the blended rate above,
+          weighted by the mix you entered in section 02.</p>
+      </div>
+      <div class="studio-panel">
+        <h3>Why the truck share matters</h3>
+        <p class="note" style="margin-top:0">Trucks are a small share of traffic but carry a much higher value
+          of time and far higher stop-and-go operating costs. Raising the combination-truck share from
+          ${(sh.ct * 100).toFixed(0)}% to ${Math.min(100, (sh.ct * 100 + 5)).toFixed(0)}% would move the
+          blended rate from <b>$${votWeighted().toFixed(2)}</b> to about
+          <b>$${(votWeighted() + 0.05 * (S.votCt - S.votCar)).toFixed(2)}</b> per hour &mdash; roughly
+          ${(((votWeighted() + 0.05 * (S.votCt - S.votCar)) / votWeighted() - 1) * 100).toFixed(0)}% more
+          user cost for the same delay.</p>
+        <p class="note">The workbook's seeded values were $12.80/hr for cars and $31.70/hr for both truck
+          classes. Caltrans publishes updated values periodically; substitute the current ones for real work,
+          and say in your report which vintage you used.</p>
+      </div>
+    </div>`;
+}
+
 /* Guided tour ------------------------------------------------------------ */
 const TOUR_STEPS = [
   { sel: null, title: "Welcome — this compares pavement strategies over decades",
@@ -2387,6 +3036,17 @@ function renderAltPanel() {
   });
 
   decorateHelp(panel);
+  // Each activity's closure field links into the window designer
+  panel.querySelectorAll('[data-f="closIn"]').forEach(inp => {
+    const lab = inp.closest("label.field");
+    if (!lab || lab.querySelector(".explore-link")) return;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "explore-link";
+    b.textContent = "design window…";
+    b.onclick = e => { e.preventDefault(); openStudio("closure"); };
+    (lab.querySelector(".field-caption") || lab).appendChild(b);
+  });
 
   const add = document.createElement("button");
   add.className = "btn";
@@ -2800,6 +3460,11 @@ $("btnReset").onclick = () => {
   }
 };
 $("btnRecalc").onclick = () => refresh();
+$("btnStudio").onclick = () => openStudio();
+$("studioClose").onclick = () => closeStudio();
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !$("studio").hidden) closeStudio();
+});
 
 /* Print report. Browsers' "Save as PDF" destination is the PDF generator here —
    no library, which also means nothing to load past the CSP. */
