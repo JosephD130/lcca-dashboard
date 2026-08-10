@@ -1,0 +1,38 @@
+MIT License
+
+Copyright (c) 2026 Joseph Dib
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+NOTE ON THE UNDERLYING METHOD
+
+The life-cycle cost analysis methodology implemented here was developed by the
+Federal Highway Administration (RealCost; "Life-Cycle Cost Analysis in Pavement
+Design", FHWA-SA-98-079) and adapted for California by the California
+Department of Transportation (RealCost 2.5.7CA). Works of the United States
+federal government are not subject to copyright (17 U.S.C. 105), and methods of
+operation are not copyrightable subject matter (17 U.S.C. 102(b)).
+
+This project is an independent, original implementation written from the
+published methodology. It contains no code from the RealCost workbook. It is
+not produced, reviewed, endorsed, or supported by FHWA or Caltrans, and it is
+not a certified substitute for the official RealCost tool. The MIT license
+above covers this implementation only.

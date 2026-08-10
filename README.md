@@ -48,12 +48,15 @@ modules, forced-flow queue speed curve.
 
 The app is a single static `index.html` — no build step.
 
-1. Push this repo to GitHub (already done if you're reading this there).
-2. In Vercel: **Add New → Project**, import the repo.
-3. Set **Root Directory** to `lcca-dashboard`, framework preset **Other**.
-4. Deploy. Every push to the branch redeploys automatically.
+1. In Vercel: **Add New → Project**, import this repo.
+2. Framework preset **Other**. Leave Root Directory at the repo root —
+   `index.html` is served as-is and there is no build step.
+3. Deploy. Every push to `main` redeploys automatically.
 
-Or from a terminal: `cd lcca-dashboard && npx vercel`.
+Or from a terminal in a clone: `npx vercel`.
+
+`vercel.json` sets `cleanUrls` and a few conservative security headers, and
+marks `index.html` as must-revalidate so a deploy is picked up immediately.
 
 ## Credits and status
 
@@ -68,6 +71,30 @@ published methodology and the input structure of the RealCost workbook. It is
 not produced, reviewed, endorsed, or supported by FHWA or Caltrans, and is not
 a certified substitute for the official tool. Verify results against official
 RealCost before using them in project decisions or submittals.
+
+## Parameter studio
+
+Several inputs cannot be understood from a dropdown label. The studio (sidebar →
+Input → Parameter studio) gives each of them a screen:
+
+- **Hourly distribution** — every option drawn as a 24-hour profile, labelled
+  with its peak hour and night share, and priced per day against the current
+  work zone so the cheapest is obvious. Includes a builder for your own curve,
+  saved onto the scenario.
+- **Closure window** — click hours to build a window and watch cost and queue
+  respond; rank every contiguous window of the same length by cost and apply
+  the pick.
+- **Capacity & speed** — typical HCM/Caltrans values with sources, and what a
+  lane closure does to directional capacity at your settings.
+- **Value of time** — the blended rate by class and share, and the effect of
+  shifting the truck mix.
+
+## Development
+
+There is no build step and no dependencies. Open `index.html` in a browser, or
+serve the folder with anything (`python3 -m http.server`). Everything — engine,
+styles, reference data — lives in that one file so it can be dropped on any
+host or opened straight from disk on a locked-down machine.
 
 ## Where the pricing lives
 
