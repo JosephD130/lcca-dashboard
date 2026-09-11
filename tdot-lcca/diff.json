@@ -1,0 +1,2406 @@
+{
+ "diff": {
+  "TMP(NewPCC)_IndirectCost": [
+   {
+    "cell": "F2",
+    "before": "=SUM(_xlfn.XLOOKUP('General Information'!D10,RevenueData!A:A,RevenueData!B:H))",
+    "after": "=IF('General Information'!$D$38=\"Yes\",SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$H:$H),0)"
+   },
+   {
+    "cell": "G2",
+    "before": null,
+    "after": "=IF(AND('General Information'!$D$38=\"Yes\",F2=0),\"No revenue data for this airport - lost revenue set to $0. Contact Aeronautics.\",\"\")"
+   },
+   {
+    "cell": "F4",
+    "before": "0",
+    "after": "=ROUNDUP(C5*550/(50*100/9)/10000,0)+ROUNDUP(C5*'Maintenance Policies'!D38/10000,0)+ROUNDUP(C5*'Maintenance Policies'!D39/5000,0)+ROUNDUP(C5*'Maintenance Policies'!D40/5000,0)"
+   },
+   {
+    "cell": "F5",
+    "before": "0",
+    "after": "=ROUNDUP(C5*550/(50*100/9)/10000,0)+ROUNDUP(C5*'Maintenance Policies'!D44/10000,0)+ROUNDUP(C5*'Maintenance Policies'!D43/5000,0)+ROUNDUP(C5*'Maintenance Policies'!D42/5000,0)+ROUNDUP(C5*'Maintenance Policies'!D41/1000,0)+7"
+   },
+   {
+    "cell": "B14",
+    "before": "=VLOOKUP(C14,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C14=\"\",0,VLOOKUP(C14,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B15",
+    "before": "=VLOOKUP(C15,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C15=\"\",0,VLOOKUP(C15,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B16",
+    "before": "=VLOOKUP(C16,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C16=\"\",0,VLOOKUP(C16,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B17",
+    "before": "=VLOOKUP(C17,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C17=\"\",0,VLOOKUP(C17,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B18",
+    "before": "=VLOOKUP(C18,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C18=\"\",0,VLOOKUP(C18,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B19",
+    "before": "=VLOOKUP(C19,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C19=\"\",0,VLOOKUP(C19,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B20",
+    "before": "=VLOOKUP(C20,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C20=\"\",0,VLOOKUP(C20,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B21",
+    "before": "=VLOOKUP(C21,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C21=\"\",0,VLOOKUP(C21,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B22",
+    "before": "=VLOOKUP(C22,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C22=\"\",0,VLOOKUP(C22,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B26",
+    "before": null,
+    "after": "Engineering"
+   },
+   {
+    "cell": "G26",
+    "before": null,
+    "after": "=('General Information'!$D$37/100)*G24"
+   },
+   {
+    "cell": "E38",
+    "before": "=D38/(1+('General Information'!$D$34/100))^C38",
+    "after": "=IF(C38>'General Information'!$D$33,0,D38/(1+('General Information'!$D$34/100))^C38)"
+   },
+   {
+    "cell": "L38",
+    "before": "=D37",
+    "after": "=IF(K38-$C$6>'General Information'!$D$33,0,IF(K38=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K38-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M38",
+    "before": "0",
+    "after": "=IF(K38-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K38-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N38",
+    "before": "=E37",
+    "after": "=IF(K38-$C$6>'General Information'!$D$33,0,IF(K38=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K38-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "E39",
+    "before": "=D39/(1+('General Information'!$D$34/100))^C39",
+    "after": "=IF(C39>'General Information'!$D$33,0,D39/(1+('General Information'!$D$34/100))^C39)"
+   },
+   {
+    "cell": "L39",
+    "before": null,
+    "after": "=IF(K39-$C$6>'General Information'!$D$33,0,IF(K39=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K39-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M39",
+    "before": null,
+    "after": "=IF(K39-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K39-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N39",
+    "before": null,
+    "after": "=IF(K39-$C$6>'General Information'!$D$33,0,IF(K39=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K39-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "E40",
+    "before": "=D40/(1+('General Information'!$D$34/100))^C40",
+    "after": "=IF(C40>'General Information'!$D$33,0,D40/(1+('General Information'!$D$34/100))^C40)"
+   },
+   {
+    "cell": "L40",
+    "before": null,
+    "after": "=IF(K40-$C$6>'General Information'!$D$33,0,IF(K40=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K40-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M40",
+    "before": null,
+    "after": "=IF(K40-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K40-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N40",
+    "before": null,
+    "after": "=IF(K40-$C$6>'General Information'!$D$33,0,IF(K40=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K40-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "E41",
+    "before": "=D41/(1+('General Information'!$D$34/100))^C41",
+    "after": "=IF(C41>'General Information'!$D$33,0,D41/(1+('General Information'!$D$34/100))^C41)"
+   },
+   {
+    "cell": "L41",
+    "before": null,
+    "after": "=IF(K41-$C$6>'General Information'!$D$33,0,IF(K41=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K41-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M41",
+    "before": null,
+    "after": "=IF(K41-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K41-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N41",
+    "before": null,
+    "after": "=IF(K41-$C$6>'General Information'!$D$33,0,IF(K41=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K41-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "E42",
+    "before": "=D42/(1+('General Information'!$D$34/100))^C42",
+    "after": "=IF(C42>'General Information'!$D$33,0,D42/(1+('General Information'!$D$34/100))^C42)"
+   },
+   {
+    "cell": "L42",
+    "before": null,
+    "after": "=IF(K42-$C$6>'General Information'!$D$33,0,IF(K42=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K42-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M42",
+    "before": null,
+    "after": "=IF(K42-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K42-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N42",
+    "before": null,
+    "after": "=IF(K42-$C$6>'General Information'!$D$33,0,IF(K42=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K42-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L43",
+    "before": null,
+    "after": "=IF(K43-$C$6>'General Information'!$D$33,0,IF(K43=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K43-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M43",
+    "before": null,
+    "after": "=IF(K43-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K43-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N43",
+    "before": null,
+    "after": "=IF(K43-$C$6>'General Information'!$D$33,0,IF(K43=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K43-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L44",
+    "before": null,
+    "after": "=IF(K44-$C$6>'General Information'!$D$33,0,IF(K44=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K44-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M44",
+    "before": null,
+    "after": "=IF(K44-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K44-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N44",
+    "before": null,
+    "after": "=IF(K44-$C$6>'General Information'!$D$33,0,IF(K44=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K44-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L45",
+    "before": null,
+    "after": "=IF(K45-$C$6>'General Information'!$D$33,0,IF(K45=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K45-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M45",
+    "before": null,
+    "after": "=IF(K45-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K45-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N45",
+    "before": null,
+    "after": "=IF(K45-$C$6>'General Information'!$D$33,0,IF(K45=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K45-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L46",
+    "before": null,
+    "after": "=IF(K46-$C$6>'General Information'!$D$33,0,IF(K46=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K46-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M46",
+    "before": null,
+    "after": "=IF(K46-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K46-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N46",
+    "before": null,
+    "after": "=IF(K46-$C$6>'General Information'!$D$33,0,IF(K46=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K46-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L47",
+    "before": null,
+    "after": "=IF(K47-$C$6>'General Information'!$D$33,0,IF(K47=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K47-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M47",
+    "before": null,
+    "after": "=IF(K47-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K47-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N47",
+    "before": null,
+    "after": "=IF(K47-$C$6>'General Information'!$D$33,0,IF(K47=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K47-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L48",
+    "before": null,
+    "after": "=IF(K48-$C$6>'General Information'!$D$33,0,IF(K48=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K48-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M48",
+    "before": null,
+    "after": "=IF(K48-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K48-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N48",
+    "before": null,
+    "after": "=IF(K48-$C$6>'General Information'!$D$33,0,IF(K48=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K48-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L49",
+    "before": null,
+    "after": "=IF(K49-$C$6>'General Information'!$D$33,0,IF(K49=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K49-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M49",
+    "before": null,
+    "after": "=IF(K49-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K49-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N49",
+    "before": null,
+    "after": "=IF(K49-$C$6>'General Information'!$D$33,0,IF(K49=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K49-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L50",
+    "before": null,
+    "after": "=IF(K50-$C$6>'General Information'!$D$33,0,IF(K50=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K50-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M50",
+    "before": null,
+    "after": "=IF(K50-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K50-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N50",
+    "before": null,
+    "after": "=IF(K50-$C$6>'General Information'!$D$33,0,IF(K50=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K50-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L51",
+    "before": null,
+    "after": "=IF(K51-$C$6>'General Information'!$D$33,0,IF(K51=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K51-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M51",
+    "before": null,
+    "after": "=IF(K51-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K51-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N51",
+    "before": null,
+    "after": "=IF(K51-$C$6>'General Information'!$D$33,0,IF(K51=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K51-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L52",
+    "before": null,
+    "after": "=IF(K52-$C$6>'General Information'!$D$33,0,IF(K52=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K52-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M52",
+    "before": null,
+    "after": "=IF(K52-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K52-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N52",
+    "before": null,
+    "after": "=IF(K52-$C$6>'General Information'!$D$33,0,IF(K52=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K52-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L53",
+    "before": null,
+    "after": "=IF(K53-$C$6>'General Information'!$D$33,0,IF(K53=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K53-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M53",
+    "before": null,
+    "after": "=IF(K53-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K53-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N53",
+    "before": null,
+    "after": "=IF(K53-$C$6>'General Information'!$D$33,0,IF(K53=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K53-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L54",
+    "before": null,
+    "after": "=IF(K54-$C$6>'General Information'!$D$33,0,IF(K54=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K54-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M54",
+    "before": null,
+    "after": "=IF(K54-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K54-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N54",
+    "before": null,
+    "after": "=IF(K54-$C$6>'General Information'!$D$33,0,IF(K54=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K54-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L55",
+    "before": null,
+    "after": "=IF(K55-$C$6>'General Information'!$D$33,0,IF(K55=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K55-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M55",
+    "before": null,
+    "after": "=IF(K55-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K55-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N55",
+    "before": null,
+    "after": "=IF(K55-$C$6>'General Information'!$D$33,0,IF(K55=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K55-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L56",
+    "before": null,
+    "after": "=IF(K56-$C$6>'General Information'!$D$33,0,IF(K56=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K56-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M56",
+    "before": null,
+    "after": "=IF(K56-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K56-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N56",
+    "before": null,
+    "after": "=IF(K56-$C$6>'General Information'!$D$33,0,IF(K56=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K56-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L57",
+    "before": "=D38",
+    "after": "=IF(K57-$C$6>'General Information'!$D$33,0,IF(K57=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K57-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M57",
+    "before": "=D39",
+    "after": "=IF(K57-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K57-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N57",
+    "before": "=E38+E39",
+    "after": "=IF(K57-$C$6>'General Information'!$D$33,0,IF(K57=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K57-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L58",
+    "before": null,
+    "after": "=IF(K58-$C$6>'General Information'!$D$33,0,IF(K58=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K58-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M58",
+    "before": null,
+    "after": "=IF(K58-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K58-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N58",
+    "before": null,
+    "after": "=IF(K58-$C$6>'General Information'!$D$33,0,IF(K58=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K58-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L59",
+    "before": null,
+    "after": "=IF(K59-$C$6>'General Information'!$D$33,0,IF(K59=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K59-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M59",
+    "before": null,
+    "after": "=IF(K59-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K59-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N59",
+    "before": null,
+    "after": "=IF(K59-$C$6>'General Information'!$D$33,0,IF(K59=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K59-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L60",
+    "before": null,
+    "after": "=IF(K60-$C$6>'General Information'!$D$33,0,IF(K60=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K60-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M60",
+    "before": null,
+    "after": "=IF(K60-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K60-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N60",
+    "before": null,
+    "after": "=IF(K60-$C$6>'General Information'!$D$33,0,IF(K60=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K60-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L61",
+    "before": null,
+    "after": "=IF(K61-$C$6>'General Information'!$D$33,0,IF(K61=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K61-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M61",
+    "before": null,
+    "after": "=IF(K61-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K61-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N61",
+    "before": null,
+    "after": "=IF(K61-$C$6>'General Information'!$D$33,0,IF(K61=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K61-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L62",
+    "before": null,
+    "after": "=IF(K62-$C$6>'General Information'!$D$33,0,IF(K62=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K62-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M62",
+    "before": null,
+    "after": "=IF(K62-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K62-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N62",
+    "before": null,
+    "after": "=IF(K62-$C$6>'General Information'!$D$33,0,IF(K62=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K62-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L63",
+    "before": null,
+    "after": "=IF(K63-$C$6>'General Information'!$D$33,0,IF(K63=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K63-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M63",
+    "before": null,
+    "after": "=IF(K63-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K63-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N63",
+    "before": null,
+    "after": "=IF(K63-$C$6>'General Information'!$D$33,0,IF(K63=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K63-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L64",
+    "before": null,
+    "after": "=IF(K64-$C$6>'General Information'!$D$33,0,IF(K64=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K64-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M64",
+    "before": null,
+    "after": "=IF(K64-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K64-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N64",
+    "before": null,
+    "after": "=IF(K64-$C$6>'General Information'!$D$33,0,IF(K64=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K64-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L65",
+    "before": "=D40",
+    "after": "=IF(K65-$C$6>'General Information'!$D$33,0,IF(K65=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K65-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M65",
+    "before": "=D41",
+    "after": "=IF(K65-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K65-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N65",
+    "before": "=E40+E41",
+    "after": "=IF(K65-$C$6>'General Information'!$D$33,0,IF(K65=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K65-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L66",
+    "before": null,
+    "after": "=IF(K66-$C$6>'General Information'!$D$33,0,IF(K66=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K66-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M66",
+    "before": null,
+    "after": "=IF(K66-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K66-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N66",
+    "before": null,
+    "after": "=IF(K66-$C$6>'General Information'!$D$33,0,IF(K66=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K66-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L67",
+    "before": null,
+    "after": "=IF(K67-$C$6>'General Information'!$D$33,0,IF(K67=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K67-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M67",
+    "before": null,
+    "after": "=IF(K67-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K67-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N67",
+    "before": null,
+    "after": "=IF(K67-$C$6>'General Information'!$D$33,0,IF(K67=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K67-$C$6,$E$38:$E$42))"
+   },
+   {
+    "cell": "L68",
+    "before": "=D42",
+    "after": "=IF(K68-$C$6>'General Information'!$D$33,0,IF(K68=$C$6,$D$37,0)+SUMIFS($D$38:$D$42,$C$38:$C$42,K68-$C$6,$B$38:$B$42,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M68",
+    "before": "0",
+    "after": "=IF(K68-$C$6>'General Information'!$D$33,0,SUMIFS($D$38:$D$42,$C$38:$C$42,K68-$C$6,$B$38:$B$42,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N68",
+    "before": "=E42",
+    "after": "=IF(K68-$C$6>'General Information'!$D$33,0,IF(K68=$C$6,$E$37,0)+SUMIF($C$38:$C$42,K68-$C$6,$E$38:$E$42))"
+   }
+  ],
+  "General Information": [
+   {
+    "cell": "D33",
+    "before": "10",
+    "after": "30"
+   },
+   {
+    "cell": "D39",
+    "before": "=IF(D38<>\"Yes\",\"\",IF((COUNTIF(RevenueData!A:A,D10)=0),\"Missing Airport Revenue\",SUM(_xlfn.XLOOKUP(D10,RevenueData!A:A,RevenueData!B:H))))",
+    "after": "=IF(D38<>\"Yes\",\"\",IF(COUNTIF(RevenueData!$A:$A,$D$10)=0,\"Missing Airport Revenue\",SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$H:$H)))"
+   }
+  ],
+  "Pay_Items": [
+   {
+    "cell": "D20",
+    "before": "Separation geotextile",
+    "after": "Separation Geotextile (P-154)"
+   },
+   {
+    "cell": "D28",
+    "before": "Separation Geotextile",
+    "after": "Separation Geotextile (P-208)"
+   },
+   {
+    "cell": "D30",
+    "before": "Separation Geotextile",
+    "after": "Separation Geotextile (P-209)"
+   },
+   {
+    "cell": "D32",
+    "before": "Separation Geotextile",
+    "after": "Separation Geotextile (P-219)"
+   }
+  ],
+  "TMP(NewHMA)_IndirectCost": [
+   {
+    "cell": "F2",
+    "before": "=SUM(_xlfn.XLOOKUP('General Information'!D10,RevenueData!A:A,RevenueData!B:H))",
+    "after": "=IF('General Information'!$D$38=\"Yes\",SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$H:$H),0)"
+   },
+   {
+    "cell": "G2",
+    "before": null,
+    "after": "=IF(AND('General Information'!$D$38=\"Yes\",F2=0),\"No revenue data for this airport - lost revenue set to $0. Contact Aeronautics.\",\"\")"
+   },
+   {
+    "cell": "F4",
+    "before": "0",
+    "after": "=ROUNDUP((C5/15000),0)+ROUNDUP((C8/20000),0)+ROUNDUP((C8/50000),0)"
+   },
+   {
+    "cell": "F5",
+    "before": "0",
+    "after": "=ROUNDUP((C5/15000),0)+ROUNDUP((C8/20000),0)+ROUNDUP((C8/50000),0)"
+   },
+   {
+    "cell": "F6",
+    "before": "0",
+    "after": "=ROUNDUP((C5/15000),0)+ROUNDUP((C8/20000),0)+ROUNDUP((C8/50000),0)+ROUNDUP((C5*'Maintenance Policies'!D15/10000),0)+ROUNDUP((C5*'Maintenance Policies'!D14/5000),0)"
+   },
+   {
+    "cell": "F7",
+    "before": "0",
+    "after": "=ROUNDUP((C5/15000),0)+ROUNDUP((C8/20000),0)+ROUNDUP((C8/50000),0)+ROUNDUP((C5*'Maintenance Policies'!D18/10000),0)+ROUNDUP((C5*'Maintenance Policies'!D19/5000),0)"
+   },
+   {
+    "cell": "F8",
+    "before": "0",
+    "after": "=ROUNDUP((C5/3800),0)+ROUNDUP((C8/50000),0)"
+   },
+   {
+    "cell": "F9",
+    "before": "0",
+    "after": "=ROUNDUP((C5/15000),0)+ROUNDUP((C8/20000),0)+ROUNDUP((C8/50000),0)"
+   },
+   {
+    "cell": "F10",
+    "before": "0",
+    "after": "=ROUNDUP((C5/15000),0)+ROUNDUP((C8/20000),0)+ROUNDUP((C8/50000),0)+ROUNDUP((C5*'Maintenance Policies'!D28/10000),0)+ROUNDUP((C5*'Maintenance Policies'!D29/5000),0)"
+   },
+   {
+    "cell": "B26",
+    "before": null,
+    "after": "Engineering"
+   },
+   {
+    "cell": "G26",
+    "before": null,
+    "after": "=('General Information'!$D$37/100)*G24"
+   },
+   {
+    "cell": "E37",
+    "before": "=D37/(1+('General Information'!$D$34/100))^C37",
+    "after": "=IF(C37>'General Information'!$D$33,0,D37/(1+('General Information'!$D$34/100))^C37)"
+   },
+   {
+    "cell": "L37",
+    "before": "=D36",
+    "after": "=IF(K37-$C$6>'General Information'!$D$33,0,IF(K37=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K37-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M37",
+    "before": "=E36",
+    "after": "=IF(K37-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K37-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N37",
+    "before": null,
+    "after": "=IF(K37-$C$6>'General Information'!$D$33,0,IF(K37=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K37-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E38",
+    "before": "=D38/(1+('General Information'!$D$34/100))^C38",
+    "after": "=IF(C38>'General Information'!$D$33,0,D38/(1+('General Information'!$D$34/100))^C38)"
+   },
+   {
+    "cell": "L38",
+    "before": null,
+    "after": "=IF(K38-$C$6>'General Information'!$D$33,0,IF(K38=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K38-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M38",
+    "before": null,
+    "after": "=IF(K38-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K38-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N38",
+    "before": null,
+    "after": "=IF(K38-$C$6>'General Information'!$D$33,0,IF(K38=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K38-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E39",
+    "before": "=D39/(1+('General Information'!$D$34/100))^C39",
+    "after": "=IF(C39>'General Information'!$D$33,0,D39/(1+('General Information'!$D$34/100))^C39)"
+   },
+   {
+    "cell": "L39",
+    "before": null,
+    "after": "=IF(K39-$C$6>'General Information'!$D$33,0,IF(K39=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K39-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M39",
+    "before": null,
+    "after": "=IF(K39-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K39-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N39",
+    "before": null,
+    "after": "=IF(K39-$C$6>'General Information'!$D$33,0,IF(K39=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K39-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E40",
+    "before": "=D40/(1+('General Information'!$D$34/100))^C40",
+    "after": "=IF(C40>'General Information'!$D$33,0,D40/(1+('General Information'!$D$34/100))^C40)"
+   },
+   {
+    "cell": "L40",
+    "before": null,
+    "after": "=IF(K40-$C$6>'General Information'!$D$33,0,IF(K40=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K40-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M40",
+    "before": null,
+    "after": "=IF(K40-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K40-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N40",
+    "before": null,
+    "after": "=IF(K40-$C$6>'General Information'!$D$33,0,IF(K40=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K40-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E41",
+    "before": "=D41/(1+('General Information'!$D$34/100))^C41",
+    "after": "=IF(C41>'General Information'!$D$33,0,D41/(1+('General Information'!$D$34/100))^C41)"
+   },
+   {
+    "cell": "L41",
+    "before": "=D37",
+    "after": "=IF(K41-$C$6>'General Information'!$D$33,0,IF(K41=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K41-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M41",
+    "before": "=D38",
+    "after": "=IF(K41-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K41-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N41",
+    "before": "=E37+E38",
+    "after": "=IF(K41-$C$6>'General Information'!$D$33,0,IF(K41=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K41-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E42",
+    "before": "=D42/(1+('General Information'!$D$34/100))^C42",
+    "after": "=IF(C42>'General Information'!$D$33,0,D42/(1+('General Information'!$D$34/100))^C42)"
+   },
+   {
+    "cell": "L42",
+    "before": null,
+    "after": "=IF(K42-$C$6>'General Information'!$D$33,0,IF(K42=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K42-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M42",
+    "before": null,
+    "after": "=IF(K42-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K42-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N42",
+    "before": null,
+    "after": "=IF(K42-$C$6>'General Information'!$D$33,0,IF(K42=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K42-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E43",
+    "before": "=D43/(1+('General Information'!$D$34/100))^C43",
+    "after": "=IF(C43>'General Information'!$D$33,0,D43/(1+('General Information'!$D$34/100))^C43)"
+   },
+   {
+    "cell": "L43",
+    "before": null,
+    "after": "=IF(K43-$C$6>'General Information'!$D$33,0,IF(K43=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K43-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M43",
+    "before": null,
+    "after": "=IF(K43-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K43-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N43",
+    "before": null,
+    "after": "=IF(K43-$C$6>'General Information'!$D$33,0,IF(K43=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K43-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E44",
+    "before": "=D44/(1+('General Information'!$D$34/100))^C44",
+    "after": "=IF(C44>'General Information'!$D$33,0,D44/(1+('General Information'!$D$34/100))^C44)"
+   },
+   {
+    "cell": "L44",
+    "before": null,
+    "after": "=IF(K44-$C$6>'General Information'!$D$33,0,IF(K44=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K44-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M44",
+    "before": null,
+    "after": "=IF(K44-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K44-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N44",
+    "before": null,
+    "after": "=IF(K44-$C$6>'General Information'!$D$33,0,IF(K44=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K44-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E45",
+    "before": "=D45/(1+('General Information'!$D$34/100))^C45",
+    "after": "=IF(C45>'General Information'!$D$33,0,D45/(1+('General Information'!$D$34/100))^C45)"
+   },
+   {
+    "cell": "L45",
+    "before": "=D39",
+    "after": "=IF(K45-$C$6>'General Information'!$D$33,0,IF(K45=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K45-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M45",
+    "before": "=D40",
+    "after": "=IF(K45-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K45-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N45",
+    "before": "=E39+E40",
+    "after": "=IF(K45-$C$6>'General Information'!$D$33,0,IF(K45=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K45-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E46",
+    "before": "=D46/(1+('General Information'!$D$34/100))^C46",
+    "after": "=IF(C46>'General Information'!$D$33,0,D46/(1+('General Information'!$D$34/100))^C46)"
+   },
+   {
+    "cell": "L46",
+    "before": null,
+    "after": "=IF(K46-$C$6>'General Information'!$D$33,0,IF(K46=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K46-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M46",
+    "before": null,
+    "after": "=IF(K46-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K46-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N46",
+    "before": null,
+    "after": "=IF(K46-$C$6>'General Information'!$D$33,0,IF(K46=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K46-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E47",
+    "before": "=D47/(1+('General Information'!$D$34/100))^C47",
+    "after": "=IF(C47>'General Information'!$D$33,0,D47/(1+('General Information'!$D$34/100))^C47)"
+   },
+   {
+    "cell": "L47",
+    "before": null,
+    "after": "=IF(K47-$C$6>'General Information'!$D$33,0,IF(K47=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K47-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M47",
+    "before": null,
+    "after": "=IF(K47-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K47-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N47",
+    "before": null,
+    "after": "=IF(K47-$C$6>'General Information'!$D$33,0,IF(K47=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K47-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E48",
+    "before": "=D48/(1+('General Information'!$D$34/100))^C48",
+    "after": "=IF(C48>'General Information'!$D$33,0,D48/(1+('General Information'!$D$34/100))^C48)"
+   },
+   {
+    "cell": "L48",
+    "before": null,
+    "after": "=IF(K48-$C$6>'General Information'!$D$33,0,IF(K48=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K48-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M48",
+    "before": null,
+    "after": "=IF(K48-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K48-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N48",
+    "before": null,
+    "after": "=IF(K48-$C$6>'General Information'!$D$33,0,IF(K48=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K48-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E49",
+    "before": "=D49/(1+('General Information'!$D$34/100))^C49",
+    "after": "=IF(C49>'General Information'!$D$33,0,D49/(1+('General Information'!$D$34/100))^C49)"
+   },
+   {
+    "cell": "L49",
+    "before": "=D41",
+    "after": "=IF(K49-$C$6>'General Information'!$D$33,0,IF(K49=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K49-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M49",
+    "before": "=D42",
+    "after": "=IF(K49-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K49-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N49",
+    "before": "=E41+E42",
+    "after": "=IF(K49-$C$6>'General Information'!$D$33,0,IF(K49=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K49-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E50",
+    "before": "=D50/(1+('General Information'!$D$34/100))^C50",
+    "after": "=IF(C50>'General Information'!$D$33,0,D50/(1+('General Information'!$D$34/100))^C50)"
+   },
+   {
+    "cell": "L50",
+    "before": null,
+    "after": "=IF(K50-$C$6>'General Information'!$D$33,0,IF(K50=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K50-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M50",
+    "before": null,
+    "after": "=IF(K50-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K50-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N50",
+    "before": null,
+    "after": "=IF(K50-$C$6>'General Information'!$D$33,0,IF(K50=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K50-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "E51",
+    "before": "=D51/(1+('General Information'!$D$34/100))^C51",
+    "after": "=IF(C51>'General Information'!$D$33,0,D51/(1+('General Information'!$D$34/100))^C51)"
+   },
+   {
+    "cell": "L51",
+    "before": null,
+    "after": "=IF(K51-$C$6>'General Information'!$D$33,0,IF(K51=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K51-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M51",
+    "before": null,
+    "after": "=IF(K51-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K51-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N51",
+    "before": null,
+    "after": "=IF(K51-$C$6>'General Information'!$D$33,0,IF(K51=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K51-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L52",
+    "before": null,
+    "after": "=IF(K52-$C$6>'General Information'!$D$33,0,IF(K52=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K52-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M52",
+    "before": null,
+    "after": "=IF(K52-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K52-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N52",
+    "before": null,
+    "after": "=IF(K52-$C$6>'General Information'!$D$33,0,IF(K52=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K52-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L53",
+    "before": "=D43",
+    "after": "=IF(K53-$C$6>'General Information'!$D$33,0,IF(K53=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K53-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M53",
+    "before": "=D44",
+    "after": "=IF(K53-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K53-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N53",
+    "before": "=E43+E44",
+    "after": "=IF(K53-$C$6>'General Information'!$D$33,0,IF(K53=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K53-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L54",
+    "before": null,
+    "after": "=IF(K54-$C$6>'General Information'!$D$33,0,IF(K54=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K54-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M54",
+    "before": null,
+    "after": "=IF(K54-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K54-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N54",
+    "before": null,
+    "after": "=IF(K54-$C$6>'General Information'!$D$33,0,IF(K54=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K54-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L55",
+    "before": null,
+    "after": "=IF(K55-$C$6>'General Information'!$D$33,0,IF(K55=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K55-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M55",
+    "before": null,
+    "after": "=IF(K55-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K55-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N55",
+    "before": null,
+    "after": "=IF(K55-$C$6>'General Information'!$D$33,0,IF(K55=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K55-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L56",
+    "before": null,
+    "after": "=IF(K56-$C$6>'General Information'!$D$33,0,IF(K56=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K56-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M56",
+    "before": null,
+    "after": "=IF(K56-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K56-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N56",
+    "before": null,
+    "after": "=IF(K56-$C$6>'General Information'!$D$33,0,IF(K56=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K56-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L57",
+    "before": "=D45",
+    "after": "=IF(K57-$C$6>'General Information'!$D$33,0,IF(K57=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K57-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M57",
+    "before": "=D46",
+    "after": "=IF(K57-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K57-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N57",
+    "before": "=E45+E46",
+    "after": "=IF(K57-$C$6>'General Information'!$D$33,0,IF(K57=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K57-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L58",
+    "before": null,
+    "after": "=IF(K58-$C$6>'General Information'!$D$33,0,IF(K58=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K58-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M58",
+    "before": null,
+    "after": "=IF(K58-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K58-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N58",
+    "before": null,
+    "after": "=IF(K58-$C$6>'General Information'!$D$33,0,IF(K58=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K58-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L59",
+    "before": null,
+    "after": "=IF(K59-$C$6>'General Information'!$D$33,0,IF(K59=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K59-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M59",
+    "before": null,
+    "after": "=IF(K59-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K59-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N59",
+    "before": null,
+    "after": "=IF(K59-$C$6>'General Information'!$D$33,0,IF(K59=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K59-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L60",
+    "before": null,
+    "after": "=IF(K60-$C$6>'General Information'!$D$33,0,IF(K60=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K60-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M60",
+    "before": null,
+    "after": "=IF(K60-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K60-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N60",
+    "before": null,
+    "after": "=IF(K60-$C$6>'General Information'!$D$33,0,IF(K60=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K60-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L61",
+    "before": "=D47",
+    "after": "=IF(K61-$C$6>'General Information'!$D$33,0,IF(K61=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K61-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M61",
+    "before": "=D48",
+    "after": "=IF(K61-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K61-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N61",
+    "before": "=E47+E48",
+    "after": "=IF(K61-$C$6>'General Information'!$D$33,0,IF(K61=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K61-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L62",
+    "before": null,
+    "after": "=IF(K62-$C$6>'General Information'!$D$33,0,IF(K62=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K62-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M62",
+    "before": null,
+    "after": "=IF(K62-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K62-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N62",
+    "before": null,
+    "after": "=IF(K62-$C$6>'General Information'!$D$33,0,IF(K62=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K62-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L63",
+    "before": null,
+    "after": "=IF(K63-$C$6>'General Information'!$D$33,0,IF(K63=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K63-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M63",
+    "before": null,
+    "after": "=IF(K63-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K63-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N63",
+    "before": null,
+    "after": "=IF(K63-$C$6>'General Information'!$D$33,0,IF(K63=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K63-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L64",
+    "before": null,
+    "after": "=IF(K64-$C$6>'General Information'!$D$33,0,IF(K64=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K64-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M64",
+    "before": null,
+    "after": "=IF(K64-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K64-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N64",
+    "before": null,
+    "after": "=IF(K64-$C$6>'General Information'!$D$33,0,IF(K64=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K64-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L65",
+    "before": "=D49",
+    "after": "=IF(K65-$C$6>'General Information'!$D$33,0,IF(K65=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K65-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M65",
+    "before": "=D50",
+    "after": "=IF(K65-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K65-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N65",
+    "before": "=E49+E50",
+    "after": "=IF(K65-$C$6>'General Information'!$D$33,0,IF(K65=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K65-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L66",
+    "before": null,
+    "after": "=IF(K66-$C$6>'General Information'!$D$33,0,IF(K66=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K66-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M66",
+    "before": null,
+    "after": "=IF(K66-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K66-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N66",
+    "before": null,
+    "after": "=IF(K66-$C$6>'General Information'!$D$33,0,IF(K66=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K66-$C$6,$E$37:$E$51))"
+   },
+   {
+    "cell": "L67",
+    "before": "=D51",
+    "after": "=IF(K67-$C$6>'General Information'!$D$33,0,IF(K67=$C$6,$D$36,0)+SUMIFS($D$37:$D$51,$C$37:$C$51,K67-$C$6,$B$37:$B$51,\"<>*Indirect*\"))"
+   },
+   {
+    "cell": "M67",
+    "before": "0",
+    "after": "=IF(K67-$C$6>'General Information'!$D$33,0,SUMIFS($D$37:$D$51,$C$37:$C$51,K67-$C$6,$B$37:$B$51,\"*Indirect*\"))"
+   },
+   {
+    "cell": "N67",
+    "before": "=E51",
+    "after": "=IF(K67-$C$6>'General Information'!$D$33,0,IF(K67=$C$6,$E$36,0)+SUMIF($C$37:$C$51,K67-$C$6,$E$37:$E$51))"
+   }
+  ],
+  "TMP(NewHMA)": [
+   {
+    "cell": "G24",
+    "before": "=SUM(G14:G23)",
+    "after": "=SUM(G13:G22)"
+   },
+   {
+    "cell": "B26",
+    "before": null,
+    "after": "Engineering"
+   },
+   {
+    "cell": "G26",
+    "before": null,
+    "after": "=('General Information'!$D$37/100)*G24"
+   },
+   {
+    "cell": "E37",
+    "before": "=D37/(1+('General Information'!$D$34/100))^C37",
+    "after": "=IF(C37>'General Information'!$D$33,0,D37/(1+('General Information'!$D$34/100))^C37)"
+   },
+   {
+    "cell": "L37",
+    "before": "=D36",
+    "after": "=IF(K37-$C$6>'General Information'!$D$33,0,IF(K37=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K37-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M37",
+    "before": "=E36",
+    "after": "=IF(K37-$C$6>'General Information'!$D$33,0,IF(K37=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K37-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "E38",
+    "before": "=D38/(1+('General Information'!$D$34/100))^C38",
+    "after": "=IF(C38>'General Information'!$D$33,0,D38/(1+('General Information'!$D$34/100))^C38)"
+   },
+   {
+    "cell": "L38",
+    "before": null,
+    "after": "=IF(K38-$C$6>'General Information'!$D$33,0,IF(K38=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K38-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M38",
+    "before": null,
+    "after": "=IF(K38-$C$6>'General Information'!$D$33,0,IF(K38=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K38-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "E39",
+    "before": "=D39/(1+('General Information'!$D$34/100))^C39",
+    "after": "=IF(C39>'General Information'!$D$33,0,D39/(1+('General Information'!$D$34/100))^C39)"
+   },
+   {
+    "cell": "L39",
+    "before": null,
+    "after": "=IF(K39-$C$6>'General Information'!$D$33,0,IF(K39=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K39-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M39",
+    "before": null,
+    "after": "=IF(K39-$C$6>'General Information'!$D$33,0,IF(K39=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K39-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "E40",
+    "before": "=D40/(1+('General Information'!$D$34/100))^C40",
+    "after": "=IF(C40>'General Information'!$D$33,0,D40/(1+('General Information'!$D$34/100))^C40)"
+   },
+   {
+    "cell": "L40",
+    "before": null,
+    "after": "=IF(K40-$C$6>'General Information'!$D$33,0,IF(K40=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K40-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M40",
+    "before": null,
+    "after": "=IF(K40-$C$6>'General Information'!$D$33,0,IF(K40=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K40-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "E41",
+    "before": "=D41/(1+('General Information'!$D$34/100))^C41",
+    "after": "=IF(C41>'General Information'!$D$33,0,D41/(1+('General Information'!$D$34/100))^C41)"
+   },
+   {
+    "cell": "L41",
+    "before": "=D37",
+    "after": "=IF(K41-$C$6>'General Information'!$D$33,0,IF(K41=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K41-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M41",
+    "before": "=E37",
+    "after": "=IF(K41-$C$6>'General Information'!$D$33,0,IF(K41=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K41-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "E42",
+    "before": "=D42/(1+('General Information'!$D$34/100))^C42",
+    "after": "=IF(C42>'General Information'!$D$33,0,D42/(1+('General Information'!$D$34/100))^C42)"
+   },
+   {
+    "cell": "L42",
+    "before": null,
+    "after": "=IF(K42-$C$6>'General Information'!$D$33,0,IF(K42=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K42-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M42",
+    "before": null,
+    "after": "=IF(K42-$C$6>'General Information'!$D$33,0,IF(K42=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K42-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "E43",
+    "before": "=D43/(1+('General Information'!$D$34/100))^C43",
+    "after": "=IF(C43>'General Information'!$D$33,0,D43/(1+('General Information'!$D$34/100))^C43)"
+   },
+   {
+    "cell": "L43",
+    "before": null,
+    "after": "=IF(K43-$C$6>'General Information'!$D$33,0,IF(K43=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K43-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M43",
+    "before": null,
+    "after": "=IF(K43-$C$6>'General Information'!$D$33,0,IF(K43=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K43-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "E44",
+    "before": "=D44/(1+('General Information'!$D$34/100))^C44",
+    "after": "=IF(C44>'General Information'!$D$33,0,D44/(1+('General Information'!$D$34/100))^C44)"
+   },
+   {
+    "cell": "L44",
+    "before": null,
+    "after": "=IF(K44-$C$6>'General Information'!$D$33,0,IF(K44=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K44-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M44",
+    "before": null,
+    "after": "=IF(K44-$C$6>'General Information'!$D$33,0,IF(K44=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K44-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L45",
+    "before": "=D38",
+    "after": "=IF(K45-$C$6>'General Information'!$D$33,0,IF(K45=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K45-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M45",
+    "before": "=E38",
+    "after": "=IF(K45-$C$6>'General Information'!$D$33,0,IF(K45=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K45-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L46",
+    "before": null,
+    "after": "=IF(K46-$C$6>'General Information'!$D$33,0,IF(K46=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K46-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M46",
+    "before": null,
+    "after": "=IF(K46-$C$6>'General Information'!$D$33,0,IF(K46=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K46-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L47",
+    "before": null,
+    "after": "=IF(K47-$C$6>'General Information'!$D$33,0,IF(K47=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K47-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M47",
+    "before": null,
+    "after": "=IF(K47-$C$6>'General Information'!$D$33,0,IF(K47=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K47-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L48",
+    "before": null,
+    "after": "=IF(K48-$C$6>'General Information'!$D$33,0,IF(K48=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K48-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M48",
+    "before": null,
+    "after": "=IF(K48-$C$6>'General Information'!$D$33,0,IF(K48=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K48-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L49",
+    "before": "=D39",
+    "after": "=IF(K49-$C$6>'General Information'!$D$33,0,IF(K49=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K49-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M49",
+    "before": "=E39",
+    "after": "=IF(K49-$C$6>'General Information'!$D$33,0,IF(K49=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K49-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L50",
+    "before": null,
+    "after": "=IF(K50-$C$6>'General Information'!$D$33,0,IF(K50=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K50-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M50",
+    "before": null,
+    "after": "=IF(K50-$C$6>'General Information'!$D$33,0,IF(K50=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K50-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L51",
+    "before": null,
+    "after": "=IF(K51-$C$6>'General Information'!$D$33,0,IF(K51=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K51-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M51",
+    "before": null,
+    "after": "=IF(K51-$C$6>'General Information'!$D$33,0,IF(K51=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K51-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L52",
+    "before": null,
+    "after": "=IF(K52-$C$6>'General Information'!$D$33,0,IF(K52=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K52-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M52",
+    "before": null,
+    "after": "=IF(K52-$C$6>'General Information'!$D$33,0,IF(K52=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K52-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L53",
+    "before": "=D40",
+    "after": "=IF(K53-$C$6>'General Information'!$D$33,0,IF(K53=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K53-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M53",
+    "before": "=E40",
+    "after": "=IF(K53-$C$6>'General Information'!$D$33,0,IF(K53=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K53-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L54",
+    "before": null,
+    "after": "=IF(K54-$C$6>'General Information'!$D$33,0,IF(K54=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K54-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M54",
+    "before": null,
+    "after": "=IF(K54-$C$6>'General Information'!$D$33,0,IF(K54=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K54-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L55",
+    "before": null,
+    "after": "=IF(K55-$C$6>'General Information'!$D$33,0,IF(K55=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K55-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M55",
+    "before": null,
+    "after": "=IF(K55-$C$6>'General Information'!$D$33,0,IF(K55=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K55-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L56",
+    "before": null,
+    "after": "=IF(K56-$C$6>'General Information'!$D$33,0,IF(K56=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K56-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M56",
+    "before": null,
+    "after": "=IF(K56-$C$6>'General Information'!$D$33,0,IF(K56=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K56-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L57",
+    "before": "=D41",
+    "after": "=IF(K57-$C$6>'General Information'!$D$33,0,IF(K57=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K57-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M57",
+    "before": "=E41",
+    "after": "=IF(K57-$C$6>'General Information'!$D$33,0,IF(K57=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K57-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L58",
+    "before": null,
+    "after": "=IF(K58-$C$6>'General Information'!$D$33,0,IF(K58=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K58-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M58",
+    "before": null,
+    "after": "=IF(K58-$C$6>'General Information'!$D$33,0,IF(K58=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K58-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L59",
+    "before": null,
+    "after": "=IF(K59-$C$6>'General Information'!$D$33,0,IF(K59=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K59-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M59",
+    "before": null,
+    "after": "=IF(K59-$C$6>'General Information'!$D$33,0,IF(K59=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K59-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L60",
+    "before": null,
+    "after": "=IF(K60-$C$6>'General Information'!$D$33,0,IF(K60=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K60-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M60",
+    "before": null,
+    "after": "=IF(K60-$C$6>'General Information'!$D$33,0,IF(K60=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K60-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L61",
+    "before": "=D42",
+    "after": "=IF(K61-$C$6>'General Information'!$D$33,0,IF(K61=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K61-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M61",
+    "before": "=E42",
+    "after": "=IF(K61-$C$6>'General Information'!$D$33,0,IF(K61=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K61-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L62",
+    "before": null,
+    "after": "=IF(K62-$C$6>'General Information'!$D$33,0,IF(K62=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K62-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M62",
+    "before": null,
+    "after": "=IF(K62-$C$6>'General Information'!$D$33,0,IF(K62=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K62-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L63",
+    "before": null,
+    "after": "=IF(K63-$C$6>'General Information'!$D$33,0,IF(K63=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K63-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M63",
+    "before": null,
+    "after": "=IF(K63-$C$6>'General Information'!$D$33,0,IF(K63=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K63-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L64",
+    "before": null,
+    "after": "=IF(K64-$C$6>'General Information'!$D$33,0,IF(K64=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K64-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M64",
+    "before": null,
+    "after": "=IF(K64-$C$6>'General Information'!$D$33,0,IF(K64=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K64-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L65",
+    "before": "=D43",
+    "after": "=IF(K65-$C$6>'General Information'!$D$33,0,IF(K65=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K65-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M65",
+    "before": "=E43",
+    "after": "=IF(K65-$C$6>'General Information'!$D$33,0,IF(K65=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K65-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L66",
+    "before": null,
+    "after": "=IF(K66-$C$6>'General Information'!$D$33,0,IF(K66=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K66-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M66",
+    "before": null,
+    "after": "=IF(K66-$C$6>'General Information'!$D$33,0,IF(K66=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K66-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L67",
+    "before": "=D44",
+    "after": "=IF(K67-$C$6>'General Information'!$D$33,0,IF(K67=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K67-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M67",
+    "before": "=E44",
+    "after": "=IF(K67-$C$6>'General Information'!$D$33,0,IF(K67=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K67-$C$6,$E$37:$E$44))"
+   }
+  ],
+  "TMP(NewPCC)": [
+   {
+    "cell": "B14",
+    "before": "=VLOOKUP(C14,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C14=\"\",0,VLOOKUP(C14,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B15",
+    "before": "=VLOOKUP(C15,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C15=\"\",0,VLOOKUP(C15,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B16",
+    "before": "=VLOOKUP(C16,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C16=\"\",0,VLOOKUP(C16,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B17",
+    "before": "=VLOOKUP(C17,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C17=\"\",0,VLOOKUP(C17,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B18",
+    "before": "=VLOOKUP(C18,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C18=\"\",0,VLOOKUP(C18,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B19",
+    "before": "=VLOOKUP(C19,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C19=\"\",0,VLOOKUP(C19,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B20",
+    "before": "=VLOOKUP(C20,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C20=\"\",0,VLOOKUP(C20,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B21",
+    "before": "=VLOOKUP(C21,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C21=\"\",0,VLOOKUP(C21,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "B22",
+    "before": "=VLOOKUP(C22,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
+    "after": "=IF(C22=\"\",0,VLOOKUP(C22,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))"
+   },
+   {
+    "cell": "G24",
+    "before": "=SUM(G14:G23)",
+    "after": "=SUM(G13:G22)"
+   },
+   {
+    "cell": "B26",
+    "before": null,
+    "after": "Engineering"
+   },
+   {
+    "cell": "G26",
+    "before": null,
+    "after": "=('General Information'!$D$37/100)*G24"
+   },
+   {
+    "cell": "E38",
+    "before": "=D38/(1+('General Information'!$D$34/100))^C38",
+    "after": "=IF(C38>'General Information'!$D$33,0,D38/(1+('General Information'!$D$34/100))^C38)"
+   },
+   {
+    "cell": "L38",
+    "before": "=D37",
+    "after": "=IF(K38-$C$6>'General Information'!$D$33,0,IF(K38=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K38-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M38",
+    "before": "=E37",
+    "after": "=IF(K38-$C$6>'General Information'!$D$33,0,IF(K38=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K38-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "E39",
+    "before": "=D39/(1+('General Information'!$D$34/100))^C39",
+    "after": "=IF(C39>'General Information'!$D$33,0,D39/(1+('General Information'!$D$34/100))^C39)"
+   },
+   {
+    "cell": "L39",
+    "before": null,
+    "after": "=IF(K39-$C$6>'General Information'!$D$33,0,IF(K39=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K39-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M39",
+    "before": null,
+    "after": "=IF(K39-$C$6>'General Information'!$D$33,0,IF(K39=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K39-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "E40",
+    "before": "=D40/(1+('General Information'!$D$34/100))^C40",
+    "after": "=IF(C40>'General Information'!$D$33,0,D40/(1+('General Information'!$D$34/100))^C40)"
+   },
+   {
+    "cell": "L40",
+    "before": null,
+    "after": "=IF(K40-$C$6>'General Information'!$D$33,0,IF(K40=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K40-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M40",
+    "before": null,
+    "after": "=IF(K40-$C$6>'General Information'!$D$33,0,IF(K40=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K40-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L41",
+    "before": null,
+    "after": "=IF(K41-$C$6>'General Information'!$D$33,0,IF(K41=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K41-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M41",
+    "before": null,
+    "after": "=IF(K41-$C$6>'General Information'!$D$33,0,IF(K41=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K41-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L42",
+    "before": null,
+    "after": "=IF(K42-$C$6>'General Information'!$D$33,0,IF(K42=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K42-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M42",
+    "before": null,
+    "after": "=IF(K42-$C$6>'General Information'!$D$33,0,IF(K42=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K42-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L43",
+    "before": null,
+    "after": "=IF(K43-$C$6>'General Information'!$D$33,0,IF(K43=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K43-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M43",
+    "before": null,
+    "after": "=IF(K43-$C$6>'General Information'!$D$33,0,IF(K43=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K43-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L44",
+    "before": null,
+    "after": "=IF(K44-$C$6>'General Information'!$D$33,0,IF(K44=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K44-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M44",
+    "before": null,
+    "after": "=IF(K44-$C$6>'General Information'!$D$33,0,IF(K44=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K44-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L45",
+    "before": null,
+    "after": "=IF(K45-$C$6>'General Information'!$D$33,0,IF(K45=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K45-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M45",
+    "before": null,
+    "after": "=IF(K45-$C$6>'General Information'!$D$33,0,IF(K45=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K45-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L46",
+    "before": null,
+    "after": "=IF(K46-$C$6>'General Information'!$D$33,0,IF(K46=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K46-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M46",
+    "before": null,
+    "after": "=IF(K46-$C$6>'General Information'!$D$33,0,IF(K46=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K46-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L47",
+    "before": null,
+    "after": "=IF(K47-$C$6>'General Information'!$D$33,0,IF(K47=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K47-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M47",
+    "before": null,
+    "after": "=IF(K47-$C$6>'General Information'!$D$33,0,IF(K47=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K47-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L48",
+    "before": null,
+    "after": "=IF(K48-$C$6>'General Information'!$D$33,0,IF(K48=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K48-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M48",
+    "before": null,
+    "after": "=IF(K48-$C$6>'General Information'!$D$33,0,IF(K48=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K48-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L49",
+    "before": null,
+    "after": "=IF(K49-$C$6>'General Information'!$D$33,0,IF(K49=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K49-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M49",
+    "before": null,
+    "after": "=IF(K49-$C$6>'General Information'!$D$33,0,IF(K49=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K49-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L50",
+    "before": null,
+    "after": "=IF(K50-$C$6>'General Information'!$D$33,0,IF(K50=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K50-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M50",
+    "before": null,
+    "after": "=IF(K50-$C$6>'General Information'!$D$33,0,IF(K50=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K50-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L51",
+    "before": null,
+    "after": "=IF(K51-$C$6>'General Information'!$D$33,0,IF(K51=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K51-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M51",
+    "before": null,
+    "after": "=IF(K51-$C$6>'General Information'!$D$33,0,IF(K51=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K51-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L52",
+    "before": null,
+    "after": "=IF(K52-$C$6>'General Information'!$D$33,0,IF(K52=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K52-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M52",
+    "before": null,
+    "after": "=IF(K52-$C$6>'General Information'!$D$33,0,IF(K52=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K52-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L53",
+    "before": null,
+    "after": "=IF(K53-$C$6>'General Information'!$D$33,0,IF(K53=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K53-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M53",
+    "before": null,
+    "after": "=IF(K53-$C$6>'General Information'!$D$33,0,IF(K53=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K53-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L54",
+    "before": null,
+    "after": "=IF(K54-$C$6>'General Information'!$D$33,0,IF(K54=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K54-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M54",
+    "before": null,
+    "after": "=IF(K54-$C$6>'General Information'!$D$33,0,IF(K54=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K54-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L55",
+    "before": null,
+    "after": "=IF(K55-$C$6>'General Information'!$D$33,0,IF(K55=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K55-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M55",
+    "before": null,
+    "after": "=IF(K55-$C$6>'General Information'!$D$33,0,IF(K55=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K55-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L56",
+    "before": null,
+    "after": "=IF(K56-$C$6>'General Information'!$D$33,0,IF(K56=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K56-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M56",
+    "before": null,
+    "after": "=IF(K56-$C$6>'General Information'!$D$33,0,IF(K56=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K56-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L57",
+    "before": "=D38",
+    "after": "=IF(K57-$C$6>'General Information'!$D$33,0,IF(K57=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K57-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M57",
+    "before": "=E38",
+    "after": "=IF(K57-$C$6>'General Information'!$D$33,0,IF(K57=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K57-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L58",
+    "before": null,
+    "after": "=IF(K58-$C$6>'General Information'!$D$33,0,IF(K58=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K58-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M58",
+    "before": null,
+    "after": "=IF(K58-$C$6>'General Information'!$D$33,0,IF(K58=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K58-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L59",
+    "before": null,
+    "after": "=IF(K59-$C$6>'General Information'!$D$33,0,IF(K59=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K59-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M59",
+    "before": null,
+    "after": "=IF(K59-$C$6>'General Information'!$D$33,0,IF(K59=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K59-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L60",
+    "before": null,
+    "after": "=IF(K60-$C$6>'General Information'!$D$33,0,IF(K60=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K60-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M60",
+    "before": null,
+    "after": "=IF(K60-$C$6>'General Information'!$D$33,0,IF(K60=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K60-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L61",
+    "before": null,
+    "after": "=IF(K61-$C$6>'General Information'!$D$33,0,IF(K61=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K61-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M61",
+    "before": null,
+    "after": "=IF(K61-$C$6>'General Information'!$D$33,0,IF(K61=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K61-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L62",
+    "before": null,
+    "after": "=IF(K62-$C$6>'General Information'!$D$33,0,IF(K62=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K62-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M62",
+    "before": null,
+    "after": "=IF(K62-$C$6>'General Information'!$D$33,0,IF(K62=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K62-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L63",
+    "before": null,
+    "after": "=IF(K63-$C$6>'General Information'!$D$33,0,IF(K63=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K63-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M63",
+    "before": null,
+    "after": "=IF(K63-$C$6>'General Information'!$D$33,0,IF(K63=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K63-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L64",
+    "before": null,
+    "after": "=IF(K64-$C$6>'General Information'!$D$33,0,IF(K64=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K64-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M64",
+    "before": null,
+    "after": "=IF(K64-$C$6>'General Information'!$D$33,0,IF(K64=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K64-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L65",
+    "before": "=D39",
+    "after": "=IF(K65-$C$6>'General Information'!$D$33,0,IF(K65=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K65-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M65",
+    "before": "=E39",
+    "after": "=IF(K65-$C$6>'General Information'!$D$33,0,IF(K65=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K65-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L66",
+    "before": null,
+    "after": "=IF(K66-$C$6>'General Information'!$D$33,0,IF(K66=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K66-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M66",
+    "before": null,
+    "after": "=IF(K66-$C$6>'General Information'!$D$33,0,IF(K66=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K66-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L67",
+    "before": null,
+    "after": "=IF(K67-$C$6>'General Information'!$D$33,0,IF(K67=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K67-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M67",
+    "before": null,
+    "after": "=IF(K67-$C$6>'General Information'!$D$33,0,IF(K67=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K67-$C$6,$E$38:$E$40))"
+   },
+   {
+    "cell": "L68",
+    "before": "=D40",
+    "after": "=IF(K68-$C$6>'General Information'!$D$33,0,IF(K68=$C$6,$D$37,0)+SUMIF($C$38:$C$40,K68-$C$6,$D$38:$D$40))"
+   },
+   {
+    "cell": "M68",
+    "before": "=E40",
+    "after": "=IF(K68-$C$6>'General Information'!$D$33,0,IF(K68=$C$6,$E$37,0)+SUMIF($C$38:$C$40,K68-$C$6,$E$38:$E$40))"
+   }
+  ],
+  "TMP(HMARehab)": [
+   {
+    "cell": "G24",
+    "before": "=SUM(G14:G23)",
+    "after": "=SUM(G13:G22)"
+   },
+   {
+    "cell": "B26",
+    "before": null,
+    "after": "Engineering"
+   },
+   {
+    "cell": "G26",
+    "before": null,
+    "after": "=('General Information'!$D$37/100)*G24"
+   },
+   {
+    "cell": "E37",
+    "before": "=D37/(1+('General Information'!$D$34/100))^C37",
+    "after": "=IF(C37>'General Information'!$D$33,0,D37/(1+('General Information'!$D$34/100))^C37)"
+   },
+   {
+    "cell": "L37",
+    "before": "=D36",
+    "after": "=IF(K37-$C$6>'General Information'!$D$33,0,IF(K37=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K37-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M37",
+    "before": "=E36",
+    "after": "=IF(K37-$C$6>'General Information'!$D$33,0,IF(K37=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K37-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "E38",
+    "before": "=D38/(1+('General Information'!$D$34/100))^C38",
+    "after": "=IF(C38>'General Information'!$D$33,0,D38/(1+('General Information'!$D$34/100))^C38)"
+   },
+   {
+    "cell": "L38",
+    "before": null,
+    "after": "=IF(K38-$C$6>'General Information'!$D$33,0,IF(K38=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K38-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M38",
+    "before": null,
+    "after": "=IF(K38-$C$6>'General Information'!$D$33,0,IF(K38=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K38-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "E39",
+    "before": "=D39/(1+('General Information'!$D$34/100))^C39",
+    "after": "=IF(C39>'General Information'!$D$33,0,D39/(1+('General Information'!$D$34/100))^C39)"
+   },
+   {
+    "cell": "L39",
+    "before": null,
+    "after": "=IF(K39-$C$6>'General Information'!$D$33,0,IF(K39=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K39-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M39",
+    "before": null,
+    "after": "=IF(K39-$C$6>'General Information'!$D$33,0,IF(K39=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K39-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "E40",
+    "before": "=D40/(1+('General Information'!$D$34/100))^C40",
+    "after": "=IF(C40>'General Information'!$D$33,0,D40/(1+('General Information'!$D$34/100))^C40)"
+   },
+   {
+    "cell": "L40",
+    "before": null,
+    "after": "=IF(K40-$C$6>'General Information'!$D$33,0,IF(K40=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K40-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M40",
+    "before": null,
+    "after": "=IF(K40-$C$6>'General Information'!$D$33,0,IF(K40=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K40-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "E41",
+    "before": "=D41/(1+('General Information'!$D$34/100))^C41",
+    "after": "=IF(C41>'General Information'!$D$33,0,D41/(1+('General Information'!$D$34/100))^C41)"
+   },
+   {
+    "cell": "L41",
+    "before": "=D37",
+    "after": "=IF(K41-$C$6>'General Information'!$D$33,0,IF(K41=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K41-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M41",
+    "before": "=E37",
+    "after": "=IF(K41-$C$6>'General Information'!$D$33,0,IF(K41=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K41-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "C42",
+    "before": "=C36+'Maintenance Policies'!E65",
+    "after": "='Maintenance Policies'!E65"
+   },
+   {
+    "cell": "E42",
+    "before": "=D42/(1+('General Information'!$D$34/100))^C42",
+    "after": "=IF(C42>'General Information'!$D$33,0,D42/(1+('General Information'!$D$34/100))^C42)"
+   },
+   {
+    "cell": "L42",
+    "before": null,
+    "after": "=IF(K42-$C$6>'General Information'!$D$33,0,IF(K42=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K42-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M42",
+    "before": null,
+    "after": "=IF(K42-$C$6>'General Information'!$D$33,0,IF(K42=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K42-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "E43",
+    "before": "=D43/(1+('General Information'!$D$34/100))^C43",
+    "after": "=IF(C43>'General Information'!$D$33,0,D43/(1+('General Information'!$D$34/100))^C43)"
+   },
+   {
+    "cell": "L43",
+    "before": null,
+    "after": "=IF(K43-$C$6>'General Information'!$D$33,0,IF(K43=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K43-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M43",
+    "before": null,
+    "after": "=IF(K43-$C$6>'General Information'!$D$33,0,IF(K43=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K43-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "D44",
+    "before": "=-'Maintenance Policies'!D71*AV22",
+    "after": "=-'Maintenance Policies'!D71*AN22"
+   },
+   {
+    "cell": "E44",
+    "before": "=D44/(1+('General Information'!$D$34/100))^C44",
+    "after": "=IF(C44>'General Information'!$D$33,0,D44/(1+('General Information'!$D$34/100))^C44)"
+   },
+   {
+    "cell": "L44",
+    "before": null,
+    "after": "=IF(K44-$C$6>'General Information'!$D$33,0,IF(K44=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K44-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M44",
+    "before": null,
+    "after": "=IF(K44-$C$6>'General Information'!$D$33,0,IF(K44=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K44-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L45",
+    "before": "=D38",
+    "after": "=IF(K45-$C$6>'General Information'!$D$33,0,IF(K45=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K45-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M45",
+    "before": "=E38",
+    "after": "=IF(K45-$C$6>'General Information'!$D$33,0,IF(K45=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K45-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L46",
+    "before": null,
+    "after": "=IF(K46-$C$6>'General Information'!$D$33,0,IF(K46=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K46-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M46",
+    "before": null,
+    "after": "=IF(K46-$C$6>'General Information'!$D$33,0,IF(K46=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K46-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L47",
+    "before": null,
+    "after": "=IF(K47-$C$6>'General Information'!$D$33,0,IF(K47=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K47-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M47",
+    "before": null,
+    "after": "=IF(K47-$C$6>'General Information'!$D$33,0,IF(K47=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K47-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L48",
+    "before": null,
+    "after": "=IF(K48-$C$6>'General Information'!$D$33,0,IF(K48=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K48-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M48",
+    "before": null,
+    "after": "=IF(K48-$C$6>'General Information'!$D$33,0,IF(K48=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K48-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L49",
+    "before": "=D39",
+    "after": "=IF(K49-$C$6>'General Information'!$D$33,0,IF(K49=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K49-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M49",
+    "before": "=E39",
+    "after": "=IF(K49-$C$6>'General Information'!$D$33,0,IF(K49=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K49-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L50",
+    "before": null,
+    "after": "=IF(K50-$C$6>'General Information'!$D$33,0,IF(K50=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K50-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M50",
+    "before": null,
+    "after": "=IF(K50-$C$6>'General Information'!$D$33,0,IF(K50=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K50-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L51",
+    "before": null,
+    "after": "=IF(K51-$C$6>'General Information'!$D$33,0,IF(K51=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K51-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M51",
+    "before": null,
+    "after": "=IF(K51-$C$6>'General Information'!$D$33,0,IF(K51=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K51-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L52",
+    "before": null,
+    "after": "=IF(K52-$C$6>'General Information'!$D$33,0,IF(K52=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K52-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M52",
+    "before": null,
+    "after": "=IF(K52-$C$6>'General Information'!$D$33,0,IF(K52=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K52-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L53",
+    "before": "=D40",
+    "after": "=IF(K53-$C$6>'General Information'!$D$33,0,IF(K53=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K53-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M53",
+    "before": "=E40",
+    "after": "=IF(K53-$C$6>'General Information'!$D$33,0,IF(K53=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K53-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L54",
+    "before": null,
+    "after": "=IF(K54-$C$6>'General Information'!$D$33,0,IF(K54=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K54-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M54",
+    "before": null,
+    "after": "=IF(K54-$C$6>'General Information'!$D$33,0,IF(K54=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K54-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L55",
+    "before": null,
+    "after": "=IF(K55-$C$6>'General Information'!$D$33,0,IF(K55=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K55-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M55",
+    "before": null,
+    "after": "=IF(K55-$C$6>'General Information'!$D$33,0,IF(K55=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K55-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L56",
+    "before": null,
+    "after": "=IF(K56-$C$6>'General Information'!$D$33,0,IF(K56=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K56-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M56",
+    "before": null,
+    "after": "=IF(K56-$C$6>'General Information'!$D$33,0,IF(K56=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K56-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L57",
+    "before": "=D41",
+    "after": "=IF(K57-$C$6>'General Information'!$D$33,0,IF(K57=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K57-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M57",
+    "before": "=E41",
+    "after": "=IF(K57-$C$6>'General Information'!$D$33,0,IF(K57=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K57-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L58",
+    "before": null,
+    "after": "=IF(K58-$C$6>'General Information'!$D$33,0,IF(K58=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K58-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M58",
+    "before": null,
+    "after": "=IF(K58-$C$6>'General Information'!$D$33,0,IF(K58=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K58-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L59",
+    "before": null,
+    "after": "=IF(K59-$C$6>'General Information'!$D$33,0,IF(K59=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K59-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M59",
+    "before": null,
+    "after": "=IF(K59-$C$6>'General Information'!$D$33,0,IF(K59=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K59-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L60",
+    "before": null,
+    "after": "=IF(K60-$C$6>'General Information'!$D$33,0,IF(K60=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K60-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M60",
+    "before": null,
+    "after": "=IF(K60-$C$6>'General Information'!$D$33,0,IF(K60=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K60-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L61",
+    "before": "=D42",
+    "after": "=IF(K61-$C$6>'General Information'!$D$33,0,IF(K61=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K61-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M61",
+    "before": "=E42",
+    "after": "=IF(K61-$C$6>'General Information'!$D$33,0,IF(K61=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K61-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L62",
+    "before": null,
+    "after": "=IF(K62-$C$6>'General Information'!$D$33,0,IF(K62=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K62-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M62",
+    "before": null,
+    "after": "=IF(K62-$C$6>'General Information'!$D$33,0,IF(K62=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K62-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L63",
+    "before": null,
+    "after": "=IF(K63-$C$6>'General Information'!$D$33,0,IF(K63=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K63-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M63",
+    "before": null,
+    "after": "=IF(K63-$C$6>'General Information'!$D$33,0,IF(K63=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K63-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L64",
+    "before": null,
+    "after": "=IF(K64-$C$6>'General Information'!$D$33,0,IF(K64=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K64-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M64",
+    "before": null,
+    "after": "=IF(K64-$C$6>'General Information'!$D$33,0,IF(K64=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K64-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L65",
+    "before": "=D43",
+    "after": "=IF(K65-$C$6>'General Information'!$D$33,0,IF(K65=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K65-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M65",
+    "before": "=E43",
+    "after": "=IF(K65-$C$6>'General Information'!$D$33,0,IF(K65=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K65-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L66",
+    "before": null,
+    "after": "=IF(K66-$C$6>'General Information'!$D$33,0,IF(K66=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K66-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M66",
+    "before": null,
+    "after": "=IF(K66-$C$6>'General Information'!$D$33,0,IF(K66=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K66-$C$6,$E$37:$E$44))"
+   },
+   {
+    "cell": "L67",
+    "before": "=D44",
+    "after": "=IF(K67-$C$6>'General Information'!$D$33,0,IF(K67=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K67-$C$6,$D$37:$D$44))"
+   },
+   {
+    "cell": "M67",
+    "before": "=E44",
+    "after": "=IF(K67-$C$6>'General Information'!$D$33,0,IF(K67=$C$6,$E$36,0)+SUMIF($C$37:$C$44,K67-$C$6,$E$37:$E$44))"
+   }
+  ]
+ },
+ "dv": {
+  "before": [
+   [
+    "D21",
+    "$S$9:$S$12"
+   ],
+   [
+    "D29",
+    "$S$16:$S$18"
+   ],
+   [
+    "D9",
+    "$L$9:$L$84"
+   ],
+   [
+    "D38",
+    "\"No, Yes\""
+   ]
+  ],
+  "after": [
+   [
+    "D21",
+    "$S$9:$S$12"
+   ],
+   [
+    "D29",
+    "$S$16:$S$18"
+   ],
+   [
+    "D9",
+    "$L$10:$L$88"
+   ],
+   [
+    "D38",
+    "\"No, Yes\""
+   ]
+  ]
+ },
+ "textdiff": [
+  [
+   2,
+   "The following step-by-step procedures are provided to assist in using the workbook and in understanding how the series of worksheets fit together. Be sure to follow these directions in the logical, step-by-step fashion to avoid problems. Also, don't use the cut and paste feature as this can write over any functions, commands, or equations. Make sure to \u201cEnable Content\u201d in Excel when the file is opened so that functions work properly. There have also been issues with functions running properly when multiple monitors are in use. Opening the file in the main monitor should correct function issue, if they occur.",
+   "The following step-by-step procedures are provided to assist in using the workbook and in understanding how the series of worksheets fit together. Be sure to follow these directions in the logical, step-by-step fashion to avoid problems. Also, don't use the cut and paste feature as this can write over any functions, commands, or equations. Make sure to \u201cEnable Content\u201d in Excel when the file is opened so that functions work properly. There have also been issues with functions running properly when multiple monitors are in use. Opening the file in the main monitor should correct function issue, if they occur. If Excel shows a yellow bar reading \"BLOCKED CONTENT: The ActiveX content in this file is blocked\", go to File > Options > Trust Center > Trust Center Settings > ActiveX Settings, select \"Prompt me before enabling all controls with minimal restrictions\", click OK, then close and reopen Excel. If that setting is greyed out, ask your IT department to allow ActiveX for this file."
+  ],
+  [
+   4,
+   "1. Go to the \"General Information\" worksheet and enter in the relevant items in cells D9 through D38.  This is general information (such as project airport, branch information, pavement area, and so on) that is needed to identify the project and complete the cost computations. Ensure the appropriate selection is made in cell D38.",
+   "1. Go to the \"General Information\" worksheet and enter in the relevant items in cells D9 through D39.  This is general information (such as project airport, branch information, pavement area, and so on) that is needed to identify the project and complete the cost computations. Ensure the appropriate selection is made in cell D38."
+  ],
+  [
+   5,
+   "2. Still in the \"General Information\" worksheet, click on the \u201cCreate Alternatives\u201d button at the bottom of the information list. A separate form will pop up for adding alternatives. The pop-up window includes the list of available alternatives for this LCCA. Select which alternatives will be used, update details and description, if desired, and click on \u201cAdd.\u201d The form can also be used to \"Copy\" or \"Delete\" alternatives. Alternatives can also be reorganized using the buttons at the bottom of the form. Once completed, click \u201cClose\u201d and a worksheet for each alternative will be created. A \"Summary\" worksheet is also populated as alternatives are completed.",
+   "2. Still in the \"General Information\" worksheet, click on the \u201cAlternative Setup\u201d button at the bottom of the information list. A separate form will pop up for adding alternatives. The pop-up window includes the list of available alternatives for this LCCA. Select which alternatives will be used, update details and description, if desired, and click on \u201cAdd.\u201d The form can also be used to \"Copy\" or \"Delete\" alternatives. Alternatives can also be reorganized using the buttons at the bottom of the form. Once completed, click \u201cClose\u201d and a worksheet for each alternative will be created. A \"Summary\" worksheet is also populated as alternatives are completed."
+  ],
+  [
+   7,
+   "4. For analyses accounting for indirect costs, go to the \"Indirect Cost Items\" worksheet and select an Airport for revenue data. Leave the analyses revenue same as the default revenue or modify as needed.",
+   "4. To include lost airport revenue during runway closures, set cell D38 on the \"General Information\" worksheet to Yes before creating alternatives. The average daily revenue for the selected airport is pulled automatically from the hidden RevenueData worksheet, which covers the 17 airports meeting Aeronautics' activity criteria (cell D39 shows the value). If the airport is not in that list, D39 reads \"Missing Airport Revenue\", lost revenue is carried as $0, and a warning appears on each alternative worksheet; contact Aeronautics to add revenue data. To view the hidden worksheet: Home > Format > Hide & Unhide > Unhide Sheet."
+  ],
+  [
+   8,
+   "5. Go to the worksheet for each alternative included in the LCCA and fill in cells C4 through C8, and F4 through F10 (for analyses accounting for indirect costs). Select the appropriate pay items in cells C13 through C22 for the alternative (only select the cells you need; leave extra cells blank). Enter the quantities for each selected pay item in cells E13 through E22.",
+   "5. Go to the worksheet for each alternative included in the LCCA and fill in cells C4 through C8, and F4 through F10 (for analyses accounting for indirect costs). Select the appropriate pay items in cells C13 through C22 for the alternative (only select the cells you need; leave extra cells blank). Enter the quantities for each selected pay item in cells E13 through E22. Closure durations in cells F4 through F10 are pre-filled from production-rate defaults (surface treatment 15,000 SY/day, mill and overlay 3,800 SY/day, PCC joint and slab work) and may be overridden with project-specific values."
+  ]
+ ],
+ "hashes": {
+  "8eaa2547-TDOA_LCCA_Framework_v1.1.2_ARA_Task2_08182026.xlsm": "b0680f2a90e86654a5d7e57eb29ae45e960ddf7b517ccb65bc2978afaee4705a",
+  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "09065f5ebdab22de35b71315751a555aa89600a3723dbf2e345e07bf81fe7c24",
+  "TDOT_LCCA_Decision_Workbook.xlsx": "27626ed0e58784a85c3894dcd7cafc8108c0576d5db7acd7eb47e0c5a34ed658",
+  "Output.bas": "7e7e1cad7c0d41cc23d929d643a2e4ce5861761c2885f82e9a0b0757a0a8fd82",
+  "35f08cad-TDOA_LCCA_Framework_v1.1.2_MBT_20260521_LostRevenue_1.xlsm": "117135e9facc9395b88883c3ffd4de48b67cb997605d6ad0a1acd7d64edfb08b",
+  "527a5482-TDOA_LCCA_Framework_v1.1.2_SRB_20260521_LostRevenue.xlsm": "b0d001b1beaac7a40569329939d43c732a33a780f2c0d1db89ef1e1fcabc1b68"
+ }
+}

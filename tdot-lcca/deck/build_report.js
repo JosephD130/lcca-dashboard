@@ -1,0 +1,435 @@
+const fs = require('fs');
+const path = require('path');
+const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, HeadingLevel, AlignmentType, ImageRun,
+  PageBreak, TableOfContents, ShadingType, BorderStyle, LevelFormat, Footer, Header, PageNumber, TabStopType } = require('docx');
+
+const S = path.resolve(__dirname, '..');
+const diff = JSON.parse(fs.readFileSync(S + '/diff.json', 'utf8'));
+const OUTBAS = fs.readFileSync(S + '/Output.bas', 'utf8').split(/\r?\n/);
+const IMG = __dirname + '/img/';
+
+// ------------------------------------------------------------------ helpers
+const FONT = 'Calibri', MONO = 'Courier New';
+const W = 9360; // 6.5 in text width in DXA
+function p(text, opts = {}) {
+  const runs = Array.isArray(text) ? text : [new TextRun({ text, font: FONT, size: opts.size || 22, bold: opts.bold, italics: opts.italics, color: opts.color })];
+  return new Paragraph({ children: runs, spacing: { after: opts.after == null ? 120 : opts.after, before: opts.before || 0 }, alignment: opts.align, keepNext: opts.keepNext });
+}
+function r(text, o = {}) { return new TextRun({ text, font: o.mono ? MONO : FONT, size: o.size || 22, bold: o.bold, italics: o.italics, color: o.color }); }
+function h1(t) { return new Paragraph({ text: t, heading: HeadingLevel.HEADING_1, spacing: { before: 360, after: 160 } }); }
+function h2(t) { return new Paragraph({ text: t, heading: HeadingLevel.HEADING_2, spacing: { before: 280, after: 120 } }); }
+function h3(t) { return new Paragraph({ text: t, heading: HeadingLevel.HEADING_3, spacing: { before: 200, after: 80 } }); }
+function bullet(t, level = 0) { return new Paragraph({ children: [r(t)], numbering: { reference: 'bul', level }, spacing: { after: 60 } }); }
+function num(t) { return new Paragraph({ children: [r(t)], numbering: { reference: 'num', level: 0 }, spacing: { after: 60 } }); }
+function mono(t, size = 16) { return new Paragraph({ children: [new TextRun({ text: t, font: MONO, size })], spacing: { after: 0 } }); }
+function cell(text, w, o = {}) {
+  const lines = String(text == null ? '' : text).split('\n');
+  return new TableCell({
+    width: { size: w, type: WidthType.DXA },
+    shading: o.head ? { type: ShadingType.CLEAR, fill: 'E7E6E6', color: 'auto' } : (o.fill ? { type: ShadingType.CLEAR, fill: o.fill, color: 'auto' } : undefined),
+    margins: { top: 40, bottom: 40, left: 80, right: 80 },
+    children: lines.map(l => new Paragraph({ children: [new TextRun({ text: l, font: o.mono ? MONO : FONT, size: o.size || 18, bold: o.head })], spacing: { after: 0 } })),
+  });
+}
+function table(rows, widths, o = {}) {
+  return new Table({
+    width: { size: widths.reduce((a, b) => a + b, 0), type: WidthType.DXA }, columnWidths: widths,
+    rows: rows.map((row, i) => new TableRow({ tableHeader: i === 0, cantSplit: true, children: row.map((c, j) => cell(c, widths[j], { head: i === 0, mono: o.monoCols && o.monoCols.includes(j) && i > 0, size: o.size })) })),
+  });
+}
+function image(file, widthIn, ratio) {
+  const w = Math.round(widthIn * 96), h = Math.round(w / ratio);
+  return new Paragraph({ children: [new ImageRun({ type: 'png', data: fs.readFileSync(IMG + file), transformation: { width: w, height: h } })], spacing: { after: 60 }, alignment: AlignmentType.CENTER });
+}
+function caption(t) { return p([r(t, { italics: true, size: 18, color: '595959' })], { after: 200 }); }
+const GI = "'General Information'";
+
+// ------------------------------------------------------------------ Appendix A compression
+function groupSheet(name, entries) {
+  const rows = [];
+  const byCol = {};
+  for (const e of entries) {
+    const m = e.cell.match(/^([A-Z]+)(\d+)$/); const col = m[1], row = +m[2];
+    if (['L', 'M', 'N'].includes(col) && row >= 37) { (byCol[col] = byCol[col] || []).push({ row, e }); }
+    else rows.push([e.cell, e.before == null ? '(empty)' : e.before, e.after == null ? '(empty)' : e.after]);
+  }
+  for (const col of ['L', 'M', 'N']) {
+    if (!byCol[col]) continue;
+    const list = byCol[col].sort((a, b) => a.row - b.row);
+    const first = list[0], last = list[list.length - 1];
+    const befores = [...new Set(list.map(x => x.e.before == null ? '(empty)' : x.e.before))];
+    rows.push([`${col}${first.row}:${col}${last.row}\n(${list.length} cells)`,
+      `Hard-positioned links or blanks, e.g. ${befores.slice(0, 4).join(', ')}${befores.length > 4 ? ', ...' : ''}`,
+      `Row ${first.row} shown; the row number substitutes down the column:\n${first.e.after}`]);
+  }
+  return rows;
+}
+
+// ------------------------------------------------------------------ content
+const children = [];
+const cover = [
+  new Paragraph({ spacing: { before: 2400 } }),
+  p([r('Tennessee Department of Transportation, Aeronautics Division', { size: 24, color: '595959' })], { after: 120 }),
+  p([r('LCCA Framework Workbook', { size: 48, bold: true })], { after: 60 }),
+  p([r('Technical Change Record, v1.1.2 to v1.2.0', { size: 32 })], { after: 400 }),
+  p([r('Root causes, exact changes, verification, and the companion decision workbook', { size: 24, italics: true, color: '595959' })], { after: 1400 }),
+  p([r('Prepared by Applied Research Associates, Inc., Transportation Division', { size: 22 })], { after: 40 }),
+  p([r('Task 005935.00000.00000.TASK2', { size: 22 })], { after: 40 }),
+  p([r('11 September 2026', { size: 22 })], { after: 40 }),
+  p([r('Companion to: TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm, Output.bas, TDOT_LCCA_Decision_Workbook.xlsx', { size: 20, color: '595959' })], { after: 40 }),
+  new Paragraph({ children: [new PageBreak()] }),
+  h1('Contents'),
+  new TableOfContents('Contents', { hyperlink: true, headingStyleRange: '1-2' }),
+  new Paragraph({ children: [new PageBreak()] }),
+];
+children.push(...cover);
+
+// 1 purpose
+children.push(h1('1. Purpose and scope'));
+children.push(p('This record documents every change made to the TDOT Aeronautics Life-Cycle Cost Analysis (LCCA) framework workbook between version 1.1.2 (ARA, 18 August 2026) and version 1.2.0 (ARA, 11 September 2026). For each defect it states the symptom, the evidence in the file, the root cause, the exact cell-level change, the effect on results, and how the change was verified. It also documents the replacement VBA Output module, the changes to the Instructions text and to the chart parts, and the companion decision workbook built for the Murfreesboro (MBT) and Upper Cumberland (SRB) analyses.'));
+children.push(p('The review was triggered by the Neel-Schaffer (NS) review of 24 August 2026 (user manual comments and annotated screenshots) and by Aeronautics\' request that ARA spend 8 to 16 hours reviewing and improving the tool. The NS comments are usability findings; the calculation defects below were found in ARA\'s line-by-line audit of the templates and VBA.'));
+children.push(p('Scope of the v1.2.0 change: arithmetic, guards, defaults, chart data, instructions and the Summary builder. Out of scope, and unchanged: the TDOT Maintenance Policies, the pay-item database values, the salvage policy, the lost-revenue method and the alternative-creation workflow. Section 11 lists the policy questions that the update makes visible but deliberately does not decide.'));
+
+// 2 files
+children.push(h1('2. Files, versions and integrity'));
+children.push(p('SHA-256 hashes of the inputs reviewed and the outputs delivered. A recipient can confirm they hold the same bytes with certutil -hashfile <file> SHA256 on Windows.'));
+const hashRows = [['File', 'Role', 'SHA-256']];
+const roles = {
+  '8eaa2547-TDOA_LCCA_Framework_v1.1.2_ARA_Task2_08182026.xlsm': 'Input: v1.1.2 base workbook (reviewed)',
+  '35f08cad-TDOA_LCCA_Framework_v1.1.2_MBT_20260521_LostRevenue_1.xlsm': 'Input: MBT run (verification data)',
+  '527a5482-TDOA_LCCA_Framework_v1.1.2_SRB_20260521_LostRevenue.xlsm': 'Input: SRB run (verification data)',
+  'TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm': 'Output: v1.2.0 workbook',
+  'Output.bas': 'Output: replacement VBA module',
+  'TDOT_LCCA_Decision_Workbook.xlsx': 'Output: decision workbook',
+};
+for (const [f, h] of Object.entries(diff.hashes)) hashRows.push([f.replace(/^[0-9a-f]{8}-/, ''), roles[f] || '', h]);
+children.push(table(hashRows, [3200, 2400, 3760], { monoCols: [2], size: 14 }));
+children.push(p(''));
+children.push(p('Version identity of the workbook: the sheet list, VBA project, ActiveX controls, tables, data validations, comments and drawing parts of v1.1.2 are carried into v1.2.0 unchanged except where this record says otherwise. The two external-link parts and the calculation chain part were removed; Excel rebuilds the calculation chain on first open.'));
+
+// 3 method
+children.push(h1('3. How the review and the change were done'));
+children.push(bullet('Every worksheet, defined name, data validation, chart part, drawing text box, comment and the full VBA project of v1.1.2 were extracted and read. The five alternative templates (TMP(NewHMA), TMP(NewHMA)_IndirectCost, TMP(NewPCC), TMP(NewPCC)_IndirectCost, TMP(HMARehab)) were compared formula by formula against each other and against the populated MBT and SRB alternative sheets.'));
+bullet('');
+children.push(bullet('Fixes were applied by editing the worksheet, chart, drawing and shared-string XML inside the .xlsm package directly. Re-saving the workbook through a library or another application would have dropped the 192 ActiveX pay-item comboboxes and the embedded charts, so no such tool touched the file. The patch is a script (patch_lcca.py) and is reproducible.'));
+children.push(bullet('The patched workbook and a patched copy of the MBT workbook were fully recalculated with LibreOffice Calc (calculateAll, not cached values) and every cell scanned for error values. Results were compared with an independent Python implementation of the LCCA arithmetic.'));
+children.push(bullet('Charts were validated as well-formed XML and parsed with an independent chart reader to confirm their category and value ranges. The decision workbook was recalculated the same way and rendered to PDF to inspect every chart.'));
+children.push(bullet('Not done here: the replacement VBA module and the patched charts have not been executed or displayed in Microsoft Excel, which was not available in the review environment. Section 12 gives the first-open checklist that closes that gap.'));
+
+// 4 systemic root cause
+children.push(h1('4. Systemic root cause'));
+children.push(p('The workbook is built from hidden template sheets, one per pavement type, that VBA copies to create each alternative. Each template holds about 1,600 formulas laid out in eight side-by-side blocks (initial construction, six maintenance activities, one rehabilitation) plus a net-present-worth table and a chart helper block. The templates are near-identical copies of one another and are maintained by hand.'));
+children.push(p('The 2026 lost-revenue feature was implemented by cloning TMP(NewHMA) and TMP(NewPCC) into TMP(NewHMA)_IndirectCost and TMP(NewPCC)_IndirectCost and editing the clones. There is no single formula source, no consistency check across templates, and the new inputs added over time (analysis period, lost-revenue lookup) were wired to one cell each rather than through the whole calculation. This is the single cause behind most of the defects in Section 5:'));
+children.push(bullet('The initial-construction subtotal excludes pay item 1 in the three original templates and is correct in the two 2026 clones: a fix made in the clones that never reached the originals.'));
+children.push(bullet('The blank guard on the pay-item lookup exists on row 13 of every template and on rows 14 to 22 of the HMA templates, but is missing from rows 14 to 22 of both PCC templates: a fix applied to one pavement type only.'));
+children.push(bullet('The analysis period cell is referenced by exactly one formula per template, the salvage row.'));
+children.push(bullet('The revenue lookup on General Information carries a COUNTIF guard; the copy pasted into the templates carries only the inner lookup.'));
+children.push(bullet('The chart helper columns were populated by placing links at row 37 plus the policy year by hand, with the category reference later removed (a filteredCategoryTitle extension remains in the chart XML as evidence that it once existed).'));
+children.push(p('Recommendation for the next revision: keep one template per pavement type with the lost-revenue option as a switch on the sheet, and add a consistency-check macro that compares the formula text of the templates block by block. That removes the class of defect rather than the instances.'));
+
+// 5 findings
+children.push(h1('5. Findings, root causes and changes'));
+children.push(p('Each finding below gives the symptom a user would see, the evidence in v1.1.2, the root cause, the exact change in v1.2.0 and its effect. Cell references are as they appear in the template sheets; the alternative sheets created from them carry the same references. Appendix A lists every changed cell.'));
+
+function finding(id, title, sym, evid, cause, changes, effect, verif) {
+  children.push(h2(`${id}. ${title}`));
+  children.push(p([r('Symptom. ', { bold: true }), r(sym)]));
+  children.push(p([r('Evidence in v1.1.2. ', { bold: true }), r(evid)]));
+  children.push(p([r('Root cause. ', { bold: true }), r(cause)]));
+  children.push(p([r('Change in v1.2.0.', { bold: true })], { keepNext: true }));
+  children.push(table([['Sheet / cell', 'v1.1.2', 'v1.2.0'], ...changes], [1900, 3000, 4460], { monoCols: [1, 2], size: 15 }));
+  children.push(p(''));
+  children.push(p([r('Effect on results. ', { bold: true }), r(effect)]));
+  children.push(p([r('Verification. ', { bold: true }), r(verif)]));
+}
+const F2new = `=IF(${GI}!$D$38="Yes",SUMIF(RevenueData!$A:$A,${GI}!$D$10,RevenueData!$B:$B)+SUMIF(...$C:$C)+SUMIF(...$D:$D)+SUMIF(...$E:$E)+SUMIF(...$F:$F)+SUMIF(...$G:$G)+SUMIF(...$H:$H),0)`;
+
+finding('5.1', 'Pay item 1 excluded from the initial construction subtotal',
+  'The first pay item entered on an alternative sheet does not count toward Initial Construction, Mobilization, Total, or NPW when the analysis is run without lost revenue.',
+  'TMP(NewHMA)!G24, TMP(NewPCC)!G24 and TMP(HMARehab)!G24 read =SUM(G14:G23). Pay items occupy rows 13 to 22 (A13 = 1 ... A22 = 10; row 23 is empty). The two 2026 templates read =SUM(G13:G22).',
+  'The subtotal range was authored for a layout in which items began on row 14 and was not updated when row 13 became the first item; the clones built in 2026 corrected it locally. Because templates are maintained as separate copies, the correction never propagated back.',
+  [['TMP(NewHMA)!G24\nTMP(NewPCC)!G24\nTMP(HMARehab)!G24', '=SUM(G14:G23)', '=SUM(G13:G22)']],
+  'Any v1.1.2 analysis run with "Account Indirect Cost" = No understates initial construction by the item-1 line and by 10 percent mobilization on it. In the SRB layout item 1 is the largest line (P-403 asphalt base, $1.95M). The MBT and SRB reports were run with lost revenue on and are not affected.',
+  'Full recalculation shows the three templates now sum rows 13 to 22; the two clones are unchanged.');
+
+finding('5.2', 'Engineering percent not applied to initial construction',
+  'General Information D37 (Engineering, 5 percent) is added to every maintenance and rehabilitation activity but not to initial construction, so the comparison is biased toward the alternative with the higher first cost.',
+  'In every template the initial block ends with row 24 Subtotal, row 25 Mobilization, row 26 empty (formatted, no label, no formula), row 27 Total =SUM(G24:G26). Every M&R block carries Subtotal, Mobilization, Engineering, Total. Row 26 was reserved for Engineering and left empty.',
+  'An incomplete feature: the Total formula already spans row 26, so the intent is clear; the row was never filled in and no template check would have caught it.',
+  [['All five templates, B26', '(empty)', 'Engineering'], ['All five templates, G26', '(empty)', `=(${GI}!$D$37/100)*G24`]],
+  'Initial construction rises by the engineering percent of the pay-item subtotal. Re-running the reports in v1.2.0 at the same inputs: MBT HMA initial $5,306,577 to $5,547,785 (+$241,208), MBT PCC $8,410,245 to $8,792,529 (+$382,284), SRB HMA $9,009,181 to $9,418,689 (+$409,508), SRB PCC $15,445,398 to $16,147,462 (+$702,064). Because PCC salvage is 25 percent of initial cost, PCC NPW rises by less than its initial cost: MBT NPW moves from $8,809,266 / $8,028,734 to $9,050,474 / $8,371,644 (PCC still lower, margin $679k instead of $781k); SRB moves from $13,854,192 / $14,439,889 to $14,263,700 / $15,069,642 (HMA still lower, margin $806k instead of $586k). Aeronautics should decide whether engineering belongs on initial construction; if not, set D37 to zero for that block or delete G26.',
+  'Recalculated values of G26 and G27 in every template; the arithmetic above was computed with the independent engine.');
+
+finding('5.3', 'Analysis period only sets the salvage year',
+  'Changing General Information D33 (Analysis Period) moves the salvage credit to that year but every maintenance and rehabilitation activity is still counted, including those scheduled after the period ends. The NS reviewer set 20 years and got salvage at year 20 with maintenance at years 24 and 28 still in the NPW.',
+  'D33 is referenced by exactly one cell per template (the salvage-row year, e.g. TMP(NewHMA)!C44). Activity years come straight from Maintenance Policies (E10, E12, E14 ...). The discounted-cost formula =D37/(1+(D34/100))^C37 has no test against D33.',
+  'The analysis period was added as an input after the templates were built and wired only to the salvage row. The Overview text states a fixed 30-year period, which is what the templates assume.',
+  [[`Every discounted-cost cell, e.g. TMP(NewHMA)!E37:E44`, `=D37/(1+(${GI}!$D$34/100))^C37`, `=IF(C37>${GI}!$D$33,0,D37/(1+(${GI}!$D$34/100))^C37)`],
+   ['General Information!D33', '10', '30']],
+  'At 30 years nothing changes (all policy years are 30 or less), so the MBT and SRB results are unaffected. At 20 years, HMA Maintenance 5 and 6 (years 24, 28) and PCC Rehabilitation 1 (year 27) now drop to $0 as they should. Salvage remains at the policy fraction; see Section 11 on whether the fraction should change with the period.',
+  'Patched MBT copy recalculated at 30 years: NPW unchanged to the cent ($8,809,266.42 and $8,028,734.49).');
+
+finding('5.4', 'Default analysis period of 10 years',
+  'A new analysis discounts salvage at year 10 unless the user notices and changes D33.',
+  'General Information!D33 = 10 in the shipped template; the Overview says 30 years; every maintenance policy runs to year 30.',
+  'A test value left in the template.',
+  [['General Information!D33', '10', '30']],
+  'Salvage now discounted at year 30 by default.', 'Value confirmed after recalculation.');
+
+finding('5.5', 'Missing-airport revenue lookup returns #N/A',
+  'With "Account Indirect Cost" = Yes and an airport outside the 17 with revenue data, Average Daily Revenue shows #N/A, every indirect-cost row shows #N/A, the alternative NPW shows #N/A and the Summary shows #N/A (NS screenshots, Alt 3 and Alt 4). On Excel 2019 or earlier the same cells show #NAME? because XLOOKUP does not exist.',
+  `Template F2 = SUM(_xlfn.XLOOKUP(${GI}!D10,RevenueData!A:A,RevenueData!B:H)). General Information!D39 wraps the same lookup in IF(COUNTIF(...)=0,"Missing Airport Revenue",...), so the guard existed and was not carried into the templates. RevenueData also contains text in several numeric cells (" $-   ", " NA ", descriptive text on the XNX and M54 rows).`,
+  'The guarded formula was written once on General Information and the unguarded inner expression copied into the templates. XLOOKUP was chosen over functions available in every Excel version.',
+  [['TMP(NewHMA)_IndirectCost!F2\nTMP(NewPCC)_IndirectCost!F2', `=SUM(_xlfn.XLOOKUP(${GI}!D10,RevenueData!A:A,RevenueData!B:H))`, F2new],
+   ['Same sheets, G2 (new)', '(empty)', `=IF(AND(${GI}!$D$38="Yes",F2=0),"No revenue data for this airport - lost revenue set to $0. Contact Aeronautics.","")`],
+   ['General Information!D39', `...SUM(_xlfn.XLOOKUP(D10,RevenueData!A:A,RevenueData!B:H))...`, `...SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$B:$B)+...+SUMIF(...$H:$H)...`]],
+  'For the 17 airports the result is identical (SUMIF ignores the text cells exactly as SUM(XLOOKUP) did). For any other airport lost revenue is $0 and a warning appears in G2 and on D39, instead of #N/A propagating to the Summary. Works on every Excel version.',
+  'Recalculated: F2 = 0 and G2 = "" with no airport selected; original file shows 39 #NAME? and 60 #N/A cells under the same recalculation, v1.2.0 shows none.');
+
+finding('5.6', 'No blank guard on PCC pay-item rows 14 to 22',
+  '#N/A appears in the Pay Item column, Item Cost, Subtotal and Total of a PCC alternative as soon as one of rows 14 to 22 is left empty (NS screenshot, Alt 1 New PCC row 18).',
+  'TMP(NewPCC)!B14:B22 and TMP(NewPCC)_IndirectCost!B14:B22 read =VLOOKUP(C14,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0). Row 13 in the same sheets, and rows 13 to 22 in the HMA templates, read =IF(C13="",0,VLOOKUP(...)). A placeholder row in Pay_Items (row 3, description blank, "Default") lets the unguarded lookup resolve when the linked cell holds an empty string, which is why the defect appears only sometimes.',
+  'A partial fix: the guard was added to row 13 of the PCC templates and to every row of the HMA templates, but not to rows 14 to 22 of the PCC templates.',
+  [['TMP(NewPCC)!B14:B22\nTMP(NewPCC)_IndirectCost!B14:B22', '=VLOOKUP(C14,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)', '=IF(C14="",0,VLOOKUP(C14,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0))']],
+  'Empty rows give 0, consistent with the HMA templates. No change to filled rows.',
+  'Patched MBT copy: Alt 2 (New PCC) rows 17 to 22 read 0 after recalculation where the unpatched template gives #N/A.');
+
+finding('5.7', 'Four pay items share the description "Separation Geotextile"',
+  'Selecting a separation geotextile under P-208, P-209 or P-219 returns the pay item number and unit cost of the first geotextile line in the table.',
+  'Pay_Items!D20 (P-154-5.2, "Separation geotextile"), D28 (P-208-5.2), D30 (P-209-5.2) and D32 (P-219-5.2) carry the same text. Every template lookup keys on Table2[Pay Item Description] because the ActiveX combobox writes the description, not the item number, to its linked cell.',
+  'The lookup key is the description because that is what the control returns; the pay-item list was extended with one geotextile line per base-course specification without making the descriptions unique.',
+  [['Pay_Items!D20', 'Separation geotextile', 'Separation Geotextile (P-154)'], ['Pay_Items!D28', 'Separation Geotextile', 'Separation Geotextile (P-208)'], ['Pay_Items!D30', 'Separation Geotextile', 'Separation Geotextile (P-209)'], ['Pay_Items!D32', 'Separation Geotextile', 'Separation Geotextile (P-219)']],
+  'Each geotextile line now resolves to its own item number and unit cost. Existing alternative sheets that selected one of these items will show the old description in the linked cell and must be re-selected.',
+  'Recalculated; descriptions confirmed unique in Table2.');
+
+finding('5.8', 'Airport dropdown stops four airports short',
+  'Warren County Memorial, William L. Whitehurst Field, Winchester Municipal and Wolf River cannot be selected in General Information D9.',
+  'The data validation on D9 lists $L$9:$L$84; the airport table occupies L10:L88.',
+  'A static range in the validation while the table grew; a table reference would have followed the rows.',
+  [['General Information!D9 validation', '$L$9:$L$84', '$L$10:$L$88']],
+  'All 79 airports selectable.', 'Validation formula confirmed after patch.');
+
+finding('5.9', 'Closure durations ship as zero',
+  'Every lost-revenue row is $0 until the user types closure days into F4:F10 of each alternative sheet. The MBT and SRB files carry hand-written production-rate formulas in those cells; the template does not.',
+  'TMP(NewHMA)_IndirectCost!F4:F10 = 0 and TMP(NewPCC)_IndirectCost!F4:F5 = 0. MBT and SRB Alt sheets hold formulas such as =ROUNDUP((C5/15000),0)+ROUNDUP((C8/20000),0)+ROUNDUP((C8/50000),0) (surface treatment at 15,000 SY/day plus markings) and =ROUNDUP((C5/3800),0)+ROUNDUP((C8/50000),0) (mill and overlay at 3,800 SY/day).',
+  'The production-rate defaults were developed during the MBT and SRB analyses, after the template was issued, and were never back-ported.',
+  [['TMP(NewHMA)_IndirectCost!F4:F10', '0', 'Production-rate formulas from the MBT run (Appendix A gives each cell); cells remain gray inputs and may be overridden'],
+   ['TMP(NewPCC)_IndirectCost!F4:F5', '0', 'Production-rate formulas from the MBT run (Appendix A)']],
+  'New analyses start from the same closure assumptions as the two completed runs. On a blank template F4:F10 evaluate to 0 (HMA) and 0 and 7 (PCC, the rehabilitation formula carries a fixed 7-day term) until an area is entered.',
+  'Recalculated on the blank template and on the MBT copy (6, 6, 8, 8, 15, 6, 8 days for HMA; 9 and 18 for PCC), matching the MBT report.');
+
+finding('5.10', 'Chart helper rows hard-positioned; no years on the axis',
+  'The expenditure chart on each alternative sheet reads 1 to 31 on its axis, mixes undiscounted and discounted bars, and would silently misplace a bar if a policy year changed. Its title is set once by VBA at creation ("Alternative 4" on an Alt 1 sheet in the NS screenshots).',
+  'Column L is populated only at rows 37, 41, 45, 49, 53, 57, 61, 65 and 67 with links such as L41 = D37, that is, row 37 plus the policy year of Maintenance 1. The chart series have no <c:cat> element; a c15:filteredCategoryTitle extension referencing K37:K67 shows the category was set and later filtered out.',
+  'The helper block was built by hand to match the current policy years and never linked to them; the category axis was dropped at some point.',
+  [['TMP(NewHMA)!L37:L67 (and M)', 'L37 = D36, L41 = D37, ... L67 = D44; other rows empty', `=IF(K37-$C$6>${GI}!$D$33,0,IF(K37=$C$6,$D$36,0)+SUMIF($C$37:$C$44,K37-$C$6,$D$37:$D$44))  (M uses column E)`],
+   ['TMP(NewHMA)_IndirectCost!L37:N67', 'as above, N = E36 etc.', `L: SUMIFS over D with criteria "<>*Indirect*"; M: SUMIFS over D with "*Indirect*"; N: SUMIF over E (all with the period guard)`],
+   ['PCC templates L38:N68', 'as above, one row lower', 'same formulas with the PCC row references ($D$37, $C$38:$C$42 ...)'],
+   ['Chart parts chart1 to chart5', 'no category; 2 or 3 series (Actual/Discounted or Direct/Indirect/Total Discounted)', 'category = K37:K67 (calendar years); direct templates keep the Actual series; indirect templates keep Direct and Indirect, stacked; axis format "0"']],
+  'Bars now land on the calendar year that Maintenance Policies dictates and respect the analysis period; the axis shows 2027 to 2057. Column N (total discounted by year) remains for the Summary.',
+  'Patched MBT copy: sum of L plus M equals the activity totals ($10,959,044 HMA; $7,281,371 PCC) and sum of N equals NPW to the dollar. Year-by-year values in Appendix C. Chart XML parsed by an independent reader with the intended ranges.');
+
+finding('5.11', 'HMA Rehabilitation template latent defects',
+  'Not visible today: the template is very-hidden and disabled in the VBA since 19 November 2022. If re-enabled, Maintenance 5 would be discounted by (1+r) to the power 2044 and the salvage row would multiply an empty cell.',
+  "TMP(HMARehab)!C42 = C36+'Maintenance Policies'!E65 adds the construction year (e.g. 2020) to the policy year. D44 = -'Maintenance Policies'!D71*AV22, but the rehabilitation total in that template is AN22; AV22 is empty.",
+  'The template was abandoned when the rehab options were hidden and drifted from the others.',
+  [["TMP(HMARehab)!C42", "=C36+'Maintenance Policies'!E65", "='Maintenance Policies'!E65"], ["TMP(HMARehab)!D44", "=-'Maintenance Policies'!D71*AV22", "=-'Maintenance Policies'!D71*AN22"]],
+  'None today. Correct behaviour if the option returns.', 'Recalculated without error.');
+
+// 6 charts (covered) -> 6 instructions text
+children.push(h1('6. Instructions text box'));
+children.push(p('The Instructions sheet holds its text in a drawing text box, not in cells. Five runs were changed; the wording of every other run is unchanged.'));
+const trows = [['Run', 'v1.1.2', 'v1.2.0']];
+for (const [i, a, b] of diff.textdiff) trows.push([String(i), a, b]);
+children.push(table(trows, [700, 4330, 4330], { size: 14 }));
+children.push(p(''));
+children.push(p('The Overview text box is unchanged. NS supplied a rewrite (2022 APTech framework, 2026 NS and ARA update, the four airport criteria); it should be pasted once the wording is approved.'));
+children.push(p('Cell notes on General Information D26 and D39 carried the author\'s name; the author is now "ARA". The workbook carried two external links to files on a personal drive (v1.1.004 and a Savannah copy, referenced only by three sheet-scoped copies of the Airport_Name name); the links and those three names were removed. The workbook-level Airport_Name name (General Information D9) is unchanged.'));
+
+// 7 VBA
+children.push(h1('7. VBA: the Output module'));
+children.push(p('The VBA project is unchanged except for the Output module, which is delivered as Output.bas and must be imported by hand (Section 12). The entry point SetupSummaryWs keeps its name and is still called from frmAlternativeSetup.cmdClose_Click, so no other module changes.'));
+children.push(table([
+  ['Aspect', 'v1.1.2 SetupSummaryWs', 'v1.2.0 SetupSummaryWs'],
+  ['Results written', 'Alt number, name, Initial Construction (=Total cell), Present Worth (=NPW cell), description', 'Adds Type, Maintenance PW, Rehabilitation PW, Lost Revenue PW, Salvage PW, delta to lowest NPW, closure days over the period; a verdict line naming the lowest-NPW alternative and the analysis settings'],
+  ['How rows are found', 'Finds "Net Present Worth" in column B and "Total" in column A of each Alt sheet', 'Same, plus "Initial Construction" to bound the activity rows; category sums use SUMIFS on the row labels ("Maintenance*", "Rehabilitation*", "*Indirect*", "Salvage*")'],
+  ['Helper blocks', 'None', 'PW by category; expenditure by calendar year (SUMIF on Year Applied); cumulative discounted cost; NPW versus discount rate 2 to 8 percent by SUMPRODUCT; winner at the analysis rate versus 7 percent'],
+  ['Charts', 'Updates the two series of the existing "Chart 1"', 'Deletes existing charts and builds four: PW by category (stacked), expenditure stream (clustered), cumulative cost (line), rate sensitivity (line); series coloured by pavement type (HMA blue 2A78D6, PCC orange EB6834, tints for a second alternative of the same type)'],
+  ['Error handling', 'None', 'ScreenUpdating restored and a message box if the build fails part way'],
+  ['Compatibility', 'Any Excel', 'Shapes.AddChart2 requires Excel 2013 or later (Microsoft 365 at TDOT)'],
+], [1700, 3300, 4360], { size: 15 }));
+children.push(p(''));
+children.push(p('All summary cells are live formulas into the alternative sheets, so the Summary follows quantity changes without re-running the form; charts are rebuilt each time the form closes. The full listing is Appendix B; the v1.1.2 module remains in the v1.1.2 file for comparison.'));
+
+// 8 decision workbook
+children.push(h1('8. Companion decision workbook'));
+children.push(p('TDOT_LCCA_Decision_Workbook.xlsx is a separate, macro-free workbook that carries the MBT and SRB analyses and answers the questions the framework Summary cannot: where the difference between the alternatives comes from, whether it survives the FAA AIP rate, which input would flip it, and what the runway closures cost. It does not replace the framework; it reads the framework\'s outputs.'));
+children.push(h2('8.1 Method'));
+children.push(p('For each alternative, with r the discount rate, P the analysis period, and multipliers c (cost), d (closure days), s (salvage) and f (share of daily revenue lost):'));
+children.push(mono('NPW = Initial x c', 18));
+children.push(mono('    + sum over activities with year <= P of [ (DirectCost x c) + (ClosureDays x d x DailyRevenue x f) ] / (1 + r)^year', 18));
+children.push(mono('    + SalvageBase x c x s / (1 + r)^P', 18));
+children.push(p([r('SalvageBase = -fraction x basis, where basis is initial construction (PCC, 25 percent) or the mill-and-overlay cost (HMA, 12.5 percent) per the TDOT Maintenance Policies. With all multipliers at 1, r = 3, P = 30 this reproduces the framework NPW to the cent. EUAC = NPW x r(1+r)^P / ((1+r)^P - 1).')], { before: 120 }));
+children.push(h2('8.2 Inputs'));
+children.push(table([
+  ['Cell(s)', 'Input', 'MBT value', 'Source'],
+  ['B5', 'Discount rate (%)', '3', 'General Information D34'],
+  ['B6', 'Analysis period (years)', '30', 'General Information D33'],
+  ['B7', 'Construction year', '2027', 'General Information D25'],
+  ['B8', 'Airport daily revenue ($/day)', '8,841.38', 'General Information D39 / Alt sheet F2'],
+  ['B9', 'Share of daily revenue lost during a closure', '100%', 'Framework method (gross receipts); test 30 to 50 percent for margin-based revenue'],
+  ['B10', 'Closure-days multiplier', '1.0', 'Scales every closure duration'],
+  ['B11, B12', 'HMA and PCC cost multipliers', '1.0', 'Bid-price uncertainty on all direct costs'],
+  ['B13', 'Salvage multiplier', '1.0', '0 removes the salvage credit'],
+  ['B14', 'Mainline area (SY)', '52,777.7', 'General Information D26'],
+  ['B15:B18', 'Salvage fraction and basis per alternative', '0.125 Rehabilitation; 0.25 Initial', 'Maintenance Policies tables 1 and 2'],
+  ['Activity tables C:D and L:M', 'Base direct cost and closure days per policy activity', 'from the run', 'Alt sheet NPW table column D (Actual Cost) and cells F4:F10'],
+], [1500, 2900, 1900, 3060], { size: 15 }));
+children.push(p(''));
+children.push(h2('8.3 Blocks and charts'));
+for (const t of [
+  'RESULTS: initial cost, maintenance, rehabilitation, lost revenue and salvage present worth, NPW, EUAC, NPW per SY, closure days in period, runway availability, undiscounted lost revenue; the lower-cost alternative, its margin in dollars and percent, whether the same alternative wins at 7 percent, and the probability that PCC is lower from the live simulation.',
+  'BREAK-EVEN VALUES: the daily revenue, PCC bid level, HMA bid level and PCC salvage fraction at which the two alternatives tie, in closed form (the NPW difference is linear in each), and the first discount rate in the 2 to 8 percent sweep at which the winner changes.',
+  'DISCOUNT-RATE SENSITIVITY: NPW of each alternative at 25 rates from 2 to 8 percent.',
+  'EXPENDITURE BY CALENDAR YEAR: direct cost and lost revenue by year for each alternative, cumulative discounted cost, closure days by year, and the crossover year of the cumulative lines.',
+  'WHAT COULD FLIP THE ANSWER: PCC minus HMA present worth when one input moves across its range (rate 2 to 8 percent, each salvage credit off, each cost plus or minus 20 percent, closures x0.5 to x2, lost revenue off, 20-year period), with a flag where the sign changes.',
+  'SCENARIO SCORECARD: twelve pre-run scenarios with their own parameters (TDOT policy, FAA AIP 7 percent and 20 years, 3 percent and 20 years, 5 percent, no lost revenue, 40 percent revenue loss, no salvage, PCC bids +20, HMA bids +20, closures x2, closures x0.5, and a stress case).',
+  'DECISION MAP: PCC minus HMA present worth on a grid of discount rate (2 to 8 percent) by salvage multiplier (0 to 1), colour-scaled so the winner is read at a glance.',
+  'MONTE CARLO (column AK onward): 1,000 joint draws from editable triangular ranges on rate, both cost multipliers, closure days, salvage and revenue share; probability that PCC is lower, mean, P10, P50, P90 and a histogram. RAND() based, so F9 redraws and the probability moves by a percent or two.',
+  'Charts (column T onward): present worth by category (stacked), expenditure stream by year, cumulative discounted cost, NPW versus discount rate, tornado, closure timeline (bubble, size = days), closure days by year, NPW by scenario, simulation histogram.',
+]) children.push(bullet(t));
+children.push(h2('8.4 Adding a project'));
+children.push(num('Right-click the TEMPLATE sheet tab, Move or Copy, tick Create a copy, rename the sheet.'));
+children.push(num('Fill B5:B18 from the framework General Information sheet and the Maintenance Policies.'));
+children.push(num('For each alternative, type the base direct cost and closure days of each policy activity into the yellow cells of the activity table, taken from the alternative sheet\'s NPW table (column D) and cells F4:F10.'));
+children.push(num('Every table and chart updates. The sheet compares one HMA and one PCC alternative, which is how the framework is used; policy years are editable if the maintenance tables change.'));
+children.push(p([r('Note on the loaded runs. ', { bold: true }), r('The MBT and SRB values are the framework outputs as reported on 21 May 2026, that is, without engineering on initial construction (Section 5.2). Re-running those projects in v1.2.0 would change the initial costs as stated there.')]));
+children.push(image('MBT_bridge.png', 6.5, 4.14));
+children.push(caption('Figure 1. MBT present-worth bridge from HMA to PCC by category (decision workbook view).'));
+children.push(image('MBT_closures.png', 6.5, 6.44));
+children.push(caption('Figure 2. MBT runway closure timeline; bubble size is days closed.'));
+
+// 9 verification
+children.push(h1('9. Verification record'));
+children.push(table([
+  ['Check', 'Method', 'Result'],
+  ['v1.2.0 workbook integrity', 'Zip test; every XML, rels and VML part parsed', 'Pass; 463 cells changed across 7 sheets, 1 validation, 5 text runs, 5 chart parts, 1 comments part'],
+  ['v1.2.0 full recalculation', 'LibreOffice Calc calculateAll, then scan of every cell for error values', '1,644 formulas, 0 errors'],
+  ['v1.1.2 under the same recalculation', 'Same', '99 error cells: 39 #NAME? (XLOOKUP) and 60 #N/A (unguarded PCC lookups, revenue lookup)'],
+  ['Template formulas on real data', 'Formula changes applied to the MBT workbook alternative sheets; full recalculation', 'NPW unchanged: HMA $8,809,266.42, PCC $8,028,734.49; PCC rows 17 to 22 = 0 (were #N/A)'],
+  ['Year-indexed chart columns', 'Sum of L + M against activity totals; sum of N against NPW; per-year values against policy years', 'HMA: L+M = $10,959,044 = totals; N = $8,809,266 = NPW. PCC: L+M = $7,281,371; N = $8,028,734. Appendix D'],
+  ['Chart parts', 'Parsed with an independent chart reader', 'Category K37:K67 (or K38:K68) and value ranges as intended; indirect charts stacked with two series'],
+  ['Decision workbook recalculation', 'LibreOffice Calc calculateAll; error scan', '47,265 formulas, 0 errors'],
+  ['Decision workbook against independent engine', 'Python implementation of Section 8.1', 'NPW, category split (sums to NPW), EUAC, closure days, break-even values (engine returns a $0 difference at each), 25-point sensitivity, tornado, 12 scenarios and 35-cell decision map agree to the dollar'],
+  ['Decision workbook charts', 'Rendered to PDF and inspected', 'All eight per-project charts and the simulation histogram draw with the intended series, axes and years'],
+  ['Not verified in this environment', '', 'Output.bas execution in Excel; display of the patched charts in Excel (LibreOffice does not draw charts on the ActiveX-bearing sheets). Closed by Section 12.'],
+], [2300, 3000, 4060], { size: 15 }));
+
+// 10 what is different in one place
+children.push(h1('10. What is different, in one place'));
+children.push(p('For a reader who needs only the list:'));
+for (const t of [
+  'Numbers that change for every analysis: initial construction now includes pay item 1 (non-indirect templates) and the engineering percent (all templates).',
+  'Numbers that change only when the analysis period is shorter than the policy schedule: activities after the period drop out.',
+  'Numbers that change from #N/A to a value: any analysis with lost revenue for an airport outside the 17; any PCC alternative with an empty pay-item row.',
+  'Defaults that change: analysis period 30 instead of 10; closure days pre-filled instead of 0.',
+  'Lookups that change: the four geotextile lines now resolve to their own item numbers.',
+  'Presentation that changes: alternative charts by calendar year, stacked direct and lost revenue; Summary with categories, closures and rate sensitivity.',
+  'Text that changes: Instructions runs 2, 4, 5, 7 and 8; two cell notes.',
+  'Removed: two external links, three sheet-scoped names, the cached calculation chain.',
+  'Not changed: Maintenance Policies, Pay_Items unit costs, RevenueData, salvage fractions, the discount formula for in-period activities, the VBA that creates alternatives, the ActiveX controls, every other sheet.',
+]) children.push(bullet(t));
+
+// 11 policy
+children.push(h1('11. Policy questions surfaced, not decided'));
+children.push(table([
+  ['Question', 'Why it matters', 'Where it is visible now'],
+  ['Salvage asymmetry', 'PCC recovers 25 percent of total initial cost including mobilization; HMA 12.5 percent of one mill-and-overlay. In SRB that line is -$3.86M against -$0.41M, larger than the NPW margin.', 'Decision workbook RESULTS (Salvage PW), tornado, decision map, salvage multiplier input'],
+  ['Salvage when the period is shortened', 'The policy fractions are defined at year 30. At 20 years the workbook applies the same fraction at year 20, a simplification that under-credits PCC.', 'Scenario scorecard rows "FAA AIP" and "TDOT 3% but 20-yr life"'],
+  ['Lost-revenue basis', 'The framework sums gross fuel sales, tie-downs, hangar storage, flowage fees and tenant revenue as lost on every closure day. A margin-based share would be far lower.', 'Input B9 (share lost); scenario "Revenue loss at 40% of gross"'],
+  ['FAA AIP rule', 'AIP-funded projects require 7 percent and a 20-year life (Appendix U). MBT changes winner at 4.5 percent.', 'Sensitivity block, "Same winner at 7%" flag, FAA scenario'],
+  ['Engineering on initial construction', 'Section 5.2 applies it; Aeronautics may prefer the previous treatment.', 'General Information D37; template row 26'],
+  ['RevenueData hygiene', 'MBT and MQY rows are identical; XNX and M54 hold text; 62 airports have no data.', 'Warning in template G2; D39 message'],
+  ['Overview wording', 'NS rewrite pending approval.', 'Overview text box'],
+], [1900, 4200, 3260], { size: 15 }));
+
+// 12 checklist
+children.push(h1('12. First-open checklist in Excel'));
+for (const t of [
+  'Open TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm; enable content (or follow the ActiveX steps now in the Instructions).',
+  'Alt+F11; in the project tree right-click the Output module, Remove (answer No to export); File, Import File, Output.bas. Save.',
+  'General Information: select Murfreesboro Municipal Airport, D38 = Yes, D25 = 2027, D26 = 52777.7, D28 = 5433. Alternative Setup: add one New HMA and one New PCC; Close. Expect the Summary to populate with four charts and no #N/A.',
+  'On Alt 1: enter the MBT pay items and quantities. Expect Initial Construction $5,547,785 (the reported $5,306,577 plus 5 percent engineering on the $4,824,160 subtotal). Expect columns L:N to sum to the NPW table and the chart axis to read 2027 to 2057.',
+  'Set D33 = 20. Expect Maintenance 5 and 6 to show $0 discounted and the chart to end at 2047. Restore 30.',
+  'Select an airport outside the 17 with D38 = Yes. Expect G2 on each Alt sheet to show the warning and lost revenue $0, not #N/A.',
+  'Open TDOT_LCCA_Decision_Workbook.xlsx; on MBT confirm NPW $8,809,266 and $8,028,734; press F9 twice and confirm the simulation probability moves only slightly around 52 percent.',
+]) children.push(num(t));
+
+// Appendix A
+children.push(new Paragraph({ children: [new PageBreak()] }));
+children.push(h1('Appendix A. Cell-level change list'));
+children.push(p('Every cell whose formula or value differs between v1.1.2 and v1.2.0, generated by comparing the two workbooks cell by cell (463 cells). Runs of identical formulas in the chart helper columns L, M and N are shown once with the first row; the row number substitutes down the column.'));
+for (const [sheet, entries] of Object.entries(diff.diff)) {
+  children.push(h2(`A.${Object.keys(diff.diff).indexOf(sheet) + 1} ${sheet} (${entries.length} cells)`));
+  const rows = [['Cell', 'v1.1.2', 'v1.2.0'], ...groupSheet(sheet, entries)];
+  children.push(table(rows, [1300, 3400, 4660], { monoCols: [1, 2], size: 13 }));
+  children.push(p(''));
+}
+children.push(h2('A.8 Other parts'));
+children.push(table([
+  ['Part', 'Change'],
+  ['General Information data validation D9', '$L$9:$L$84 to $L$10:$L$88'],
+  ['xl/comments1.xml and vmlDrawing2.vml', 'Author "Ebenezer Duah" replaced by "ARA" in the D26 and D39 notes'],
+  ['xl/sharedStrings.xml', 'Four strings appended for the geotextile descriptions'],
+  ['xl/charts/chart1.xml to chart5.xml', 'Series reduced to Actual (direct templates) or Direct + Indirect stacked (indirect templates); category reference K37:K67 or K38:K68 added; series extension lists and caches removed; category axis number format "0"'],
+  ['xl/drawings/drawing3.xml', 'Instructions text runs 2, 4, 5, 7, 8 (Section 6)'],
+  ['xl/workbook.xml', 'externalReferences element and three sheet-scoped Airport_Name names removed; calcPr fullCalcOnLoad="1"'],
+  ['xl/externalLinks/*, xl/calcChain.xml', 'Removed with their relationships and content-type overrides'],
+], [3200, 6160], { size: 15 }));
+
+// Appendix B
+children.push(new Paragraph({ children: [new PageBreak()] }));
+children.push(h1('Appendix B. Output.bas listing (v1.2.0)'));
+for (const line of OUTBAS) children.push(mono(line.replace(/\t/g, '    '), 14));
+
+// Appendix C reconciliation
+children.push(new Paragraph({ children: [new PageBreak()] }));
+children.push(h1('Appendix C. MBT reconciliation of the year-indexed chart columns'));
+children.push(p('Values from the recalculated MBT copy after the template formulas were applied (calendar year, direct cost, lost revenue, total discounted). Rows with no activity are zero and omitted.'));
+children.push(table([
+  ['Alt 1 New HMA', 'Direct (L)', 'Lost revenue (M)', 'Discounted (N)'],
+  ['2027', '5,306,577', '0', '5,306,577'], ['2031', '482,830', '53,048', '476,121'], ['2035', '482,830', '53,048', '423,027'], ['2039', '547,129', '70,731', '433,355'],
+  ['2043', '561,004', '70,731', '393,677'], ['2047', '2,302,558', '132,621', '1,348,299'], ['2051', '482,830', '53,048', '263,617'], ['2055', '577,147', '70,731', '283,172'], ['2057', '-287,820', '0', '-118,578'],
+  ['Sum', '10,455,085', '503,959', '8,809,266 = NPW'],
+], [2340, 2340, 2340, 2340], { size: 15 }));
+children.push(p(''));
+children.push(table([
+  ['Alt 2 New PCC', 'Direct (L)', 'Lost revenue (M)', 'Discounted (N)'],
+  ['2027', '8,410,245', '0', '8,410,245'], ['2046', '306,564', '79,572', '220,208'], ['2054', '587,551', '0*', '264,509'], ['2057', '-2,102,561', '0', '-866,227'],
+  ['Sum', '7,201,798', '79,572', '8,028,734 = NPW'],
+], [2340, 2340, 2340, 2340], { size: 15 }));
+children.push(p([r('* In the MBT file the PCC rehabilitation indirect row is labelled "Rehabilitation 1" rather than "Rehabilitation 1 Indirect Cost", so its $159,145 is counted as direct there. The v1.2.0 template label is correct.', { size: 16, italics: true })], { before: 80 }));
+
+// ------------------------------------------------------------------ document
+const doc = new Document({
+  creator: 'Applied Research Associates, Inc.', title: 'TDOT LCCA Framework Technical Change Record v1.2.0', features: { updateFields: true },
+  styles: {
+    default: { document: { run: { font: FONT, size: 22 } } },
+    paragraphStyles: [
+      { id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { font: 'Cambria', size: 30, bold: true, color: '1D2733' }, paragraph: { spacing: { before: 360, after: 160 }, outlineLevel: 0 } },
+      { id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { font: 'Cambria', size: 25, bold: true, color: '1D2733' }, paragraph: { spacing: { before: 280, after: 120 }, outlineLevel: 1 } },
+      { id: 'Heading3', name: 'Heading 3', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { font: 'Cambria', size: 22, bold: true }, paragraph: { spacing: { before: 200, after: 80 }, outlineLevel: 2 } },
+    ],
+  },
+  numbering: { config: [
+    { reference: 'bul', levels: [{ level: 0, format: LevelFormat.BULLET, text: '•', alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 540, hanging: 270 } } } }] },
+    { reference: 'num', levels: [{ level: 0, format: LevelFormat.DECIMAL, text: '%1.', alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 540, hanging: 360 } } } }] },
+  ] },
+  sections: [{
+    properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } },
+    headers: { default: new Header({ children: [p([r('TDOT Aeronautics LCCA Framework, Technical Change Record v1.1.2 to v1.2.0', { size: 16, color: '7F7F7F' })], { after: 0 })] }) },
+    footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: 'Applied Research Associates, Inc.  |  Page ', font: FONT, size: 16, color: '7F7F7F' }), new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: 16, color: '7F7F7F' })] })] }) },
+    children,
+  }],
+});
+Packer.toBuffer(doc).then(buf => { fs.writeFileSync(__dirname + '/TDOT_LCCA_v1.2.0_Technical_Change_Record.docx', buf); console.log('wrote docx', buf.length); });

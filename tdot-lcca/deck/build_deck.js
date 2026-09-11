@@ -131,6 +131,28 @@ s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.5, y: 4.15, w: 9.0, h: 0.8, fil
 s.addText('v1.2.0 does not change any of these. It makes each one visible and testable so Aeronautics can decide them deliberately.', { x: 0.7, y: 4.2, w: 8.6, h: 0.7, fontFace: BF, fontSize: 13, color: INK, isTextBox: true, margin: 0, valign: 'middle' });
 s.addNotes('Recommend a per-category "share lost during closure" factor on RevenueData and a funding-source switch for the AIP rule.');
 
+// ---------------------------------------------------------------- 6b root cause, systemic
+s = pres.addSlide(); s.background = { color: WHITE };
+title(s, 'Root cause: five copies of one template');
+sub(s, 'Why the defects exist, and why they sit in some templates and not others');
+card(s, 0.5, 1.5, 4.4, 3.5, 'How the workbook is built',
+  'Each pavement type has a hidden template sheet of about 1,600 near-identical formulas. VBA copies the template to create an alternative.\n\nThe 2026 lost-revenue feature was added by cloning two templates and editing the clones. There is no shared formula source, so a fix made in one copy never reaches the others.\n\nNew inputs (analysis period, revenue lookup) were wired to one cell each rather than through the whole template.');
+card(s, 5.1, 1.5, 4.4, 3.5, 'What that produced',
+  'Pay item 1 dropped in three templates, correct in the two 2026 clones\n\nBlank guard on row 13 in every template, missing on rows 14 to 22 of the PCC templates only\n\nAnalysis period wired to the salvage row and nothing else\n\nRevenue guard present on General Information, lost when the lookup was copied into the templates\n\nChart helper rows placed by hand at row 37 plus the policy year, with the category reference removed');
+s.addNotes('Recommendation for the next revision: one template per pavement type with the lost-revenue option as a switch, plus a consistency check macro across templates.');
+
+// ---------------------------------------------------------------- 6c root cause, top four
+s = pres.addSlide(); s.background = { color: WHITE };
+title(s, 'The four defects that move money');
+table(s, [
+  ['Defect', 'Root cause (evidence in the file)', 'Exact change'],
+  ['Pay item 1 excluded', 'Subtotal G24 = SUM(G14:G23) while items occupy rows 13 to 22 (A13 = 1). The indirect clones read SUM(G13:G22), so the range was corrected there and never propagated.', 'G24 = SUM(G13:G22) in TMP(NewHMA), TMP(NewPCC), TMP(HMARehab)'],
+  ['No engineering on initial cost', 'Row 26 is formatted and included in the Total (G27 = SUM(G24:G26)) but empty. The M&R blocks all carry Mobilization then Engineering; the initial block stopped after Mobilization.', 'B26 = "Engineering"; G26 = (D37/100) x G24 in all five templates'],
+  ['Analysis period ignored', 'D33 is referenced once per template, by the salvage row. Every activity year comes straight from Maintenance Policies with no comparison to D33.', 'Each discounted cost: IF(year > D33, 0, cost / (1+r)^year); default D33 = 30'],
+  ['#N/A on missing airport', 'General Information D39 guards the lookup with COUNTIF; the templates copied only the inner SUM(XLOOKUP(...)). XLOOKUP also fails on Excel 2019 (#NAME?).', 'F2 = IF(D38="Yes", SUMIF chain over RevenueData columns B:H, 0); G2 warning text when F2 = 0'],
+], 0.5, 1.3, 9.0, [1.8, 4.2, 3.0], 9.5);
+s.addNotes('Full cell-by-cell record, 463 cells, is Appendix A of the Technical Change Record.');
+
 // ---------------------------------------------------------------- 7 fixes: calculations
 s = pres.addSlide(); s.background = { color: WHITE };
 title(s, 'v1.2.0: calculation fixes');
