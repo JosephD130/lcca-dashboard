@@ -28,6 +28,12 @@ PROJECTS = {
    pcc=dict(name='Alt 1 - New PCC', desc='11" P-501 on 6" P-209 + P-403 base', initial=15445398.25, salv_frac=0.25, salv_basis='initial',
      events=[('Maintenance 1',19,432674.93,11),('Rehabilitation 1',27,604639.40,20)])),
 }
+PROJECTS['TEMPLATE']=dict(title='NEW PROJECT (template) - copy this sheet, rename it, fill the yellow cells', daily=0, area=0, markings=0, year0=2027,
+   hma=dict(name='Alt 1 - New HMA', desc='fill in', initial=0, salv_frac=0.125, salv_basis='rehab',
+     events=[('Maintenance 1',4,0,0),('Maintenance 2',8,0,0),('Maintenance 3',12,0,0),('Maintenance 4',16,0,0),('Rehabilitation 1',20,0,0),('Maintenance 5',24,0,0),('Maintenance 6',28,0,0)]),
+   pcc=dict(name='Alt 2 - New PCC', desc='fill in', initial=0, salv_frac=0.25, salv_basis='initial',
+     events=[('Maintenance 1',19,0,0),('Rehabilitation 1',27,0,0)]))
+
 def salvage_base(alt):
     basis = alt['initial'] if alt['salv_basis']=='initial' else [c for n,y,c,d in alt['events'] if 'Rehab' in n][0]
     return -basis*alt['salv_frac']
@@ -84,25 +90,35 @@ def build_project(wb, key, pr):
             ('HMA cost multiplier',1.0,'Bid-price uncertainty on all HMA direct costs'),
             ('PCC cost multiplier',1.0,'Bid-price uncertainty on all PCC direct costs'),
             ('Salvage multiplier',1.0,'0 = no salvage credit; 1 = workbook policy (PCC 25% of initial, HMA 12.5% of one mill-and-overlay)'),
-            ('Mainline area (SY)',pr['area'],'')]
+            ('Mainline area (SY)',pr['area'],''),
+            ('HMA salvage fraction',pr['hma']['salv_frac'],'TDOT policy: 2 of 16 years of the mill-and-overlay = 0.125'),
+            ('HMA salvage basis','Rehabilitation' if pr['hma']['salv_basis']=='rehab' else 'Initial','Initial or Rehabilitation (which cost the fraction applies to)'),
+            ('PCC salvage fraction',pr['pcc']['salv_frac'],'TDOT policy: 10 of 40 years of initial construction = 0.25'),
+            ('PCC salvage basis','Rehabilitation' if pr['pcc']['salv_basis']=='rehab' else 'Initial','Initial or Rehabilitation')]
     hdr(ws,4,1,['Parameter','Value','Note'])
     for i,(l,v,n) in enumerate(params):
         r=5+i; ws.cell(r,1,l).font=F_B; c=ws.cell(r,2,v); c.font=F_IN; c.fill=FILL_IN; c.border=BOX; ws.cell(r,3,n).font=F_NOTE
     ws['B5'].number_format='0.00'; ws['B8'].number_format='$#,##0.00'; ws['B9'].number_format='0%'; ws['B14'].number_format='#,##0'
+    ws['B15'].number_format='0.0%'; ws['B17'].number_format='0.0%'
+    from openpyxl.worksheet.datavalidation import DataValidation
+    dv=DataValidation(type='list',formula1='"Initial,Rehabilitation"',allow_blank=False); ws.add_data_validation(dv); dv.add('B16'); dv.add('B18')
+    ws['A20']='ACTIVITY TABLES: type the base direct cost and closure days for each policy activity (yellow). Years follow the TDOT Maintenance Policies. Copy them from the framework workbook alternative sheets (column D of the NPW table and cells F4:F10).'; ws['A20'].font=F_NOTE
     RATE,PER,Y0,DAILY,RF,DM,CM_H,CM_P,SM,AREA='$B$5','$B$6','$B$7','$B$8','$B$9','$B$10','$B$11','$B$12','$B$13','$B$14'
 
     # ---- activity tables (salvage kept outside the table so scenarios can move its year)
     tables={}
-    def activity_table(alt, col0, cm, fill):
+    def activity_table(alt, col0, cm, fill, sf, sb):
         c=lambda k: L(col0+k)
-        r0=18
-        ws.cell(16,col0,alt['name']+'  ('+alt['desc']+')').font=F_H
-        hdr(ws,17,col0,['Activity','Year','Direct cost (base $)','Closure days (base)','Direct cost (scenario)','Lost revenue (scenario)','Present worth'],fill)
+        r0=24
+        ws.cell(22,col0,alt['name']+'  ('+alt['desc']+')').font=F_H
+        hdr(ws,23,col0,['Activity','Year','Direct cost (base $)','Closure days (base)','Direct cost (scenario)','Lost revenue (scenario)','Present worth'],fill)
         rows=[('Initial construction',0,alt['initial'],0)]+[(n,y,cc,d) for n,y,cc,d in alt['events']]
         for i,(n,y,cc,d) in enumerate(rows):
             r=r0+i
             ws.cell(r,col0,n).font=F_B; ws.cell(r,col0+1,y).font=F_B
-            ws.cell(r,col0+2,cc).number_format=CUR; ws.cell(r,col0+3,d)
+            for k,v in ((2,cc),(3,d)):
+                cell=ws.cell(r,col0+k,v); cell.font=F_IN; cell.fill=FILL_IN; cell.border=BOX
+            ws.cell(r,col0+2).number_format=CUR
             ws.cell(r,col0+4,f'={c(2)}{r}*{cm}').number_format=CUR
             ws.cell(r,col0+5,f'={c(3)}{r}*{DM}*{DAILY}*{RF}').number_format=CUR
             ws.cell(r,col0+6,f'=IF({c(1)}{r}>{PER},0,({c(4)}{r}+{c(5)}{r})/(1+{RATE}/100)^{c(1)}{r})').number_format=CUR
@@ -110,15 +126,15 @@ def build_project(wb, key, pr):
         rs=rl+1
         ws.cell(rs,col0,'Salvage value (at end of period)').font=F_B
         ws.cell(rs,col0+1,f'={PER}')
-        ws.cell(rs,col0+2,salvage_base(alt)).number_format=CUR
+        ws.cell(rs,col0+2,f'=-{sf}*IF({sb}="Initial",{c(2)}{r0},SUMPRODUCT(ISNUMBER(SEARCH("Rehab",{c(0)}{r0+1}:{c(0)}{rl}))*{c(2)}{r0+1}:{c(2)}{rl}))').number_format=CUR
         ws.cell(rs,col0+4,f'={c(2)}{rs}*{cm}*{SM}').number_format=CUR
         ws.cell(rs,col0+6,f'={c(4)}{rs}/(1+{RATE}/100)^{c(1)}{rs}').number_format=CUR
         ws.cell(rs+1,col0,'Net present worth').font=F_H
         ws.cell(rs+1,col0+6,f'=SUM({c(6)}{r0}:{c(6)}{rs})').number_format=CUR; ws.cell(rs+1,col0+6).font=F_H
-        ws.cell(rs+2,col0,'Salvage basis: '+('25% of initial construction' if alt['salv_basis']=='initial' else '12.5% (2 of 16 years) of the mill-and-overlay')+' per TDOT Maintenance Policies; base costs from the 2026-05-21 workbook run').font=F_NOTE
+        ws.cell(rs+2,col0,'Salvage = fraction x basis from the parameter block (TDOT Maintenance Policies). Base costs and closure days are inputs.').font=F_NOTE
         return dict(r0=r0,rl=rl,rs=rs,rn=rs+1,col0=col0,c=c,cm=cm)
-    tables['H']=activity_table(pr['hma'],1,CM_H,FILL_HMA)
-    tables['P']=activity_table(pr['pcc'],10,CM_P,FILL_PCC)
+    tables['H']=activity_table(pr['hma'],1,CM_H,FILL_HMA,'$B$15','$B$16')
+    tables['P']=activity_table(pr['pcc'],10,CM_P,FILL_PCC,'$B$17','$B$18')
     rowNext=max(tables['H']['rn'],tables['P']['rn'])+4
 
     # generic NPW formula with explicit parameters (cell refs or literals)
@@ -145,7 +161,7 @@ def build_project(wb, key, pr):
               ('Lost revenue PW',lambda t:'='+CAT(t,'lost'),CUR),('Salvage PW',lambda t:'='+CAT(t,'salvage'),CUR),
               ('Net present worth',lambda t:f'={t["c"](6)}{t["rn"]}',CUR),
               ('Equivalent uniform annual cost',lambda t:f'={t["c"](6)}{t["rn"]}*({RATE}/100)*(1+{RATE}/100)^{PER}/((1+{RATE}/100)^{PER}-1)',CUR),
-              ('NPW per SY of mainline',lambda t:f'={t["c"](6)}{t["rn"]}/{AREA}','$#,##0.00'),
+              ('NPW per SY of mainline',lambda t:f'=IFERROR({t["c"](6)}{t["rn"]}/{AREA},0)','$#,##0.00'),
               ('Closure days in period',lambda t:'='+DAYS(t),'0'),
               ('Runway availability over period',lambda t:f'=1-({DAYS(t)})/({PER}*365)','0.00%'),
               ('Lost revenue, undiscounted',lambda t:f'=SUMPRODUCT(({t["c"](1)}{t["r0"]}:{t["c"](1)}{t["rl"]}<={PER})*{t["c"](5)}{t["r0"]}:{t["c"](5)}{t["rl"]})',CUR)]
@@ -159,7 +175,7 @@ def build_project(wb, key, pr):
     ws.cell(rv,1,'Lower-cost alternative').font=F_H
     ws.cell(rv,2,f'=IF(C{rNPW}<B{rNPW},"PCC","HMA")').font=F_H
     ws.cell(rv,3,f'=ABS(D{rNPW})').number_format=CUR
-    ws.cell(rv,4,f'=ABS(D{rNPW})/MAX(B{rNPW},C{rNPW})').number_format=PCT
+    ws.cell(rv,4,f'=IFERROR(ABS(D{rNPW})/MAX(B{rNPW},C{rNPW}),0)').number_format=PCT
     ws.cell(rv,5,f'=IF(D{rv}<0.1,"Margin inside estimating noise (<10%): treat as a tie on cost; decide on closures and constructability","Margin outside estimating noise")').font=F_NOTE
     ws.cell(rv+1,1,'Same winner at 7% (FAA AIP)?').font=F_H
     ws.cell(rv+1,2,f'=IF(({NPW(tables["P"],rate=7)})<({NPW(tables["H"],rate=7)}),"PCC","HMA")')
@@ -176,7 +192,7 @@ def build_project(wb, key, pr):
     be=[('Airport daily revenue ($/day)',f'=IFERROR(IF({be_d}<=0,"none (no positive value ties them)",{be_d}),"n/a")','$#,##0',f'={DAILY}','Daily revenue at which lost-revenue exposure alone flips the decision'),
         ('PCC cost multiplier',f'=IFERROR(({tH["c"](6)}{tH["rn"]}-{CAT(tP,"lost")})/(({pvdirect(tP)})/{CM_P}),"n/a")','0.00',f'={CM_P}','PCC bid level (x base estimate) at which the two tie'),
         ('HMA cost multiplier',f'=IFERROR(({tP["c"](6)}{tP["rn"]}-{CAT(tH,"lost")})/(({pvdirect(tH)})/{CM_H}),"n/a")','0.00',f'={CM_H}','HMA bid level (x base estimate) at which the two tie'),
-        ('PCC salvage credit (% of initial)',f'=IFERROR(({tP["c"](6)}{tP["rn"]}-{tP["c"](6)}{tP["rs"]}-{tH["c"](6)}{tH["rn"]})/({tP["c"](4)}{tP["r0"]}/(1+{RATE}/100)^{PER}),"n/a")','0.0%',f'=-{tP["c"](2)}{tP["rs"]}*{SM}/{tP["c"](2)}{tP["r0"]}','Salvage fraction PCC needs to tie; compare with the 25% policy')]
+        ('PCC salvage credit (% of initial)',f'=IFERROR(({tP["c"](6)}{tP["rn"]}-{tP["c"](6)}{tP["rs"]}-{tH["c"](6)}{tH["rn"]})/({tP["c"](4)}{tP["r0"]}/(1+{RATE}/100)^{PER}),"n/a")','0.0%',f'=IFERROR(-{tP["c"](2)}{tP["rs"]}*{SM}/{tP["c"](2)}{tP["r0"]},0)','Salvage fraction PCC needs to tie; compare with the 25% policy')]
     for i,(lab,f,fmt,cur,note) in enumerate(be):
         r=BE+2+i; ws.cell(r,1,lab).font=F_B; ws.cell(r,2,f).number_format=fmt; ws.cell(r,3,cur).number_format=fmt; ws.cell(r,4,note).font=F_NOTE
         for cc in range(1,4): ws.cell(r,cc).border=BOX
@@ -362,6 +378,54 @@ def build_project(wb, key, pr):
     ch.x_axis.scaling.orientation='maxMin'
     style_chart(ch,'Net present worth by scenario',h=12); place(ch,7)
 
+    # ================================================================= live Monte Carlo (columns AK onward)
+    N_MC=1000; mc0=37  # column AK
+    mcC=lambda k: L(mc0+k)
+    ws.cell(4,mc0,'MONTE CARLO (live): uncertain inputs drawn jointly from triangular ranges; press F9 to redraw').font=F_TITLE
+    hdr(ws,5,mc0,['Uncertain input','Min','Most likely','Max'])
+    dists=[('Discount rate (%)',2,3,7),('HMA cost multiplier',0.8,1,1.25),('PCC cost multiplier',0.8,1,1.25),('Closure-days multiplier',0.5,1,2),('Salvage multiplier',0.5,1,1),('Share of revenue lost',0.3,0.65,1)]
+    for i,(lab,a,b,cc) in enumerate(dists):
+        r=6+i; ws.cell(r,mc0,lab).font=F_B
+        for j,v in enumerate((a,b,cc)):
+            cell=ws.cell(r,mc0+1+j,v); cell.font=F_IN; cell.fill=FILL_IN; cell.border=BOX
+    d0=14  # first draw row
+    hdr(ws,d0-1,mc0,['Draw','Rate %','HMA cost x','PCC cost x','Closure x','Salvage x','Revenue share','NPW HMA','NPW PCC','PCC - HMA','u1','u2','u3','u4','u5','u6'])
+    def tri(u,row):
+        a,b,cc=f'${mcC(1)}${row}',f'${mcC(2)}${row}',f'${mcC(3)}${row}'
+        return f'IFERROR(IF({u}<({b}-{a})/({cc}-{a}),{a}+SQRT({u}*({cc}-{a})*({b}-{a})),{cc}-SQRT((1-{u})*({cc}-{a})*({cc}-{b}))),{b})'
+    for k in range(N_MC):
+        r=d0+k; ws.cell(r,mc0,k+1)
+        for j in range(6): ws.cell(r,mc0+10+j,'=RAND()')
+        for j in range(6): ws.cell(r,mc0+1+j,'='+tri(f'{mcC(10+j)}{r}',6+j))
+        drow=dict(rate=f'{mcC(1)}{r}',dm=f'{mcC(4)}{r}',sm=f'{mcC(5)}{r}',rf=f'{mcC(6)}{r}')
+        ws.cell(r,mc0+7,'='+NPW(tH,cm=f'{mcC(2)}{r}',**drow)); ws.cell(r,mc0+8,'='+NPW(tP,cm=f'{mcC(3)}{r}',**drow))
+        ws.cell(r,mc0+9,f'={mcC(8)}{r}-{mcC(7)}{r}')
+    d1=d0+N_MC-1
+    diff=f'${mcC(9)}${d0}:${mcC(9)}${d1}'
+    sc=mc0+17  # summary columns (BB..)
+    ws.cell(5,sc,'Simulation summary').font=F_H
+    summ=[('Draws',f'=COUNT({diff})','0'),('Probability PCC is lower cost',f'=COUNTIF({diff},"<0")/COUNT({diff})','0%'),
+          ('Mean PCC - HMA',f'=AVERAGE({diff})',CUR),('P10',f'=PERCENTILE({diff},0.1)',CUR),('P50 (median)',f'=PERCENTILE({diff},0.5)',CUR),('P90',f'=PERCENTILE({diff},0.9)',CUR)]
+    for i,(lab,f,fmt) in enumerate(summ):
+        ws.cell(6+i,sc,lab).font=F_B; ws.cell(6+i,sc+1,f).number_format=fmt
+    ws.cell(13,sc,'Histogram of PCC - HMA').font=F_H
+    hdr(ws,14,sc,['Bin upper edge','Draws','Cumulative'])
+    nb=20; lo=f'PERCENTILE({diff},0.01)'; hi=f'PERCENTILE({diff},0.99)'
+    for i in range(nb):
+        r=15+i
+        ws.cell(r,sc,f'={lo}+({hi}-{lo})*{i+1}/{nb}').number_format='$#,##0,"k"'
+        prev=f'{L(sc)}{r-1}' if i>0 else None
+        ws.cell(r,sc+1,f'=COUNTIF({diff},"<="&{L(sc)}{r})' + (f'-COUNTIF({diff},"<="&{prev})' if prev else ''))
+        ws.cell(r,sc+2,f'=COUNTIF({diff},"<="&{L(sc)}{r})/COUNT({diff})').number_format='0%'
+    # RESULTS link
+    ws.cell(rv+2,1,'Probability PCC is lower (live simulation, F9 redraws)').font=F_H
+    ws.cell(rv+2,2,f'={L(sc+1)}7').number_format='0%'; ws.cell(rv+2,2).font=F_H
+    ws.cell(rv+2,3,f'="P10 "&TEXT({L(sc+1)}9,"$#,##0,,")&"M   P90 "&TEXT({L(sc+1)}11,"$#,##0,,")&"M   (PCC - HMA)"').font=F_NOTE
+    ch=BarChart(); ch.type='col'; ch.grouping='clustered'; ch.gapWidth=10
+    data=Reference(ws,min_col=sc+1,max_col=sc+1,min_row=14,max_row=14+nb); cats=Reference(ws,min_col=sc,min_row=15,max_row=14+nb)
+    ch.add_data(data,titles_from_data=True); ch.set_categories(cats); color_series(ch.series[0],'4A4A4A'); ch.legend=None
+    ch.title='Monte Carlo: PCC minus HMA present worth (left of zero = PCC cheaper)'; ch.width=18; ch.height=9; ch.y_axis.title='Draws'; ch.y_axis.numFmt='0'; ch.x_axis.numFmt='$#,##0,"k"'; ch.x_axis.tickLblSkip=2; ch.x_axis.delete=False; ch.y_axis.delete=False; ch.y_axis.majorGridlines=None
+    place(ch,8)
     ws.freeze_panes='A4'
     return dict(rNPW=rNPW, R=R)
 
@@ -429,7 +493,9 @@ def build_readme(wb):
     ('3. BREAK-EVEN VALUES answer "how wrong would an input have to be" without a goal seek: daily revenue, PCC and HMA bid levels, PCC salvage fraction and discount rate at which the two alternatives tie.',F_B),
     ('4. SENSITIVITY, TORNADO, SCENARIO SCORECARD and the DECISION MAP are pre-run: the scorecard rows carry their own parameters (TDOT policy, FAA AIP 7%/20 yr, no lost revenue, 40% revenue loss, no salvage, bids +20%, closures x2 and x0.5, and a stress case).',F_B),
     ('5. Charts start in column T of each project sheet: PW by category, expenditure stream, cumulative discounted cost, rate sensitivity, tornado, closure timeline, closure days by year, NPW by scenario.',F_B),
-    ('6. MonteCarlo holds 5,000 joint-uncertainty draws per project (values) with the probability that PCC is the lower-cost alternative.',F_B),
+    ('6. A live Monte Carlo block (column AK onward on each project sheet) draws 1,000 joint scenarios from triangular ranges you can edit; RESULTS shows the probability that PCC is the lower-cost alternative. Press F9 to redraw; results move by a percent or two between draws.',F_B),
+    ('7. To analyse a new project: right-click the TEMPLATE sheet tab > Move or Copy > Create a copy, rename it, then fill the yellow cells: parameters B5:B18, and for each alternative the base direct cost and closure days of every policy activity (columns C:D and L:M of the activity tables). Take them from the framework workbook: General Information D25 (year) and D39 (daily revenue), each Alt sheet column D of the NPW table and cells F4:F10. Every table and chart updates.',F_B),
+    ('8. The workbook compares one HMA and one PCC alternative per sheet, which is how the TDOT framework is used. Activity rows follow the TDOT Maintenance Policies (six maintenance events and one rehabilitation for HMA, one maintenance and one rehabilitation for PCC); the years are editable if the policies change.',F_B),
     ('',F_B),('Method notes',F_H),
     ('Present worth = sum over activities within the period of (direct cost x cost multiplier + closure days x closure multiplier x daily revenue x revenue share lost) / (1 + r)^year, plus salvage x cost multiplier x salvage multiplier / (1 + r)^period. Initial construction is year 0. This reproduces the framework workbook NPW exactly at its own settings (3%, 30 years, multipliers = 1).',F_B),
     ('Salvage follows TDOT Maintenance Policies: PCC 25% of initial construction; HMA 12.5% of one mill-and-overlay (2 of 16 years). When the period is shortened the same fraction is applied at the end of the shorter period, which is a conservative simplification.',F_B),
@@ -442,10 +508,9 @@ def build_readme(wb):
 def main():
     wb=Workbook(); build_readme(wb)
     info={k:build_project(wb,k,pr) for k,pr in PROJECTS.items()}
-    mc=build_mc(wb)
     wb.save(OUT); print('wrote',OUT)
     for k,pr in PROJECTS.items():
-        print(k,'engine NPW HMA',round(npw(pr['hma'],3,30,pr['daily']),2),'PCC',round(npw(pr['pcc'],3,30,pr['daily']),2),
-              '| P(PCC<HMA)',round((mc[k][2]<0).mean(),3))
+        if k=='TEMPLATE': continue
+        print(k,'engine NPW HMA',round(npw(pr['hma'],3,30,pr['daily']),2),'PCC',round(npw(pr['pcc'],3,30,pr['daily']),2))
 
 if __name__=='__main__': main()

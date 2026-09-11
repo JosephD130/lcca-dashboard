@@ -91,7 +91,7 @@ Charts are coloured by pavement type: HMA blue, PCC orange (second alternative o
 | New year-indexed chart columns (L:N) on the MBT alternatives | sum of L + M equals total direct + lost revenue; sum of N equals NPW to the dollar; bars land on 2027, 2031, 2035 ... 2057 as the policy years dictate |
 | Patched chart XML | well-formed; parsed by openpyxl's chart reader with the expected category (K) and value (L, M) ranges; indirect charts stacked with two series |
 | Zip integrity and XML well-formedness of every part | pass |
-| `TDOT_LCCA_Decision_Workbook.xlsx` full recalculation | 1,370 formulas, **0 errors** |
+| `TDOT_LCCA_Decision_Workbook.xlsx` full recalculation | 47,265 formulas, **0 errors** (includes the live 1,000-draw simulation on each sheet) |
 | Decision workbook vs. independent Python engine | NPW, category split (sums to NPW), EUAC, closure days, break-even values (engine returns a $0 difference at each break-even), rate sensitivity, tornado, all 12 scenario rows and the 35-cell decision map agree to the dollar |
 | Charts rendered through LibreOffice to PDF | all eight per-project charts and the two Monte Carlo charts draw with the right series, axes and years |
 
@@ -99,9 +99,15 @@ Not verified here: the `Output.bas` VBA module (no Excel in this environment) an
 
 ## 8. Decision workbook (`TDOT_LCCA_Decision_Workbook.xlsx`)
 
-A companion, macro-free workbook that already carries the MBT and SRB runs and answers the questions the framework Summary cannot. One sheet per project; yellow cells B5:B14 drive everything.
+A companion, macro-free workbook that already carries the MBT and SRB runs and answers the questions the framework Summary cannot. One sheet per project plus a TEMPLATE sheet; yellow cells drive everything.
 
-Blocks: RESULTS (PW by category, NPW, EUAC, $/SY, closure days, runway availability, winner, margin, winner at 7%), BREAK-EVEN VALUES (daily revenue, PCC and HMA bid level, PCC salvage fraction, discount rate that tie the alternatives), DISCOUNT-RATE SENSITIVITY 2 to 8%, EXPENDITURE BY CALENDAR YEAR with cumulative PW and crossover year, WHAT COULD FLIP THE ANSWER (tornado, 8 inputs), SCENARIO SCORECARD (12 pre-run scenarios incl. FAA AIP 7%/20 yr, no lost revenue, 40% revenue loss, no salvage, bids +20%, closures x2 and x0.5, stress case), DECISION MAP (rate x salvage grid, colour-coded winner). Charts in column T: PW by category, expenditure stream, cumulative discounted cost, rate sensitivity, tornado, closure timeline (bubble), closure days by year, NPW by scenario. MonteCarlo sheet: 5,000 joint-uncertainty draws per project with P(PCC lower).
+Inputs on each sheet: discount rate, analysis period, construction year, daily revenue, share of revenue lost during a closure, closure-days multiplier, HMA and PCC cost multipliers, salvage multiplier, mainline area, and the salvage fraction and basis for each alternative (B5:B18); then, per alternative, the base direct cost and closure days of each TDOT policy activity (the activity tables). Salvage is computed from the fraction and basis. Change any of them and every table and chart follows.
+
+Blocks: RESULTS (PW by category, NPW, EUAC, $/SY, closure days, runway availability, winner, margin, winner at 7%, probability PCC is lower from the live simulation), BREAK-EVEN VALUES (daily revenue, PCC and HMA bid level, PCC salvage fraction, discount rate that tie the alternatives), DISCOUNT-RATE SENSITIVITY 2 to 8%, EXPENDITURE BY CALENDAR YEAR with cumulative PW and crossover year, WHAT COULD FLIP THE ANSWER (tornado, 8 inputs), SCENARIO SCORECARD (12 pre-run scenarios incl. FAA AIP 7%/20 yr, no lost revenue, 40% revenue loss, no salvage, bids +20%, closures x2 and x0.5, stress case), DECISION MAP (rate x salvage grid, colour-coded winner), and a live MONTE CARLO block (column AK onward: 1,000 joint draws from editable triangular ranges; F9 redraws). Charts in column T: PW by category, expenditure stream, cumulative discounted cost, rate sensitivity, tornado, closure timeline (bubble), closure days by year, NPW by scenario, simulation histogram.
+
+New project: copy the TEMPLATE sheet, rename it, fill the yellow cells from the framework workbook (General Information D25 and D39; each Alt sheet's NPW-table column D and cells F4:F10). One HMA and one PCC alternative per sheet, as the framework is used; policy years are editable.
+
+Full recalculation: 47,265 formulas, 0 errors. Every block reconciles to an independent engine; the simulation's probability moves by a percent or two between draws.
 
 Headline readings at TDOT policy settings:
 
@@ -112,6 +118,6 @@ Headline readings at TDOT policy settings:
 | Holds with zero salvage? | Barely ($33k) | Yes |
 | Closure days over 30 yr, HMA / PCC | 57 / 27 | 75 / 31 |
 | PCC bid level that ties | +9.9% | -4.1% |
-| P(PCC lower), Monte Carlo | 53% | 22% |
+| P(PCC lower), live simulation | ~52% | ~18% |
 
 Both margins are inside estimating noise. In MBT the answer is a discount-rate and salvage call; in SRB, HMA wins on cost while PCC wins on closures, so the decision is what a runway-day is worth to Aeronautics.
