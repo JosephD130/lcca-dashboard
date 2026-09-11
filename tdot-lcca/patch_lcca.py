@@ -166,6 +166,8 @@ def main(src, out, mbt_mode=False):
         # verification only: MBT Alt 1 (New HMA) = sheet14 (indirect HMA layout), Alt 2 (New PCC) = sheet15 (indirect PCC layout)
         x = rd('xl/worksheets/sheet14.xml'); x = patch_template(x, init=36, fa=37, la=51, kstart=37, kend=67, indirect=True, fix_g24=False, add_engineering=False); wr('xl/worksheets/sheet14.xml', x)
         x = rd('xl/worksheets/sheet15.xml'); x = patch_template(x, init=37, fa=38, la=42, kstart=38, kend=68, indirect=True, pcc_guard=True, fix_g24=False, add_engineering=False); wr('xl/worksheets/sheet15.xml', x)
+        for ch, sheet, ks, ke, keep in [('chart6', 'Alt 1 (New HMA)', 37, 67, 2), ('chart7', 'Alt 2 (New PCC)', 38, 68, 2)]:
+            c = rd('xl/charts/%s.xml' % ch); c = patch_chart(c, sheet, ks, ke, keep); wr('xl/charts/%s.xml' % ch, c)
     else:
         # --- templates
         x = rd('xl/worksheets/sheet10.xml'); x = patch_template(x, init=36, fa=37, la=44, kstart=37, kend=67, indirect=False); wr('xl/worksheets/sheet10.xml', x)
