@@ -1,0 +1,442 @@
+<title>TDOT LCCA Summary Redesign</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --plane:#f7f6f2; --surface:#fcfcfb; --ink:#141412; --ink-2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
+  --hma:#2a78d6; --hma-2:#6da7ec; --hma-3:#b7d3f6;
+  --pcc:#eb6834; --pcc-2:#f39c7a; --pcc-3:#f8cdb9;
+  --gray-fill:#b8b6ae; --good:#006300; --warn:#b3541e;
+  --tdot:#c8102e;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --plane:#0f0f0e; --surface:#1a1a19; --ink:#f4f3ee; --ink-2:#c3c2b7; --muted:#8f8d86;
+    --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+    --hma:#3987e5; --hma-2:#6da7ec; --hma-3:#2f4f78;
+    --pcc:#d95926; --pcc-2:#f39c7a; --pcc-3:#6b3a27;
+    --gray-fill:#5b5a55; --good:#3fbf3f; --warn:#f0a06a;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --plane:#0f0f0e; --surface:#1a1a19; --ink:#f4f3ee; --ink-2:#c3c2b7; --muted:#8f8d86;
+  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+  --hma:#3987e5; --hma-2:#6da7ec; --hma-3:#2f4f78;
+  --pcc:#d95926; --pcc-2:#f39c7a; --pcc-3:#6b3a27;
+  --gray-fill:#5b5a55; --good:#3fbf3f; --warn:#f0a06a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plane);color:var(--ink);font:16px/1.5 "Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:1140px;margin:0 auto}
+h1,h2,h3{font-family:"Archivo",system-ui,sans-serif;text-wrap:balance;margin:0}
+h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+h2{font-size:17px;font-weight:600}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+header{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:end;justify-content:space-between;padding-block:24px 16px;border-bottom:1px solid var(--grid)}
+.brand{display:flex;gap:12px;align-items:center}
+.mark{width:36px;height:36px;background:var(--tdot);color:#fff;font:700 13px/36px "Archivo",sans-serif;text-align:center;border-radius:3px}
+.sub{color:var(--ink-2);font-size:14px}
+.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--axis);border-radius:6px;overflow:hidden}
+.seg button{background:transparent;border:0;color:var(--ink-2);font:600 14px "Source Sans 3",sans-serif;padding:7px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--plane)}
+.seg button:focus-visible{outline:2px solid var(--hma);outline-offset:-2px}
+label.ctl{font-size:14px;color:var(--ink-2);display:inline-flex;gap:6px;align-items:center}
+input[type=range]{accent-color:var(--ink);width:110px}
+.verdict{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;padding-block:24px;align-items:start}
+.verdict .lead{font-family:"Archivo",sans-serif;font-size:22px;font-weight:600;line-height:1.25}
+.verdict .lead b{font-weight:700}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;border:1px solid var(--ring)}
+.chip.good{color:var(--good)} .chip.warn{color:var(--warn)}
+.note{color:var(--ink-2);font-size:14px;max-width:62ch}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--ring);border-radius:8px;padding:12px 14px;display:grid;gap:2px;position:relative}
+.kpi::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:4px;border-radius:0 3px 3px 0;background:var(--c)}
+.kpi .l{font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.kpi .v{font-family:"Archivo",sans-serif;font-size:24px;font-weight:600;line-height:1.1}
+.kpi .d{font-size:13px;color:var(--ink-2)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
+.card{background:var(--surface);border:1px solid var(--ring);border-radius:8px;padding:16px 18px 12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.card.wide{grid-column:1/-1}
+.card p{margin:0;color:var(--ink-2);font-size:14px;max-width:70ch}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink-2);margin-top:2px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+.sw.line{height:3px;border-radius:2px;width:16px}
+svg{width:100%;height:auto;display:block;font:12px "Source Sans 3",sans-serif;overflow:visible}
+svg text{fill:var(--ink-2);font-variant-numeric:tabular-nums}
+svg .t-ink{fill:var(--ink)} svg .t-mute{fill:var(--muted)}
+.gl{stroke:var(--grid);stroke-width:1} .ax{stroke:var(--axis);stroke-width:1}
+.hit{fill:transparent;pointer-events:all}
+details{margin-top:4px} summary{cursor:pointer;font-size:13px;color:var(--muted)}
+table{border-collapse:collapse;font-size:13px;width:100%;margin-top:6px;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:4px 8px;border-bottom:1px solid var(--grid)} th:first-child,td:first-child{text-align:left}
+.tbl{overflow-x:auto}
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--plane);font-size:13px;padding:6px 9px;border-radius:5px;opacity:0;transition:opacity .08s;max-width:260px;z-index:9;line-height:1.35}
+#tip b{font-weight:600}
+.why{margin-top:28px;border-top:1px solid var(--grid);padding-top:18px}
+.why ol{margin:8px 0 0;padding-left:20px;color:var(--ink-2);font-size:14px;max-width:80ch}
+.why li{margin-bottom:6px}
+.foot{color:var(--muted);font-size:12px;margin-top:24px}
+@media (max-width:820px){.verdict,.grid{grid-template-columns:1fr}.card.wide{grid-column:auto}}
+@media (prefers-reduced-motion:reduce){#tip{transition:none}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="brand">
+    <div class="mark">TN</div>
+    <div>
+      <div class="eyebrow">Aeronautics Division · LCCA Framework v1.1.2 · proposed Summary sheet</div>
+      <h1 id="title">Runway 18-36 Reconstruction, Murfreesboro (MBT)</h1>
+      <div class="sub" id="subtitle"></div>
+    </div>
+  </div>
+  <div class="filters">
+    <div class="seg" role="group" aria-label="Project">
+      <button id="btn-mbt" aria-pressed="true" data-p="MBT">MBT</button>
+      <button id="btn-srb" aria-pressed="false" data-p="SRB">SRB</button>
+    </div>
+    <label class="ctl">Discount <input id="rate" type="range" min="2" max="8" step="0.5" value="3"> <span id="rate-v">3.0%</span></label>
+    <label class="ctl"><input id="ind" type="checkbox" checked> Lost revenue</label>
+  </div>
+</header>
+
+<section class="verdict">
+  <div>
+    <div class="eyebrow">Result</div>
+    <div class="lead" id="lead"></div>
+    <div style="margin:10px 0 8px;display:flex;gap:8px;flex-wrap:wrap" id="chips"></div>
+    <p class="note" id="lead-note"></p>
+  </div>
+  <div class="kpis" id="kpis"></div>
+</section>
+
+<div class="grid">
+  <div class="card wide">
+    <h2>Where the difference comes from</h2>
+    <p>Bridge from the HMA net present worth to the PCC net present worth, one step per cost category. The step that dwarfs the others is the one the reviewer should question first.</p>
+    <div id="bridge"></div>
+    <details><summary>Table view</summary><div class="tbl" id="bridge-t"></div></details>
+  </div>
+
+  <div class="card">
+    <h2>Expenditure stream, HMA</h2>
+    <p>Undiscounted spend by calendar year. Real years on the axis, not positions 1 to 31.</p>
+    <div id="stream-hma"></div>
+  </div>
+  <div class="card">
+    <h2>Expenditure stream, PCC</h2>
+    <p>Same axis and scale as HMA so bar heights compare across the two panels.</p>
+    <div id="stream-pcc"></div>
+  </div>
+  <div class="card wide" style="padding-top:8px">
+    <div class="legend" id="stream-legend"></div>
+    <details><summary>Table view</summary><div class="tbl" id="stream-t"></div></details>
+  </div>
+
+  <div class="card">
+    <h2>Cumulative discounted cost</h2>
+    <p>Running present worth through the analysis period. Where the lines cross is the payback year for the higher first cost; the drop at the end is salvage.</p>
+    <div id="cum"></div>
+    <div class="legend" id="cum-legend"></div>
+  </div>
+
+  <div class="card">
+    <h2>Discount-rate sensitivity</h2>
+    <p>Net present worth of each alternative across the rate range. TDOT's 3 percent and the FAA AIP handbook's 7 percent are marked.</p>
+    <div id="sens"></div>
+    <div class="legend" id="sens-legend"></div>
+  </div>
+
+  <div class="card wide">
+    <h2>Runway closure timeline</h2>
+    <p>Every maintenance or rehabilitation closure over the analysis period, sized by days closed. This is the chart Aeronautics asked for when they added lost revenue: how often, how long, and what it costs the airport.</p>
+    <div id="closures"></div>
+    <details><summary>Table view</summary><div class="tbl" id="closures-t"></div></details>
+  </div>
+
+  <div class="card wide">
+    <h2>What could flip the answer</h2>
+    <p>Swing in the PCC minus HMA present worth when one input moves across its plausible range. Bars crossing zero mean the winner changes.</p>
+    <div id="tornado"></div>
+    <details><summary>Table view</summary><div class="tbl" id="tornado-t"></div></details>
+  </div>
+</div>
+
+<section class="why">
+  <div class="eyebrow">Why these charts replace the current ones</div>
+  <ol>
+    <li><b>Current per-alternative chart</b> plots undiscounted and discounted bars side by side on positions 1 to 31 with no year labels, and its title is set once by VBA and goes stale when alternatives are reordered. The two stream panels above share one calendar axis and one scale.</li>
+    <li><b>Current Summary chart</b> is a clustered bar of initial cost versus present worth with a raw-number axis. It cannot show why one alternative wins. The bridge does that in one read.</li>
+    <li><b>Nothing today shows robustness.</b> The sensitivity line and the tornado answer the reviewer's first question: does this hold at 7 percent, and what happens if salvage is wrong.</li>
+    <li><b>Nothing today shows closures</b>, which is the whole reason the 2026 update exists.</li>
+  </ol>
+</section>
+<div class="foot">Mockup built from the inputs in the MBT and SRB workbooks dated 2026-05-21 (3 percent, 30 years, construction 2027). Engine reproduces the workbook NPW to the dollar at the workbook's own settings. Every panel maps to a native Excel chart driven by a helper table on the Summary sheet; no add-ins. Illustrative layout for discussion, not a deliverable.</div>
+</div>
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script>
+// ---------- data (from the workbooks) ----------
+const PROJECTS = {
+  MBT: {
+    title:"Runway 18-36 Reconstruction, Murfreesboro (MBT)",
+    sub:"52,778 SY mainline · 5,433 SF markings · daily revenue $8,841 · construction 2027",
+    daily:8841.38, area:52777.7,
+    hma:{ name:"Alt 1 · New HMA", desc:"5\" P-401 on 16\" P-209", initial:5306576.53, salvage:{frac:.125, basis:"rehab"},
+      events:[["Maintenance 1",4,482829.92,6],["Maintenance 2",8,482829.92,6],["Maintenance 3",12,547129.30,8],["Maintenance 4",16,561004.48,8],["Rehabilitation 1",20,2302557.72,15],["Maintenance 5",24,482829.92,6],["Maintenance 6",28,577147.05,8]]},
+    pcc:{ name:"Alt 2 · New PCC", desc:"8\" P-501 on 6\" P-209", initial:8410244.97, salvage:{frac:.25, basis:"initial"},
+      events:[["Maintenance 1",19,306563.68,9],["Rehabilitation 1",27,428405.86,18]]},
+  },
+  SRB: {
+    title:"Runway Reconstruction, Upper Cumberland Regional (SRB)",
+    sub:"74,489 SY mainline · 22,052 SF markings · daily revenue $4,344 · construction 2027",
+    daily:4344.12, area:74488.89,
+    hma:{ name:"Alt 2 · New HMA", desc:"4\" P-401 + 5\" P-403 on 6\" P-209", initial:9009181.19, salvage:{frac:.125, basis:"rehab"},
+      events:[["Maintenance 1",4,714698.49,8],["Maintenance 2",8,714698.49,8],["Maintenance 3",12,805448.74,10],["Maintenance 4",16,825031.76,10],["Rehabilitation 1",20,3270106.16,21],["Maintenance 5",24,714698.49,8],["Maintenance 6",28,847814.90,10]]},
+    pcc:{ name:"Alt 1 · New PCC", desc:"11\" P-501 on 6\" P-209 + P-403 base", initial:15445398.25, salvage:{frac:.25, basis:"initial"},
+      events:[["Maintenance 1",19,432674.93,11],["Rehabilitation 1",27,604639.40,20]]},
+  }
+};
+const PERIOD=30, YEAR0=2027;
+
+// ---------- engine ----------
+function run(alt, o){ // o: rate(%), daily, useInd, costMul, salvMul, dayMul
+  const r=o.rate/100, rows=[];
+  const init=alt.initial*o.costMul;
+  rows.push({name:"Initial construction",year:0,cat:"initial",direct:init,indirect:0,days:0});
+  let rehabCost=0;
+  for(const [n,y,c,d] of alt.events){
+    const direct=c*o.costMul, days=Math.round(d*o.dayMul);
+    const ind=o.useInd? days*o.daily:0;
+    rows.push({name:n,year:y,cat:/Rehab/.test(n)?"rehab":"maint",direct,indirect:ind,days});
+    if(/Rehab/.test(n)) rehabCost=direct;
+  }
+  const basis=alt.salvage.basis==="initial"?init:rehabCost;
+  rows.push({name:"Salvage value",year:PERIOD,cat:"salvage",direct:-basis*alt.salvage.frac*o.salvMul,indirect:0,days:0});
+  let npw=0, agency=0, indirect=0;
+  for(const x of rows){ const f=1/Math.pow(1+r,x.year); x.pvD=x.direct*f; x.pvI=x.indirect*f; npw+=x.pvD+x.pvI; agency+=x.pvD; indirect+=x.pvI; }
+  const byCat={initial:0,maint:0,rehab:0,indirect:0,salvage:0};
+  for(const x of rows){ byCat[x.cat]+=x.pvD; byCat.indirect+=x.pvI; }
+  const days=rows.reduce((s,x)=>s+x.days,0);
+  return {rows,npw,agency,indirect,byCat,days,initial:init};
+}
+
+// ---------- helpers ----------
+const $=s=>document.querySelector(s);
+const fmtM=v=>{const a=Math.abs(v);const s=v<0?"−":"";return a>=1e6? s+"$"+(a/1e6).toFixed(2)+"M": a>=1e3? s+"$"+Math.round(a/1e3)+"k": s+"$"+Math.round(a);};
+const fmt$=v=>(v<0?"−":"")+"$"+Math.round(Math.abs(v)).toLocaleString();
+const pct=v=>(v*100).toFixed(1)+"%";
+const cs=getComputedStyle(document.documentElement);
+const C=()=>({hma:cs.getPropertyValue("--hma").trim(),hma2:cs.getPropertyValue("--hma-2").trim(),hma3:cs.getPropertyValue("--hma-3").trim(),pcc:cs.getPropertyValue("--pcc").trim(),pcc2:cs.getPropertyValue("--pcc-2").trim(),pcc3:cs.getPropertyValue("--pcc-3").trim(),gray:cs.getPropertyValue("--gray-fill").trim(),surface:cs.getPropertyValue("--surface").trim()});
+const tip=$("#tip");
+function bindTips(root){
+  root.querySelectorAll("[data-tip]").forEach(el=>{
+    el.addEventListener("mousemove",e=>{tip.innerHTML=el.dataset.tip;tip.style.opacity=1;tip.style.left=(e.clientX+14)+"px";tip.style.top=(e.clientY+14)+"px";});
+    el.addEventListener("mouseleave",()=>tip.style.opacity=0);
+  });
+}
+function niceMax(v){const p=Math.pow(10,Math.floor(Math.log10(v)));const m=v/p;const n=m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10;return n*p;}
+function table(el, head, rows){ el.innerHTML="<table><thead><tr>"+head.map(h=>"<th>"+h+"</th>").join("")+"</tr></thead><tbody>"+rows.map(r=>"<tr>"+r.map((c,i)=>"<td>"+c+"</td>").join("")+"</tr>").join("")+"</tbody></table>"; }
+
+// ---------- state ----------
+let P="MBT", rate=3, useInd=true;
+function render(){
+  const pr=PROJECTS[P], col=C();
+  const base={rate,daily:pr.daily,useInd,costMul:1,salvMul:1,dayMul:1};
+  const H=run(pr.hma,base), K=run(pr.pcc,base);
+  $("#title").textContent=pr.title; $("#subtitle").textContent=pr.sub;
+  $("#rate-v").textContent=rate.toFixed(1)+"%";
+
+  // verdict
+  const diff=K.npw-H.npw, lowName=diff<0?"PCC":"HMA", lowAlt=diff<0?pr.pcc:pr.hma, hiAlt=diff<0?pr.hma:pr.pcc;
+  const lo=Math.min(H.npw,K.npw), hi=Math.max(H.npw,K.npw);
+  $("#lead").innerHTML=`<b>${lowName}</b> has the lower present worth by <b>${fmtM(Math.abs(diff))}</b>, ${pct(Math.abs(diff)/hi)} of the ${diff<0?"HMA":"PCC"} total, at ${rate.toFixed(1)}% over 30 years.`;
+  // robustness across 2..8 and salvage
+  const flips=[];
+  for(let rr=2;rr<=8;rr+=0.5){const o={...base,rate:rr};const d=run(pr.pcc,o).npw-run(pr.hma,o).npw;if(Math.sign(d)!==Math.sign(diff))flips.push(rr);}
+  const noSalv=run(pr.pcc,{...base,salvMul:0}).npw-run(pr.hma,{...base,salvMul:0}).npw;
+  const chips=[];
+  chips.push(flips.length? `<span class="chip warn">⚠ Winner flips at ${flips[0].toFixed(1)}%${flips.length>1?" and above":""}</span>` : `<span class="chip good">✓ Same winner from 2% to 8%</span>`);
+  chips.push(Math.sign(noSalv)!==Math.sign(diff)? `<span class="chip warn">⚠ Flips with salvage set to zero</span>` : `<span class="chip good">✓ Holds with zero salvage</span>`);
+  $("#chips").innerHTML=chips.join("");
+  const margin=Math.abs(diff)/hi;
+  $("#lead-note").textContent = margin<0.10 ? `A ${pct(margin)} margin is inside normal estimating noise for a planning-level LCCA. Treat the two as equivalent on cost and decide on closure exposure and constructability.` : `A ${pct(margin)} margin is outside estimating noise. The bridge below shows which line item carries it.`;
+
+  // KPIs
+  const kpi=(l,v,d,c)=>`<div class="kpi" style="--c:${c}"><div class="l">${l}</div><div class="v">${v}</div><div class="d">${d}</div></div>`;
+  $("#kpis").innerHTML=[
+    kpi(pr.hma.name+" · NPW",fmtM(H.npw),`agency ${fmtM(H.agency)} · lost revenue ${fmtM(H.indirect)}`,col.hma),
+    kpi(pr.pcc.name+" · NPW",fmtM(K.npw),`agency ${fmtM(K.agency)} · lost revenue ${fmtM(K.indirect)}`,col.pcc),
+    kpi("HMA · initial · closures",fmtM(H.initial),`${H.days} closure days over 30 yr · ${H.rows.length-2} events`,col.hma),
+    kpi("PCC · initial · closures",fmtM(K.initial),`${K.days} closure days over 30 yr · ${K.rows.length-2} events`,col.pcc),
+  ].join("");
+
+  drawBridge(H,K,pr,col);
+  drawStreams(H,K,pr,col);
+  drawCum(H,K,pr,col);
+  drawSens(pr,base,col);
+  drawClosures(H,K,pr,col);
+  drawTornado(pr,base,diff,col);
+  bindTips(document);
+}
+
+// ---------- bridge ----------
+function drawBridge(H,K,pr,col){
+  const cats=[["initial","Initial construction"],["maint","Maintenance"],["rehab","Rehabilitation"],["indirect","Lost revenue"],["salvage","Salvage credit"]];
+  const steps=[]; let acc=H.npw;
+  for(const [k,l] of cats){const d=K.byCat[k]-H.byCat[k];steps.push({l,d,from:acc,to:acc+d});acc+=d;}
+  const W=1040,Hh=250,ml=60,mr=20,mt=16,mb=40,pw=W-ml-mr,ph=Hh-mt-mb;
+  const vals=[H.npw,K.npw,...steps.flatMap(s=>[s.from,s.to])];
+  const ymax=niceMax(Math.max(...vals)*1.05), ymin=Math.min(0,...vals);
+  const y=v=>mt+ph-(v-ymin)/(ymax-ymin)*ph;
+  const n=steps.length+2, bw=pw/n, bar=bw*0.58;
+  let s=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Present worth bridge from HMA to PCC">`;
+  for(let i=0;i<=4;i++){const v=ymin+(ymax-ymin)*i/4;s+=`<line class="gl" x1="${ml}" x2="${W-mr}" y1="${y(v)}" y2="${y(v)}"/><text x="${ml-8}" y="${y(v)+4}" text-anchor="end" class="t-mute">${fmtM(v)}</text>`;}
+  const rect=(x,v0,v1,fill,label,tipTxt,name)=>{const top=Math.min(y(v0),y(v1)),h=Math.max(2,Math.abs(y(v0)-y(v1)));s+=`<rect x="${x}" y="${top}" width="${bar}" height="${h}" rx="3" fill="${fill}" data-tip="${tipTxt}"/><text x="${x+bar/2}" y="${top-6}" text-anchor="middle" class="t-ink" font-weight="600">${label}</text><text x="${x+bar/2}" y="${Hh-mb+18}" text-anchor="middle">${name}</text>`;};
+  let x=ml+(bw-bar)/2;
+  rect(x,0,H.npw,col.hma,fmtM(H.npw),`<b>${pr.hma.name}</b><br>NPW ${fmt$(H.npw)}`,"HMA NPW");
+  steps.forEach((st,i)=>{x+=bw;const fill=st.d>0?col.gray:col.hma3;rect(x,st.from,st.to,fill,(st.d>0?"+":"−")+fmtM(Math.abs(st.d)),`<b>${st.l}</b><br>HMA ${fmt$(H.byCat[cats[i][0]])}<br>PCC ${fmt$(K.byCat[cats[i][0]])}<br>Δ ${fmt$(st.d)}`,st.l.replace("construction","").replace(" credit",""));
+    s+=`<line x1="${x-bw+bar}" x2="${x}" y1="${y(st.from)}" y2="${y(st.from)}" stroke="var(--axis)" stroke-dasharray="3 3"/>`;});
+  x+=bw; rect(x,0,K.npw,col.pcc,fmtM(K.npw),`<b>${pr.pcc.name}</b><br>NPW ${fmt$(K.npw)}`,"PCC NPW");
+  s+=`<line class="ax" x1="${ml}" x2="${W-mr}" y1="${y(0)}" y2="${y(0)}"/></svg>`;
+  $("#bridge").innerHTML=s;
+  table($("#bridge-t"),["Category","HMA PW","PCC PW","PCC − HMA"],cats.map(([k,l])=>[l,fmt$(H.byCat[k]),fmt$(K.byCat[k]),fmt$(K.byCat[k]-H.byCat[k])]).concat([["<b>Total</b>","<b>"+fmt$(H.npw)+"</b>","<b>"+fmt$(K.npw)+"</b>","<b>"+fmt$(K.npw-H.npw)+"</b>"]]));
+}
+
+// ---------- expenditure streams ----------
+function drawStreams(H,K,pr,col){
+  const ymax=niceMax(Math.max(H.initial,K.initial)*1.05);
+  const ymin=-niceMax(Math.max(-Math.min(...H.rows.map(r=>r.direct)),-Math.min(...K.rows.map(r=>r.direct)))*1.1);
+  const mk=(A,fills,id,label)=>{
+    const W=520,Hh=230,ml=52,mr=8,mt=14,mb=30,pw=W-ml-mr,ph=Hh-mt-mb;
+    const y=v=>mt+ph-(v-ymin)/(ymax-ymin)*ph;
+    const xs=yr=>ml+(yr/PERIOD)*pw; const bw=pw/PERIOD*0.7;
+    let s=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Expenditure stream ${label}">`;
+    const ticks=[ymin,0,ymax/2,ymax];
+    ticks.forEach(v=>{s+=`<line class="gl" x1="${ml}" x2="${W-mr}" y1="${y(v)}" y2="${y(v)}"/><text x="${ml-6}" y="${y(v)+4}" text-anchor="end" class="t-mute">${fmtM(v)}</text>`;});
+    for(let yr=0;yr<=PERIOD;yr+=5) s+=`<text x="${xs(yr)}" y="${Hh-8}" text-anchor="middle" class="t-mute">${YEAR0+yr}</text>`;
+    // group by year
+    const byYear={};
+    A.rows.forEach(r=>{(byYear[r.year]=byYear[r.year]||[]).push(r);});
+    for(const yr in byYear){
+      let up=0, dn=0;
+      for(const r of byYear[yr]){
+        const segs=[[r.direct,fills[r.cat],r.name],[r.indirect,col.gray,"Lost revenue · "+r.days+" days"]];
+        for(const [v,f,nm] of segs){ if(!v) continue;
+          const x=xs(+yr)-bw/2;
+          if(v>0){const t=y(up+v),b=y(up);s+=`<rect x="${x}" y="${t}" width="${bw}" height="${Math.max(1.5,b-t-1)}" rx="2" fill="${f}" data-tip="<b>${nm}</b><br>${YEAR0+ +yr} · ${fmt$(v)}"/>`;up+=v;}
+          else{const t=y(dn),b=y(dn+v);s+=`<rect x="${x}" y="${t+1}" width="${bw}" height="${Math.max(1.5,b-t-1)}" rx="2" fill="${f}" data-tip="<b>${nm}</b><br>${YEAR0+ +yr} · ${fmt$(v)}"/>`;dn+=v;}
+        }
+      }
+    }
+    s+=`<line class="ax" x1="${ml}" x2="${W-mr}" y1="${y(0)}" y2="${y(0)}"/></svg>`;
+    $(id).innerHTML=s;
+  };
+  mk(H,{initial:col.hma,rehab:col.hma2,maint:col.hma3,salvage:col.hma3},"#stream-hma","HMA");
+  mk(K,{initial:col.pcc,rehab:col.pcc2,maint:col.pcc3,salvage:col.pcc3},"#stream-pcc","PCC");
+  $("#stream-legend").innerHTML=`<span><i class="sw" style="background:${col.hma}"></i>/<i class="sw" style="background:${col.pcc}"></i> Initial construction</span><span><i class="sw" style="background:${col.hma2}"></i>/<i class="sw" style="background:${col.pcc2}"></i> Rehabilitation</span><span><i class="sw" style="background:${col.hma3}"></i>/<i class="sw" style="background:${col.pcc3}"></i> Maintenance, salvage (below zero)</span><span><i class="sw" style="background:${col.gray}"></i> Lost revenue during closure</span>`;
+  const rows=[...H.rows.map(r=>["HMA",r.name,YEAR0+r.year,fmt$(r.direct),fmt$(r.indirect),fmt$(r.pvD+r.pvI)]),...K.rows.map(r=>["PCC",r.name,YEAR0+r.year,fmt$(r.direct),fmt$(r.indirect),fmt$(r.pvD+r.pvI)])];
+  table($("#stream-t"),["Alt","Activity","Year","Direct","Lost revenue","Present worth"],rows);
+}
+
+// ---------- cumulative ----------
+function drawCum(H,K,pr,col){
+  const series=A=>{const out=[];let c=0;for(let yr=0;yr<=PERIOD;yr++){A.rows.filter(r=>r.year===yr).forEach(r=>c+=r.pvD+r.pvI);out.push(c);}return out;};
+  const h=series(H),k=series(K);
+  const W=520,Hh=250,ml=56,mr=44,mt=14,mb=30,pw=W-ml-mr,ph=Hh-mt-mb;
+  const ymax=niceMax(Math.max(...h,...k)*1.05);
+  const y=v=>mt+ph-v/ymax*ph, x=i=>ml+i/PERIOD*pw;
+  let s=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Cumulative discounted cost">`;
+  for(let i=0;i<=4;i++){const v=ymax*i/4;s+=`<line class="gl" x1="${ml}" x2="${W-mr}" y1="${y(v)}" y2="${y(v)}"/><text x="${ml-6}" y="${y(v)+4}" text-anchor="end" class="t-mute">${fmtM(v)}</text>`;}
+  for(let yr=0;yr<=PERIOD;yr+=5) s+=`<text x="${x(yr)}" y="${Hh-8}" text-anchor="middle" class="t-mute">${YEAR0+yr}</text>`;
+  const path=a=>a.map((v,i)=>(i?"L":"M")+x(i)+" "+y(v)).join(" ");
+  // crossover
+  let cross=null; for(let i=1;i<=PERIOD;i++){ if(Math.sign(k[i]-h[i])!==Math.sign(k[i-1]-h[i-1])) {cross=i;} }
+  s+=`<path d="${path(h)}" fill="none" stroke="${col.hma}" stroke-width="2.5" stroke-linejoin="round"/><path d="${path(k)}" fill="none" stroke="${col.pcc}" stroke-width="2.5" stroke-linejoin="round"/>`;
+  if(cross!==null){s+=`<line x1="${x(cross)}" x2="${x(cross)}" y1="${mt}" y2="${y(0)}" stroke="var(--axis)" stroke-dasharray="3 3"/><text x="${x(cross)+(cross>PERIOD*0.6?-5:5)}" y="${mt+12}" text-anchor="${cross>PERIOD*0.6?"end":"start"}" class="t-ink" font-weight="600">Lines cross ${YEAR0+cross}</text>`;}
+  s+=`<text x="${x(PERIOD)+4}" y="${y(h[PERIOD])+4}" class="t-ink" font-weight="600" text-anchor="start">HMA</text><text x="${x(PERIOD)+4}" y="${y(k[PERIOD])+4}" class="t-ink" font-weight="600">PCC</text>`;
+  // hover columns
+  for(let i=0;i<=PERIOD;i++){s+=`<rect class="hit" x="${x(i)-pw/PERIOD/2}" y="${mt}" width="${pw/PERIOD}" height="${ph}" data-tip="<b>${YEAR0+i}</b><br>HMA ${fmt$(h[i])}<br>PCC ${fmt$(k[i])}"/>`;}
+  s+=`<line class="ax" x1="${ml}" x2="${W-mr}" y1="${y(0)}" y2="${y(0)}"/></svg>`;
+  $("#cum").innerHTML=s;
+  $("#cum-legend").innerHTML=`<span><i class="sw line" style="background:${col.hma}"></i> ${pr.hma.name}</span><span><i class="sw line" style="background:${col.pcc}"></i> ${pr.pcc.name}</span>`;
+}
+
+// ---------- sensitivity ----------
+function drawSens(pr,base,col){
+  const rates=[]; for(let r=2;r<=8;r+=0.25) rates.push(r);
+  const h=rates.map(r=>run(pr.hma,{...base,rate:r}).npw), k=rates.map(r=>run(pr.pcc,{...base,rate:r}).npw);
+  const W=520,Hh=250,ml=56,mr=14,mt=14,mb=30,pw=W-ml-mr,ph=Hh-mt-mb;
+  const all=[...h,...k], ymax=niceMax(Math.max(...all)*1.02), ymin=Math.floor(Math.min(...all)/1e6*0.9)*1e6;
+  const y=v=>mt+ph-(v-ymin)/(ymax-ymin)*ph, x=r=>ml+(r-2)/6*pw;
+  let s=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Discount-rate sensitivity">`;
+  for(let i=0;i<=4;i++){const v=ymin+(ymax-ymin)*i/4;s+=`<line class="gl" x1="${ml}" x2="${W-mr}" y1="${y(v)}" y2="${y(v)}"/><text x="${ml-6}" y="${y(v)+4}" text-anchor="end" class="t-mute">${fmtM(v)}</text>`;}
+  for(let r=2;r<=8;r++) s+=`<text x="${x(r)}" y="${Hh-8}" text-anchor="middle" class="t-mute">${r}%</text>`;
+  const mark=(r,l)=>s+=`<line x1="${x(r)}" x2="${x(r)}" y1="${mt}" y2="${y(ymin)}" stroke="var(--axis)" stroke-dasharray="3 3"/><text x="${x(r)+4}" y="${mt+11}" class="t-mute">${l}</text>`;
+  mark(3,"TDOT 3%"); mark(7,"FAA AIP 7%");
+  const path=a=>a.map((v,i)=>(i?"L":"M")+x(rates[i])+" "+y(v)).join(" ");
+  s+=`<path d="${path(h)}" fill="none" stroke="${col.hma}" stroke-width="2.5"/><path d="${path(k)}" fill="none" stroke="${col.pcc}" stroke-width="2.5"/>`;
+  rates.forEach((r,i)=>{s+=`<rect class="hit" x="${x(r)-pw/24/2}" y="${mt}" width="${pw/24}" height="${ph}" data-tip="<b>${r.toFixed(2)}%</b><br>HMA ${fmt$(h[i])}<br>PCC ${fmt$(k[i])}<br>PCC − HMA ${fmt$(k[i]-h[i])}"/>`;});
+  const cur=base.rate; s+=`<circle cx="${x(cur)}" cy="${y(run(pr.hma,base).npw)}" r="5" fill="${col.hma}" stroke="${col.surface}" stroke-width="2"/><circle cx="${x(cur)}" cy="${y(run(pr.pcc,base).npw)}" r="5" fill="${col.pcc}" stroke="${col.surface}" stroke-width="2"/>`;
+  s+=`<line class="ax" x1="${ml}" x2="${W-mr}" y1="${y(ymin)}" y2="${y(ymin)}"/></svg>`;
+  $("#sens").innerHTML=s;
+  $("#sens-legend").innerHTML=`<span><i class="sw line" style="background:${col.hma}"></i> ${pr.hma.name}</span><span><i class="sw line" style="background:${col.pcc}"></i> ${pr.pcc.name}</span><span>● current rate</span>`;
+}
+
+// ---------- closures ----------
+function drawClosures(H,K,pr,col){
+  const W=1040,Hh=160,ml=150,mr=20,mt=24,pw=W-ml-mr;
+  const x=yr=>ml+yr/PERIOD*pw;
+  const maxD=Math.max(...H.rows.map(r=>r.days),...K.rows.map(r=>r.days));
+  let s=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Closure timeline">`;
+  for(let yr=0;yr<=PERIOD;yr+=5) s+=`<line class="gl" x1="${x(yr)}" x2="${x(yr)}" y1="${mt}" y2="${Hh-28}"/><text x="${x(yr)}" y="${Hh-10}" text-anchor="middle" class="t-mute">${YEAR0+yr}</text>`;
+  const lane=(A,yy,c,label)=>{
+    s+=`<line class="ax" x1="${ml}" x2="${W-mr}" y1="${yy}" y2="${yy}"/><text x="${ml-8}" y="${yy+4}" text-anchor="end" class="t-ink" font-weight="600">${label}</text>`;
+    A.rows.filter(r=>r.days>0).forEach(r=>{const rr=6+ (r.days/maxD)*12;s+=`<circle cx="${x(r.year)}" cy="${yy}" r="${rr}" fill="${c}" stroke="${col.surface}" stroke-width="2" data-tip="<b>${r.name}</b><br>${YEAR0+r.year} · ${r.days} days closed<br>lost revenue ${fmt$(r.indirect)}"/><text x="${x(r.year)}" y="${yy-rr-5}" text-anchor="middle" class="t-ink">${r.days}d</text>`;});
+    s+=`<text x="${ml-8}" y="${yy+18}" text-anchor="end" class="t-mute">${A.days} days · ${fmtM(A.rows.reduce((t,r)=>t+r.indirect,0))} lost</text>`;
+  };
+  lane(H,mt+30,col.hma,"HMA"); lane(K,mt+90,col.pcc,"PCC");
+  s+=`</svg>`;
+  $("#closures").innerHTML=s;
+  table($("#closures-t"),["Alt","Activity","Year","Days closed","Lost revenue (undiscounted)"],[...H.rows,...K.rows].filter(r=>r.days>0).map((r,i)=>[H.rows.includes(r)?"HMA":"PCC",r.name,YEAR0+r.year,r.days,fmt$(r.indirect)]));
+}
+
+// ---------- tornado ----------
+function drawTornado(pr,base,diff,col){
+  const d=o=>run(pr.pcc,{...base,...o}).npw-run(pr.hma,{...base,...o}).npw;
+  const items=[
+    ["Discount rate 2% → 8%", d({rate:2}), d({rate:8}), "2%", "8%"],
+    ["PCC salvage 0% → 25% of initial", run(pr.pcc,{...base,salvMul:0}).npw-run(pr.hma,base).npw, diff, "0%", "25%"],
+    ["HMA salvage 0% → 12.5% of rehab", run(pr.pcc,base).npw-run(pr.hma,{...base,salvMul:0}).npw, diff, "0%", "12.5%"],
+    ["PCC direct costs −20% → +20%", run(pr.pcc,{...base,costMul:.8}).npw-run(pr.hma,base).npw, run(pr.pcc,{...base,costMul:1.2}).npw-run(pr.hma,base).npw, "−20%", "+20%"],
+    ["HMA direct costs −20% → +20%", run(pr.pcc,base).npw-run(pr.hma,{...base,costMul:.8}).npw, run(pr.pcc,base).npw-run(pr.hma,{...base,costMul:1.2}).npw, "−20%", "+20%"],
+    ["Closure days ×0.5 → ×2", d({dayMul:.5}), d({dayMul:2}), "×0.5", "×2"],
+    ["Lost revenue excluded", d({useInd:false}), diff, "off", "on"],
+  ].map(([l,a,b,la,lb])=>({l,lo:Math.min(a,b),hi:Math.max(a,b),a,b,la,lb})).sort((p,q)=>(q.hi-q.lo)-(p.hi-p.lo));
+  const W=1040,rowH=30,ml=250,mr=90,mt=26,pw=W-ml-mr,Hh=mt+items.length*rowH+30;
+  const ext=niceMax(Math.max(...items.flatMap(i=>[Math.abs(i.lo),Math.abs(i.hi)]),Math.abs(diff))*1.05);
+  const x=v=>ml+(v+ext)/(2*ext)*pw;
+  let s=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Tornado of PCC minus HMA present worth">`;
+  [-ext,-ext/2,0,ext/2,ext].forEach(v=>{s+=`<line class="gl" x1="${x(v)}" x2="${x(v)}" y1="${mt-6}" y2="${Hh-24}"/><text x="${x(v)}" y="${Hh-8}" text-anchor="middle" class="t-mute">${fmtM(v)}</text>`;});
+  s+=`<text x="${x(-ext)}" y="${mt-12}" class="t-mute">← PCC cheaper</text><text x="${x(ext)}" y="${mt-12}" text-anchor="end" class="t-mute">HMA cheaper →</text>`;
+  items.forEach((it,i)=>{const yy=mt+i*rowH; const flip=(it.lo<0&&it.hi>0);
+    s+=`<text x="${ml-10}" y="${yy+rowH/2+4}" text-anchor="end" class="t-ink">${it.l}</text>`;
+    s+=`<rect x="${x(it.lo)}" y="${yy+6}" width="${Math.max(2,x(it.hi)-x(it.lo))}" height="${rowH-12}" rx="3" fill="${flip?col.gray:(diff<0?col.pcc3:col.hma3)}" stroke="${flip?"var(--warn)":"none"}" stroke-width="1.5" data-tip="<b>${it.l}</b><br>${it.la}: ${fmt$(it.a)}<br>${it.lb}: ${fmt$(it.b)}"/>`;
+    s+=`<text x="${x(it.lo)-5}" y="${yy+rowH/2+4}" text-anchor="end" class="t-mute">${it.a<it.b?it.la:it.lb}</text><text x="${x(it.hi)+5}" y="${yy+rowH/2+4}" class="t-mute">${it.a<it.b?it.lb:it.la}</text>`;
+  });
+  s+=`<line x1="${x(0)}" x2="${x(0)}" y1="${mt-6}" y2="${Hh-24}" stroke="var(--ink)" stroke-width="1.5"/><line x1="${x(diff)}" x2="${x(diff)}" y1="${mt-6}" y2="${Hh-24}" stroke="var(--ink)" stroke-dasharray="3 3"/><text x="${x(diff)+4}" y="${Hh-28}" class="t-ink">base ${fmtM(diff)}</text></svg>`;
+  $("#tornado").innerHTML=s;
+  table($("#tornado-t"),["Input","Low case","High case","Swing"],items.map(i=>[i.l,fmt$(i.a),fmt$(i.b),fmt$(i.hi-i.lo)]));
+}
+
+// ---------- controls ----------
+document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{P=b.dataset.p;document.querySelectorAll(".seg button").forEach(o=>o.setAttribute("aria-pressed",o===b));render();}));
+$("#rate").addEventListener("input",e=>{rate=+e.target.value;render();});
+$("#ind").addEventListener("change",e=>{useInd=e.target.checked;render();});
+render();
+</script>
