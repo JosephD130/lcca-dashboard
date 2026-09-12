@@ -49,7 +49,7 @@
  ],
  [
   "Q4",
-  "=IF($G4=\"\",\"\",IFERROR(SUM(INDIRECT(\"'\"&$G4&\"'!$F$4:$F$10\")),0))"
+  "=IF($G4=\"\",\"\",IF(IFERROR(INDIRECT(\"'\"&$G4&\"'!$F$2\"),0)>0,SUM($AG$41:$AG$71),IFERROR(SUM(INDIRECT(\"'\"&$G4&\"'!$F$4:$F$10\")),0)))"
  ],
  [
   "R4",
@@ -57,7 +57,7 @@
  ],
  [
   "G9",
-  "=IF(COUNT($O$4:$O$7)=0,\"No alternatives yet. Go to General Information and click Alternative Setup.\",\"Lowest present worth: \"&INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))&\"   |   margin to next: \"&TEXT(SMALL($O$4:$O$7,MIN(2,COUNT($O$4:$O$7)))-MIN($O$4:$O$7),\"$#,##0\")&\"   |   \"&'General Information'!$D$34&\"% over \"&'General Information'!$D$33&\" years   |   lost revenue: \"&'General Information'!$D$38)"
+  "=IF(COUNT($O$4:$O$7)=0,\"No alternatives yet. Go to General Information and click Alternative Setup.\",\"Lowest present worth: \"&INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))&IF(COUNT($O$4:$O$7)<2,\"   |   only one alternative so far\",\"   |   margin to next: \"&TEXT(SMALL($O$4:$O$7,2)-MIN($O$4:$O$7),\"$#,##0\"))&\"   |   \"&'General Information'!$D$34&\"% over \"&'General Information'!$D$33&\" years   |   lost revenue: \"&'General Information'!$D$38)"
  ],
  [
   "G10",

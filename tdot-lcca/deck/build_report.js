@@ -251,7 +251,7 @@ children.push(h1('7. The Summary sheet'));
 children.push(p('The VBA project is not changed. The v1.1.2 Summary consisted of five columns written by the Alternative Setup form (alternative, name, initial construction, present worth, description) and one clustered-bar chart. v1.2.0 keeps those five columns and that chart exactly as the form writes them, moves the chart beside the new charts, and adds from column G onward a results table, a verdict line and five charts that are ordinary worksheet formulas. They read the list of alternative worksheets that the form stores on the hidden Database sheet, reach into each worksheet with INDIRECT, and therefore follow whatever alternatives exist, up to the four rows the form allows.'));
 children.push(table([
   ['Block', 'What it shows', 'How it is computed'],
-  ['Results table G3:R7', 'Worksheet, alternative, type, initial construction, maintenance PW, rehabilitation PW, lost revenue PW, salvage PW, net present worth, difference to the lowest NPW, closure days in the period, runway availability', 'Database!A:D for the names; INDEX/MATCH on "Total" and "Net Present Worth"; SUMIFS over the NPW-table window (rows 37 to 52) on the row labels ("Maintenance*", "Rehabilitation*", "*Indirect*", "Salvage*"); SUM of F4:F10 for closure days'],
+  ['Results table G3:R7', 'Worksheet, alternative, type, initial construction, maintenance PW, rehabilitation PW, lost revenue PW, salvage PW, net present worth, difference to the lowest NPW, closure days in the period, runway availability', 'Database!A:D for the names; INDEX/MATCH on "Total" and "Net Present Worth"; SUMIFS over the NPW-table window (rows 37 to 52) on the row labels ("Maintenance*", "Rehabilitation*", "*Indirect*", "Salvage*"); closure days = sum of the by-year closure block (indirect cost / daily revenue, years within the analysis period), falling back to SUM of F4:F10 when lost revenue is off'],
   ['Verdict line G9:G10', 'Lowest present worth, margin to the next alternative, discount rate, period, lost-revenue setting; whether the same alternative is lowest at 7 percent', 'INDEX/MATCH on the NPW column; SMALL for the margin; comparison against the 7 percent row of the sensitivity block'],
   ['Chart 1 (G14)', 'Present worth by category, stacked, salvage below zero', 'Category block W3:AA9'],
   ['Chart 2 (N14)', 'NPW versus discount rate, 2 to 8 percent in 0.25 steps', 'Sensitivity block W10:AA36: initial + SUMPRODUCT((year <= period) x cost / (1+r)^year) per alternative'],
@@ -316,7 +316,7 @@ children.push(table([
   ['Check', 'Method', 'Result'],
   ['v1.2.0 workbook integrity', 'Zip test; every XML, rels and VML part parsed', 'Pass; 463 cells changed across 7 sheets, 1 validation, 5 text runs, 5 chart parts, 1 comments part'],
   ['v1.2.0 full recalculation', 'LibreOffice Calc calculateAll, then scan of every cell for error values', '2,240 formulas including the new Summary, 0 errors'],
-  ['New Summary on the MBT data', 'Summary transplanted into the MBT workbook; full recalculation; rendered to PDF', 'Table reads NPW $8,809,266 and $8,028,734, categories sum to NPW, closure days 57 and 27, flags the winner change at 7 percent; six charts parse in an independent reader and render; on the empty template the sheet reads "No alternatives yet" with no error cells'],
+  ['New Summary on the MBT data', 'Summary transplanted into the MBT workbook; full recalculation; rendered to PDF', 'Table reads NPW $8,809,266 and $8,028,734, categories sum to NPW, closure days 57 (HMA) and 9 for PCC in that file (its rehabilitation indirect row is mislabelled, see Appendix C; the v1.2.0 template gives 27), flags the winner change at 7 percent; six charts parse in an independent reader and render; on the empty template the sheet reads "No alternatives yet" with no error cells'],
   ['v1.1.2 under the same recalculation', 'Same', '99 error cells: 39 #NAME? (XLOOKUP) and 60 #N/A (unguarded PCC lookups, revenue lookup)'],
   ['Template formulas on real data', 'Formula changes applied to the MBT workbook alternative sheets; full recalculation', 'NPW unchanged: HMA $8,809,266.42, PCC $8,028,734.49; PCC rows 17 to 22 = 0 (were #N/A)'],
   ['Year-indexed chart columns', 'Sum of L + M against activity totals; sum of N against NPW; per-year values against policy years', 'HMA: L+M = $10,959,044 = totals; N = $8,809,266 = NPW. PCC: L+M = $7,281,371; N = $8,028,734. Appendix D'],
@@ -324,6 +324,7 @@ children.push(table([
   ['Decision workbook recalculation', 'LibreOffice Calc calculateAll; error scan', '47,265 formulas, 0 errors'],
   ['Decision workbook against independent engine', 'Python implementation of Section 8.1', 'NPW, category split (sums to NPW), EUAC, closure days, break-even values (engine returns a $0 difference at each), 25-point sensitivity, tornado, 12 scenarios and 35-cell decision map agree to the dollar'],
   ['Decision workbook charts', 'Rendered to PDF and inspected', 'All eight per-project charts and the simulation histogram draw with the intended series, axes and years'],
+  ['Scripted click-through', 'LibreOffice UNO API: open both workbooks, follow every button target, change discount rate, analysis period, indirect-cost flag and airport, remove alternatives (verification/uno_walkthrough.py)', 'All three buttons land on visible sheets; 7 percent flips the verdict to Alternative 1; 20 years drops HMA closures to 43 days and PCC rehabilitation to $0; an unknown airport gives $0 lost revenue with the G2 warning and no error cells; one alternative and none read cleanly'],
   ['Not verified in this environment', '', 'Display of the alternative-sheet charts in Excel (LibreOffice does not draw charts on the ActiveX-bearing sheets). Closed by Section 12.'],
 ], [2300, 3000, 4060], { size: 15 }));
 
@@ -414,7 +415,7 @@ children.push(table([
   ['2027', '8,410,245', '0', '8,410,245'], ['2046', '306,564', '79,572', '220,208'], ['2054', '587,551', '0*', '264,509'], ['2057', '-2,102,561', '0', '-866,227'],
   ['Sum', '7,201,798', '79,572', '8,028,734 = NPW'],
 ], [2340, 2340, 2340, 2340], { size: 15 }));
-children.push(p([r('* In the MBT file the PCC rehabilitation indirect row is labelled "Rehabilitation 1" rather than "Rehabilitation 1 Indirect Cost", so its $159,145 is counted as direct there. The v1.2.0 template label is correct.', { size: 16, italics: true })], { before: 80 }));
+children.push(p([r('* In the MBT file the PCC rehabilitation indirect row is labelled "Rehabilitation 1" rather than "Rehabilitation 1 Indirect Cost", so its $159,145 is counted as direct there and its 18 closure days are not counted by the Summary in that file. The v1.2.0 template label is correct.', { size: 16, italics: true })], { before: 80 }));
 
 // ------------------------------------------------------------------ document
 const doc = new Document({

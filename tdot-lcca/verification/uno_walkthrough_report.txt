@@ -1,0 +1,113 @@
+===== TEMPLATE TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm
+  sheet 'TMP(NewPCC)_IndirectCost'       visible=False charts=1 shapes={'OLE2Shape': 1, 'ControlShape': 10}
+  sheet 'Overview'                       visible=True charts=0 shapes={'GraphicObjectShape': 1, 'CustomShape': 1}
+  sheet 'Instructions'                   visible=True charts=0 shapes={'GraphicObjectShape': 1, 'CustomShape': 1}
+  sheet 'General Information'            visible=True charts=0 shapes={'GraphicObjectShape': 1, 'ControlShape': 1}
+  sheet 'Pay_Items'                      visible=True charts=0 shapes={}
+  sheet 'Database'                       visible=False charts=0 shapes={}
+  sheet 'Maintenance Policies'           visible=True charts=0 shapes={'GraphicObjectShape': 1}
+  sheet 'TMP(NewHMA)_IndirectCost'       visible=False charts=1 shapes={'OLE2Shape': 1, 'ControlShape': 10}
+  sheet 'RevenueData'                    visible=False charts=0 shapes={}
+  sheet 'TMP(NewHMA)'                    visible=False charts=1 shapes={'OLE2Shape': 1, 'ControlShape': 34}
+  sheet 'TMP(NewPCC)'                    visible=False charts=1 shapes={'OLE2Shape': 1, 'ControlShape': 19}
+  sheet 'TMP(HMARehab)'                  visible=False charts=1 shapes={'OLE2Shape': 1, 'ControlShape': 32}
+  sheet 'TMP(PCCRehab)'                  visible=False charts=0 shapes={}
+  sheet 'Summary'                        visible=True charts=6 shapes={'OLE2Shape': 6}
+  -- hyperlink buttons
+    General Information!$D$44 "View Summary  ►" -> Summary!G1  target exists=True landed=Summary visible=True
+    Summary!$A$1  "◄ General Information" -> 'General Information'!D9  target exists=True landed=General Information visible=True
+    Summary!$B$1  "Instructions" -> Instructions!B9  target exists=True landed=Instructions visible=True
+  -- error cells after full recalc: none
+  [as loaded] D34=3.0 D33=30.0 D38=No D10='N/A'
+     G9 : No alternatives yet. Go to General Information and click Alternative Setup.
+     G10: 
+     sens@3%: 0 / 0   sens@7%: 0 / 0   cat sums: 0 / 0
+     by-year nonzero rows: 0 first [] last [] | cumPW end: 0 / 0
+     errors: none
+     [D10=MBT, D38=Yes] template F2= 8841.38 G2= '' GI D39=  $8,841.38 
+     [D10=unknown, D38=Yes] template F2= 0.0 G2= 'No revenue data for this airport - lost revenue set to $0. Contact Aeronautics.' GI D39=  Missing Airport Revenue  errors: none
+     [D38=No] template F2= 0.0 G2= ''
+===== MBT MBT_check.xlsm
+  sheet 'TMP(NewPCC)_IndirectCost'       visible=False charts=1 shapes={'OLE2Shape': 1, 'GraphicObjectShape': 19}
+  sheet 'Overview'                       visible=True charts=0 shapes={'GraphicObjectShape': 1, 'CustomShape': 1}
+  sheet 'Instructions'                   visible=True charts=0 shapes={'GraphicObjectShape': 1, 'CustomShape': 1}
+  sheet 'General Information'            visible=True charts=0 shapes={'GraphicObjectShape': 2}
+  sheet 'Pay_Items'                      visible=True charts=0 shapes={}
+  sheet 'Database'                       visible=True charts=0 shapes={}
+  sheet 'Maintenance Policies'           visible=True charts=0 shapes={'GraphicObjectShape': 1}
+  sheet 'TMP(NewHMA)_IndirectCost'       visible=False charts=1 shapes={'OLE2Shape': 1, 'GraphicObjectShape': 34}
+  sheet 'Indirect Cost Items'            visible=True charts=0 shapes={}
+  sheet 'TMP(NewHMA)'                    visible=False charts=1 shapes={'OLE2Shape': 1, 'GraphicObjectShape': 34}
+  sheet 'TMP(NewPCC)'                    visible=False charts=1 shapes={'OLE2Shape': 1, 'GraphicObjectShape': 19}
+  sheet 'TMP(HMARehab)'                  visible=False charts=1 shapes={'OLE2Shape': 1, 'GraphicObjectShape': 32}
+  sheet 'TMP(PCCRehab)'                  visible=False charts=0 shapes={}
+  sheet 'Alt 1 (New HMA)'                visible=True charts=1 shapes={'OLE2Shape': 1, 'GraphicObjectShape': 34}
+  sheet 'Alt 2 (New PCC)'                visible=True charts=1 shapes={'OLE2Shape': 1, 'GraphicObjectShape': 19}
+  sheet 'Summary'                        visible=True charts=6 shapes={'OLE2Shape': 6}
+  -- hyperlink buttons
+    General Information!$D$44 "View Summary  ►" -> Summary!G1  target exists=True landed=Summary visible=True
+    Summary!$A$1  "◄ General Information" -> 'General Information'!D9  target exists=True landed=General Information visible=True
+    Summary!$B$1  "Instructions" -> Instructions!B9  target exists=True landed=Instructions visible=True
+  -- error cells after full recalc: {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}
+  [as loaded] D34=3.0 D33=30.0 D38=Yes D10='MBT'
+     row4: Alternative 1 HMA-New init=5,306,577 maint=2,033,261 rehab=1,274,870 lost=313,136 salv=-118,578 NPW=8,809,266 delta=780,532 days=57 avail=0.9948
+     row5: Alternative 2 PCC-New init=8,410,245 maint=174,829 rehab=264,509 lost=45,379 salv=-866,227 NPW=8,028,734 delta=0 days=9 avail=0.9992
+     G9 : Lowest present worth: Alternative 2   |   margin to next: $780,532   |   3% over 30 years   |   lost revenue: Yes
+     G10: At the FAA AIP rate of 7% the lowest-cost alternative changes: see chart 2.
+     sens@3%: 8,809,266 / 8,028,734   sens@7%: 7,310,185 / 8,335,362   cat sums: 8,809,266 / 8,028,734
+     by-year nonzero rows: 11 first [(2027, 5306576.5345103135, 8410244.969511298, 0.0, 0.0), (2031, 535878.1976753927, 0.0, 6.0, 0.0)] last [(2057, -287819.7147292403, -2102561.2423778246, 0.0, 0.0)] | cumPW end: 8,809,266 / 8,028,734
+     errors: {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}
+  [D34=7] D34=7.0 D33=30.0 D38=Yes D10='MBT'
+     row4: Alternative 1 HMA-New init=5,306,577 maint=1,264,316 rehab=595,025 lost=182,077 salv=-37,810 NPW=7,310,185 delta=0 days=57 avail=0.9948
+     row5: Alternative 2 PCC-New init=8,410,245 maint=84,767 rehab=94,555 lost=22,002 salv=-276,207 NPW=8,335,362 delta=1,025,177 days=9 avail=0.9992
+     G9 : Lowest present worth: Alternative 1   |   margin to next: $1,025,177   |   7% over 30 years   |   lost revenue: Yes
+     G10: At the FAA AIP rate of 7% the lowest-cost alternative changes: see chart 2.
+     sens@3%: 8,809,266 / 8,028,734   sens@7%: 7,310,185 / 8,335,362   cat sums: 7,310,185 / 8,335,362
+     by-year nonzero rows: 11 first [(2027, 5306576.5345103135, 8410244.969511298, 0.0, 0.0), (2031, 535878.1976753927, 0.0, 6.0, 0.0)] last [(2057, -287819.7147292403, -2102561.2423778246, 0.0, 0.0)] | cumPW end: 7,310,185 / 8,335,362
+     errors: {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}
+  [D33=20] D34=3.0 D33=20.0 D38=Yes D10='MBT'
+     row4: Alternative 1 HMA-New init=5,306,577 maint=1,543,483 rehab=1,274,870 lost=256,125 salv=-159,359 NPW=8,221,697 delta=755,381 days=43 avail=0.9941
+     row5: Alternative 2 PCC-New init=8,410,245 maint=174,829 rehab=0 lost=45,379 salv=-1,164,137 NPW=7,466,316 delta=0 days=9 avail=0.9988
+     G9 : Lowest present worth: Alternative 2   |   margin to next: $755,381   |   3% over 20 years   |   lost revenue: Yes
+     G10: At the FAA AIP rate of 7% the lowest-cost alternative changes: see chart 2.
+     sens@3%: 8,221,697 / 7,466,316   sens@7%: 7,070,528 / 7,973,673   cat sums: 8,221,697 / 7,466,316
+     by-year nonzero rows: 7 first [(2027, 5306576.5345103135, 8410244.969511298, 0.0, 0.0), (2031, 535878.1976753927, 0.0, 6.0, 0.0)] last [(2047, 2147358.703104682, -2102561.2423778246, 15.0, 0.0)] | cumPW end: 8,221,697 / 7,466,316
+     errors: {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}
+  [D38=No] D34=3.0 D33=30.0 D38=No D10='MBT'
+     row4: Alternative 1 HMA-New init=5,306,577 maint=2,033,261 rehab=1,274,870 lost=313,136 salv=-118,578 NPW=8,809,266 delta=780,532 days=57 avail=0.9948
+     row5: Alternative 2 PCC-New init=8,410,245 maint=174,829 rehab=264,509 lost=45,379 salv=-866,227 NPW=8,028,734 delta=0 days=9 avail=0.9992
+     G9 : Lowest present worth: Alternative 2   |   margin to next: $780,532   |   3% over 30 years   |   lost revenue: No
+     G10: At the FAA AIP rate of 7% the lowest-cost alternative changes: see chart 2.
+     sens@3%: 8,809,266 / 8,028,734   sens@7%: 7,310,185 / 8,335,362   cat sums: 8,809,266 / 8,028,734
+     by-year nonzero rows: 11 first [(2027, 5306576.5345103135, 8410244.969511298, 0.0, 0.0), (2031, 535878.1976753927, 0.0, 6.0, 0.0)] last [(2057, -287819.7147292403, -2102561.2423778246, 0.0, 0.0)] | cumPW end: 8,809,266 / 8,028,734
+     errors: {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}
+  [D10=unknown airport] D34=3.0 D33=30.0 D38=Yes D10='Zzz Test Airport'
+     row4: Alternative 1 HMA-New init=5,306,577 maint=2,033,261 rehab=1,274,870 lost=313,136 salv=-118,578 NPW=8,809,266 delta=780,532 days=57 avail=0.9948
+     row5: Alternative 2 PCC-New init=8,410,245 maint=174,829 rehab=264,509 lost=45,379 salv=-866,227 NPW=8,028,734 delta=0 days=9 avail=0.9992
+     G9 : Lowest present worth: Alternative 2   |   margin to next: $780,532   |   3% over 30 years   |   lost revenue: Yes
+     G10: At the FAA AIP rate of 7% the lowest-cost alternative changes: see chart 2.
+     sens@3%: 8,809,266 / 8,028,734   sens@7%: 7,310,185 / 8,335,362   cat sums: 8,809,266 / 8,028,734
+     by-year nonzero rows: 11 first [(2027, 5306576.5345103135, 8410244.969511298, 0.0, 0.0), (2031, 535878.1976753927, 0.0, 6.0, 0.0)] last [(2057, -287819.7147292403, -2102561.2423778246, 0.0, 0.0)] | cumPW end: 8,809,266 / 8,028,734
+     errors: {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}
+     alt1 G2 warning: '' F2= 8841.38
+  [one alternative] D34=3.0 D33=30.0 D38=Yes D10='MBT'
+     row4: Alternative 1 HMA-New init=5,306,577 maint=2,033,261 rehab=1,274,870 lost=313,136 salv=-118,578 NPW=8,809,266 delta=0 days=57 avail=0.9948
+     G9 : Lowest present worth: Alternative 1   |   only one alternative so far   |   3% over 30 years   |   lost revenue: Yes
+     G10: 
+     sens@3%: 8,809,266 / 0   sens@7%: 7,310,185 / 0   cat sums: 8,809,266 / 0
+     by-year nonzero rows: 9 first [(2027, 5306576.5345103135, 0.0, 0.0, 0.0), (2031, 535878.1976753927, 0.0, 6.0, 0.0)] last [(2057, -287819.7147292403, 0.0, 0.0, 0.0)] | cumPW end: 8,809,266 / 0
+     errors: {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}
+  [no alternatives] D34=3.0 D33=30.0 D38=Yes D10='MBT'
+     G9 : No alternatives yet. Go to General Information and click Alternative Setup.
+     G10: 
+     sens@3%: 0 / 0   sens@7%: 0 / 0   cat sums: 0 / 0
+     by-year nonzero rows: 0 first [] last [] | cumPW end: 0 / 0
+     errors: {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}
+  [restored] D34=3.0 D33=30.0 D38=Yes D10='MBT'
+     row4: Alternative 1 HMA-New init=5,306,577 maint=2,033,261 rehab=1,274,870 lost=313,136 salv=-118,578 NPW=8,809,266 delta=780,532 days=57 avail=0.9948
+     row5: Alternative 2 PCC-New init=8,410,245 maint=174,829 rehab=264,509 lost=45,379 salv=-866,227 NPW=8,028,734 delta=0 days=9 avail=0.9992
+     G9 : Lowest present worth: Alternative 2   |   margin to next: $780,532   |   3% over 30 years   |   lost revenue: Yes
+     G10: At the FAA AIP rate of 7% the lowest-cost alternative changes: see chart 2.
+     sens@3%: 8,809,266 / 8,028,734   sens@7%: 7,310,185 / 8,335,362   cat sums: 8,809,266 / 8,028,734
+     by-year nonzero rows: 11 first [(2027, 5306576.5345103135, 8410244.969511298, 0.0, 0.0), (2031, 535878.1976753927, 0.0, 6.0, 0.0)] last [(2057, -287819.7147292403, -2102561.2423778246, 0.0, 0.0)] | cumPW end: 8,809,266 / 8,028,734
+     errors: {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}

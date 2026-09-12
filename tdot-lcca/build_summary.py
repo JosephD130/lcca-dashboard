@@ -70,14 +70,15 @@ def build_scratch(path):
         ws.cell(r, 14, f'=IF({g}="","",IFERROR(SUMIFS({E},{B},"Salvage*"),0))')
         ws.cell(r, 15, f'=IF({g}="","",IFERROR(INDEX(INDIRECT("\'"&{g}&"\'!$E$1:$E$70"),MATCH("Net Present Worth",INDIRECT("\'"&{g}&"\'!$B$1:$B$70"),0)),0))')
         ws.cell(r, 16, f'=IF({g}="","",O{r}-MIN($O$4:$O$7))')
-        ws.cell(r, 17, f'=IF({g}="","",IFERROR(SUM(INDIRECT("\'"&{g}&"\'!$F$4:$F$10")),0))')
+        dcol = L(DC + 2 + 2 * NALT + i)  # this alternative's closure-days column in the by-year block (period-aware)
+        ws.cell(r, 17, f'=IF({g}="","",IF(IFERROR(INDIRECT("\'"&{g}&"\'!$F$2"),0)>0,SUM(${dcol}$41:${dcol}$71),IFERROR(SUM(INDIRECT("\'"&{g}&"\'!$F$4:$F$10")),0)))')
         ws.cell(r, 18, f'=IF({g}="","",1-Q{r}/({GI}!$D$33*365))')
         for c in range(10, 17): ws.cell(r, c).number_format = CUR
         ws.cell(r, 18).number_format = '0.00%'
         for c in range(7, 19): ws.cell(r, c).font = F_B; ws.cell(r, c).border = BOX
     S7 = f'${L(DC+1)}${12+20}:${L(DC+NALT)}${12+20}'  # 7.00% row of the sensitivity data block
     ws['G9'] = (f'=IF(COUNT($O$4:$O$7)=0,"No alternatives yet. Go to General Information and click Alternative Setup.",'
-                f'"Lowest present worth: "&INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))&"   |   margin to next: "&TEXT(SMALL($O$4:$O$7,MIN(2,COUNT($O$4:$O$7)))-MIN($O$4:$O$7),"$#,##0")'
+                f'"Lowest present worth: "&INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))&IF(COUNT($O$4:$O$7)<2,"   |   only one alternative so far","   |   margin to next: "&TEXT(SMALL($O$4:$O$7,2)-MIN($O$4:$O$7),"$#,##0"))'
                 f'&"   |   "&{GI}!$D$34&"% over "&{GI}!$D$33&" years   |   lost revenue: "&{GI}!$D$38)')
     ws['G9'].font = F_H; ws['G9'].fill = FILL_VERDICT
     for c in range(8, 19): ws.cell(9, c).fill = FILL_VERDICT

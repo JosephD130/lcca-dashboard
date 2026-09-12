@@ -272,13 +272,12 @@ table(s, [
   ['Framework v1.2.0, full recalculation in LibreOffice Calc', '2,240 formulas incl. the new Summary, 0 errors (v1.1.2 shows 99 error cells under the same recalc)'],
   ['Patch applied to the populated MBT workbook', 'NPW unchanged: $8,809,266 and $8,028,734; PCC blank rows now 0, not #N/A'],
   ['New year-indexed chart columns', 'Direct plus lost revenue reconciles to activity totals; discounted column sums to NPW to the dollar'],
-  ['Patched chart XML', 'Well-formed; parsed by an independent chart reader with the intended year categories'],
   ['Decision workbook, full recalculation', '47,265 formulas, 0 errors'],
   ['Decision workbook against an independent engine', 'NPW, categories, break-evens, sensitivity, tornado, 12 scenarios and the decision map agree to the dollar'],
-  ['Charts rendered to PDF', 'All eight per-project charts and the simulation histogram draw correctly'],
   ['New Summary sheet on the MBT data', 'Table, verdict, categories and closure days match; six charts render; template reads "No alternatives yet" with no errors'],
+  ['Scripted click-through (LibreOffice API)', 'Buttons land where they should; 7% flips the verdict as flagged; 20 years drops late closures; unknown airport gives $0 lost revenue with a warning, no errors'],
   ['Not yet verified', 'The alternative-sheet charts in Excel itself (no Excel here); a first-open check is in the notes'],
-], 0.5, 1.3, 9.0, [3.6, 5.4], 10.5);
+], 0.5, 1.2, 9.0, [3.4, 5.6], 10);
 s.addNotes('The first-open check: pick an airport, set Yes, add one HMA and one PCC alternative, confirm Summary and Alt sheet columns L:N.');
 
 // ---------------------------------------------------------------- 14 how TDOT uses it

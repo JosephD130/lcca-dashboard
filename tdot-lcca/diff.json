@@ -2488,7 +2488,7 @@
    {
     "cell": "Q4",
     "before": null,
-    "after": "=IF($G4=\"\",\"\",IFERROR(SUM(INDIRECT(\"'\"&$G4&\"'!$F$4:$F$10\")),0))"
+    "after": "=IF($G4=\"\",\"\",IF(IFERROR(INDIRECT(\"'\"&$G4&\"'!$F$2\"),0)>0,SUM($AG$41:$AG$71),IFERROR(SUM(INDIRECT(\"'\"&$G4&\"'!$F$4:$F$10\")),0)))"
    },
    {
     "cell": "R4",
@@ -2573,7 +2573,7 @@
    {
     "cell": "Q5",
     "before": null,
-    "after": "=IF($G5=\"\",\"\",IFERROR(SUM(INDIRECT(\"'\"&$G5&\"'!$F$4:$F$10\")),0))"
+    "after": "=IF($G5=\"\",\"\",IF(IFERROR(INDIRECT(\"'\"&$G5&\"'!$F$2\"),0)>0,SUM($AH$41:$AH$71),IFERROR(SUM(INDIRECT(\"'\"&$G5&\"'!$F$4:$F$10\")),0)))"
    },
    {
     "cell": "R5",
@@ -2658,7 +2658,7 @@
    {
     "cell": "Q6",
     "before": null,
-    "after": "=IF($G6=\"\",\"\",IFERROR(SUM(INDIRECT(\"'\"&$G6&\"'!$F$4:$F$10\")),0))"
+    "after": "=IF($G6=\"\",\"\",IF(IFERROR(INDIRECT(\"'\"&$G6&\"'!$F$2\"),0)>0,SUM($AI$41:$AI$71),IFERROR(SUM(INDIRECT(\"'\"&$G6&\"'!$F$4:$F$10\")),0)))"
    },
    {
     "cell": "R6",
@@ -2743,7 +2743,7 @@
    {
     "cell": "Q7",
     "before": null,
-    "after": "=IF($G7=\"\",\"\",IFERROR(SUM(INDIRECT(\"'\"&$G7&\"'!$F$4:$F$10\")),0))"
+    "after": "=IF($G7=\"\",\"\",IF(IFERROR(INDIRECT(\"'\"&$G7&\"'!$F$2\"),0)>0,SUM($AJ$41:$AJ$71),IFERROR(SUM(INDIRECT(\"'\"&$G7&\"'!$F$4:$F$10\")),0)))"
    },
    {
     "cell": "R7",
@@ -2803,7 +2803,7 @@
    {
     "cell": "G9",
     "before": null,
-    "after": "=IF(COUNT($O$4:$O$7)=0,\"No alternatives yet. Go to General Information and click Alternative Setup.\",\"Lowest present worth: \"&INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))&\"   |   margin to next: \"&TEXT(SMALL($O$4:$O$7,MIN(2,COUNT($O$4:$O$7)))-MIN($O$4:$O$7),\"$#,##0\")&\"   |   \"&'General Information'!$D$34&\"% over \"&'General Information'!$D$33&\" years   |   lost revenue: \"&'General Information'!$D$38)"
+    "after": "=IF(COUNT($O$4:$O$7)=0,\"No alternatives yet. Go to General Information and click Alternative Setup.\",\"Lowest present worth: \"&INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))&IF(COUNT($O$4:$O$7)<2,\"   |   only one alternative so far\",\"   |   margin to next: \"&TEXT(SMALL($O$4:$O$7,2)-MIN($O$4:$O$7),\"$#,##0\"))&\"   |   \"&'General Information'!$D$34&\"% over \"&'General Information'!$D$33&\" years   |   lost revenue: \"&'General Information'!$D$38)"
    },
    {
     "cell": "W9",
@@ -5809,7 +5809,7 @@
  ],
  "hashes": {
   "8eaa2547-TDOA_LCCA_Framework_v1.1.2_ARA_Task2_08182026.xlsm": "b0680f2a90e86654a5d7e57eb29ae45e960ddf7b517ccb65bc2978afaee4705a",
-  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "68da37c3f338cf181eddfaa93763fb9136b3607b07e8770148f4895d99f7296b",
+  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "658bc324ab1f46e5e5f59e92317c991c7e6c3bcc926238123ca95bf98759ccc8",
   "TDOT_LCCA_Decision_Workbook.xlsx": "27626ed0e58784a85c3894dcd7cafc8108c0576d5db7acd7eb47e0c5a34ed658",
   "Output.bas": "7e7e1cad7c0d41cc23d929d643a2e4ce5861761c2885f82e9a0b0757a0a8fd82",
   "35f08cad-TDOA_LCCA_Framework_v1.1.2_MBT_20260521_LostRevenue_1.xlsm": "117135e9facc9395b88883c3ffd4de48b67cb997605d6ad0a1acd7d64edfb08b",

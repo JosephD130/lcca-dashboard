@@ -43,8 +43,10 @@ populates it with no further steps:
 - Results table G3:R7: worksheet, alternative, type, initial construction, maintenance PW,
   rehabilitation PW, lost revenue PW, salvage PW, net present worth, difference to the lowest,
   closure days in the analysis period, runway availability.
-- Verdict line G9: lowest-cost alternative and its margin to the next; G10 flags whether the same
-  alternative is lowest at the FAA AIP rate of 7%.
+- Verdict line G9: lowest-cost alternative and its margin to the next (or "only one alternative so
+  far"); G10 flags whether the same alternative is lowest at the FAA AIP rate of 7%.
+- Closure days count only activities inside the analysis period (from the by-year block), so a
+  20-year run drops the late maintenance closures; with lost revenue off it falls back to F4:F10.
 - Five charts: 1 present worth by category (stacked, salvage below zero); 2 NPW versus discount
   rate 2% to 8% in 0.25 steps; 3 expenditure stream by calendar year (undiscounted); 4 cumulative
   discounted cost by year; 5 runway closure days by calendar year.
@@ -89,6 +91,12 @@ populates it with no further steps:
 5. Pick an airport outside the 17 with D38 = Yes: G2 on each Alt sheet should show the warning and
    lost revenue should be $0, not #N/A.
 6. Click the three navigation buttons.
+
+Scripted click-through done here (LibreOffice, UNO API): every button target exists and lands on a
+visible sheet; changing D34 to 7 flips the verdict to Alternative 1 (the 7% flag already warned);
+D33 = 20 drops HMA closure days from 57 to 43 and PCC rehabilitation to $0; an airport outside the
+17 gives lost revenue $0 with the warning in G2 and no error cells; one alternative and none both
+read cleanly. Values were not saved.
 
 Verification done here (LibreOffice Calc, full recalculation): the template workbook recalculates
 with 2,240 formulas and 0 errors (v1.1.2 shows 99 error cells under the same recalc). The same
