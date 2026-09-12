@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #8A8F98; font-family: Arial, Helvetica, sans-serif; color: #1D2733; }
+    a { color: #2A78D6; } a:hover { color: #1D5BA6; }
+    .win { background: #FFFFFF; min-height: 100%; display: flex; flex-direction: column; }
+    .colstrip { display: flex; height: 17px; background: #F2F3F5; border-bottom: 1px solid #D7DBE0; font-size: 10px; flex: none; }
+    .colstrip .c { justify-content: center; border-right: 1px solid #E3E6EA; color: #77808C; }
+    .grid { counter-reset: row; flex: 1 1 auto; }
+    .r { display: flex; height: 18px; counter-increment: row; }
+    .rh { width: 34px; flex: none; background: #F2F3F5; border-right: 1px solid #D7DBE0; color: #77808C; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+    .rh::before { content: counter(row); }
+    .colstrip .rh::before { content: ""; }
+    .c { display: flex; align-items: center; padding: 0 5px; box-sizing: border-box; font-size: 12.5px; line-height: 1.15; overflow: hidden; white-space: nowrap; flex: none; }
+    .wA { width: 100px; } .wB { width: 150px; } .wC { width: 300px; } .wD { width: 300px; }
+    .wE { width: 245px; } .wF { width: 90px; } .wG { width: 100px; }
+    .b { font-weight: bold; } .right { justify-content: flex-end; }
+    .inp { background: #D9D9D9; }
+    .hdr { background: #D9D9D9; font-weight: bold; border: 1px solid #BFBFBF; }
+    .cell { border: 1px solid #D0D4D9; }
+    .btn { background: #1D2733; color: #FFFFFF; font-weight: bold; font-size: 12px; justify-content: center; }
+    .btn.blue { background: #2A78D6; }
+    .note { color: #595959; font-style: italic; font-size: 11px; }
+    .pick { position: relative; }
+    .pick::after { content: "\25BE"; position: absolute; right: 4px; top: 50%; transform: translateY(-50%); font-size: 9px; color: #4A525E; background: #F0F0F0; border: 1px solid #A9AEB4; width: 14px; height: 14px; line-height: 12px; text-align: center; box-sizing: border-box; }
+    .tabs { display: flex; gap: 3px; padding: 5px 8px 6px; background: #F2F3F5; border-top: 1px solid #D7DBE0; align-items: flex-end; flex: none; }
+    .tab { font-size: 11px; padding: 4px 9px 3px; background: #E7EAEE; color: #4A525E; border-radius: 3px 3px 0 0; border-bottom: 3px solid transparent; white-space: nowrap; }
+    .tab.on { background: #FFFFFF; color: #1D2733; font-weight: bold; }
+  </style>
+</helmet>
+<div class="win">
+
+  <div class="colstrip">
+    <div class="rh"></div>
+    <div class="c wA">A</div><div class="c wB">B</div><div class="c wC">C</div><div class="c wD">D</div>
+    <div class="c wE">E</div><div class="c wF">F</div><div class="c wG">G</div>
+  </div>
+
+  <div class="grid">
+
+    <div class="r" style="height: 21px;">
+      <div class="rh"></div>
+      <div class="c btn" style="width: 250px; height: 21px;">&#9668; General Information</div>
+      <div class="c wC btn blue" style="height: 21px;">Summary</div>
+      <div class="c note" style="width: 735px;">  Grey cells are yours: C4 to C8 project data (filled from General Information), F4 to F10 closure days, C13 to C22 pay items and E13 to E22 quantities. Everything else calculates.</div>
+    </div>
+
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA b">Initial Construction Costs:</div><div class="c wB"></div><div class="c wC"></div><div class="c wD"></div>
+      <div class="c wE b">Average Daily Revenue:</div><div class="c wF right">$3,239.39</div>
+    </div>
+
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA">Pavement Type:</div><div class="c wB"></div><div class="c wC inp">New HMA</div><div class="c wD"></div>
+      <div class="c wE">Maintenance 1 Duration (Days)</div><div class="c wF inp right">7</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA">Mainline Pavement Area:</div><div class="c wB"></div><div class="c wC inp right">66,667</div><div class="c wD">S.Y.</div>
+      <div class="c wE">Maintenance 2 Duration (Days)</div><div class="c wF inp right">7</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA">Initial Construction Year:</div><div class="c wB"></div><div class="c wC inp right">2028</div><div class="c wD"></div>
+      <div class="c wE">Maintenance 3 Duration (Days)</div><div class="c wF inp right">9</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA">Asphalt Surface Treatment Type:</div><div class="c wB"></div>
+      <div class="c wC inp">Emulsified Asphalt Surface Treatment</div>
+      <div class="c wD note">Select alternative treatment, if planned.</div>
+      <div class="c wE">Maintenance 4 Duration (Days)</div><div class="c wF inp right">9</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA">Markings Area:</div><div class="c wB"></div><div class="c wC inp right">15,000</div><div class="c wD">S.F.</div>
+      <div class="c wE">Rehabilitation 1 Duration (Days)</div><div class="c wF inp right">19</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA"></div><div class="c wB"></div><div class="c wC"></div><div class="c wD"></div>
+      <div class="c wE">Maintenance 5 Duration (Days)</div><div class="c wF inp right">7</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA"></div><div class="c wB"></div><div class="c wC"></div><div class="c wD"></div>
+      <div class="c wE">Maintenance 6 Duration (Days)</div><div class="c wF inp right">9</div>
+    </div>
+
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA hdr">Item No.</div><div class="c wB hdr">Pay Item</div><div class="c wC hdr">Description</div>
+      <div class="c wD hdr">Unit</div><div class="c wE hdr">Qty</div><div class="c wF hdr">Unit Cost</div><div class="c wG hdr">Item Cost</div>
+    </div>
+
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA cell">1</div><div class="c wB cell">P-155-8.1</div><div class="c wC cell inp pick">Lime Treated subgrade</div>
+      <div class="c wD cell">S.Y.</div><div class="c wE cell inp right">66,667</div><div class="c wF cell right">10.00</div><div class="c wG cell right">666,670</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA cell">2</div><div class="c wB cell">P-154-5.1</div><div class="c wC cell inp pick">Subbase Course</div>
+      <div class="c wD cell">C.Y.</div><div class="c wE cell inp right">14,815</div><div class="c wF cell right">55.00</div><div class="c wG cell right">814,825</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA cell">3</div><div class="c wB cell">P-209-5.1</div><div class="c wC cell inp pick">Crushed Aggregate Base Course</div>
+      <div class="c wD cell">C.Y.</div><div class="c wE cell inp right">11,111</div><div class="c wF cell right">65.00</div><div class="c wG cell right">722,215</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA cell">4</div><div class="c wB cell">P-401-8.1b</div><div class="c wC cell inp pick">Asphalt Base Course</div>
+      <div class="c wD cell">TON</div><div class="c wE cell inp right">18,333</div><div class="c wF cell right">120.00</div><div class="c wG cell right">2,199,960</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA cell">5</div><div class="c wB cell">P-401-8.1a</div><div class="c wC cell inp pick">Asphalt Surface Course</div>
+      <div class="c wD cell">TON</div><div class="c wE cell inp right">14,667</div><div class="c wF cell right">130.00</div><div class="c wG cell right">1,906,710</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA cell">6</div><div class="c wB cell">P-620-5.1a</div><div class="c wC cell inp pick">Markings (prep, markings, reflective media)</div>
+      <div class="c wD cell">S.F.</div><div class="c wE cell inp right">15,000</div><div class="c wF cell right">0.67</div><div class="c wG cell right">10,000</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA cell">7</div><div class="c wB cell">0</div><div class="c wC cell inp pick"></div>
+      <div class="c wD cell">N/A</div><div class="c wE cell inp"></div><div class="c wF cell">N/A</div><div class="c wG cell right">0</div>
+    </div>
+
+  </div>
+
+  <div class="tabs">
+    <div class="tab" style="border-bottom-color: #595959;">Overview</div>
+    <div class="tab" style="border-bottom-color: #595959;">Instructions</div>
+    <div class="tab" style="border-bottom-color: #1D2733;">General Information</div>
+    <div class="tab" style="border-bottom-color: #BFBFBF;">Pay_Items</div>
+    <div class="tab" style="border-bottom-color: #BFBFBF;">Maintenance Policies</div>
+    <div class="tab on" style="border-bottom-color: #8EA9DB;">Alt 1 (New HMA)</div>
+    <div class="tab" style="border-bottom-color: #8EA9DB;">Alt 2 (New PCC)</div>
+    <div class="tab" style="border-bottom-color: #2A78D6;">Summary</div>
+    <div class="tab" style="border-bottom-color: #BFBFBF;">Typical Values</div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #8A8F98; font-family: Arial, Helvetica, sans-serif; color: #1D2733; }
+    a { color: #2A78D6; } a:hover { color: #1D5BA6; }
+    .win { background: #FFFFFF; min-height: 100%; display: flex; flex-direction: column; }
+    .colstrip { display: flex; height: 17px; background: #F2F3F5; border-bottom: 1px solid #D7DBE0; font-size: 10px; flex: none; }
+    .colstrip .c { justify-content: center; border-right: 1px solid #E3E6EA; color: #77808C; }
+    .grid { counter-reset: row; flex: 1 1 auto; }
+    .r { display: flex; height: 18px; counter-increment: row; }
+    .rh { width: 34px; flex: none; background: #F2F3F5; border-right: 1px solid #D7DBE0; color: #77808C; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+    .rh::before { content: counter(row); }
+    .colstrip .rh::before { content: ""; }
+    .c { display: flex; align-items: center; padding: 0 5px; box-sizing: border-box; font-size: 13px; line-height: 1.15; overflow: hidden; white-space: nowrap; flex: none; }
+    .wA { width: 66px; } .wB { width: 96px; } .wC { width: 192px; } .wD { width: 253px; } .wE { width: 66px; } .wF { width: 96px; }
+    .inp { background: #D9D9D9; }
+    .grey { color: #6B7280; }
+    .right { justify-content: flex-end; }
+    .b { font-weight: bold; }
+    .axbtn { width: 148px; height: 25px; margin: 0 5px; background: #E9E7DF; border: 1px solid #9AA0A6; box-shadow: inset 1px 1px 0 #FFFFFF; font-size: 12px; color: #111111; display: flex; align-items: center; justify-content: center; }
+    .logo { height: 92px; display: flex; align-items: center; gap: 10px; }
+    .logo .mark { width: 52px; height: 52px; background: #E31837; color: #FFFFFF; font-weight: bold; font-size: 22px; display: flex; align-items: center; justify-content: center; }
+    .logo .wm { line-height: 1.15; }
+    .logo .wm .t1 { font-size: 21px; font-weight: bold; color: #16243A; letter-spacing: .01em; }
+    .logo .wm .t2 { font-size: 12.5px; color: #4A5568; }
+    .logo .rule { width: 52px; height: 4px; background: #16243A; margin-top: 5px; }
+    .tabs { display: flex; gap: 3px; padding: 5px 8px 6px; background: #F2F3F5; border-top: 1px solid #D7DBE0; align-items: flex-end; flex: none; }
+    .tab { font-size: 11px; padding: 4px 9px 3px; background: #E7EAEE; color: #4A525E; border-radius: 3px 3px 0 0; border-bottom: 3px solid transparent; white-space: nowrap; }
+    .tab.on { background: #FFFFFF; color: #1D2733; font-weight: bold; }
+  </style>
+</helmet>
+<div class="win">
+
+  <div class="colstrip">
+    <div class="rh"></div>
+    <div class="c wA">A</div><div class="c wB">B</div><div class="c wC">C</div><div class="c wD">D</div>
+    <div class="c wE">E</div><div class="c wF">F</div><div class="c wF">G</div><div class="c wF">H</div>
+    <div class="c wF">I</div><div class="c wF">J</div>
+  </div>
+
+  <div class="grid">
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA"></div>
+      <div class="c" style="width: 607px; height: 92px;">
+        <div class="logo">
+          <div class="mark">TN</div>
+          <div class="wm"><div class="t1">TDOT</div><div class="t2">Department of<br>Transportation</div><div class="rule"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB b">Airport Information:</div></div>
+
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Airport Name:</div><div class="c wD inp"></div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Airport ID:</div><div class="c wD grey">N/A</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">City:</div><div class="c wD grey">N/A</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Airport Owner:</div><div class="c wD grey">N/A</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">State Region:</div><div class="c wD grey">N/A</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Design Consultant:</div><div class="c wD inp"></div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Project Number:</div><div class="c wD inp"></div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Project Name:</div><div class="c wD inp"></div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Date of LCCA:</div><div class="c wD inp"></div></div>
+
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB b">Project Information:</div></div>
+
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Branch Type:</div><div class="c wD inp"></div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Branch Name:</div><div class="c wD inp"></div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Project Type:</div><div class="c wD inp"></div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Project Description:</div><div class="c wD inp"></div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Intial Construction Year:</div><div class="c wD inp"></div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Mainline Area, S.Y.:</div><div class="c wD inp"></div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Shoulder Area, S.Y.:</div><div class="c wD inp"></div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Markings, S.F.:</div><div class="c wD inp"></div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Markings, Type:</div><div class="c wD inp"></div></div>
+
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB b">LCCA Parameters:</div></div>
+
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Analysis Period, years:</div><div class="c wD inp right">10</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Discount Rate, percent:</div><div class="c wD inp right">3</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Salvage Value, $:</div><div class="c wD" style="font-size: 12px;">Remaining service life at end of analysis period</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Mobilization, percent:</div><div class="c wD inp right">10</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Engineering, percent:</div><div class="c wD inp right">5</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Account Indirect Cost (Yes/No)</div><div class="c wD inp right b">No</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Airport Daily Revenue</div><div class="c wD"></div></div>
+
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div>
+      <div class="c wB b" style="width: 192px;">Alternative Setup:</div>
+      <div class="c" style="width: 0;"></div>
+      <div class="c wD" style="padding: 0;"><div class="axbtn">Alternative Setup</div></div>
+    </div>
+
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab">Overview</div>
+    <div class="tab">Instructions</div>
+    <div class="tab on">General Information</div>
+    <div class="tab">Pay_Items</div>
+    <div class="tab">Maintenance Policies</div>
+    <div class="tab">Alt 1 (New HMA)</div>
+    <div class="tab">Alt 2 (New PCC)</div>
+    <div class="tab">Summary</div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #8A8F98; font-family: Arial, Helvetica, sans-serif; color: #1D2733; }
+    a { color: #2A78D6; } a:hover { color: #1D5BA6; }
+    .win { background: #FFFFFF; min-height: 100%; display: flex; flex-direction: column; }
+    .colstrip { display: flex; height: 17px; background: #F2F3F5; border-bottom: 1px solid #D7DBE0; font-size: 10px; flex: none; }
+    .colstrip .c { justify-content: center; border-right: 1px solid #E3E6EA; color: #77808C; }
+    .colstrip .rh { background: #F2F3F5; }
+    .grid { counter-reset: row; flex: 1 1 auto; }
+    .r { display: flex; height: 18px; counter-increment: row; }
+    .rh { width: 34px; flex: none; background: #F2F3F5; border-right: 1px solid #D7DBE0; color: #77808C; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+    .rh::before { content: counter(row); }
+    .colstrip .rh::before { content: ""; }
+    .c { display: flex; align-items: center; padding: 0 5px; box-sizing: border-box; font-size: 13px; line-height: 1.15; overflow: hidden; white-space: nowrap; flex: none; }
+    .wA { width: 66px; } .wB { width: 96px; } .wC { width: 192px; } .wD { width: 253px; } .wE { width: 66px; }
+    .wF { width: 96px; } .wFJ { width: 480px; } .wBE { width: 607px; } .wAE { width: 673px; }
+    .inp { background: #D9D9D9; }
+    .grey { color: #6B7280; }
+    .right { justify-content: flex-end; }
+    .b { font-weight: bold; }
+    .band { background: #EAF2FB; border-bottom: 2px solid #2A78D6; font-weight: bold; }
+    .cardt { background: #1D2733; color: #FFFFFF; font-weight: bold; font-size: 12px; letter-spacing: .02em; }
+    .cardb { background: #EAF2FB; color: #1D2733; font-size: 11.5px; white-space: pre-line; align-items: flex-start; padding: 6px 10px 0; line-height: 1.55; }
+    .status { font-weight: bold; font-size: 12px; border-bottom: 2px solid #2A78D6; white-space: pre-line; line-height: 1.35; padding: 0 9px; }
+    .btn { background: #1D2733; color: #FFFFFF; font-weight: bold; font-size: 12px; justify-content: center; }
+    .btn.blue { background: #2A78D6; }
+    .axbtn { width: 148px; height: 25px; margin: 0 5px; background: #E9E7DF; border: 1px solid #9AA0A6; box-shadow: inset 1px 1px 0 #FFFFFF; font-size: 12px; color: #111111; display: flex; align-items: center; justify-content: center; }
+    .note { color: #595959; font-style: italic; font-size: 11px; }
+    .logo { height: 92px; display: flex; align-items: center; gap: 10px; }
+    .logo .mark { width: 52px; height: 52px; background: #E31837; color: #FFFFFF; font-weight: bold; font-size: 22px; display: flex; align-items: center; justify-content: center; }
+    .logo .wm { line-height: 1.15; }
+    .logo .wm .t1 { font-size: 21px; font-weight: bold; color: #16243A; letter-spacing: .01em; }
+    .logo .wm .t2 { font-size: 12.5px; color: #4A5568; }
+    .logo .rule { width: 52px; height: 4px; background: #16243A; margin-top: 5px; }
+    .tabs { display: flex; gap: 3px; padding: 5px 8px 6px; background: #F2F3F5; border-top: 1px solid #D7DBE0; align-items: flex-end; flex: none; }
+    .tab { font-size: 11px; padding: 4px 9px 3px; background: #E7EAEE; color: #4A525E; border-radius: 3px 3px 0 0; border-bottom: 3px solid transparent; white-space: nowrap; }
+    .tab.on { background: #FFFFFF; color: #1D2733; font-weight: bold; }
+  </style>
+</helmet>
+<div class="win">
+
+  <div class="colstrip">
+    <div class="rh"></div>
+    <div class="c wA">A</div><div class="c wB">B</div><div class="c wC">C</div><div class="c wD">D</div>
+    <div class="c wE">E</div><div class="c wF">F</div><div class="c wF">G</div><div class="c wF">H</div>
+    <div class="c wF">I</div><div class="c wF">J</div>
+  </div>
+
+  <div class="grid">
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA"></div>
+      <div class="c wB" style="width: 607px; height: 92px; align-items: center;">
+        <div class="logo">
+          <div class="mark">TN</div>
+          <div class="wm"><div class="t1">TDOT</div><div class="t2">Department of<br>Transportation</div><div class="rule"></div></div>
+        </div>
+      </div>
+      <div class="c wFJ cardt">HOW TO USE THIS WORKBOOK</div>
+    </div>
+
+    <div class="r" style="height: 20px;">
+      <div class="rh"></div><div class="c wAE"></div>
+      <div class="c wFJ cardb" style="height: 100px;">1.   Fill in the grey cells below (D9 to D39).
+2.   Click Alternative Setup and add your alternatives.
+3.   Click View Summary to compare them.
+Grey cells are yours to fill in; white cells calculate themselves.
+Typical Values lists the usual range for each input.</div>
+    </div>
+    <div class="r" style="height: 20px;"><div class="rh"></div></div>
+    <div class="r" style="height: 20px;"><div class="rh"></div></div>
+    <div class="r" style="height: 20px;"><div class="rh"></div></div>
+    <div class="r" style="height: 20px;"><div class="rh"></div></div>
+
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div>
+      <div class="c wBE band">Airport Information:</div>
+    </div>
+
+    <div class="r" style="height: 37px;">
+      <div class="rh"></div><div class="c wA"></div><div class="c wB"></div>
+      <div class="c wC">Airport Name:</div>
+      <div class="c wD inp">{{v.airport}}</div>
+      <div class="c wE"></div>
+      <div class="c wFJ status" style="height: 37px; background: {{st.bg}}; color: {{st.fg}};">{{st.text}}</div>
+    </div>
+
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Airport ID:</div><div class="c wD grey">{{v.id}}</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">City:</div><div class="c wD grey">{{v.city}}</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Airport Owner:</div><div class="c wD grey">{{v.owner}}</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">State Region:</div><div class="c wD grey">{{v.region}}</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Design Consultant:</div><div class="c wD inp">{{v.consultant}}</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Project Number:</div><div class="c wD inp right">{{v.projno}}</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Project Name:</div><div class="c wD inp">{{v.projname}}</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Date of LCCA:</div><div class="c wD inp right">{{v.date}}</div></div>
+
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div>
+      <div class="c wBE band">Project Information:</div>
+    </div>
+
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Branch Type:</div><div class="c wD inp">{{v.branchtype}}</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Branch Name:</div><div class="c wD inp">{{v.branch}}</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Project Type:</div><div class="c wD inp">{{v.ptype}}</div></div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Project Description:</div><div class="c wD inp">{{v.pdesc}}</div></div>
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Intial Construction Year:</div>
+      <div class="c wD inp right">{{v.year}}</div><div class="c wE"></div>
+      <div class="c wFJ note">Construction year; the analysis period starts here.</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Mainline Area, S.Y.:</div>
+      <div class="c wD inp right">{{v.area}}</div><div class="c wE"></div>
+      <div class="c wFJ note">Length x width / 9. TN GA: 4,000-6,000 ft x 75-100 ft wide.</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Shoulder Area, S.Y.:</div>
+      <div class="c wD inp right">{{v.shoulder}}</div><div class="c wE"></div>
+      <div class="c wFJ note">Paved shoulders only; usually 0 at TN GA airports.</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Markings, S.F.:</div>
+      <div class="c wD inp right">{{v.markings}}</div><div class="c wE"></div>
+      <div class="c wFJ note">About 2,000-3,000 SF per 1,000 ft of runway.</div>
+    </div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Markings, Type:</div><div class="c wD inp">{{v.marktype}}</div></div>
+
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div>
+      <div class="c wBE band">LCCA Parameters:</div>
+    </div>
+
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Analysis Period, years:</div>
+      <div class="c wD inp right">30</div><div class="c wE"></div>
+      <div class="c wFJ note">TDOT policy 30 years; FAA leaves the period to the engineer.</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Discount Rate, percent:</div>
+      <div class="c wD inp right">3</div><div class="c wE"></div>
+      <div class="c wFJ note">TDOT 3%. FAA uses the OMB A-94 real rate, 2.0% in 2026.</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Salvage Value, $:</div>
+      <div class="c wD note">Remaining service life at end of analysis period</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Mobilization, percent:</div>
+      <div class="c wD inp right">10</div><div class="c wE"></div>
+      <div class="c wFJ note">Percent of pay items; workbook default 10.</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Engineering, percent:</div>
+      <div class="c wD inp right">5</div><div class="c wE"></div>
+      <div class="c wFJ note">Percent of pay items; now applied to initial construction too.</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Account Indirect Cost (Yes/No)</div>
+      <div class="c wD inp right b">{{v.indirect}}</div><div class="c wE"></div>
+      <div class="c wFJ note">Yes counts lost revenue during closures (17 airports have data).</div>
+    </div>
+    <div class="r"><div class="rh"></div><div class="c wA"></div><div class="c wB"></div><div class="c wC">Airport Daily Revenue</div><div class="c wD grey right">{{v.revenue}}</div></div>
+
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r">
+      <div class="rh"></div><div class="c wA"></div>
+      <div class="c wB b" style="width: 192px;">Alternative Setup:</div>
+      <div class="c wC" style="width: 0;"></div>
+      <div class="c wD" style="padding: 0;"><div class="axbtn">Alternative Setup</div></div>
+    </div>
+
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r" style="height: 21px;">
+      <div class="rh"></div><div class="c wA"></div>
+      <div class="c wB b" style="width: 192px;">LCCA Summary:</div>
+      <div class="c wC" style="width: 0;"></div>
+      <div class="c wD btn" style="height: 21px;">View Summary  &#9658;</div>
+    </div>
+
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r" style="height: 21px;">
+      <div class="rh"></div><div class="c wA"></div>
+      <div class="c wB b" style="width: 192px;">Typical input values:</div>
+      <div class="c wC" style="width: 0;"></div>
+      <div class="c wD btn" style="height: 21px;">Typical Values  &#9658;</div>
+    </div>
+
+    <div class="r"><div class="rh"></div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab" style="border-bottom-color: #595959;">Overview</div>
+    <div class="tab" style="border-bottom-color: #595959;">Instructions</div>
+    <div class="tab on" style="border-bottom-color: #1D2733;">General Information</div>
+    <div class="tab" style="border-bottom-color: #BFBFBF;">Pay_Items</div>
+    <div class="tab" style="border-bottom-color: #BFBFBF;">Maintenance Policies</div>
+    <div class="tab" style="border-bottom-color: #8EA9DB;">Alt 1 (New HMA)</div>
+    <div class="tab" style="border-bottom-color: #8EA9DB;">Alt 2 (New PCC)</div>
+    <div class="tab" style="border-bottom-color: #2A78D6;">Summary</div>
+    <div class="tab" style="border-bottom-color: #BFBFBF;">Typical Values</div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"state":{"editor":"enum","default":"Filled in (Outlaw Field)","options":["Empty (new project)","Filled in (Outlaw Field)"],"section":"Sheet"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const filled = (this.props.state ?? 'Filled in (Outlaw Field)').indexOf('Filled') === 0;
+    const blank = {
+      airport: '', id: 'N/A', city: 'N/A', owner: 'N/A', region: 'N/A', consultant: '', projno: '',
+      projname: '', date: '', branchtype: '', branch: '', ptype: '', pdesc: '', year: '', area: '',
+      shoulder: '', markings: '', marktype: '', indirect: 'No', revenue: ''
+    };
+    const ckv = {
+      airport: 'Outlaw Field', id: 'CKV', city: 'Clarksville', owner: 'Montgomery', region: 'Middle',
+      consultant: 'Applied Research Associates', projno: '5936', projname: 'Runway 17-35 Reconstruction',
+      date: '9/12/2026', branchtype: 'Runway', branch: 'Runway 17-35', ptype: 'Reconstruction',
+      pdesc: 'Full-depth reconstruction, 6,000 x 100 ft', year: '2028', area: '66,667', shoulder: '0',
+      markings: '15,000', marktype: 'Reflective', indirect: 'Yes', revenue: ' $3,239.39 '
+    };
+    return {
+      v: filled ? ckv : blank,
+      st: filled
+        ? { text: 'All required inputs are filled. Next: click Alternative Setup.', bg: '#E8F6EC', fg: '#186A3B' }
+        : { text: 'Still needed: Airport Name, Construction Year, Mainline Area,\nMarkings Area', bg: '#FFF3CD', fg: '#7F6000' }
+    };
+  }
+}
+</script>
+</body>
+</html>

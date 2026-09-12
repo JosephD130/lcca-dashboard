@@ -1,0 +1,17 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "General Information (v1.2.0)", "x": 0, "y": 0, "w": 1210, "h": 960, "is_interactive": true },
+    { "file": "Summary.dc.html", "title": "Summary (v1.2.0)", "x": 1330, "y": 0, "w": 1880, "h": 1200 },
+    { "file": "AltSheet.dc.html", "title": "Alternative worksheet (v1.2.0)", "x": 0, "y": 1320, "w": 1340, "h": 420 },
+    { "file": "TypicalValues.dc.html", "title": "Typical Values (new sheet)", "x": 1480, "y": 1320, "w": 1450, "h": 460 },
+    { "file": "BeforeGeneralInfo.dc.html", "title": "General Information (v1.1.2)", "x": 0, "y": 1900, "w": 1210, "h": 920 },
+    { "file": "BeforeSummary.dc.html", "title": "Summary (v1.1.2)", "x": 1330, "y": 1900, "w": 900, "h": 440 }
+  ],
+  "annotations": [
+    { "id": "after-label", "x": 0, "y": -150, "w": 520, "text": "v1.2.0 - what TDOT opens\nSame form, same grey cells, same Alternative Setup button. What is new is the guidance around them." },
+    { "id": "summary-note", "x": 1330, "y": -150, "w": 760, "text": "The Summary is where the answer lives: present worth by category, the RealCost-style agency / user / total block, and five charts. The lowest-cost row highlights itself." },
+    { "id": "support-note", "x": 0, "y": 1180, "w": 760, "text": "Every alternative worksheet gets a way back to the form and the Summary. Typical Values is a new reference sheet: workbook defaults beside recent bid prices, a source on every row." },
+    { "id": "before-label", "x": 0, "y": 1780, "w": 520, "text": "v1.1.2 - what it looks like today\nNo guidance on the form, and a Summary of five columns and one chart." }
+  ],
+  "launch": { "view": "canvas" }
+}

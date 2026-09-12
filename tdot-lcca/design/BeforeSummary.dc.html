@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #8A8F98; font-family: Arial, Helvetica, sans-serif; color: #1D2733; }
+    a { color: #2A78D6; } a:hover { color: #1D5BA6; }
+    .win { background: #FFFFFF; min-height: 100%; display: flex; flex-direction: column; }
+    .colstrip { display: flex; height: 17px; background: #F2F3F5; border-bottom: 1px solid #D7DBE0; font-size: 10px; flex: none; }
+    .colstrip .c { justify-content: center; border-right: 1px solid #E3E6EA; color: #77808C; }
+    .grid { counter-reset: row; flex: 1 1 auto; }
+    .r { display: flex; height: 18px; counter-increment: row; }
+    .rh { width: 34px; flex: none; background: #F2F3F5; border-right: 1px solid #D7DBE0; color: #77808C; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+    .rh::before { content: counter(row); }
+    .colstrip .rh::before { content: ""; }
+    .c { display: flex; align-items: center; padding: 0 5px; box-sizing: border-box; font-size: 12.5px; line-height: 1.15; overflow: hidden; white-space: nowrap; flex: none; }
+    .wA { width: 150px; } .wB { width: 220px; } .wC { width: 120px; } .wD { width: 120px; } .wE { width: 235px; }
+    .right { justify-content: flex-end; }
+    .hdr { background: #D9D9D9; font-weight: bold; font-size: 11.5px; }
+    .chart { border: 1px solid #D4D8DD; background: #FFFFFF; padding: 8px 10px 6px; width: 620px; }
+    .chart h4 { margin: 0 0 4px; font-size: 12px; text-align: center; color: #595959; font-weight: normal; }
+    .chart .lg { display: flex; gap: 12px; justify-content: center; font-size: 9.5px; color: #3C4450; margin-top: 3px; }
+    .chart .lg i { display: inline-block; width: 8px; height: 8px; margin-right: 3px; }
+    .tabs { display: flex; gap: 3px; padding: 5px 8px 6px; background: #F2F3F5; border-top: 1px solid #D7DBE0; align-items: flex-end; flex: none; }
+    .tab { font-size: 11px; padding: 4px 9px 3px; background: #E7EAEE; color: #4A525E; border-radius: 3px 3px 0 0; white-space: nowrap; }
+    .tab.on { background: #FFFFFF; color: #1D2733; font-weight: bold; }
+  </style>
+</helmet>
+<div class="win">
+
+  <div class="colstrip">
+    <div class="rh"></div>
+    <div class="c wA">A</div><div class="c wB">B</div><div class="c wC">C</div><div class="c wD">D</div><div class="c wE">E</div>
+  </div>
+
+  <div class="grid">
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA hdr">Alternative</div><div class="c wB hdr">Name</div><div class="c wC hdr">Initial Construction</div>
+      <div class="c wD hdr">Present Worth</div><div class="c wE hdr">Alternative Description</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA">Alt 1</div><div class="c wB">Alternative 1</div><div class="c wC right">$7,268,437</div>
+      <div class="c wD right">$9,829,224</div><div class="c wE">New HMA</div>
+    </div>
+    <div class="r">
+      <div class="rh"></div>
+      <div class="c wA">Alt 2</div><div class="c wB">Alternative 2</div><div class="c wC right">$9,062,466</div>
+      <div class="c wD right">$9,180,602</div><div class="c wE">New PCC</div>
+    </div>
+
+    <div class="r"><div class="rh"></div></div>
+    <div class="r"><div class="rh"></div></div>
+
+    <div class="r" style="height: 220px;">
+      <div class="rh" style="height: 220px;"></div>
+      <div class="c" style="width: 40px; height: 220px;"></div>
+      <div class="chart">
+        <h4>Alternatives Comparison</h4>
+        <svg viewBox="0 0 600 170" width="600" height="170" role="img">
+          <line x1="60" y1="140" x2="590" y2="140" stroke="#C9CED4"></line>
+          <text x="54" y="24" font-size="9" fill="#6B7280" text-anchor="end">$10M</text>
+          <text x="54" y="84" font-size="9" fill="#6B7280" text-anchor="end">$5M</text>
+          <text x="54" y="144" font-size="9" fill="#6B7280" text-anchor="end">$0</text>
+          <rect x="140" y="53" width="60" height="87" fill="#ED7D31"></rect>
+          <rect x="206" y="22" width="60" height="118" fill="#A6A6A6"></rect>
+          <rect x="380" y="31" width="60" height="109" fill="#ED7D31"></rect>
+          <rect x="446" y="30" width="60" height="110" fill="#A6A6A6"></rect>
+          <text x="203" y="158" font-size="10" fill="#3C4450" text-anchor="middle">Alt 1</text>
+          <text x="443" y="158" font-size="10" fill="#3C4450" text-anchor="middle">Alt 2</text>
+        </svg>
+        <div class="lg"><span><i style="background:#ED7D31"></i>Initial Construction</span><span><i style="background:#A6A6A6"></i>Present Worth</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab">Overview</div>
+    <div class="tab">Instructions</div>
+    <div class="tab">General Information</div>
+    <div class="tab">Pay_Items</div>
+    <div class="tab">Maintenance Policies</div>
+    <div class="tab">Alt 1 (New HMA)</div>
+    <div class="tab">Alt 2 (New PCC)</div>
+    <div class="tab on">Summary</div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>
