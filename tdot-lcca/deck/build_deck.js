@@ -178,19 +178,26 @@ table(s, [
   ['Area', 'What changed'],
   ['Instructions', 'ActiveX "blocked content" steps (Trust Center, then restart Excel, or ask IT); correct button name; D9:D39; how to unhide RevenueData and the 17-airport rule'],
   ['Alternative chart', 'Year-indexed data keyed on Year Applied; calendar years on the axis; undiscounted direct and lost revenue stacked; mixed discounted series removed'],
-  ['Summary sheet (VBA)', 'Results table with PW by category, delta to lowest and closure days; charts for PW by category, expenditure stream, cumulative cost and rate sensitivity 2 to 8% with a 7% flag'],
+  ['Summary sheet', 'Formula-driven, no macro: results table with PW by category, delta to lowest, closure days and runway availability; five charts (category, rate sensitivity 2 to 8%, expenditure stream, cumulative cost, closure days); navigation buttons that work with macros blocked'],
   ['Housekeeping', 'Personal names removed from cell notes; two dead links to files on a C: drive removed; full recalculation on open'],
   ['Not changed', 'Overview wording (NS rewrite pending Mat\'s approval); salvage, lost-revenue and AIP policy'],
 ], 0.5, 1.3, 9.0, [2.0, 7.0], 10.5);
 s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.5, y: 4.3, w: 9.0, h: 0.65, fill: { color: LIGHT }, line: { color: LIGHT }, rectRadius: 0.06 });
-s.addText('Install: replace the Output module in the VBA editor with Output.bas. No other code changes.', { x: 0.7, y: 4.35, w: 8.6, h: 0.55, fontFace: BF, fontSize: 12.5, color: INK, isTextBox: true, margin: 0, valign: 'middle' });
-s.addNotes('The Summary is rebuilt every time the Alternative Setup form closes, as before.');
+s.addText('Nothing to install: the workbook is self-contained. The VBA project is untouched; Alternative Setup still writes columns A:E of the Summary as before.', { x: 0.7, y: 4.35, w: 8.6, h: 0.55, fontFace: BF, fontSize: 12.5, color: INK, isTextBox: true, margin: 0, valign: 'middle' });
+s.addNotes('The Summary formulas read the Database sheet the form writes, so they follow whatever alternatives exist.');
+
+// ---------------------------------------------------------------- 8b the new Summary sheet
+s = pres.addSlide(); s.background = { color: WHITE };
+title(s, 'The new Summary sheet');
+sub(s, 'MBT data loaded. Table, verdict line, five charts and the original comparison chart, all live formulas.');
+let y = img(s, 'summary_sheet.png', 1.25, 1.35, 7.5, 2.05);
+caption(s, 'Buttons at top left return to General Information and Instructions; a "View Summary" button sits under Alternative Setup. Chart data lives in columns W onward, marked "do not edit".', 0.5, y + 0.05, 9.0);
 
 // ---------------------------------------------------------------- 9 decision workbook intro
 s = pres.addSlide(); s.background = { color: WHITE };
 title(s, 'The decision workbook');
 sub(s, 'MBT and SRB already loaded, plus a blank TEMPLATE sheet. Yellow cells drive every table and chart.');
-let y = img(s, 'MBT_kpis.png', 0.5, 1.5, 9.0, 3.97);
+y = img(s, 'MBT_kpis.png', 0.5, 1.5, 9.0, 3.97);
 caption(s, 'The verdict line: which alternative is lower, by how much, and two robustness flags a reviewer can read in five seconds. Shown here for MBT at TDOT settings.', 0.5, y + 0.1, 9.0);
 bullets(s, [
   'RESULTS: present worth by category, EUAC, cost per SY, closure days, runway availability',
@@ -262,14 +269,15 @@ s = pres.addSlide(); s.background = { color: WHITE };
 title(s, 'Verification before release');
 table(s, [
   ['Check', 'Result'],
-  ['Framework v1.2.0, full recalculation in LibreOffice Calc', '1,644 formulas, 0 errors (v1.1.2 shows 99 error cells under the same recalc)'],
+  ['Framework v1.2.0, full recalculation in LibreOffice Calc', '2,240 formulas incl. the new Summary, 0 errors (v1.1.2 shows 99 error cells under the same recalc)'],
   ['Patch applied to the populated MBT workbook', 'NPW unchanged: $8,809,266 and $8,028,734; PCC blank rows now 0, not #N/A'],
   ['New year-indexed chart columns', 'Direct plus lost revenue reconciles to activity totals; discounted column sums to NPW to the dollar'],
   ['Patched chart XML', 'Well-formed; parsed by an independent chart reader with the intended year categories'],
   ['Decision workbook, full recalculation', '47,265 formulas, 0 errors'],
   ['Decision workbook against an independent engine', 'NPW, categories, break-evens, sensitivity, tornado, 12 scenarios and the decision map agree to the dollar'],
   ['Charts rendered to PDF', 'All eight per-project charts and the simulation histogram draw correctly'],
-  ['Not yet verified', 'Output.bas in Excel (no Excel here) and the patched charts in Excel itself; a six-step first-open check is in the notes'],
+  ['New Summary sheet on the MBT data', 'Table, verdict, categories and closure days match; six charts render; template reads "No alternatives yet" with no errors'],
+  ['Not yet verified', 'The alternative-sheet charts in Excel itself (no Excel here); a first-open check is in the notes'],
 ], 0.5, 1.3, 9.0, [3.6, 5.4], 10.5);
 s.addNotes('The first-open check: pick an airport, set Yes, add one HMA and one PCC alternative, confirm Summary and Alt sheet columns L:N.');
 
@@ -278,7 +286,7 @@ s = pres.addSlide(); s.background = { color: WHITE };
 title(s, 'How TDOT uses it');
 sub(s, 'Excel only. No add-ins. The decision workbook has no macros at all.');
 const steps = [
-  ['Run the framework as before', 'Open v1.2.0, enable content, fill General Information, build alternatives with Alternative Setup. The Summary now shows categories, closures and the 7 percent flag.'],
+  ['Run the framework as before', 'Open v1.2.0, enable content, fill General Information, build alternatives with Alternative Setup. Click View Summary: categories, closures, the 7 percent flag and five charts, no import needed.'],
   ['Copy the TEMPLATE sheet', 'In the decision workbook, right-click TEMPLATE, Move or Copy, rename. Paste the base costs and closure days from each Alt sheet into the yellow cells.'],
   ['Read the decision blocks', 'RESULTS, BREAK-EVEN VALUES, the scenario scorecard and the decision map. Change any yellow cell and every chart follows. F9 redraws the simulation.'],
 ];
@@ -297,13 +305,13 @@ title(s, 'Open items');
 card(s, 0.5, 1.4, 4.4, 3.6, 'Decisions for Aeronautics',
   'Salvage policy: keep 25% of initial for PCC and 12.5% of one overlay for HMA, or move both to a remaining-life basis\n\nLost revenue basis: gross receipts or a per-category share lost during closure\n\nFAA AIP projects: enforce 7% and 20 years, or show both\n\nRevenueData: confirm MBT vs MQY, fix XNX and M54, add the other 62 airports or state the rule\n\nOverview text: adopt the NS rewrite');
 card(s, 5.1, 1.4, 4.4, 3.6, 'Next steps',
-  'First open in Excel: run the six-step check, import Output.bas\n\nSend v1.2.0 and the decision workbook to NS for a second pass\n\nPCC rehabilitation template is still "Coming soon" if TDOT wants rehab alternatives\n\nOptional later: a no-macro web version would remove the ActiveX problem entirely');
+  'First open in Excel: run the first-open check in the notes\n\nSend v1.2.0 and the decision workbook to NS for a second pass\n\nPCC rehabilitation template is still "Coming soon" if TDOT wants rehab alternatives\n\nOptional later: a no-macro web version would remove the ActiveX problem entirely');
 s.addNotes('Keep it Excel-first; the web option is noted only because IT blocking was the reviewer\'s first obstacle.');
 
 // ---------------------------------------------------------------- 16 close
 s = pres.addSlide(); s.background = { color: DARK };
 s.addText('In one line', { x: 0.6, y: 1.2, w: 8.8, h: 0.6, fontFace: BF, fontSize: 14, color: 'AEB8C4', isTextBox: true, margin: 0, italic: true });
 s.addText('The tool now computes what it says it computes, shows why one alternative wins, and shows how many runway days that costs.', { x: 0.6, y: 1.8, w: 8.8, h: 1.6, fontFace: HF, fontSize: 26, bold: true, color: WHITE, isTextBox: true, margin: 0, valign: 'top' });
-s.addText('Deliverables: TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm  |  Output.bas  |  TDOT_LCCA_Decision_Workbook.xlsx  |  change notes', { x: 0.6, y: 4.4, w: 8.8, h: 0.6, fontFace: BF, fontSize: 11, color: 'AEB8C4', isTextBox: true, margin: 0 });
+s.addText('Deliverables: TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm  |  TDOT_LCCA_Decision_Workbook.xlsx  |  Technical Change Record  |  change notes', { x: 0.6, y: 4.4, w: 8.8, h: 0.6, fontFace: BF, fontSize: 11, color: 'AEB8C4', isTextBox: true, margin: 0 });
 
 pres.writeFile({ fileName: __dirname + '/TDOT_LCCA_Review_and_v1.2.0_Update.pptx' }).then(f => console.log('wrote', f));

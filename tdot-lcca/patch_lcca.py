@@ -4,6 +4,7 @@ Edits sheet XML in place inside the .xlsm zip so VBA, ActiveX comboboxes, charts
 tables and data validations are preserved (openpyxl would drop them).
 """
 import re, sys, os, zipfile, shutil, html
+from build_summary import transplant
 
 GI = "'General Information'"
 
@@ -215,6 +216,17 @@ def main(src, out, mbt_mode=False):
         set_run(7, lambda t: '4. To include lost airport revenue during runway closures, set cell D38 on the "General Information" worksheet to Yes before creating alternatives. The average daily revenue for the selected airport is pulled automatically from the hidden RevenueData worksheet, which covers the 17 airports meeting Aeronautics\' activity criteria (cell D39 shows the value). If the airport is not in that list, D39 reads "Missing Airport Revenue", lost revenue is carried as $0, and a warning appears on each alternative worksheet; contact Aeronautics to add revenue data. To view the hidden worksheet: Home > Format > Hide & Unhide > Unhide Sheet.')
         set_run(8, lambda t: t + ' Closure durations in cells F4 through F10 are pre-filled from production-rate defaults (surface treatment 15,000 SY/day, mill and overlay 3,800 SY/day, PCC joint and slab work) and may be overridden with project-specific values.')
         wr('xl/drawings/drawing3.xml', d)
+    # --- navigation button on General Information (hyperlink cell, no macro)
+    gi_part = 'xl/worksheets/sheet4.xml'
+    x = rd(gi_part)
+    st = style_of(x, 'B41')
+    x = put_cell(x, 'B43', '<c r="B43"%s t="str"><f>HYPERLINK("#Summary!G1","View Summary  \u25ba")</f><v>View Summary  \u25ba</v></c>' % (' s="%s"' % st if st else ''))
+    wr(gi_part, x)
+    # --- formula-driven Summary sheet with embedded charts (no VBA import needed)
+    if mbt_mode:
+        transplant(work, 'xl/worksheets/sheet16.xml', 'xl/drawings/drawing12.xml', 9, 15)
+    else:
+        transplant(work, 'xl/worksheets/sheet14.xml', 'xl/drawings/drawing10.xml', 7, 13)
     # --- workbook: drop broken external links, force full recalculation on open
     w = rd('xl/workbook.xml')
     w = re.sub(r'<externalReferences>.*?</externalReferences>', '', w, flags=re.S)

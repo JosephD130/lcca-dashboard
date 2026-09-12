@@ -5,7 +5,7 @@ const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthT
 
 const S = path.resolve(__dirname, '..');
 const diff = JSON.parse(fs.readFileSync(S + '/diff.json', 'utf8'));
-const OUTBAS = fs.readFileSync(S + '/Output.bas', 'utf8').split(/\r?\n/);
+const SUMMARY_FORMULAS = JSON.parse(fs.readFileSync(S + '/summary_formulas.json', 'utf8'));
 const IMG = __dirname + '/img/';
 
 // ------------------------------------------------------------------ helpers
@@ -76,7 +76,7 @@ const cover = [
   p([r('Prepared by Applied Research Associates, Inc., Transportation Division', { size: 22 })], { after: 40 }),
   p([r('Task 005935.00000.00000.TASK2', { size: 22 })], { after: 40 }),
   p([r('11 September 2026', { size: 22 })], { after: 40 }),
-  p([r('Companion to: TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm, Output.bas, TDOT_LCCA_Decision_Workbook.xlsx', { size: 20, color: '595959' })], { after: 40 }),
+  p([r('Companion to: TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm and TDOT_LCCA_Decision_Workbook.xlsx', { size: 20, color: '595959' })], { after: 40 }),
   new Paragraph({ children: [new PageBreak()] }),
   h1('Contents'),
   new TableOfContents('Contents', { hyperlink: true, headingStyleRange: '1-2' }),
@@ -86,7 +86,7 @@ children.push(...cover);
 
 // 1 purpose
 children.push(h1('1. Purpose and scope'));
-children.push(p('This record documents every change made to the TDOT Aeronautics Life-Cycle Cost Analysis (LCCA) framework workbook between version 1.1.2 (ARA, 18 August 2026) and version 1.2.0 (ARA, 11 September 2026). For each defect it states the symptom, the evidence in the file, the root cause, the exact cell-level change, the effect on results, and how the change was verified. It also documents the replacement VBA Output module, the changes to the Instructions text and to the chart parts, and the companion decision workbook built for the Murfreesboro (MBT) and Upper Cumberland (SRB) analyses.'));
+children.push(p('This record documents every change made to the TDOT Aeronautics Life-Cycle Cost Analysis (LCCA) framework workbook between version 1.1.2 (ARA, 18 August 2026) and version 1.2.0 (ARA, 11 September 2026). For each defect it states the symptom, the evidence in the file, the root cause, the exact cell-level change, the effect on results, and how the change was verified. It also documents the new formula-driven Summary sheet, the changes to the Instructions text and to the chart parts, and the companion decision workbook built for the Murfreesboro (MBT) and Upper Cumberland (SRB) analyses.'));
 children.push(p('The review was triggered by the Neel-Schaffer (NS) review of 24 August 2026 (user manual comments and annotated screenshots) and by Aeronautics\' request that ARA spend 8 to 16 hours reviewing and improving the tool. The NS comments are usability findings; the calculation defects below were found in ARA\'s line-by-line audit of the templates and VBA.'));
 children.push(p('Scope of the v1.2.0 change: arithmetic, guards, defaults, chart data, instructions and the Summary builder. Out of scope, and unchanged: the TDOT Maintenance Policies, the pay-item database values, the salvage policy, the lost-revenue method and the alternative-creation workflow. Section 11 lists the policy questions that the update makes visible but deliberately does not decide.'));
 
@@ -99,13 +99,13 @@ const roles = {
   '35f08cad-TDOA_LCCA_Framework_v1.1.2_MBT_20260521_LostRevenue_1.xlsm': 'Input: MBT run (verification data)',
   '527a5482-TDOA_LCCA_Framework_v1.1.2_SRB_20260521_LostRevenue.xlsm': 'Input: SRB run (verification data)',
   'TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm': 'Output: v1.2.0 workbook',
-  'Output.bas': 'Output: replacement VBA module',
+  'Output.bas': 'Superseded first draft (not a deliverable)',
   'TDOT_LCCA_Decision_Workbook.xlsx': 'Output: decision workbook',
 };
 for (const [f, h] of Object.entries(diff.hashes)) hashRows.push([f.replace(/^[0-9a-f]{8}-/, ''), roles[f] || '', h]);
 children.push(table(hashRows, [3200, 2400, 3760], { monoCols: [2], size: 14 }));
 children.push(p(''));
-children.push(p('Version identity of the workbook: the sheet list, VBA project, ActiveX controls, tables, data validations, comments and drawing parts of v1.1.2 are carried into v1.2.0 unchanged except where this record says otherwise. The two external-link parts and the calculation chain part were removed; Excel rebuilds the calculation chain on first open.'));
+children.push(p('Version identity of the workbook: the sheet list, the VBA project (byte for byte), ActiveX controls, tables, data validations, comments and drawing parts of v1.1.2 are carried into v1.2.0 unchanged except where this record says otherwise. The two external-link parts and the calculation chain part were removed; Excel rebuilds the calculation chain on first open.'));
 
 // 3 method
 children.push(h1('3. How the review and the change were done'));
@@ -114,7 +114,7 @@ bullet('');
 children.push(bullet('Fixes were applied by editing the worksheet, chart, drawing and shared-string XML inside the .xlsm package directly. Re-saving the workbook through a library or another application would have dropped the 192 ActiveX pay-item comboboxes and the embedded charts, so no such tool touched the file. The patch is a script (patch_lcca.py) and is reproducible.'));
 children.push(bullet('The patched workbook and a patched copy of the MBT workbook were fully recalculated with LibreOffice Calc (calculateAll, not cached values) and every cell scanned for error values. Results were compared with an independent Python implementation of the LCCA arithmetic.'));
 children.push(bullet('Charts were validated as well-formed XML and parsed with an independent chart reader to confirm their category and value ranges. The decision workbook was recalculated the same way and rendered to PDF to inspect every chart.'));
-children.push(bullet('Not done here: the replacement VBA module and the patched charts have not been executed or displayed in Microsoft Excel, which was not available in the review environment. Section 12 gives the first-open checklist that closes that gap.'));
+children.push(bullet('Not done here: the alternative-sheet charts have not been displayed in Microsoft Excel, which was not available in the review environment (the Summary charts were rendered). Section 12 gives the first-open checklist that closes that gap.'));
 
 // 4 systemic root cause
 children.push(h1('4. Systemic root cause'));
@@ -246,20 +246,21 @@ children.push(p(''));
 children.push(p('The Overview text box is unchanged. NS supplied a rewrite (2022 APTech framework, 2026 NS and ARA update, the four airport criteria); it should be pasted once the wording is approved.'));
 children.push(p('Cell notes on General Information D26 and D39 carried the author\'s name; the author is now "ARA". The workbook carried two external links to files on a personal drive (v1.1.004 and a Savannah copy, referenced only by three sheet-scoped copies of the Airport_Name name); the links and those three names were removed. The workbook-level Airport_Name name (General Information D9) is unchanged.'));
 
-// 7 VBA
-children.push(h1('7. VBA: the Output module'));
-children.push(p('The VBA project is unchanged except for the Output module, which is delivered as Output.bas and must be imported by hand (Section 12). The entry point SetupSummaryWs keeps its name and is still called from frmAlternativeSetup.cmdClose_Click, so no other module changes.'));
+// 7 Summary sheet
+children.push(h1('7. The Summary sheet'));
+children.push(p('The VBA project is not changed. The v1.1.2 Summary consisted of five columns written by the Alternative Setup form (alternative, name, initial construction, present worth, description) and one clustered-bar chart. v1.2.0 keeps those five columns and that chart exactly as the form writes them, moves the chart beside the new charts, and adds from column G onward a results table, a verdict line and five charts that are ordinary worksheet formulas. They read the list of alternative worksheets that the form stores on the hidden Database sheet, reach into each worksheet with INDIRECT, and therefore follow whatever alternatives exist, up to the four rows the form allows.'));
 children.push(table([
-  ['Aspect', 'v1.1.2 SetupSummaryWs', 'v1.2.0 SetupSummaryWs'],
-  ['Results written', 'Alt number, name, Initial Construction (=Total cell), Present Worth (=NPW cell), description', 'Adds Type, Maintenance PW, Rehabilitation PW, Lost Revenue PW, Salvage PW, delta to lowest NPW, closure days over the period; a verdict line naming the lowest-NPW alternative and the analysis settings'],
-  ['How rows are found', 'Finds "Net Present Worth" in column B and "Total" in column A of each Alt sheet', 'Same, plus "Initial Construction" to bound the activity rows; category sums use SUMIFS on the row labels ("Maintenance*", "Rehabilitation*", "*Indirect*", "Salvage*")'],
-  ['Helper blocks', 'None', 'PW by category; expenditure by calendar year (SUMIF on Year Applied); cumulative discounted cost; NPW versus discount rate 2 to 8 percent by SUMPRODUCT; winner at the analysis rate versus 7 percent'],
-  ['Charts', 'Updates the two series of the existing "Chart 1"', 'Deletes existing charts and builds four: PW by category (stacked), expenditure stream (clustered), cumulative cost (line), rate sensitivity (line); series coloured by pavement type (HMA blue 2A78D6, PCC orange EB6834, tints for a second alternative of the same type)'],
-  ['Error handling', 'None', 'ScreenUpdating restored and a message box if the build fails part way'],
-  ['Compatibility', 'Any Excel', 'Shapes.AddChart2 requires Excel 2013 or later (Microsoft 365 at TDOT)'],
-], [1700, 3300, 4360], { size: 15 }));
+  ['Block', 'What it shows', 'How it is computed'],
+  ['Results table G3:R7', 'Worksheet, alternative, type, initial construction, maintenance PW, rehabilitation PW, lost revenue PW, salvage PW, net present worth, difference to the lowest NPW, closure days in the period, runway availability', 'Database!A:D for the names; INDEX/MATCH on "Total" and "Net Present Worth"; SUMIFS over the NPW-table window (rows 37 to 52) on the row labels ("Maintenance*", "Rehabilitation*", "*Indirect*", "Salvage*"); SUM of F4:F10 for closure days'],
+  ['Verdict line G9:G10', 'Lowest present worth, margin to the next alternative, discount rate, period, lost-revenue setting; whether the same alternative is lowest at 7 percent', 'INDEX/MATCH on the NPW column; SMALL for the margin; comparison against the 7 percent row of the sensitivity block'],
+  ['Chart 1 (G14)', 'Present worth by category, stacked, salvage below zero', 'Category block W3:AA9'],
+  ['Chart 2 (N14)', 'NPW versus discount rate, 2 to 8 percent in 0.25 steps', 'Sensitivity block W10:AA36: initial + SUMPRODUCT((year <= period) x cost / (1+r)^year) per alternative'],
+  ['Charts 3 and 4 (G32, N32)', 'Expenditure by calendar year (undiscounted) and cumulative discounted cost', 'By-year block W39:AJ71: SUMIF on Year Applied, running sum of the discounted column'],
+  ['Chart 5 (G50)', 'Runway closure days by calendar year', 'Indirect-cost rows divided by daily revenue (F2), by year'],
+  ['Navigation', '"General Information" and "Instructions" buttons on Summary; "View Summary" under Alternative Setup', 'HYPERLINK cells; no macro, so they work when ActiveX is blocked'],
+], [1900, 3300, 4160], { size: 14 }));
 children.push(p(''));
-children.push(p('All summary cells are live formulas into the alternative sheets, so the Summary follows quantity changes without re-running the form; charts are rebuilt each time the form closes. The full listing is Appendix B; the v1.1.2 module remains in the v1.1.2 file for comparison.'));
+children.push(p('The chart-data blocks are labelled "calculated automatically; do not edit". The print area covers the table and charts one page wide in landscape. Appendix B lists the formulas as they stand in row 4 and in the first row of each block; the remaining rows repeat them with the row number substituted. A first draft of this update replaced the VBA Output module instead (Output.bas); it was superseded by this formula-driven sheet so that nothing has to be imported, and it is not part of the deliverable.'));
 
 // 8 decision workbook
 children.push(h1('8. Companion decision workbook'));
@@ -314,7 +315,8 @@ children.push(h1('9. Verification record'));
 children.push(table([
   ['Check', 'Method', 'Result'],
   ['v1.2.0 workbook integrity', 'Zip test; every XML, rels and VML part parsed', 'Pass; 463 cells changed across 7 sheets, 1 validation, 5 text runs, 5 chart parts, 1 comments part'],
-  ['v1.2.0 full recalculation', 'LibreOffice Calc calculateAll, then scan of every cell for error values', '1,644 formulas, 0 errors'],
+  ['v1.2.0 full recalculation', 'LibreOffice Calc calculateAll, then scan of every cell for error values', '2,240 formulas including the new Summary, 0 errors'],
+  ['New Summary on the MBT data', 'Summary transplanted into the MBT workbook; full recalculation; rendered to PDF', 'Table reads NPW $8,809,266 and $8,028,734, categories sum to NPW, closure days 57 and 27, flags the winner change at 7 percent; six charts parse in an independent reader and render; on the empty template the sheet reads "No alternatives yet" with no error cells'],
   ['v1.1.2 under the same recalculation', 'Same', '99 error cells: 39 #NAME? (XLOOKUP) and 60 #N/A (unguarded PCC lookups, revenue lookup)'],
   ['Template formulas on real data', 'Formula changes applied to the MBT workbook alternative sheets; full recalculation', 'NPW unchanged: HMA $8,809,266.42, PCC $8,028,734.49; PCC rows 17 to 22 = 0 (were #N/A)'],
   ['Year-indexed chart columns', 'Sum of L + M against activity totals; sum of N against NPW; per-year values against policy years', 'HMA: L+M = $10,959,044 = totals; N = $8,809,266 = NPW. PCC: L+M = $7,281,371; N = $8,028,734. Appendix D'],
@@ -322,7 +324,7 @@ children.push(table([
   ['Decision workbook recalculation', 'LibreOffice Calc calculateAll; error scan', '47,265 formulas, 0 errors'],
   ['Decision workbook against independent engine', 'Python implementation of Section 8.1', 'NPW, category split (sums to NPW), EUAC, closure days, break-even values (engine returns a $0 difference at each), 25-point sensitivity, tornado, 12 scenarios and 35-cell decision map agree to the dollar'],
   ['Decision workbook charts', 'Rendered to PDF and inspected', 'All eight per-project charts and the simulation histogram draw with the intended series, axes and years'],
-  ['Not verified in this environment', '', 'Output.bas execution in Excel; display of the patched charts in Excel (LibreOffice does not draw charts on the ActiveX-bearing sheets). Closed by Section 12.'],
+  ['Not verified in this environment', '', 'Display of the alternative-sheet charts in Excel (LibreOffice does not draw charts on the ActiveX-bearing sheets). Closed by Section 12.'],
 ], [2300, 3000, 4060], { size: 15 }));
 
 // 10 what is different in one place
@@ -334,7 +336,7 @@ for (const t of [
   'Numbers that change from #N/A to a value: any analysis with lost revenue for an airport outside the 17; any PCC alternative with an empty pay-item row.',
   'Defaults that change: analysis period 30 instead of 10; closure days pre-filled instead of 0.',
   'Lookups that change: the four geotextile lines now resolve to their own item numbers.',
-  'Presentation that changes: alternative charts by calendar year, stacked direct and lost revenue; Summary with categories, closures and rate sensitivity.',
+  'Presentation that changes: alternative charts by calendar year, stacked direct and lost revenue; Summary with categories, closures, rate sensitivity, five charts and navigation buttons, all formula-driven.',
   'Text that changes: Instructions runs 2, 4, 5, 7 and 8; two cell notes.',
   'Removed: two external links, three sheet-scoped names, the cached calculation chain.',
   'Not changed: Maintenance Policies, Pay_Items unit costs, RevenueData, salvage fractions, the discount formula for in-period activities, the VBA that creates alternatives, the ActiveX controls, every other sheet.',
@@ -356,9 +358,9 @@ children.push(table([
 // 12 checklist
 children.push(h1('12. First-open checklist in Excel'));
 for (const t of [
-  'Open TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm; enable content (or follow the ActiveX steps now in the Instructions).',
-  'Alt+F11; in the project tree right-click the Output module, Remove (answer No to export); File, Import File, Output.bas. Save.',
-  'General Information: select Murfreesboro Municipal Airport, D38 = Yes, D25 = 2027, D26 = 52777.7, D28 = 5433. Alternative Setup: add one New HMA and one New PCC; Close. Expect the Summary to populate with four charts and no #N/A.',
+  'Open TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm; enable content (or follow the ActiveX steps now in the Instructions). Nothing to import.',
+  'Summary: expect "No alternatives yet", five empty charts, and two navigation buttons that jump to General Information and Instructions.',
+  'General Information: select Murfreesboro Municipal Airport, D38 = Yes, D25 = 2027, D26 = 52777.7, D28 = 5433. Alternative Setup: add one New HMA and one New PCC; Close. Click "View Summary". Expect the table, verdict line and all charts to populate with no #N/A.',
   'On Alt 1: enter the MBT pay items and quantities. Expect Initial Construction $5,547,785 (the reported $5,306,577 plus 5 percent engineering on the $4,824,160 subtotal). Expect columns L:N to sum to the NPW table and the chart axis to read 2027 to 2057.',
   'Set D33 = 20. Expect Maintenance 5 and 6 to show $0 discounted and the chart to end at 2047. Restore 30.',
   'Select an airport outside the 17 with D38 = Yes. Expect G2 on each Alt sheet to show the warning and lost revenue $0, not #N/A.',
@@ -371,7 +373,9 @@ children.push(h1('Appendix A. Cell-level change list'));
 children.push(p('Every cell whose formula or value differs between v1.1.2 and v1.2.0, generated by comparing the two workbooks cell by cell (463 cells). Runs of identical formulas in the chart helper columns L, M and N are shown once with the first row; the row number substitutes down the column.'));
 for (const [sheet, entries] of Object.entries(diff.diff)) {
   children.push(h2(`A.${Object.keys(diff.diff).indexOf(sheet) + 1} ${sheet} (${entries.length} cells)`));
-  const rows = [['Cell', 'v1.1.2', 'v1.2.0'], ...groupSheet(sheet, entries)];
+  const rows = sheet === 'Summary'
+    ? [['Cell', 'v1.1.2', 'v1.2.0'], ['Whole sheet', 'Header row A3:E3 and one chart', `Rebuilt: ${entries.length} cells of formulas, labels and buttons (Section 7, Appendix B); A3:E3 unchanged; rows 4 to 7 of A:E left to the form`]]
+    : [['Cell', 'v1.1.2', 'v1.2.0'], ...groupSheet(sheet, entries)];
   children.push(table(rows, [1300, 3400, 4660], { monoCols: [1, 2], size: 13 }));
   children.push(p(''));
 }
@@ -383,14 +387,16 @@ children.push(table([
   ['xl/sharedStrings.xml', 'Four strings appended for the geotextile descriptions'],
   ['xl/charts/chart1.xml to chart5.xml', 'Series reduced to Actual (direct templates) or Direct + Indirect stacked (indirect templates); category reference K37:K67 or K38:K68 added; series extension lists and caches removed; category axis number format "0"'],
   ['xl/drawings/drawing3.xml', 'Instructions text runs 2, 4, 5, 7, 8 (Section 6)'],
-  ['xl/workbook.xml', 'externalReferences element and three sheet-scoped Airport_Name names removed; calcPr fullCalcOnLoad="1"'],
+  ['xl/workbook.xml', 'externalReferences element and three sheet-scoped Airport_Name names removed; calcPr fullCalcOnLoad="1"; print area defined for Summary'],
+  ['xl/worksheets/sheet14.xml (Summary), xl/drawings/drawing10.xml, xl/charts/chart7.xml to chart11.xml, xl/styles.xml', 'Summary sheet rebuilt (formula blocks, buttons, page setup); five chart parts and their anchors added to the existing drawing; the styles the new cells use appended to the style table'],
   ['xl/externalLinks/*, xl/calcChain.xml', 'Removed with their relationships and content-type overrides'],
 ], [3200, 6160], { size: 15 }));
 
 // Appendix B
 children.push(new Paragraph({ children: [new PageBreak()] }));
-children.push(h1('Appendix B. Output.bas listing (v1.2.0)'));
-for (const line of OUTBAS) children.push(mono(line.replace(/\t/g, '    '), 14));
+children.push(h1('Appendix B. Summary sheet formula reference'));
+children.push(p('Formulas as written in the v1.2.0 Summary sheet for the first alternative row (row 4) and the first row of each chart-data block. Rows 5 to 7 and the following rows of each block repeat them with the row number substituted.'));
+children.push(table([['Cell', 'Formula'], ...SUMMARY_FORMULAS.map(x => [x[0], x[1]])], [1200, 8160], { monoCols: [1], size: 12 }));
 
 // Appendix C reconciliation
 children.push(new Paragraph({ children: [new PageBreak()] }));
