@@ -65,7 +65,7 @@ Shoulder reading (chart 7 and the column Q string, filled because D27 > 0): the 
 `9" P501 on 6" P209 on 6" P154`, `10" P401 on 10" P209`, `11" P501 on 6" P209`. Concrete keeps its
 named thickness in both readings.
 
-## Checks run on each example (all pass: 43 on GKT, 61 on MKL)
+## Checks run on each example (all pass: 43 on GKT, 61 on MKL; re-run after the Method sheet was added)
 
 Per alternative: item cost = quantity x unit cost; initial = subtotal x 1.15; every activity's present worth
 = cost / 1.03^offset; NPW = sum of the activity column. Summary: results row matches the Alt sheet and the A:E

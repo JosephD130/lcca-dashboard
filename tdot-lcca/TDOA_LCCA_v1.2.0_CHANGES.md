@@ -83,6 +83,22 @@ timing against published service lives, and a live daily-revenue table for the 1
 source URL as plain text (no hyperlink, so nothing on the sheet reaches outside the workbook); see verification/RESEARCH_SOURCES.md for what could and could not be confirmed. General Information
 gets a "Typical Values" button (D46) and short hints in column F beside D25:D38.
 
+## 3bb. Method sheet
+
+A second reference sheet, "Method" (last sheet, nothing on it feeds the calculation), states every calculation
+once: the step, the cell it lives in, the formula as it stands there, the rule in plain English and where the
+rule comes from. Sections 2 to 8 follow one alternative from the quantities typed on its worksheet to its net
+present worth (initial cost, policy years, what each event costs, closure days, lost revenue, salvage,
+discounting); section 9 covers what the Summary adds; section 10 reads the current period, rate, capital
+recovery factor and the present worth of $1 at year 20 live from the file; section 11 lists the assumptions a
+reviewer will ask about. Reason: the discounting, salvage and lost-revenue rules previously existed only as
+formulas in cells, with nothing in the workbook stating them in words. General Information gets a "Method"
+button (D48).
+
+One inconsistency found while writing it, recorded on the sheet and not changed: the PCC cost blocks estimate
+joint length from 12.5 x 12.5 ft slabs, while the closure-day formulas assume 550 L.F. of joint per 50 x 100 ft
+panel, about a third less. It understates PCC closure days and the lost revenue derived from them.
+
 ## 3c. Look and first-run usability
 
 Nothing on this list changes a number. The layout, fonts and grey input cells are unchanged, so the

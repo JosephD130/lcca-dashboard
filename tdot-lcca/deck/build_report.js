@@ -275,7 +275,7 @@ children.push(table([
   ['General Information print setup', 'Print area A1:J48, landscape, one page wide', 'The sheet printed across two pages with the hidden lookup columns'],
   ['Every alternative worksheet, row 1', '"General Information" and "Summary" buttons and a one-line reminder of which cells are inputs', 'The alternative sheets had no way back; the reminder answers the question the reviewer asked about which cells to fill'],
   ['Summary results table and comparison block', 'Conditional formatting highlights the lowest-cost row', 'The answer is visible before reading any number'],
-  ['All sheets', 'Tab colours: navy for General Information, blue for Summary, light blue for alternative worksheets, grey for reference', 'Groups fifteen tabs into four kinds'],
+  ['All sheets', 'Tab colours: navy for General Information, blue for Summary, light blue for alternative worksheets, grey for reference', 'Groups sixteen tabs into four kinds'],
 ], [1700, 3700, 3760], { size: 13 }));
 children.push(p(''));
 children.push(p('The navigation row and the tab colour live on the hidden templates, so every alternative the Alternative Setup form creates carries them without any change to the VBA.'));
@@ -295,6 +295,25 @@ children.push(table([
 children.push(p(''));
 children.push(p('General Information carries a "Typical Values" button (D46) beside the "View Summary" button, and short hints in column F beside the construction year, areas, analysis period, discount rate, mobilization, engineering and indirect-cost cells.'));
 children.push(p('Research method and limits: the values were gathered in September 2026 from TDOT, TASP, FAA, OMB, Caltrans, AAPTP and state bid tabulations. The build environment could not open several of those sites directly, so figures come from search excerpts of the cited documents; verification/RESEARCH_SOURCES.md lists what was confirmed and what still needs a look at the primary PDF (the AIP Handbook paragraph numbers, the 6G thickness table rows, and Tennessee bid prices for P-209, P-154, seal coats and crack sealing).'));
+
+children.push(h1('7c. Method sheet'));
+children.push(p('The workbook now carries its own calculation record. "Method" is the last sheet, reference only like Typical Values, and it states every calculation once in five columns: the step, the cell it lives in, the formula as it stands there, the rule in plain English, and where the rule comes from. Sections 2 to 8 follow one alternative from the quantities typed on its worksheet to its net present worth; section 9 covers what the Summary adds on top; section 10 reads the current analysis period, discount rate, capital recovery factor and the present worth of a dollar spent at year 20 live from the file; section 11 lists the assumptions a reviewer will ask about, each on a highlighted row. It exists because the discounting, the salvage rule and the lost-revenue rule previously existed only as formulas in cells, with nothing in the file stating them in words. General Information carries a "Method" button (D48) under the Typical Values button.'));
+children.push(table([
+  ['Section of the Method sheet', 'What it records'],
+  ['1. The answer', 'Net present worth as the sum of the discounted column, where it is reported, and that every other block restates the same numbers'],
+  ['2. Initial construction', 'Item cost as quantity times the Pay_Items unit cost, the VLOOKUP that fetches the price, the subtotal, mobilization and engineering percentages and the total'],
+  ['3. When later work happens', 'Policy years drawn from Maintenance Policies, the year as an offset rather than a calendar year, and the drop of events beyond the analysis period'],
+  ['4. What each event costs', 'The hidden per-event blocks: which policy rate drives each quantity, what the HMA and PCC events consist of, the assumed 12.5 ft slab layout behind the joint length, and mobilization and engineering on every event'],
+  ['5. Closure days', 'Each production rate in F4:F10 (15,000 SY/day surface treatment, 3,800 SY/day mill and overlay, 10,000 LF/day crack sealing, 5,000 SY/day patching, 1,000 SY/day slab replacement plus seven days of cure) and that the cells are overridable inputs'],
+  ['6. Lost airport revenue', 'The switch, the SUMIF chain over RevenueData, the warning for airports outside the 17, and closure days times daily revenue'],
+  ['7. Salvage', '12.5 percent of the overlay for asphalt, 25 percent of initial construction for concrete, both credited at the end of the period'],
+  ['8. Discounting', 'Cost divided by (1 + rate) to the power of the year, constant dollars with a real rate, the rate and period and where each comes from'],
+  ['9. What the Summary adds', 'Results table, Database lookup, verdict, RealCost comparison block and the EUAC formula, sensitivity, by-year blocks and the section read-back'],
+  ['10. Current settings (live)', 'Analysis period, discount rate, capital recovery factor, present worth of $1 at year 20, lost-revenue switch and the number of alternatives, all read from the file as it stands'],
+  ['11. Assumptions worth knowing', 'Engineering now charged on initial construction; the salvage asymmetry; lost revenue treated as gross revenue; the two different PCC joint-length estimates; closure rates as defaults; 145 pcf; 2022 unit costs; no inflation and no risk analysis'],
+], [2400, 6960], { size: 13 }));
+children.push(p(''));
+children.push(p('One inconsistency surfaced while writing the sheet and is recorded on it rather than changed: the cost side estimates the concrete joint length from 12.5 by 12.5 ft slabs, while the closure-day formula assumes 550 linear feet of joint per 50 by 100 ft panel. The closure formula therefore carries about a third less joint length than the cost formula, which understates PCC closure days and the lost revenue that follows from them. It is a policy or modelling decision for Aeronautics, not a defect introduced here.'));
 
 // 8 decision workbook
 children.push(h1('8. Companion decision workbook'));

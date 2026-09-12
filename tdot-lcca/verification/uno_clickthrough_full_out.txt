@@ -6,6 +6,7 @@
   PASS  button TMP(NewPCC)_IndirectCost!C1 "Summary" -> Summary!G1  |  visible=True landed=Summary
   PASS  button General Information!D44 "View Summary  ►" -> Summary!G1  |  visible=True landed=Summary
   PASS  button General Information!D46 "Typical Values  ►" -> 'Typical Values'!A1  |  visible=True landed=Typical Values
+  PASS  button General Information!D48 "Method  ►" -> Method!A1  |  visible=True landed=Method
   PASS  button TMP(NewHMA)_IndirectCost!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
   PASS  button TMP(NewHMA)_IndirectCost!C1 "Summary" -> Summary!G1  |  visible=True landed=Summary
   PASS  button TMP(NewHMA)!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
@@ -18,7 +19,9 @@
   PASS  button Summary!B1 "Instructions" -> Instructions!B9  |  visible=True landed=Instructions
   PASS  button Typical Values!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
   PASS  button Typical Values!B1 "Summary" -> Summary!G1  |  visible=True landed=Summary
-  PASS  every sheet is reachable or deliberately hidden  |  16 hyperlink buttons
+  PASS  button Method!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
+  PASS  button Method!B1 "Summary" -> Summary!G1  |  visible=True landed=Summary
+  PASS  every sheet is reachable or deliberately hidden  |  19 hyperlink buttons
   PASS  blank template says so on the Summary  |  No alternatives yet. Go to General Information and click Alternative Setup.
   PASS  input checklist lists what is missing  |  Still needed: Airport Name, Construction Year, Mainline Area, Markings Area
   PASS  checklist clears when the required inputs are filled  |  All required inputs are filled. Next: click Alternative Setup.
@@ -54,4 +57,4 @@
   PASS  restored to two alternatives
 
 ==============================================================================
-47 passed, 0 failed
+50 passed, 0 failed

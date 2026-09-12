@@ -5,7 +5,7 @@ tables and data validations are preserved (openpyxl would drop them).
 """
 import re, html, sys, os, zipfile, shutil
 from build_summary import transplant, add_plain_sheet, add_style, add_dxf, FONT, FILL, BORDER_BOTTOM
-import build_helpers, helpers_content
+import build_helpers, helpers_content, build_method
 build_helpers.set_sections(helpers_content.sections()); build_helpers.HINTS.update(helpers_content.HINTS)
 
 GI = "'General Information'"
@@ -244,6 +244,12 @@ def main(src, out, mbt_mode=False):
         x = put_cell(x, 'B46', '<c r="B46"%s t="inlineStr"><is><t>Typical input values:</t></is></c>' % (' s="%s"' % lab if lab else ''))
         x = put_cell(x, 'D46', '<c r="D46"%s t="str"><f>HYPERLINK("#\'Typical Values\'!A1","Typical Values  \u25ba")</f><v>Typical Values  \u25ba</v></c>' % (' s="%s"' % btn if btn else ''))
         x = re.sub(r'<row r="46" ', '<row r="46" ht="21" customHeight="1" ', x, count=1)
+    # --- 'Method' reference sheet: every calculation with its formula, rule and source (appended after Typical Values)
+    method_part = None if mbt_mode else add_plain_sheet(work, build_method.build, 'Method')
+    if method_part:
+        x = put_cell(x, 'B48', '<c r="B48"%s t="inlineStr"><is><t>How it is calculated:</t></is></c>' % (' s="%s"' % lab if lab else ''))
+        x = put_cell(x, 'D48', '<c r="D48"%s t="str"><f>HYPERLINK("#Method!A1","Method  \u25ba")</f><v>Method  \u25ba</v></c>' % (' s="%s"' % btn if btn else ''))
+        x = re.sub(r'<row r="48" ', '<row r="48" ht="21" customHeight="1" ', x, count=1)
     for row, hint in (build_helpers.HINTS.items() if helper_part else []):
         x = put_cell(x, 'F%d' % row, '<c r="F%d"%s t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>' % (row, ' s="%s"' % hint_style if hint_style else '', html.escape(hint, quote=False)))
     wr(gi_part, x)
@@ -261,6 +267,7 @@ def main(src, out, mbt_mode=False):
                 ('xl/worksheets/sheet3.xml', 'FF595959'),    # Instructions
                 ('xl/worksheets/sheet5.xml', 'FFBFBFBF'),    # Pay_Items
                 ('xl/worksheets/sheet7.xml', 'FFBFBFBF')]    # Maintenance Policies
+        if method_part: tabs.append((method_part, 'FFBFBFBF'))
     design_pass(work, rd, wr, gi_part, summ_part, tpl, tabs)
 
     # --- workbook: drop broken external links, force full recalculation on open
