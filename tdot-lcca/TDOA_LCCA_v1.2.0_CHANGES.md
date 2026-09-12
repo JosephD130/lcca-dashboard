@@ -174,5 +174,5 @@ Forge Runway 10-28 without shoulders and three alternatives (HMA, 9 in PCC on su
 subbase; the 11 in PCC is lowest, $5,852,247, and the answer changes at 7 percent), and McKellar-Sipes
 Runway 2-20 with 25 ft shoulders and four alternatives (two HMA, two PCC; 9 in PCC is lowest, $14,066,568,
 at every rate from 2 to 8 percent). Every block of the Summary was read back and checked against an
-independent calculation (42 and 57 checks, all pass), and the section read-back returned the sections the
+independent calculation (43 and 61 checks, all pass), and the section read-back returned the sections the
 quantities were built from, on the mainline and, for the shoulder example, in the shoulder reading.

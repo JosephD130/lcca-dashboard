@@ -300,7 +300,7 @@ table(s, [
   ['Decision workbook against an independent engine', 'NPW, categories, break-evens, sensitivity, tornado, 12 scenarios and the decision map agree to the dollar'],
   ['New Summary sheet on the MBT data', 'Table, verdict, categories and closure days match; six charts render; template reads "No alternatives yet" with no errors'],
   ['New project run end to end', 'CKV Runway 17-35 built on the blank template: framework, decision TEMPLATE and an independent engine agree to the dollar'],
-  ['Two worked examples', 'GKT Runway 10-28 (three alternatives, no shoulders) and MKL Runway 2-20 (four alternatives, 25 ft shoulders): 99 independent checks pass; section read-back returns the designed sections'],
+  ['Two worked examples', 'GKT Runway 10-28 (three alternatives, no shoulders) and MKL Runway 2-20 (four alternatives, 25 ft shoulders): 104 independent checks pass; section read-back returns the designed sections'],
   ['Scripted click-through (LibreOffice API)', 'Buttons land where they should; 7% flips the verdict as flagged; 20 years drops late closures; unknown airport gives $0 lost revenue with a warning; deleting an alternative shifts the table with no #REF!; ties and four alternatives read cleanly'],
   ['Not yet verified', 'The alternative-sheet charts in Excel itself (no Excel here); a first-open check is in the notes'],
 ], 0.5, 1.2, 9.0, [3.4, 5.6], 10);

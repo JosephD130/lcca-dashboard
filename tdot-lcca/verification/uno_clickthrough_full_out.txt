@@ -1,0 +1,57 @@
+==============================================================================
+1. DELIVERED TEMPLATE  TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm
+==============================================================================
+  PASS  template opens with no error cells  |  none
+  PASS  button TMP(NewPCC)_IndirectCost!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
+  PASS  button TMP(NewPCC)_IndirectCost!C1 "Summary" -> Summary!G1  |  visible=True landed=Summary
+  PASS  button General Information!D44 "View Summary  ►" -> Summary!G1  |  visible=True landed=Summary
+  PASS  button General Information!D46 "Typical Values  ►" -> 'Typical Values'!A1  |  visible=True landed=Typical Values
+  PASS  button TMP(NewHMA)_IndirectCost!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
+  PASS  button TMP(NewHMA)_IndirectCost!C1 "Summary" -> Summary!G1  |  visible=True landed=Summary
+  PASS  button TMP(NewHMA)!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
+  PASS  button TMP(NewHMA)!C1 "Summary" -> Summary!G1  |  visible=True landed=Summary
+  PASS  button TMP(NewPCC)!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
+  PASS  button TMP(NewPCC)!C1 "Summary" -> Summary!G1  |  visible=True landed=Summary
+  PASS  button TMP(HMARehab)!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
+  PASS  button TMP(HMARehab)!C1 "Summary" -> Summary!G1  |  visible=True landed=Summary
+  PASS  button Summary!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
+  PASS  button Summary!B1 "Instructions" -> Instructions!B9  |  visible=True landed=Instructions
+  PASS  button Typical Values!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
+  PASS  button Typical Values!B1 "Summary" -> Summary!G1  |  visible=True landed=Summary
+  PASS  every sheet is reachable or deliberately hidden  |  16 hyperlink buttons
+  PASS  blank template says so on the Summary  |  No alternatives yet. Go to General Information and click Alternative Setup.
+  PASS  input checklist lists what is missing  |  Still needed: Airport Name, Construction Year, Mainline Area, Markings Area
+  PASS  checklist clears when the required inputs are filled  |  All required inputs are filled. Next: click Alternative Setup.
+  PASS  Typical Values resolves with no errors
+  PASS  Typical Values reads the live workbook  |  rate 3.0 period 30.0
+  PASS  daily revenue table is live  |  CKV 3239.39
+  PASS  asphalt unit weight cell is on the Summary  |  145.0
+  PASS  tab colours applied  |  GI 1910579 Summary 2783446
+
+==============================================================================
+2. POPULATED WORKBOOK  MBT_check.xlsm  (scenarios and the section read-back)
+==============================================================================
+  PASS  only the pre-existing template errors are present  |  {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}
+  PASS  NPW unchanged by everything added  |  8,809,266.42 / 8,028,734.49
+  PASS  agency + user = total in the comparison block
+  PASS  EUAC matches the closed form  |  449,442.25
+  PASS  section read-back reproduces the typed description  |  5" P401 on 16" P209
+  PASS  excavation check agrees for the asphalt alternative  |  agrees
+  PASS  excavation check flags the 8 in / 9 in concrete mismatch  |  differs by -1.0 in
+  PASS  asphalt thickness follows the unit weight cell  |  5.000 -> 4.833 at 150 pcf
+  PASS  shoulder chart is empty with no shoulder area
+  PASS  shoulder chart scales the derived layers  |  0.00 -> 0.00
+  PASS  named concrete thickness does not scale  |  0.00 / 0.00
+  PASS  discount rate 7%: verdict recomputes  |  Lowest present worth: Alternative 1   |   margin to next: $1,025,177   |   7% over 30 years   | 
+  PASS  discount rate 7%: no new errors
+  PASS  analysis period 20 years: verdict recomputes  |  Lowest present worth: Alternative 2   |   margin to next: $755,381   |   3% over 20 years   |   
+  PASS  analysis period 20 years: no new errors
+  PASS  lost revenue off: verdict recomputes  |  Lowest present worth: Alternative 2   |   margin to next: $780,532   |   3% over 30 years   |   
+  PASS  lost revenue off: no new errors
+  PASS  unknown airport does not error  |  {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}
+  PASS  deleting a Database row leaves no #REF!  |  Alt 2 (New PCC)
+  PASS  verdict handles a single alternative  |  Lowest present worth: Alternative 2   |   only one alternative so far   |   3% over 30 years   |
+  PASS  restored to two alternatives
+
+==============================================================================
+47 passed, 0 failed
