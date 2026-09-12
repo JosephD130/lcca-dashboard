@@ -263,6 +263,22 @@ children.push(table([
 children.push(p(''));
 children.push(p('The chart-data blocks are labelled "calculated automatically; do not edit". The print area covers the table and charts one page wide in landscape. Appendix B lists the formulas as they stand in row 4 and in the first row of each block; the remaining rows repeat them with the row number substituted. A first draft of this update replaced the VBA Output module instead (Output.bas); it was superseded by this formula-driven sheet so that nothing has to be imported, and it is not part of the deliverable.'));
 
+children.push(h1('7c. Look and first-run usability'));
+children.push(p('The layout, fonts, grey input cells, logo and button positions are unchanged, so the workbook still reads as the same tool. What changed is the first-run guidance and the visual hierarchy. None of it touches a calculation: every cell added is text, a HYPERLINK or a format.'));
+children.push(table([
+  ['Where', 'Change', 'Why'],
+  ['General Information F2:J7', 'A "How to use this workbook" card beside the logo: fill the grey cells, click Alternative Setup, click View Summary, plus the note that grey cells are inputs and white cells calculate', 'A new user had nothing on screen telling them the order of operations; the Instructions sheet is a separate tab they had to find'],
+  ['General Information F9:J9', 'A live status line naming whichever required input is still empty (airport, construction year, mainline area, markings area, analysis period, discount rate). Conditional formatting turns it green when the list is empty', 'The reviewer built alternatives before the inputs were complete and got zeroes; the line makes that state visible before the click'],
+  ['General Information B8, B20, B32', 'The three section labels sit on a light band with a blue rule', 'Gives the form three visible blocks instead of one long list'],
+  ['General Information D35', 'The salvage sentence is styled as a note, not as an input value', 'It sits in the input column and reads like a value to fill in'],
+  ['General Information print setup', 'Print area A1:J48, landscape, one page wide', 'The sheet printed across two pages with the hidden lookup columns'],
+  ['Every alternative worksheet, row 1', '"General Information" and "Summary" buttons and a one-line reminder of which cells are inputs', 'The alternative sheets had no way back; the reminder answers the question the reviewer asked about which cells to fill'],
+  ['Summary results table and comparison block', 'Conditional formatting highlights the lowest-cost row', 'The answer is visible before reading any number'],
+  ['All sheets', 'Tab colours: navy for General Information, blue for Summary, light blue for alternative worksheets, grey for reference', 'Groups fifteen tabs into four kinds'],
+], [1700, 3700, 3760], { size: 13 }));
+children.push(p(''));
+children.push(p('The navigation row and the tab colour live on the hidden templates, so every alternative the Alternative Setup form creates carries them without any change to the VBA.'));
+
 children.push(h1('7b. Typical Values sheet and input hints'));
 children.push(p('A new last sheet, "Typical Values", is reference only: no cell on it feeds the calculation, and it was added last so no sheet index shifts. It answers the question a user asks while typing into General Information: is this number in the right range. Rows that can be read from the workbook itself are live formulas (Pay_Items unit costs, Maintenance Policies years and salvage fractions, the daily revenue of each of the 17 airports); rows from outside sources carry the source URL in the last column.'));
 children.push(table([
@@ -333,7 +349,7 @@ children.push(table([
   ['Check', 'Method', 'Result'],
   ['v1.2.0 workbook integrity', 'Zip test; every XML, rels and VML part parsed', 'Pass; 463 cells changed across 7 sheets, 1 validation, 5 text runs, 5 chart parts, 1 comments part'],
   ['v1.2.0 full recalculation', 'LibreOffice Calc calculateAll, then scan of every cell for error values', '2,240 formulas including the new Summary, 0 errors'],
-  ['New project run end to end', 'CKV Runway 17-35 (Outlaw Field) built on the blank v1.2.0 template through the UNO API: General Information, both alternatives, pay items (verification/new_project_CKV/run_ckv.py)', 'Framework Summary, the decision workbook TEMPLATE sheet and an independent Python engine give the same NPW ($9,829,224 HMA and $9,180,602 PCC) and the same category present worths; closure days, salvage and daily revenue match hand calculation; no error cells'],
+  ['New project run end to end (re-run after the design pass)', 'CKV Runway 17-35 (Outlaw Field) built on the blank v1.2.0 template through the UNO API: General Information, both alternatives, pay items (verification/new_project_CKV/run_ckv.py)', 'Framework Summary, the decision workbook TEMPLATE sheet and an independent Python engine give the same NPW ($9,829,224 HMA and $9,180,602 PCC) and the same category present worths; closure days, salvage and daily revenue match hand calculation; no error cells'],
   ['Typical Values sheet', 'Full recalculation of the template; every live row read back', 'No error cells; Pay_Items defaults, Maintenance Policies years and salvage fractions and the 17 daily revenues resolve; the sheet is last so no sheet index or print area shifted'],
   ['New Summary on the MBT data', 'Summary transplanted into the MBT workbook; full recalculation; rendered to PDF', 'Table reads NPW $8,809,266 and $8,028,734, categories sum to NPW, closure days 57 (HMA) and 9 for PCC in that file (its rehabilitation indirect row is mislabelled, see Appendix C; the v1.2.0 template gives 27), flags the winner change at 7 percent; six charts parse in an independent reader and render; on the empty template the sheet reads "No alternatives yet" with no error cells'],
   ['v1.1.2 under the same recalculation', 'Same', '99 error cells: 39 #NAME? (XLOOKUP) and 60 #N/A (unguarded PCC lookups, revenue lookup)'],

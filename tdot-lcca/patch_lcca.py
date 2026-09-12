@@ -4,7 +4,7 @@ Edits sheet XML in place inside the .xlsm zip so VBA, ActiveX comboboxes, charts
 tables and data validations are preserved (openpyxl would drop them).
 """
 import re, html, sys, os, zipfile, shutil
-from build_summary import transplant, add_plain_sheet
+from build_summary import transplant, add_plain_sheet, add_style, add_dxf, FONT, FILL, BORDER_BOTTOM
 import build_helpers, helpers_content
 build_helpers.set_sections(helpers_content.sections()); build_helpers.HINTS.update(helpers_content.HINTS)
 
@@ -245,6 +245,22 @@ def main(src, out, mbt_mode=False):
     for row, hint in build_helpers.HINTS.items():
         x = put_cell(x, 'F%d' % row, '<c r="F%d"%s t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>' % (row, ' s="%s"' % hint_style if hint_style else '', html.escape(hint, quote=False)))
     wr(gi_part, x)
+    # --- design pass: look and first-run usability (no calculation changes)
+    if mbt_mode:
+        tpl = [('xl/worksheets/sheet14.xml', GUIDE_HMA), ('xl/worksheets/sheet15.xml', GUIDE_PCC)]
+        tabs = [('xl/worksheets/sheet16.xml', 'FF2A78D6')]
+    else:
+        tpl = [('xl/worksheets/sheet8.xml', GUIDE_HMA), ('xl/worksheets/sheet10.xml', GUIDE_HMA),
+               ('xl/worksheets/sheet1.xml', GUIDE_PCC), ('xl/worksheets/sheet11.xml', GUIDE_PCC),
+               ('xl/worksheets/sheet12.xml', GUIDE_HMA)]
+        tabs = [('xl/worksheets/sheet14.xml', 'FF2A78D6'),   # Summary
+                ('xl/worksheets/sheet15.xml', 'FFBFBFBF'),   # Typical Values
+                ('xl/worksheets/sheet2.xml', 'FF595959'),    # Overview
+                ('xl/worksheets/sheet3.xml', 'FF595959'),    # Instructions
+                ('xl/worksheets/sheet5.xml', 'FFBFBFBF'),    # Pay_Items
+                ('xl/worksheets/sheet7.xml', 'FFBFBFBF')]    # Maintenance Policies
+    design_pass(work, rd, wr, gi_part, summ_part, tpl, tabs)
+
     # --- workbook: drop broken external links, force full recalculation on open
     w = rd('xl/workbook.xml')
     w = re.sub(r'<externalReferences>.*?</externalReferences>', '', w, flags=re.S)
@@ -273,6 +289,128 @@ def main(src, out, mbt_mode=False):
                 z.write(full, rel)
     shutil.rmtree(work)
     print('wrote', out)
+
+
+
+GUIDE_HMA = ('Grey cells are yours: C4 to C8 project data (filled from General Information), '
+             'F4 to F10 closure days, C13 to C22 pay items and E13 to E22 quantities. Everything else calculates.')
+GUIDE_PCC = ('Grey cells are yours: C4 to C7 project data (filled from General Information), '
+             'F4 and F5 closure days, C13 to C22 pay items and E13 to E22 quantities. Everything else calculates.')
+
+
+# ------------------------------------------------------------------ design pass (look and first-run UX)
+def ensure_row(x, r):
+    """Insert an empty <row r="N"/> in order if the sheet has no such row."""
+    if get_row(x, r): return x
+    m = None
+    for rm in re.finditer(r'<row r="(\d+)"', x):
+        if int(rm.group(1)) > r: m = rm; break
+    row = '<row r="%d">' % r + '</row>'
+    if m: return x[:m.start()] + row + x[m.start():]
+    return x.replace('</sheetData>', row + '</sheetData>', 1)
+
+
+def insert_before(x, xml, tags):
+    """Insert an element before the first of `tags` present (worksheet child order matters to Excel)."""
+    for t in tags:
+        i = x.find('<' + t)
+        if i >= 0: return x[:i] + xml + x[i:]
+    return x.replace('</worksheet>', xml + '</worksheet>')
+
+
+def tab_color(x, rgb):
+    """Set the sheet tab colour (tabColor is the first child of sheetPr)."""
+    x = re.sub(r'<tabColor[^>]*/>', '', x)
+    m = re.search(r'<sheetPr([^>]*?)/>', x)
+    if m: return x[:m.start()] + '<sheetPr%s><tabColor rgb="%s"/></sheetPr>' % (m.group(1), rgb) + x[m.end():]
+    m = re.search(r'<sheetPr([^>]*)>', x)
+    if m: return x[:m.end()] + '<tabColor rgb="%s"/>' % rgb + x[m.end():]
+    return x.replace('<dimension', '<sheetPr><tabColor rgb="%s"/></sheetPr><dimension' % rgb, 1)
+
+
+def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs):
+    """Visual and first-run usability pass: quick-start card and live input checklist on General
+    Information, section bands, navigation on every alternative sheet, and tab colours. Nothing here
+    changes a calculation; every cell added is text or a HYPERLINK."""
+    NAVY, BLUE, PALE, WHITE, GREY = 'FF1D2733', 'FF2A78D6', 'FFEAF2FB', 'FFFFFFFF', 'FF595959'
+    s_title = add_style(work, font=FONT(10, b=True, color=WHITE), fill=FILL(NAVY),
+                        alignment='horizontal="left" vertical="center" indent="1"')
+    s_body = add_style(work, font=FONT(9), fill=FILL(PALE),
+                       alignment='horizontal="left" vertical="top" wrapText="1" indent="1"')
+    s_status = add_style(work, font=FONT(10, b=True), fill=FILL(PALE), border=BORDER_BOTTOM,
+                         alignment='horizontal="left" vertical="center" wrapText="1" indent="1"')
+    s_band = add_style(work, font=FONT(10, b=True), fill=FILL(PALE), border=BORDER_BOTTOM,
+                       alignment='horizontal="left" vertical="center"')
+    s_note = add_style(work, font=FONT(9, i=True, color=GREY), alignment='horizontal="left" vertical="center"')
+    d_ok = add_dxf(work, '<dxf><font><color rgb="FF186A3B"/></font><fill><patternFill><bgColor rgb="FFE8F6EC"/></patternFill></fill></dxf>')
+    d_todo = add_dxf(work, '<dxf><font><color rgb="FF7F6000"/></font><fill><patternFill><bgColor rgb="FFFFF3CD"/></patternFill></fill></dxf>')
+
+    # ---- General Information: quick-start card, live checklist, section bands
+    x = rd(gi_part)
+    btn_dark = style_of(rd(summ_part), 'A1'); btn_blue = style_of(rd(summ_part), 'B1')
+    for r in range(2, 8): x = ensure_row(x, r)
+    card = ('1.   Fill in the grey cells below (D9 to D39).\n'
+            '2.   Click Alternative Setup and add your alternatives.\n'
+            '3.   Click View Summary to compare them.\n'
+            'Grey cells are yours to fill in; white cells calculate themselves.\n'
+            'Typical Values lists the usual range for each input.')
+    x = put_cell(x, 'F2', '<c r="F2" s="%s" t="inlineStr"><is><t>HOW TO USE THIS WORKBOOK</t></is></c>' % s_title)
+    x = put_cell(x, 'F3', '<c r="F3" s="%s" t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>' % (s_body, html.escape(card, quote=False)))
+    missing = ('&'.join('IF(D%d="","%s, ","")' % (row, lab) for row, lab in
+                        [(9, 'Airport Name'), (25, 'Construction Year'), (26, 'Mainline Area'),
+                         (28, 'Markings Area'), (33, 'Analysis Period'), (34, 'Discount Rate')]))
+    f = ('IF(LEN(%s)=0,"All required inputs are filled. Next: click Alternative Setup.","Still needed: "&LEFT(%s,LEN(%s)-2))'
+         % (missing, missing, missing))
+    x = put_cell(x, 'F9', '<c r="F9" s="%s" t="str"><f>%s</f><v>Still needed: Airport Name, Construction Year, Mainline Area, Markings Area</v></c>'
+                 % (s_status, html.escape(f, quote=False)))
+    for row in (8, 20, 32):   # "Airport Information:", "Project Information:", "LCCA Parameters:"
+        for col in 'BCDE':
+            cell = '<c r="%s%d" s="%s"%s' % (col, row, s_band, '/>' if col != 'B' else '')
+            if col == 'B':
+                cur = cell_re('B%d' % row).search(x)
+                inner = re.search(r'>(.*)</c>', cur.group(0), re.S).group(1) if cur and '</c>' in cur.group(0) else ''
+                t = re.search(r' t="([^"]+)"', cur.group(0)).group(1) if cur and ' t="' in cur.group(0) else None
+                cell = '<c r="B%d" s="%s"%s>%s</c>' % (row, s_band, ' t="%s"' % t if t else '', inner)
+            x = put_cell(x, '%s%d' % (col, row), cell)
+    x = put_cell(x, 'D35', '<c r="D35" s="%s" t="inlineStr"><is><t>Remaining service life at end of analysis period (as percent of cost)</t></is></c>' % s_note)
+    merges = '<mergeCells count="3"><mergeCell ref="F2:J2"/><mergeCell ref="F3:J7"/><mergeCell ref="F9:J9"/></mergeCells>'
+    cf = ('<conditionalFormatting sqref="F9:J9"><cfRule type="expression" dxfId="%d" priority="1"><formula>LEFT($F$9,3)="All"</formula></cfRule>'
+          '<cfRule type="expression" dxfId="%d" priority="2"><formula>LEFT($F$9,3)&lt;&gt;"All"</formula></cfRule></conditionalFormatting>' % (d_ok, d_todo))
+    x = re.sub(r'<mergeCells count="\d+">.*?</mergeCells>', '', x, flags=re.S)
+    x = insert_before(x, merges + cf, ['dataValidations', 'hyperlinks', 'printOptions', 'pageMargins'])
+    x = re.sub(r'<row r="([3-7])"([^>]*?)(/?)>', lambda m: '<row r="%s"%s ht="15" customHeight="1"%s>' % (m.group(1), m.group(2), m.group(3)), x)
+    x = re.sub(r'<row r="9"([^>]*?)(/?)>', lambda m: '<row r="9"%s ht="28" customHeight="1"%s>' % (m.group(1), m.group(2)), x, count=1)
+    # print the sheet the way it reads on screen: one page wide, landscape
+    if '<pageSetup' not in x:
+        x = re.sub(r'(<pageMargins[^>]*/>)', r'\1<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/>', x, count=1)
+    if '<pageSetUpPr' not in x:
+        x = re.sub(r'(<sheetPr[^>]*>)', r'\1<pageSetUpPr fitToPage="1"/>', x, count=1) if re.search(r'<sheetPr[^>]*>(?!/)', x) else x
+    x = tab_color(x, NAVY)
+    wr(gi_part, x)
+    w = rd('xl/workbook.xml')
+    if '_xlnm.Print_Area" localSheetId="3"' not in w:
+        pa = '<definedName name="_xlnm.Print_Area" localSheetId="3">\'General Information\'!$A$1:$J$48</definedName>'
+        w = w.replace('</definedNames>', pa + '</definedNames>') if '</definedNames>' in w else w.replace('</sheets>', '</sheets><definedNames>' + pa + '</definedNames>', 1)
+        wr('xl/workbook.xml', w)
+
+    # ---- alternative worksheets: navigation row and a one-line guide to the grey cells
+    for part, note in template_parts:
+        t = rd(part)
+        t = ensure_row(t, 1)
+        t = put_cell(t, 'A1', '<c r="A1" s="%s" t="str"><f>HYPERLINK("#\'General Information\'!D9","◄ General Information")</f><v>◄ General Information</v></c>' % btn_dark)
+        t = put_cell(t, 'B1', '<c r="B1" s="%s"/>' % btn_dark)          # merged with A1: column A alone is too narrow
+        t = put_cell(t, 'C1', '<c r="C1" s="%s" t="str"><f>HYPERLINK("#Summary!G1","Summary")</f><v>Summary</v></c>' % btn_blue)
+        t = put_cell(t, 'D1', '<c r="D1" s="%s" t="inlineStr"><is><t xml:space="preserve">  %s</t></is></c>' % (s_note, html.escape(note, quote=False)))
+        t = insert_before(t, '<mergeCells count="1"><mergeCell ref="A1:B1"/></mergeCells>',
+                          ['phoneticPr', 'conditionalFormatting', 'dataValidations', 'hyperlinks', 'printOptions', 'pageMargins'])
+        t = re.sub(r'<row r="1"([^>]*?)(/?)>', lambda m: '<row r="1"%s ht="21" customHeight="1"%s>' % (m.group(1), m.group(2)), t, count=1)
+        t = re.sub(r'(<sheetView[^>]*?) topLeftCell="[^"]*"', r'\1', t)
+        t = tab_color(t, 'FF8EA9DB')
+        wr(part, t)
+
+    # ---- tab colours elsewhere
+    for part, rgb in tabs:
+        x = rd(part); wr(part, tab_color(x, rgb))
 
 if __name__ == '__main__':
     main(sys.argv[1], sys.argv[2], mbt_mode=('--mbt' in sys.argv))

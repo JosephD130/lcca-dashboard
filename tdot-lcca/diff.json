@@ -2,6 +2,21 @@
  "diff": {
   "TMP(NewPCC)_IndirectCost": [
    {
+    "cell": "A1",
+    "before": null,
+    "after": "=HYPERLINK(\"#'General Information'!D9\",\"\u25c4 General Information\")"
+   },
+   {
+    "cell": "C1",
+    "before": "=Pay_Items!D55",
+    "after": "=HYPERLINK(\"#Summary!G1\",\"Summary\")"
+   },
+   {
+    "cell": "D1",
+    "before": null,
+    "after": "  Grey cells are yours: C4 to C7 project data (filled from General Information), F4 and F5 closure days, C13 to C22 pay items and E13 to E22 quantities. Everything else calculates."
+   },
+   {
     "cell": "F2",
     "before": "=SUM(_xlfn.XLOOKUP('General Information'!D10,RevenueData!A:A,RevenueData!B:H))",
     "after": "=IF('General Information'!$D$38=\"Yes\",SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,'General Information'!$D$10,RevenueData!$H:$H),0)"
@@ -569,14 +584,29 @@
   ],
   "General Information": [
    {
+    "cell": "F2",
+    "before": null,
+    "after": "HOW TO USE THIS WORKBOOK"
+   },
+   {
+    "cell": "F3",
+    "before": null,
+    "after": "1.   Fill in the grey cells below (D9 to D39).\n2.   Click Alternative Setup and add your alternatives.\n3.   Click View Summary to compare them.\nGrey cells are yours to fill in; white cells calculate themselves.\nTypical Values lists the usual range for each input."
+   },
+   {
+    "cell": "F9",
+    "before": null,
+    "after": "=IF(LEN(IF(D9=\"\",\"Airport Name, \",\"\")&IF(D25=\"\",\"Construction Year, \",\"\")&IF(D26=\"\",\"Mainline Area, \",\"\")&IF(D28=\"\",\"Markings Area, \",\"\")&IF(D33=\"\",\"Analysis Period, \",\"\")&IF(D34=\"\",\"Discount Rate, \",\"\"))=0,\"All required inputs are filled. Next: click Alternative Setup.\",\"Still needed: \"&LEFT(IF(D9=\"\",\"Airport Name, \",\"\")&IF(D25=\"\",\"Construction Year, \",\"\")&IF(D26=\"\",\"Mainline Area, \",\"\")&IF(D28=\"\",\"Markings Area, \",\"\")&IF(D33=\"\",\"Analysis Period, \",\"\")&IF(D34=\"\",\"Discount Rate, \",\"\"),LEN(IF(D9=\"\",\"Airport Name, \",\"\")&IF(D25=\"\",\"Construction Year, \",\"\")&IF(D26=\"\",\"Mainline Area, \",\"\")&IF(D28=\"\",\"Markings Area, \",\"\")&IF(D33=\"\",\"Analysis Period, \",\"\")&IF(D34=\"\",\"Discount Rate, \",\"\"))-2))"
+   },
+   {
     "cell": "F25",
     "before": null,
-    "after": "Construction year; the analysis runs D33 years from here."
+    "after": "Construction year; the analysis period starts here."
    },
    {
     "cell": "F26",
     "before": null,
-    "after": "Length x width / 9. TN GA runways: 4,000-6,000 ft x 75 or 100 ft = 33,000-67,000 SY (see Typical Values)."
+    "after": "Length x width / 9. TN GA: 4,000-6,000 ft x 75-100 ft wide."
    },
    {
     "cell": "F27",
@@ -586,7 +616,7 @@
    {
     "cell": "F28",
     "before": null,
-    "after": "Full runway marking set: roughly 2,000-3,000 SF per 1,000 ft; use the marking plan quantity when known."
+    "after": "About 2,000-3,000 SF per 1,000 ft of runway."
    },
    {
     "cell": "D33",
@@ -596,27 +626,27 @@
    {
     "cell": "F33",
     "before": null,
-    "after": "TDOT policy 30 years. FAA PGL 22-01 (2022) leaves the period to the engineer; 20 years was the old AIP rule."
+    "after": "TDOT policy 30 years; FAA leaves the period to the engineer."
    },
    {
     "cell": "F34",
     "before": null,
-    "after": "TDOT 3%. FAA now uses the OMB A-94 real rate (2.0% in 2026); 7% was the pre-2022 rule. Summary checks both."
+    "after": "TDOT 3%. FAA uses the OMB A-94 real rate, 2.0% in 2026."
    },
    {
     "cell": "F36",
     "before": null,
-    "after": "Mobilization 10% of pay items is the workbook default."
+    "after": "Percent of pay items; workbook default 10."
    },
    {
     "cell": "F37",
     "before": null,
-    "after": "Engineering 5% of pay items; now applied to initial construction as well as M&R."
+    "after": "Percent of pay items; now applied to initial construction too."
    },
    {
     "cell": "F38",
     "before": null,
-    "after": "Yes counts lost airport revenue during closures; 17 airports have revenue data (Typical Values)."
+    "after": "Yes counts lost revenue during closures (17 airports have data)."
    },
    {
     "cell": "D39",
@@ -667,6 +697,21 @@
    }
   ],
   "TMP(NewHMA)_IndirectCost": [
+   {
+    "cell": "A1",
+    "before": null,
+    "after": "=HYPERLINK(\"#'General Information'!D9\",\"\u25c4 General Information\")"
+   },
+   {
+    "cell": "C1",
+    "before": null,
+    "after": "=HYPERLINK(\"#Summary!G1\",\"Summary\")"
+   },
+   {
+    "cell": "D1",
+    "before": null,
+    "after": "  Grey cells are yours: C4 to C8 project data (filled from General Information), F4 to F10 closure days, C13 to C22 pay items and E13 to E22 quantities. Everything else calculates."
+   },
    {
     "cell": "F2",
     "before": "=SUM(_xlfn.XLOOKUP('General Information'!D10,RevenueData!A:A,RevenueData!B:H))",
@@ -1265,6 +1310,21 @@
   ],
   "TMP(NewHMA)": [
    {
+    "cell": "A1",
+    "before": null,
+    "after": "=HYPERLINK(\"#'General Information'!D9\",\"\u25c4 General Information\")"
+   },
+   {
+    "cell": "C1",
+    "before": null,
+    "after": "=HYPERLINK(\"#Summary!G1\",\"Summary\")"
+   },
+   {
+    "cell": "D1",
+    "before": null,
+    "after": "  Grey cells are yours: C4 to C8 project data (filled from General Information), F4 to F10 closure days, C13 to C22 pay items and E13 to E22 quantities. Everything else calculates."
+   },
+   {
     "cell": "G24",
     "before": "=SUM(G14:G23)",
     "after": "=SUM(G13:G22)"
@@ -1631,6 +1691,21 @@
    }
   ],
   "TMP(NewPCC)": [
+   {
+    "cell": "A1",
+    "before": null,
+    "after": "=HYPERLINK(\"#'General Information'!D9\",\"\u25c4 General Information\")"
+   },
+   {
+    "cell": "C1",
+    "before": null,
+    "after": "=HYPERLINK(\"#Summary!G1\",\"Summary\")"
+   },
+   {
+    "cell": "D1",
+    "before": null,
+    "after": "  Grey cells are yours: C4 to C7 project data (filled from General Information), F4 and F5 closure days, C13 to C22 pay items and E13 to E22 quantities. Everything else calculates."
+   },
    {
     "cell": "B14",
     "before": "=VLOOKUP(C14,CHOOSE({1,2},Table2[Pay Item Description],Table2[Pay Item No.]),2,0)",
@@ -2018,6 +2093,21 @@
    }
   ],
   "TMP(HMARehab)": [
+   {
+    "cell": "A1",
+    "before": null,
+    "after": "=HYPERLINK(\"#'General Information'!D9\",\"\u25c4 General Information\")"
+   },
+   {
+    "cell": "C1",
+    "before": null,
+    "after": "=HYPERLINK(\"#Summary!G1\",\"Summary\")"
+   },
+   {
+    "cell": "D1",
+    "before": null,
+    "after": "  Grey cells are yours: C4 to C8 project data (filled from General Information), F4 to F10 closure days, C13 to C22 pay items and E13 to E22 quantities. Everything else calculates."
+   },
    {
     "cell": "G24",
     "before": "=SUM(G14:G23)",
@@ -8616,7 +8706,7 @@
  ],
  "hashes": {
   "8eaa2547-TDOA_LCCA_Framework_v1.1.2_ARA_Task2_08182026.xlsm": "b0680f2a90e86654a5d7e57eb29ae45e960ddf7b517ccb65bc2978afaee4705a",
-  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "836ac0b450c70f5453ba4503c8cb5eb3a32fd8b3d90e0f9b64914050c88531d6",
+  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "8a0738a7cafc2c4348c5fa92f53f5aa11db3471500de7843ac4eedfe6aed1019",
   "TDOT_LCCA_Decision_Workbook.xlsx": "09b8585b8086a163b0a3e44f7d04606f8478a2e735fd72899059d132fefe4856",
   "Output.bas": "7e7e1cad7c0d41cc23d929d643a2e4ce5861761c2885f82e9a0b0757a0a8fd82",
   "35f08cad-TDOA_LCCA_Framework_v1.1.2_MBT_20260521_LostRevenue_1.xlsm": "117135e9facc9395b88883c3ffd4de48b67cb997605d6ad0a1acd7d64edfb08b",

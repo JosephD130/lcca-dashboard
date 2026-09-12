@@ -129,13 +129,13 @@ def sections(extra=()):
     return SECTIONS_SYSTEM + SECTIONS_COSTS + SECTIONS_CLOSURE + SECTIONS_ECON + list(extra) + H.live_sections()
 
 HINTS = {
- 25: 'Construction year; the analysis runs D33 years from here.',
- 26: 'Length x width / 9. TN GA runways: 4,000-6,000 ft x 75 or 100 ft = 33,000-67,000 SY (see Typical Values).',
+ 25: 'Construction year; the analysis period starts here.',
+ 26: 'Length x width / 9. TN GA: 4,000-6,000 ft x 75-100 ft wide.',
  27: 'Paved shoulders only; usually 0 at TN GA airports.',
- 28: 'Full runway marking set: roughly 2,000-3,000 SF per 1,000 ft; use the marking plan quantity when known.',
- 33: 'TDOT policy 30 years. FAA PGL 22-01 (2022) leaves the period to the engineer; 20 years was the old AIP rule.',
- 34: 'TDOT 3%. FAA now uses the OMB A-94 real rate (2.0% in 2026); 7% was the pre-2022 rule. Summary checks both.',
- 36: 'Mobilization 10% of pay items is the workbook default.',
- 37: 'Engineering 5% of pay items; now applied to initial construction as well as M&R.',
- 38: 'Yes counts lost airport revenue during closures; 17 airports have revenue data (Typical Values).',
+ 28: 'About 2,000-3,000 SF per 1,000 ft of runway.',
+ 33: 'TDOT policy 30 years; FAA leaves the period to the engineer.',
+ 34: 'TDOT 3%. FAA uses the OMB A-94 real rate, 2.0% in 2026.',
+ 36: 'Percent of pay items; workbook default 10.',
+ 37: 'Percent of pay items; now applied to initial construction too.',
+ 38: 'Yes counts lost revenue during closures (17 airports have data).',
 }

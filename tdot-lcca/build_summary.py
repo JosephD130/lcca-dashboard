@@ -17,6 +17,8 @@ Layout (left to right, top to bottom, as a user reads it):
 import os, re, zipfile, shutil, tempfile, html
 import xml.dom.minidom as minidom
 from openpyxl import Workbook
+from openpyxl.formatting.rule import Rule
+from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.chart import BarChart, LineChart, Reference
 from openpyxl.utils import get_column_letter as L
@@ -175,7 +177,7 @@ def build_scratch(path):
     ch.x_axis.tickLblPos = 'low'; style(ch, '1. Present worth by category (salvage below zero)'); ws.add_chart(ch, 'G22')
     ch = LineChart()
     ch.add_data(Reference(ws, min_col=DC + 1, max_col=DC + NALT, min_row=11, max_row=SENS1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC, min_row=SENS0, max_row=SENS1))
-    colour(ch, line=True); ch.x_axis.tickLblSkip = 4; ch.x_axis.numFmt = '0.00"%"'; style(ch, '2. Net present worth vs. discount rate (TDOT 3%; FAA: OMB A-94 real rate, 2% in 2026; 7% before 2022)'); ws.add_chart(ch, 'N22')
+    colour(ch, line=True); ch.x_axis.tickLblSkip = 4; ch.x_axis.numFmt = '0.00"%"'; style(ch, '2. Net present worth vs. discount rate (TDOT 3%, FAA 2%, pre-2022 rule 7%)'); ws.add_chart(ch, 'N22')
     ch = BarChart(); ch.type = 'col'; ch.grouping = 'clustered'; ch.gapWidth = 40
     ch.add_data(Reference(ws, min_col=DC + 2, max_col=DC + 1 + NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
     colour(ch); ch.x_axis.tickLblSkip = 5; ch.x_axis.tickLblPos = 'low'; style(ch, '3. Expenditure stream by calendar year (undiscounted)'); ws.add_chart(ch, 'G40')
@@ -186,6 +188,11 @@ def build_scratch(path):
     ch.add_data(Reference(ws, min_col=DC + 2 + 2 * NALT, max_col=DC + 1 + 3 * NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
     colour(ch); ch.x_axis.tickLblSkip = 5; style(ch, '5. Runway closure days by calendar year'); ch.y_axis.numFmt = '0'; ws.add_chart(ch, 'G58')
     ws['G77'] = "How to read: 1 shows where each alternative's cost sits; 2 whether the lowest-cost alternative holds at other discount rates (FAA now uses the OMB A-94 real rate, about 2%; 7% was the rule before 2022); 3 and 4 when the money is spent and when the higher first cost is paid back; 5 how often and how long the runway closes."; ws['G77'].font = F_N
+    dxf_low = DifferentialStyle(fill=PatternFill(bgColor='FFDDEBF7'), font=Font(bold=True, color='FF1F3864'))
+    for sqref, f in [('G4:R7', 'AND($G4<>"",COUNT($O$4:$O$7)>0,$O4=MIN($O$4:$O$7))'),
+                     ('G14:P17', 'AND($G14<>"",COUNT($L$14:$L$17)>0,$L14=MIN($L$14:$L$17))')]:
+        rule = Rule(type='expression', formula=[f], stopIfTrue=False, dxf=dxf_low)
+        ws.conditional_formatting.add(sqref, rule)
     ws.freeze_panes = 'A4'
     wb.save(path)
 
@@ -232,6 +239,11 @@ def transplant(work, sheet_part, drawing_part, chart_start, sheet_index):
         xf = re.sub(r'numFmtId="(\d+)"', lambda m: 'numFmtId="%d"' % nf_map.get(int(m.group(1)), int(m.group(1))), xf)
         xf = re.sub(r'xfId="\d+"', 'xfId="0"', xf); new_xfs.append(xf)
     bs, xf_off = append(bs, 'cellXfs', new_xfs)
+    dxfs = _children_xml(ss, 'dxfs')
+    dxf_off = 0
+    if dxfs:
+        if '<dxfs' in bs: bs, dxf_off = append(bs, 'dxfs', dxfs)
+        else: bs = bs.replace('</styleSheet>', '<dxfs count="%d">%s</dxfs></styleSheet>' % (len(dxfs), ''.join(dxfs)))
     minidom.parseString(bs)  # must stay well-formed
     wr('xl/styles.xml', bs)
 
@@ -242,6 +254,7 @@ def transplant(work, sheet_part, drawing_part, chart_start, sheet_index):
     sx = re.sub(r'<c r="([A-Z]+\d+)"([^>]*?) t="s"([^>]*)><v>(\d+)</v></c>',
                 lambda m: '<c r="%s"%s t="inlineStr"%s><is><t xml:space="preserve">%s</t></is></c>' % (m.group(1), m.group(2), m.group(3), html.escape(strings[int(m.group(4))], quote=False)), sx)
     sx = re.sub(r' s="(\d+)"', lambda m: ' s="%d"' % (int(m.group(1)) + xf_off), sx)
+    sx = re.sub(r'dxfId="(\d+)"', lambda m: 'dxfId="%d"' % (int(m.group(1)) + dxf_off), sx)
     sheetpr = re.search(r'<sheetPr[^>]*>.*?</sheetPr>|<sheetPr[^>]*/>', orig, re.S)
     sx = re.sub(r'<sheetPr[^>]*>.*?</sheetPr>|<sheetPr[^>]*/>', '', sx, flags=re.S)
     if sheetpr: sx = sx.replace('<dimension', sheetpr.group(0) + '<dimension', 1)
@@ -364,6 +377,7 @@ def add_plain_sheet(work, build_fn, sheet_name):
     sx = re.sub(r'<c r="([A-Z]+\d+)"([^>]*?) t="s"([^>]*)><v>(\d+)</v></c>',
                 lambda m: '<c r="%s"%s t="inlineStr"%s><is><t xml:space="preserve">%s</t></is></c>' % (m.group(1), m.group(2), m.group(3), html.escape(strings[int(m.group(4))], quote=False)), sx)
     sx = re.sub(r' s="(\d+)"', lambda m: ' s="%d"' % (int(m.group(1)) + xf_off), sx)
+    sx = re.sub(r'dxfId="(\d+)"', lambda m: 'dxfId="%d"' % (int(m.group(1)) + dxf_off), sx)
     sx = re.sub(r'<pageSetup [^>]*/>', '', sx)
     sx = re.sub(r'<pageMargins[^>]*/>', lambda m: m.group(0) + '<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/>', sx, count=1)
     # exactly one sheetPr, carrying pageSetUpPr fitToPage (Excel rejects a second sheetPr element)
@@ -384,3 +398,51 @@ def add_plain_sheet(work, build_fn, sheet_name):
     ct = rd('[Content_Types].xml').replace('</Types>', '<Override PartName="/%s" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>' % part)
     wr('xl/workbook.xml', wbx); wr('xl/_rels/workbook.xml.rels', rels); wr('[Content_Types].xml', ct)
     return part
+
+
+# ---------------------------------------------------------------------------------------------
+# Style helpers for the design pass: append fonts/fills/borders/cellXfs/dxfs to the package styles.
+def _append(xml, tag, items):
+    """Append children to a counted styles element; returns (xml, index of the first new child)."""
+    m = re.search(r'<%s count="(\d+)"' % tag, xml)
+    if not m:  # element absent (e.g. no dxfs yet): create it before </styleSheet>
+        xml = xml.replace('</styleSheet>', '<%s count="%d">%s</%s></styleSheet>' % (tag, len(items), ''.join(items), tag))
+        return xml, 0
+    cnt = int(m.group(1))
+    xml = re.sub(r'<%s count="\d+"' % tag, '<%s count="%d"' % (tag, cnt + len(items)), xml, count=1)
+    if '</%s>' % tag in xml:
+        end = xml.index('</%s>' % tag); return xml[:end] + ''.join(items) + xml[end:], cnt
+    xml = xml.replace('<%s count="%d"/>' % (tag, cnt + len(items)), '<%s count="%d">%s</%s>' % (tag, cnt + len(items), ''.join(items), tag), 1)
+    return xml, cnt
+
+
+def add_style(work, font=None, fill=None, border=None, alignment=None):
+    """Append one cellXfs entry (with any new font/fill/border) to the package styles; returns its index."""
+    p = os.path.join(work, 'xl/styles.xml'); s = open(p, encoding='utf-8').read()
+    attrs = ['numFmtId="0"', 'xfId="0"']
+    if font is not None:
+        s, off = _append(s, 'fonts', [font]); attrs.append('fontId="%d"' % off); attrs.append('applyFont="1"')
+    if fill is not None:
+        s, off = _append(s, 'fills', [fill]); attrs.append('fillId="%d"' % off); attrs.append('applyFill="1"')
+    if border is not None:
+        s, off = _append(s, 'borders', [border]); attrs.append('borderId="%d"' % off); attrs.append('applyBorder="1"')
+    body = ''
+    if alignment is not None:
+        attrs.append('applyAlignment="1"'); body = '<alignment %s/>' % alignment
+    xf = '<xf %s>%s</xf>' % (' '.join(attrs), body) if body else '<xf %s/>' % ' '.join(attrs)
+    s, idx = _append(s, 'cellXfs', [xf])
+    minidom.parseString(s); open(p, 'w', encoding='utf-8').write(s)
+    return idx
+
+
+def add_dxf(work, dxf):
+    """Append one differential format (conditional-formatting style); returns its dxfId."""
+    p = os.path.join(work, 'xl/styles.xml'); s = open(p, encoding='utf-8').read()
+    s, idx = _append(s, 'dxfs', [dxf])
+    minidom.parseString(s); open(p, 'w', encoding='utf-8').write(s)
+    return idx
+
+
+FONT = lambda sz=10, b=False, i=False, color='FF1D2733': '<font>%s%s<sz val="%s"/><color rgb="%s"/><name val="Arial"/><family val="2"/></font>' % ('<b/>' if b else '', '<i/>' if i else '', sz, color)
+FILL = lambda rgb: '<fill><patternFill patternType="solid"><fgColor rgb="%s"/><bgColor indexed="64"/></patternFill></fill>' % rgb
+BORDER_BOTTOM = '<border><left/><right/><top/><bottom style="thin"><color rgb="FF2A78D6"/></bottom><diagonal/></border>'

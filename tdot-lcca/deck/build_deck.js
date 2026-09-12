@@ -179,6 +179,7 @@ table(s, [
   ['Instructions', 'ActiveX "blocked content" steps (Trust Center, then restart Excel, or ask IT); correct button name; D9:D39; how to unhide RevenueData and the 17-airport rule'],
   ['Alternative chart', 'Year-indexed data keyed on Year Applied; calendar years on the axis; undiscounted direct and lost revenue stacked; mixed discounted series removed'],
   ['Summary sheet', 'Formula-driven, no macro: results table with PW by category, delta to lowest, closure days and runway availability; a RealCost-style comparison block (agency and user cost as PW and EUAC); five charts; navigation buttons that work with macros blocked'],
+  ['Look and first-run UX', 'How-to card and a live "still needed" status line on General Information; navigation row on every alternative sheet; lowest-cost row highlighted on the Summary; tab colours; General Information prints on one page'],
   ['Typical Values sheet', 'New reference sheet: what TDOT manages, typical runway geometry and areas, workbook unit costs beside 2025 bids, closure production rates, FAA and OMB discount-rate rules, service lives, live daily revenue for the 17 airports; hints beside the General Information inputs'],
   ['Housekeeping', 'Personal names removed from cell notes; two dead links to files on a C: drive removed; full recalculation on open'],
   ['Not changed', 'Overview wording (NS rewrite pending Mat\'s approval); salvage, lost-revenue and AIP policy'],
@@ -187,11 +188,18 @@ s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.5, y: 4.3, w: 9.0, h: 0.65, fil
 s.addText('Nothing to install: the workbook is self-contained. The VBA project is untouched; Alternative Setup still writes columns A:E of the Summary as before.', { x: 0.7, y: 4.35, w: 8.6, h: 0.55, fontFace: BF, fontSize: 12.5, color: INK, isTextBox: true, margin: 0, valign: 'middle' });
 s.addNotes('The Summary formulas read the Database sheet the form writes, so they follow whatever alternatives exist.');
 
+// ---------------------------------------------------------------- 8a the front page
+s = pres.addSlide(); s.background = { color: WHITE };
+title(s, 'The page users start on');
+sub(s, 'Same form, same grey cells. What is new is the guidance around them.');
+let y = img(s, 'general_information.png', 2.6, 1.35, 4.8, 1.399);
+caption(s, 'A how-to card beside the logo, a status line that names whatever input is still empty and turns green when the form is complete, banded section headings, and buttons to the Summary and the Typical Values sheet.', 0.5, y + 0.05, 9.0);
+
 // ---------------------------------------------------------------- 8b the new Summary sheet
 s = pres.addSlide(); s.background = { color: WHITE };
 title(s, 'The new Summary sheet');
 sub(s, 'MBT data loaded. Table, verdict line, RealCost-style comparison block, five charts, all live formulas.');
-let y = img(s, 'summary_sheet.png', 1.1, 1.42, 7.8, 1.987);
+y = img(s, 'summary_sheet.png', 1.1, 1.42, 7.8, 1.987);
 caption(s, 'The comparison block under the verdict line follows the RealCost layout: agency and user cost, each as present worth and EUAC.', 0.5, y + 0.02, 9.0);
 
 // ---------------------------------------------------------------- 8c typical values

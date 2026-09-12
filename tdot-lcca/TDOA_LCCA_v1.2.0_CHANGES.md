@@ -76,6 +76,23 @@ timing against published service lives, and a live daily-revenue table for the 1
 source URL; see verification/RESEARCH_SOURCES.md for what could and could not be confirmed. General Information
 gets a "Typical Values" button (D46) and short hints in column F beside D25:D38.
 
+## 3c. Look and first-run usability
+
+Nothing on this list changes a number. The layout, fonts and grey input cells are unchanged, so the
+workbook still reads as the same tool.
+
+- General Information: a "How to use this workbook" card beside the TDOT logo with the three steps,
+  and a live status line under it that lists whatever required input is still empty and turns green
+  when they are all filled. The three section labels sit on a light band. The salvage note in D35 is
+  styled as a note rather than an input. The sheet now prints as one landscape page (A1:J48).
+- Every alternative worksheet gets a navigation bar in row 1: "General Information" and "Summary"
+  buttons and a one-line reminder of which cells are inputs. It is on the hidden templates, so each
+  new alternative the form creates carries it.
+- Summary: the lowest-cost row is highlighted in the results table and in the comparison block by
+  conditional formatting, so the answer is visible without reading the numbers.
+- Tab colours group the sheets: navy for General Information, blue for Summary, light blue for the
+  alternative worksheets, grey for reference sheets.
+
 ## 4. Housekeeping
 
 - Instructions text box: ActiveX "blocked content" steps added (Trust Center > ActiveX Settings,
@@ -113,7 +130,7 @@ gets a "Typical Values" button (D46) and short hints in column F beside D25:D38.
 4. Set D33 = 20 and confirm Maintenance 5 and 6 drop to $0 discounted and the chart ends at 2047.
 5. Pick an airport outside the 17 with D38 = Yes: G2 on each Alt sheet should show the warning and
    lost revenue should be $0, not #N/A.
-6. Click the three navigation buttons.
+6. Click the navigation buttons on General Information, on the Summary and on an alternative sheet.
 
 Scripted click-through done here (LibreOffice, UNO API): every button target exists and lands on a
 visible sheet; changing D34 to 7 flips the verdict to Alternative 1 (the 7% flag already warned);
