@@ -104,6 +104,50 @@
   "=IF($G$4=\"\",\"\",IF($O$4=MIN($O$4:$O$7),\"lowest\",\"\"))"
  ],
  [
+  "J81",
+  "145"
+ ],
+ [
+  "H83",
+  "=IF($G$4=\"\",\"\",IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")>0,SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")*2666.6667/($J$81*'General Information'!$D$26),IFERROR(VALUE(TRIM(SUBSTITUTE(MID(IFERROR(INDEX(INDIRECT(\"'\"&$G$4&\"'!$C$13:$C$22\"),MATCH(\"Concrete Pavement*\",INDIRECT(\"'\"&$G$4&\"'!$C$13:$C$22\"),0)),\"\"),FIND(\",\",IFERROR(INDEX(INDIRECT(\"'\"&$G$4&\"'!$C$13:$C$22\"),MATCH(\"Concrete Pavement*\",INDIRECT(\"'\"&$G$4&\"'!$C$13:$C$22\"),0)),\"\"))+1,99),\"-inch\",\"\"))),0)))"
+ ],
+ [
+  "I83",
+  "=IF($G$4=\"\",\"\",36*(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-2*\")+SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-3*\"))/'General Information'!$D$26)"
+ ],
+ [
+  "J83",
+  "=IF($G$4=\"\",\"\",36*SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-154*\")/'General Information'!$D$26)"
+ ],
+ [
+  "K83",
+  "=IF($G$4=\"\",\"\",IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-155*\")+SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-156*\")+SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-157*\")+SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-158*\")>0,\"yes\",\"-\"))"
+ ],
+ [
+  "L83",
+  "=IF($G$4=\"\",\"\",H83+I83+J83)"
+ ],
+ [
+  "M83",
+  "=IF($G$4=\"\",\"\",36*SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-152*\")/'General Information'!$D$26)"
+ ],
+ [
+  "N83",
+  "=IF($G$4=\"\",\"\",IF(M83=0,\"no excavation item\",IF(ABS(M83-L83)<=0.5,\"agrees\",\"differs by \"&TEXT(M83-L83,\"0.0\")&\" in\")))"
+ ],
+ [
+  "P83",
+  "=IF($G$4=\"\",\"\",TEXT(H83,\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I83>0,\" on \"&TEXT(I83,\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J83>0,\" on \"&TEXT(J83,\"0\")&\"\"\" P154\",\"\"))"
+ ],
+ [
+  "X76",
+  "=IF($G$4=\"\",0,IFERROR(J83,0))"
+ ],
+ [
+  "X83",
+  "=IFERROR(X76*IF('General Information'!$D$27>0,'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),0),0)"
+ ],
+ [
   "X4",
   "=IF($H$4=\"\",\"Alt \"&1,$H$4)"
  ],

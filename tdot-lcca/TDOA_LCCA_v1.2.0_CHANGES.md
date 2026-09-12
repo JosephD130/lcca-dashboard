@@ -58,6 +58,12 @@ populates it with no further steps:
   the lowest in dollars and percent. The decision workbook carries the same block beside RESULTS.
 - G10 now checks the winner at 2% (OMB A-94 real rate, which FAA PGL 22-01 of June 2022 substituted for the
   fixed 7% rule) and at 7% (the pre-2022 AIP rule).
+- Pavement section read-back G80:P86, with charts 6 and 7: the thickness of each layer, derived from the
+  pay-item quantities already entered against the mainline area, the total section, a cross-check against
+  the excavation quantity, and the section written out as a string to paste into the alternative
+  description. Asphalt is the only layer needing an assumption, and its unit weight sits in J81 (145 pcf,
+  the value that reproduces the Murfreesboro section exactly). Chart 7 fills in only when a shoulder area
+  is entered and shows the same quantities spread over mainline plus shoulder.
 - Chart data lives in columns W onward, greyed and labelled "calculated automatically; do not edit".
 - Navigation: dark HYPERLINK button cells "General Information" and "Instructions" at the top of
   Summary, and a "View Summary" button under Alternative Setup on General Information (row 44).
@@ -131,6 +137,8 @@ workbook still reads as the same tool.
 5. Pick an airport outside the 17 with D38 = Yes: G2 on each Alt sheet should show the warning and
    lost revenue should be $0, not #N/A.
 6. Click the navigation buttons on General Information, on the Summary and on an alternative sheet.
+7. On the Summary, check the pavement section block: the derived thickness should match the section you
+   designed, and the excavation check should agree with it.
 
 Scripted click-through done here (LibreOffice, UNO API): every button target exists and lands on a
 visible sheet; changing D34 to 7 flips the verdict to Alternative 1 (the 7% flag already warned);

@@ -6141,9 +6141,524 @@
     "after": "=IF($G$5=\"\",0,IF(W71>'General Information'!$D$33,0,IF(W71=0,$J$5,IFERROR(SUMIF(INDIRECT(\"'\"&$G$5&\"'!$C$37:$C$52\"),W71,INDIRECT(\"'\"&$G$5&\"'!$D$37:$D$52\")),0))))"
    },
    {
+    "cell": "W74",
+    "before": null,
+    "after": "PAVEMENT SECTION (inches): mainline, then the reading if the quantities also cover the shoulder"
+   },
+   {
+    "cell": "AA75",
+    "before": null,
+    "after": "=AA$4"
+   },
+   {
+    "cell": "W75",
+    "before": null,
+    "after": "Layer"
+   },
+   {
+    "cell": "X75",
+    "before": null,
+    "after": "=X$4"
+   },
+   {
+    "cell": "Y75",
+    "before": null,
+    "after": "=Y$4"
+   },
+   {
+    "cell": "Z75",
+    "before": null,
+    "after": "=Z$4"
+   },
+   {
+    "cell": "AA76",
+    "before": null,
+    "after": "=IF($G$7=\"\",0,IFERROR(J86,0))"
+   },
+   {
+    "cell": "W76",
+    "before": null,
+    "after": "Subbase (P-154)"
+   },
+   {
+    "cell": "X76",
+    "before": null,
+    "after": "=IF($G$4=\"\",0,IFERROR(J83,0))"
+   },
+   {
+    "cell": "Y76",
+    "before": null,
+    "after": "=IF($G$5=\"\",0,IFERROR(J84,0))"
+   },
+   {
+    "cell": "Z76",
+    "before": null,
+    "after": "=IF($G$6=\"\",0,IFERROR(J85,0))"
+   },
+   {
+    "cell": "AA77",
+    "before": null,
+    "after": "=IF($G$7=\"\",0,IFERROR(I86,0))"
+   },
+   {
     "cell": "G77",
     "before": null,
     "after": "How to read: 1 shows where each alternative's cost sits; 2 whether the lowest-cost alternative holds at other discount rates (FAA now uses the OMB A-94 real rate, about 2%; 7% was the rule before 2022); 3 and 4 when the money is spent and when the higher first cost is paid back; 5 how often and how long the runway closes."
+   },
+   {
+    "cell": "W77",
+    "before": null,
+    "after": "Aggregate base"
+   },
+   {
+    "cell": "X77",
+    "before": null,
+    "after": "=IF($G$4=\"\",0,IFERROR(I83,0))"
+   },
+   {
+    "cell": "Y77",
+    "before": null,
+    "after": "=IF($G$5=\"\",0,IFERROR(I84,0))"
+   },
+   {
+    "cell": "Z77",
+    "before": null,
+    "after": "=IF($G$6=\"\",0,IFERROR(I85,0))"
+   },
+   {
+    "cell": "AA78",
+    "before": null,
+    "after": "=IF($G$7=\"\",0,IFERROR(IF(SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"TON\")>0,H86,0),0))"
+   },
+   {
+    "cell": "W78",
+    "before": null,
+    "after": "Asphalt"
+   },
+   {
+    "cell": "X78",
+    "before": null,
+    "after": "=IF($G$4=\"\",0,IFERROR(IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")>0,H83,0),0))"
+   },
+   {
+    "cell": "Y78",
+    "before": null,
+    "after": "=IF($G$5=\"\",0,IFERROR(IF(SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"TON\")>0,H84,0),0))"
+   },
+   {
+    "cell": "Z78",
+    "before": null,
+    "after": "=IF($G$6=\"\",0,IFERROR(IF(SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"TON\")>0,H85,0),0))"
+   },
+   {
+    "cell": "AA79",
+    "before": null,
+    "after": "=IF($G$7=\"\",0,IFERROR(IF(SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"TON\")>0,0,H86),0))"
+   },
+   {
+    "cell": "W79",
+    "before": null,
+    "after": "Concrete"
+   },
+   {
+    "cell": "X79",
+    "before": null,
+    "after": "=IF($G$4=\"\",0,IFERROR(IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")>0,0,H83),0))"
+   },
+   {
+    "cell": "Y79",
+    "before": null,
+    "after": "=IF($G$5=\"\",0,IFERROR(IF(SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"TON\")>0,0,H84),0))"
+   },
+   {
+    "cell": "Z79",
+    "before": null,
+    "after": "=IF($G$6=\"\",0,IFERROR(IF(SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"TON\")>0,0,H85),0))"
+   },
+   {
+    "cell": "G80",
+    "before": null,
+    "after": "PAVEMENT SECTION  (read back from the quantities already entered; nothing here changes a cost)"
+   },
+   {
+    "cell": "G81",
+    "before": null,
+    "after": "Asphalt unit weight, pcf:"
+   },
+   {
+    "cell": "J81",
+    "before": null,
+    "after": "145"
+   },
+   {
+    "cell": "K81",
+    "before": null,
+    "after": "Only asphalt needs an assumption: 145 pcf reproduces the Murfreesboro section to the hundredth of an inch. Volume items convert directly, and concrete carries its thickness in the pay-item name."
+   },
+   {
+    "cell": "W81",
+    "before": null,
+    "after": "Shoulder reading (blank unless shoulder area is entered)"
+   },
+   {
+    "cell": "AA82",
+    "before": null,
+    "after": "=AA$4"
+   },
+   {
+    "cell": "G82",
+    "before": null,
+    "after": "Alternative"
+   },
+   {
+    "cell": "H82",
+    "before": null,
+    "after": "Surface course (in)"
+   },
+   {
+    "cell": "I82",
+    "before": null,
+    "after": "Aggregate base (in)"
+   },
+   {
+    "cell": "J82",
+    "before": null,
+    "after": "Subbase (in)"
+   },
+   {
+    "cell": "K82",
+    "before": null,
+    "after": "Treated subgrade"
+   },
+   {
+    "cell": "L82",
+    "before": null,
+    "after": "Total section (in)"
+   },
+   {
+    "cell": "M82",
+    "before": null,
+    "after": "Excavation (in)"
+   },
+   {
+    "cell": "N82",
+    "before": null,
+    "after": "Excavation check"
+   },
+   {
+    "cell": "P82",
+    "before": null,
+    "after": "Section from the quantities"
+   },
+   {
+    "cell": "W82",
+    "before": null,
+    "after": "Layer"
+   },
+   {
+    "cell": "X82",
+    "before": null,
+    "after": "=X$4"
+   },
+   {
+    "cell": "Y82",
+    "before": null,
+    "after": "=Y$4"
+   },
+   {
+    "cell": "Z82",
+    "before": null,
+    "after": "=Z$4"
+   },
+   {
+    "cell": "AA83",
+    "before": null,
+    "after": "=IFERROR(AA76*IF('General Information'!$D$27>0,'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),0),0)"
+   },
+   {
+    "cell": "G83",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",$H$4)"
+   },
+   {
+    "cell": "H83",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")>0,SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")*2666.6667/($J$81*'General Information'!$D$26),IFERROR(VALUE(TRIM(SUBSTITUTE(MID(IFERROR(INDEX(INDIRECT(\"'\"&$G$4&\"'!$C$13:$C$22\"),MATCH(\"Concrete Pavement*\",INDIRECT(\"'\"&$G$4&\"'!$C$13:$C$22\"),0)),\"\"),FIND(\",\",IFERROR(INDEX(INDIRECT(\"'\"&$G$4&\"'!$C$13:$C$22\"),MATCH(\"Concrete Pavement*\",INDIRECT(\"'\"&$G$4&\"'!$C$13:$C$22\"),0)),\"\"))+1,99),\"-inch\",\"\"))),0)))"
+   },
+   {
+    "cell": "I83",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",36*(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-2*\")+SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-3*\"))/'General Information'!$D$26)"
+   },
+   {
+    "cell": "J83",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",36*SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-154*\")/'General Information'!$D$26)"
+   },
+   {
+    "cell": "K83",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-155*\")+SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-156*\")+SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-157*\")+SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-158*\")>0,\"yes\",\"-\"))"
+   },
+   {
+    "cell": "L83",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",H83+I83+J83)"
+   },
+   {
+    "cell": "M83",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",36*SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),\"P-152*\")/'General Information'!$D$26)"
+   },
+   {
+    "cell": "N83",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",IF(M83=0,\"no excavation item\",IF(ABS(M83-L83)<=0.5,\"agrees\",\"differs by \"&TEXT(M83-L83,\"0.0\")&\" in\")))"
+   },
+   {
+    "cell": "P83",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",TEXT(H83,\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I83>0,\" on \"&TEXT(I83,\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J83>0,\" on \"&TEXT(J83,\"0\")&\"\"\" P154\",\"\"))"
+   },
+   {
+    "cell": "W83",
+    "before": null,
+    "after": "Subbase (P-154)"
+   },
+   {
+    "cell": "X83",
+    "before": null,
+    "after": "=IFERROR(X76*IF('General Information'!$D$27>0,'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),0),0)"
+   },
+   {
+    "cell": "Y83",
+    "before": null,
+    "after": "=IFERROR(Y76*IF('General Information'!$D$27>0,'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),0),0)"
+   },
+   {
+    "cell": "Z83",
+    "before": null,
+    "after": "=IFERROR(Z76*IF('General Information'!$D$27>0,'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),0),0)"
+   },
+   {
+    "cell": "AA84",
+    "before": null,
+    "after": "=IFERROR(AA77*IF('General Information'!$D$27>0,'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),0),0)"
+   },
+   {
+    "cell": "G84",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",$H$5)"
+   },
+   {
+    "cell": "H84",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",IF(SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"TON\")>0,SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"TON\")*2666.6667/($J$81*'General Information'!$D$26),IFERROR(VALUE(TRIM(SUBSTITUTE(MID(IFERROR(INDEX(INDIRECT(\"'\"&$G$5&\"'!$C$13:$C$22\"),MATCH(\"Concrete Pavement*\",INDIRECT(\"'\"&$G$5&\"'!$C$13:$C$22\"),0)),\"\"),FIND(\",\",IFERROR(INDEX(INDIRECT(\"'\"&$G$5&\"'!$C$13:$C$22\"),MATCH(\"Concrete Pavement*\",INDIRECT(\"'\"&$G$5&\"'!$C$13:$C$22\"),0)),\"\"))+1,99),\"-inch\",\"\"))),0)))"
+   },
+   {
+    "cell": "I84",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",36*(SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),\"P-2*\")+SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),\"P-3*\"))/'General Information'!$D$26)"
+   },
+   {
+    "cell": "J84",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",36*SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),\"P-154*\")/'General Information'!$D$26)"
+   },
+   {
+    "cell": "K84",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",IF(SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),\"P-155*\")+SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),\"P-156*\")+SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),\"P-157*\")+SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),\"P-158*\")>0,\"yes\",\"-\"))"
+   },
+   {
+    "cell": "L84",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",H84+I84+J84)"
+   },
+   {
+    "cell": "M84",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",36*SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),\"P-152*\")/'General Information'!$D$26)"
+   },
+   {
+    "cell": "N84",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",IF(M84=0,\"no excavation item\",IF(ABS(M84-L84)<=0.5,\"agrees\",\"differs by \"&TEXT(M84-L84,\"0.0\")&\" in\")))"
+   },
+   {
+    "cell": "P84",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",TEXT(H84,\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I84>0,\" on \"&TEXT(I84,\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J84>0,\" on \"&TEXT(J84,\"0\")&\"\"\" P154\",\"\"))"
+   },
+   {
+    "cell": "W84",
+    "before": null,
+    "after": "Aggregate base"
+   },
+   {
+    "cell": "X84",
+    "before": null,
+    "after": "=IFERROR(X77*IF('General Information'!$D$27>0,'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),0),0)"
+   },
+   {
+    "cell": "Y84",
+    "before": null,
+    "after": "=IFERROR(Y77*IF('General Information'!$D$27>0,'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),0),0)"
+   },
+   {
+    "cell": "Z84",
+    "before": null,
+    "after": "=IFERROR(Z77*IF('General Information'!$D$27>0,'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),0),0)"
+   },
+   {
+    "cell": "AA85",
+    "before": null,
+    "after": "=IFERROR(AA78*IF('General Information'!$D$27>0,'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),0),0)"
+   },
+   {
+    "cell": "G85",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",$H$6)"
+   },
+   {
+    "cell": "H85",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",IF(SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"TON\")>0,SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"TON\")*2666.6667/($J$81*'General Information'!$D$26),IFERROR(VALUE(TRIM(SUBSTITUTE(MID(IFERROR(INDEX(INDIRECT(\"'\"&$G$6&\"'!$C$13:$C$22\"),MATCH(\"Concrete Pavement*\",INDIRECT(\"'\"&$G$6&\"'!$C$13:$C$22\"),0)),\"\"),FIND(\",\",IFERROR(INDEX(INDIRECT(\"'\"&$G$6&\"'!$C$13:$C$22\"),MATCH(\"Concrete Pavement*\",INDIRECT(\"'\"&$G$6&\"'!$C$13:$C$22\"),0)),\"\"))+1,99),\"-inch\",\"\"))),0)))"
+   },
+   {
+    "cell": "I85",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",36*(SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),\"P-2*\")+SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),\"P-3*\"))/'General Information'!$D$26)"
+   },
+   {
+    "cell": "J85",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",36*SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),\"P-154*\")/'General Information'!$D$26)"
+   },
+   {
+    "cell": "K85",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",IF(SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),\"P-155*\")+SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),\"P-156*\")+SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),\"P-157*\")+SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),\"P-158*\")>0,\"yes\",\"-\"))"
+   },
+   {
+    "cell": "L85",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",H85+I85+J85)"
+   },
+   {
+    "cell": "M85",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",36*SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),\"P-152*\")/'General Information'!$D$26)"
+   },
+   {
+    "cell": "N85",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",IF(M85=0,\"no excavation item\",IF(ABS(M85-L85)<=0.5,\"agrees\",\"differs by \"&TEXT(M85-L85,\"0.0\")&\" in\")))"
+   },
+   {
+    "cell": "P85",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",TEXT(H85,\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I85>0,\" on \"&TEXT(I85,\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J85>0,\" on \"&TEXT(J85,\"0\")&\"\"\" P154\",\"\"))"
+   },
+   {
+    "cell": "W85",
+    "before": null,
+    "after": "Asphalt"
+   },
+   {
+    "cell": "X85",
+    "before": null,
+    "after": "=IFERROR(X78*IF('General Information'!$D$27>0,'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),0),0)"
+   },
+   {
+    "cell": "Y85",
+    "before": null,
+    "after": "=IFERROR(Y78*IF('General Information'!$D$27>0,'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),0),0)"
+   },
+   {
+    "cell": "Z85",
+    "before": null,
+    "after": "=IFERROR(Z78*IF('General Information'!$D$27>0,'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),0),0)"
+   },
+   {
+    "cell": "AA86",
+    "before": null,
+    "after": "=IFERROR(AA79*IF('General Information'!$D$27>0,1,0),0)"
+   },
+   {
+    "cell": "G86",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",$H$7)"
+   },
+   {
+    "cell": "H86",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",IF(SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"TON\")>0,SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"TON\")*2666.6667/($J$81*'General Information'!$D$26),IFERROR(VALUE(TRIM(SUBSTITUTE(MID(IFERROR(INDEX(INDIRECT(\"'\"&$G$7&\"'!$C$13:$C$22\"),MATCH(\"Concrete Pavement*\",INDIRECT(\"'\"&$G$7&\"'!$C$13:$C$22\"),0)),\"\"),FIND(\",\",IFERROR(INDEX(INDIRECT(\"'\"&$G$7&\"'!$C$13:$C$22\"),MATCH(\"Concrete Pavement*\",INDIRECT(\"'\"&$G$7&\"'!$C$13:$C$22\"),0)),\"\"))+1,99),\"-inch\",\"\"))),0)))"
+   },
+   {
+    "cell": "I86",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",36*(SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),\"P-2*\")+SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),\"P-3*\"))/'General Information'!$D$26)"
+   },
+   {
+    "cell": "J86",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",36*SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),\"P-154*\")/'General Information'!$D$26)"
+   },
+   {
+    "cell": "K86",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",IF(SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),\"P-155*\")+SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),\"P-156*\")+SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),\"P-157*\")+SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"S.Y.\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),\"P-158*\")>0,\"yes\",\"-\"))"
+   },
+   {
+    "cell": "L86",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",H86+I86+J86)"
+   },
+   {
+    "cell": "M86",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",36*SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"C.Y.\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),\"P-152*\")/'General Information'!$D$26)"
+   },
+   {
+    "cell": "N86",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",IF(M86=0,\"no excavation item\",IF(ABS(M86-L86)<=0.5,\"agrees\",\"differs by \"&TEXT(M86-L86,\"0.0\")&\" in\")))"
+   },
+   {
+    "cell": "P86",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",TEXT(H86,\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I86>0,\" on \"&TEXT(I86,\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J86>0,\" on \"&TEXT(J86,\"0\")&\"\"\" P154\",\"\"))"
+   },
+   {
+    "cell": "W86",
+    "before": null,
+    "after": "Concrete"
+   },
+   {
+    "cell": "X86",
+    "before": null,
+    "after": "=IFERROR(X79*IF('General Information'!$D$27>0,1,0),0)"
+   },
+   {
+    "cell": "Y86",
+    "before": null,
+    "after": "=IFERROR(Y79*IF('General Information'!$D$27>0,1,0),0)"
+   },
+   {
+    "cell": "Z86",
+    "before": null,
+    "after": "=IFERROR(Z79*IF('General Information'!$D$27>0,1,0),0)"
+   },
+   {
+    "cell": "G87",
+    "before": null,
+    "after": "Thickness is not an input. Volume items give inches = 36 x C.Y. / mainline S.Y.; asphalt gives inches = 2,666.67 x tons / (pcf x mainline S.Y.); items measured by area carry no implied thickness. The last column is the section as the quantities describe it: paste it into the alternative description so the two can never disagree. The read-back divides by the mainline area only, so the excavation check is what catches a quantity that also covers the shoulder."
+   },
+   {
+    "cell": "G108",
+    "before": null,
+    "after": "Charts 6 and 7 stack the layers as they sit in the ground, surface on top. Chart 7 stays empty unless a shoulder area is entered on General Information, and then shows the same quantities spread over mainline plus shoulder, which is the lower bound on each thickness."
    }
   ],
   "Typical Values": [
@@ -8706,7 +9221,7 @@
  ],
  "hashes": {
   "8eaa2547-TDOA_LCCA_Framework_v1.1.2_ARA_Task2_08182026.xlsm": "b0680f2a90e86654a5d7e57eb29ae45e960ddf7b517ccb65bc2978afaee4705a",
-  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "8a0738a7cafc2c4348c5fa92f53f5aa11db3471500de7843ac4eedfe6aed1019",
+  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "5353ed8c81d6e73eb2fcfe9724cc4a0b412d3f3e36fb626e5ae5df89eeb423f6",
   "TDOT_LCCA_Decision_Workbook.xlsx": "09b8585b8086a163b0a3e44f7d04606f8478a2e735fd72899059d132fefe4856",
   "Output.bas": "7e7e1cad7c0d41cc23d929d643a2e4ce5861761c2885f82e9a0b0757a0a8fd82",
   "35f08cad-TDOA_LCCA_Framework_v1.1.2_MBT_20260521_LostRevenue_1.xlsm": "117135e9facc9395b88883c3ffd4de48b67cb997605d6ad0a1acd7d64edfb08b",

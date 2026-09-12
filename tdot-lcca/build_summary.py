@@ -187,6 +187,81 @@ def build_scratch(path):
     ch = BarChart(); ch.type = 'col'; ch.grouping = 'clustered'; ch.gapWidth = 40
     ch.add_data(Reference(ws, min_col=DC + 2 + 2 * NALT, max_col=DC + 1 + 3 * NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
     colour(ch); ch.x_axis.tickLblSkip = 5; style(ch, '5. Runway closure days by calendar year'); ch.y_axis.numFmt = '0'; ws.add_chart(ch, 'G58')
+    # ---- pavement section read back from the pay-item quantities (display only; no cost depends on it)
+    PCF = '$J$81'
+    AREA = f'{GI}!$D$26'; SHLD = f'{GI}!$D$27'
+    ws['G80'] = 'PAVEMENT SECTION  (read back from the quantities already entered; nothing here changes a cost)'; ws['G80'].font = F_T
+    ws['G81'] = 'Asphalt unit weight, pcf:'; ws['G81'].font = F_H
+    c = ws['J81']; c.value = 145; c.number_format = '0'; c.font = F_B; c.fill = PatternFill('solid', fgColor='D9D9D9'); c.border = BOX
+    ws['K81'] = ('Only asphalt needs an assumption: 145 pcf reproduces the Murfreesboro section to the hundredth of an inch. '
+                 'Volume items convert directly, and concrete carries its thickness in the pay-item name.')
+    ws['K81'].font = F_N
+    hdr(82, 7, ['Alternative', 'Surface course (in)', 'Aggregate base (in)', 'Subbase (in)', 'Treated subgrade',
+                'Total section (in)', 'Excavation (in)', 'Excavation check', None])
+    hdr(82, 16, ['Section from the quantities'])
+    ws.row_dimensions[82].height = 27
+    for i in range(NALT):
+        r = 83 + i; g = f'$G${4+i}'
+        B, C, D, E = rng(g, 'B', 13, 22), rng(g, 'C', 13, 22), rng(g, 'D', 13, 22), rng(g, 'E', 13, 22)
+        tons = f'SUMIFS({E},{D},"TON")'
+        cy = lambda pat: f'SUMIFS({E},{D},"C.Y.",{B},"{pat}")'
+        agg = f'({cy("P-2*")}+{cy("P-3*")})'
+        desc = f'IFERROR(INDEX({C},MATCH("Concrete Pavement*",{C},0)),"")'
+        pcc = f'IFERROR(VALUE(TRIM(SUBSTITUTE(MID({desc},FIND(",",{desc})+1,99),"-inch",""))),0)'
+        item = lambda pat: f'IFERROR(SUBSTITUTE(LEFT(INDEX({B},MATCH("{pat}",{B},0)),5),"-",""),"")'
+        ws.cell(r, 7, f'=IF({g}="","",$H${4+i})')
+        ws.cell(r, 8, f'=IF({g}="","",IF({tons}>0,{tons}*2666.6667/({PCF}*{AREA}),{pcc}))')
+        ws.cell(r, 9, f'=IF({g}="","",36*{agg}/{AREA})')
+        ws.cell(r, 10, f'=IF({g}="","",36*{cy("P-154*")}/{AREA})')
+        ws.cell(r, 11, f'=IF({g}="","",IF(SUMIFS({E},{D},"S.Y.",{B},"P-155*")+SUMIFS({E},{D},"S.Y.",{B},"P-156*")+SUMIFS({E},{D},"S.Y.",{B},"P-157*")+SUMIFS({E},{D},"S.Y.",{B},"P-158*")>0,"yes","-"))')
+        ws.cell(r, 12, f'=IF({g}="","",H{r}+I{r}+J{r})')
+        ws.cell(r, 13, f'=IF({g}="","",36*{cy("P-152*")}/{AREA})')
+        ws.cell(r, 14, f'=IF({g}="","",IF(M{r}=0,"no excavation item",IF(ABS(M{r}-L{r})<=0.5,"agrees","differs by "&TEXT(M{r}-L{r},"0.0")&" in")))')
+        ws.cell(r, 16, f'=IF({g}="","",TEXT(H{r},"0")&"\"\" "&IF({tons}>0,{item("P-4*")},{item("P-501*")})'
+                       f'&IF(I{r}>0," on "&TEXT(I{r},"0")&"\"\" "&{item("P-2*")},"")'
+                       f'&IF(J{r}>0," on "&TEXT(J{r},"0")&"\"\" P154",""))')
+        for c2 in range(8, 14): ws.cell(r, c2).number_format = '0.00'
+        for c2 in list(range(7, 15)) + [16]: ws.cell(r, c2).font = F_B; ws.cell(r, c2).border = BOX
+    ws['G87'] = ('Thickness is not an input. Volume items give inches = 36 x C.Y. / mainline S.Y.; asphalt gives inches = 2,666.67 x tons / (pcf x mainline S.Y.); '
+                 'items measured by area carry no implied thickness. The last column is the section as the quantities describe it: paste it into the alternative description so the two can never disagree. The read-back divides by the mainline area only, so the excavation check is what catches a quantity that also covers the shoulder.')
+    ws['G87'].font = F_N
+    # chart data for the two section charts (columns W onward, below the by-year block)
+    SEC = 74
+    ws.cell(SEC, DC, 'PAVEMENT SECTION (inches): mainline, then the reading if the quantities also cover the shoulder').font = F_H
+    hdr(SEC + 1, DC, ['Layer'] + [None] * NALT)
+    for i in range(NALT): ws.cell(SEC + 1, DC + 1 + i, f'={d(1+i)}$4')
+    layers = [('Subbase (P-154)', 'J'), ('Aggregate base', 'I'), ('Asphalt', 'H'), ('Concrete', 'H')]
+    for k, (lab, col) in enumerate(layers):
+        ws.cell(SEC + 2 + k, DC, lab).font = F_DATA
+        for i in range(NALT):
+            r83 = 83 + i; g = f'$G${4+i}'
+            tons = f'SUMIFS({rng(g, "E", 13, 22)},{rng(g, "D", 13, 22)},"TON")'
+            v = f'{col}{r83}'
+            if lab == 'Asphalt': v = f'IF({tons}>0,H{r83},0)'
+            if lab == 'Concrete': v = f'IF({tons}>0,0,H{r83})'
+            c = ws.cell(SEC + 2 + k, DC + 1 + i, f'=IF({g}="",0,IFERROR({v},0))'); c.number_format = '0.00'; c.font = F_DATA
+    ws.cell(SEC + 7, DC, 'Shoulder reading (blank unless shoulder area is entered)').font = F_H
+    hdr(SEC + 8, DC, ['Layer'] + [None] * NALT)
+    for i in range(NALT): ws.cell(SEC + 8, DC + 1 + i, f'={d(1+i)}$4')
+    for k, lab in enumerate([l for l, _ in layers]):
+        ws.cell(SEC + 9 + k, DC, lab).font = F_DATA
+        for i in range(NALT):
+            src = f'{d(1+i)}{SEC + 2 + k}'
+            factor = '1' if lab == 'Concrete' else f'{AREA}/({AREA}+{SHLD})'
+            scale = f'IF({SHLD}>0,{factor},0)'
+            c = ws.cell(SEC + 9 + k, DC + 1 + i, f'=IFERROR({src}*{scale},0)'); c.number_format = '0.00'; c.font = F_DATA
+    LAYER_RGB = ['DCCBA0', 'C8A96E', '3A3A3A', 'C6CBD0']
+    for anch, r0, title in [('G90', SEC + 2, '6. Pavement section, mainline (inches, surface on top)'),
+                            ('N90', SEC + 9, '7. Pavement section with the shoulder (empty unless a shoulder area is entered)')]:
+        ch = BarChart(); ch.type = 'col'; ch.grouping = 'stacked'; ch.overlap = 100; ch.gapWidth = 80
+        ch.add_data(Reference(ws, min_col=DC, max_col=DC + NALT, min_row=r0, max_row=r0 + 3), titles_from_data=True, from_rows=True)
+        ch.set_categories(Reference(ws, min_col=DC + 1, max_col=DC + NALT, min_row=r0 - 1, max_row=r0 - 1))
+        for s2, rgb in zip(ch.series, LAYER_RGB): s2.graphicalProperties.solidFill = rgb; s2.graphicalProperties.line.solidFill = rgb
+        style(ch, title); ch.y_axis.numFmt = '0'; ch.y_axis.title = 'inches'; ch.x_axis.tickLblPos = 'low'
+        ws.add_chart(ch, anch)
+    ws['G108'] = ('Charts 6 and 7 stack the layers as they sit in the ground, surface on top. Chart 7 stays empty unless a shoulder area is entered on General Information, '
+                  'and then shows the same quantities spread over mainline plus shoulder, which is the lower bound on each thickness.')
+    ws['G108'].font = F_N
     ws['G77'] = "How to read: 1 shows where each alternative's cost sits; 2 whether the lowest-cost alternative holds at other discount rates (FAA now uses the OMB A-94 real rate, about 2%; 7% was the rule before 2022); 3 and 4 when the money is spent and when the higher first cost is paid back; 5 how often and how long the runway closes."; ws['G77'].font = F_N
     dxf_low = DifferentialStyle(fill=PatternFill(bgColor='FFDDEBF7'), font=Font(bold=True, color='FF1F3864'))
     for sqref, f in [('G4:R7', 'AND($G4<>"",COUNT($O$4:$O$7)>0,$O4=MIN($O$4:$O$7))'),
@@ -273,7 +348,7 @@ def transplant(work, sheet_part, drawing_part, chart_start, sheet_index):
     sx = re.sub(r'<pageMargins[^>]*/>', lambda m: m.group(0) + '<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/>', sx, count=1)
     wbx = rd('xl/workbook.xml')
     if '_xlnm.Print_Area" localSheetId="%d"' % sheet_index not in wbx:
-        pa = '<definedName name="_xlnm.Print_Area" localSheetId="%d">Summary!$A$1:$U$78</definedName>' % sheet_index
+        pa = '<definedName name="_xlnm.Print_Area" localSheetId="%d">Summary!$A$1:$U$112</definedName>' % sheet_index
         wbx = wbx.replace('</definedNames>', pa + '</definedNames>') if '</definedNames>' in wbx else wbx.replace('</sheets>', '</sheets><definedNames>' + pa + '</definedNames>', 1)
         wr('xl/workbook.xml', wbx)
     if 'xmlns:r=' not in sx[:600]: sx = sx.replace('<worksheet ', '<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ', 1)

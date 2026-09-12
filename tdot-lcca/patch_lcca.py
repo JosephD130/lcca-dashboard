@@ -237,12 +237,14 @@ def main(src, out, mbt_mode=False):
     x = put_cell(x, 'D44', '<c r="D44"%s t="str"><f>HYPERLINK("#Summary!G1","View Summary  \u25ba")</f><v>View Summary  \u25ba</v></c>' % (' s="%s"' % btn if btn else ''))
     x = re.sub(r'<row r="44" ', '<row r="44" ht="21" customHeight="1" ', x, count=1)
     # --- 'Typical Values' reference sheet (appended last, so no sheet indices shift) + button and input hints on General Information
-    helper_part = add_plain_sheet(work, build_helpers.build, 'Typical Values')
-    hint_style = style_of(rd(helper_part), 'A2')
-    x = put_cell(x, 'B46', '<c r="B46"%s t="inlineStr"><is><t>Typical input values:</t></is></c>' % (' s="%s"' % lab if lab else ''))
-    x = put_cell(x, 'D46', '<c r="D46"%s t="str"><f>HYPERLINK("#\'Typical Values\'!A1","Typical Values  \u25ba")</f><v>Typical Values  \u25ba</v></c>' % (' s="%s"' % btn if btn else ''))
-    x = re.sub(r'<row r="46" ', '<row r="46" ht="21" customHeight="1" ', x, count=1)
-    for row, hint in build_helpers.HINTS.items():
+    # the --mbt verification copy predates the RevenueData sheet, so the live revenue rows would not resolve there
+    helper_part = None if mbt_mode else add_plain_sheet(work, build_helpers.build, 'Typical Values')
+    hint_style = style_of(rd(helper_part), 'A2') if helper_part else None
+    if helper_part:
+        x = put_cell(x, 'B46', '<c r="B46"%s t="inlineStr"><is><t>Typical input values:</t></is></c>' % (' s="%s"' % lab if lab else ''))
+        x = put_cell(x, 'D46', '<c r="D46"%s t="str"><f>HYPERLINK("#\'Typical Values\'!A1","Typical Values  \u25ba")</f><v>Typical Values  \u25ba</v></c>' % (' s="%s"' % btn if btn else ''))
+        x = re.sub(r'<row r="46" ', '<row r="46" ht="21" customHeight="1" ', x, count=1)
+    for row, hint in (build_helpers.HINTS.items() if helper_part else []):
         x = put_cell(x, 'F%d' % row, '<c r="F%d"%s t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>' % (row, ' s="%s"' % hint_style if hint_style else '', html.escape(hint, quote=False)))
     wr(gi_part, x)
     # --- design pass: look and first-run usability (no calculation changes)
