@@ -1,7 +1,7 @@
 [
  [
   "A1",
-  "=HYPERLINK(\"#'General Information'!D9\",\"\u25c4 General Information\")"
+  "=HYPERLINK(\"#'General Information'!D9\",\"◄ General Information\")"
  ],
  [
   "B1",
@@ -105,7 +105,7 @@
  ],
  [
   "J81",
-  "145"
+  145
  ],
  [
   "H83",
@@ -140,6 +140,10 @@
   "=IF($G$4=\"\",\"\",TEXT(H83,\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I83>0,\" on \"&TEXT(I83,\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J83>0,\" on \"&TEXT(J83,\"0\")&\"\"\" P154\",\"\"))"
  ],
  [
+  "Q83",
+  "=IF(OR($G$4=\"\",'General Information'!$D$27=0),\"\",TEXT(IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")>0,H83*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),H83),\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I83>0,\" on \"&TEXT(I83*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J83>0,\" on \"&TEXT(J83*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),\"0\")&\"\"\" P154\",\"\"))"
+ ],
+ [
   "X76",
   "=IF($G$4=\"\",0,IFERROR(J83,0))"
  ],
@@ -157,7 +161,7 @@
  ],
  [
   "W12",
-  "2"
+  2
  ],
  [
   "X12",
@@ -165,7 +169,7 @@
  ],
  [
   "W41",
-  "0"
+  0
  ],
  [
   "X41",

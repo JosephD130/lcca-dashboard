@@ -6,7 +6,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 F_T = Font(name='Arial', size=12, bold=True); F_H = Font(name='Arial', size=10, bold=True); F_B = Font(name='Arial', size=10)
-F_N = Font(name='Arial', size=9, italic=True, color='595959'); F_BTN = Font(name='Arial', size=10, bold=True, color='FFFFFF'); F_LINK = Font(name='Arial', size=9, color='1F4E9C', underline='single')
+F_N = Font(name='Arial', size=9, italic=True, color='595959'); F_BTN = Font(name='Arial', size=10, bold=True, color='FFFFFF'); F_SRC = Font(name='Arial', size=9, color='595959')
 FILL = PatternFill('solid', fgColor='D9D9D9'); FILL_BTN = PatternFill('solid', fgColor='1D2733'); FILL_SEC = PatternFill('solid', fgColor='EAF2FB')
 thin = Side(style='thin', color='BFBFBF'); BOX = Border(top=thin, bottom=thin, left=thin, right=thin)
 WRAP = Alignment(wrap_text=True, vertical='top')
@@ -43,7 +43,7 @@ def build(path):
                 c = ws.cell(r, 1 + i, v); c.font = F_B; c.border = BOX; c.alignment = WRAP
                 if isinstance(v, (int, float)) and not isinstance(v, bool): c.number_format = '0' if (float(v).is_integer() and 1900 < v < 2100 and i == 3) else ('#,##0' if float(v).is_integer() else '#,##0.00')
                 elif isinstance(v, str) and v.startswith('=') and i == 1: c.number_format = '#,##0.00'
-                if isinstance(v, str) and v.startswith('http'): c.font = F_LINK; c.value = f'=HYPERLINK("{v}","{v[:70]}")' if len(v) < 250 else v
+                if isinstance(v, str) and v.startswith('http'): c.font = F_SRC   # plain text: nothing on this sheet reaches outside the workbook
             r += 1
         if note: c = ws.cell(r, 1, note); c.font = F_N; c.alignment = WRAP; ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=7); ws.row_dimensions[r].height = 26; r += 1
         r += 1

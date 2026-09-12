@@ -6351,6 +6351,11 @@
     "after": "Section from the quantities"
    },
    {
+    "cell": "Q82",
+    "before": null,
+    "after": "Same quantities over mainline + shoulder"
+   },
+   {
     "cell": "W82",
     "before": null,
     "after": "Layer"
@@ -6419,6 +6424,11 @@
     "cell": "P83",
     "before": null,
     "after": "=IF($G$4=\"\",\"\",TEXT(H83,\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I83>0,\" on \"&TEXT(I83,\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J83>0,\" on \"&TEXT(J83,\"0\")&\"\"\" P154\",\"\"))"
+   },
+   {
+    "cell": "Q83",
+    "before": null,
+    "after": "=IF(OR($G$4=\"\",'General Information'!$D$27=0),\"\",TEXT(IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")>0,H83*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),H83),\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$4&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$4&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I83>0,\" on \"&TEXT(I83*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$4&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J83>0,\" on \"&TEXT(J83*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),\"0\")&\"\"\" P154\",\"\"))"
    },
    {
     "cell": "W83",
@@ -6491,6 +6501,11 @@
     "after": "=IF($G$5=\"\",\"\",TEXT(H84,\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I84>0,\" on \"&TEXT(I84,\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J84>0,\" on \"&TEXT(J84,\"0\")&\"\"\" P154\",\"\"))"
    },
    {
+    "cell": "Q84",
+    "before": null,
+    "after": "=IF(OR($G$5=\"\",'General Information'!$D$27=0),\"\",TEXT(IF(SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"TON\")>0,H84*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),H84),\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$5&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$5&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I84>0,\" on \"&TEXT(I84*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$5&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J84>0,\" on \"&TEXT(J84*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),\"0\")&\"\"\" P154\",\"\"))"
+   },
+   {
     "cell": "W84",
     "before": null,
     "after": "Aggregate base"
@@ -6559,6 +6574,11 @@
     "cell": "P85",
     "before": null,
     "after": "=IF($G$6=\"\",\"\",TEXT(H85,\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I85>0,\" on \"&TEXT(I85,\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J85>0,\" on \"&TEXT(J85,\"0\")&\"\"\" P154\",\"\"))"
+   },
+   {
+    "cell": "Q85",
+    "before": null,
+    "after": "=IF(OR($G$6=\"\",'General Information'!$D$27=0),\"\",TEXT(IF(SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"TON\")>0,H85*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),H85),\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$6&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$6&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I85>0,\" on \"&TEXT(I85*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$6&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J85>0,\" on \"&TEXT(J85*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),\"0\")&\"\"\" P154\",\"\"))"
    },
    {
     "cell": "W85",
@@ -6631,6 +6651,11 @@
     "after": "=IF($G$7=\"\",\"\",TEXT(H86,\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I86>0,\" on \"&TEXT(I86,\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J86>0,\" on \"&TEXT(J86,\"0\")&\"\"\" P154\",\"\"))"
    },
    {
+    "cell": "Q86",
+    "before": null,
+    "after": "=IF(OR($G$7=\"\",'General Information'!$D$27=0),\"\",TEXT(IF(SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"TON\")>0,H86*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),H86),\"0\")&\"\"\" \"&IF(SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$E$13:$E$22\"),INDIRECT(\"'\"&$G$7&\"'!$D$13:$D$22\"),\"TON\")>0,IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),MATCH(\"P-4*\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),MATCH(\"P-501*\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"))&IF(I86>0,\" on \"&TEXT(I86*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),\"0\")&\"\"\" \"&IFERROR(SUBSTITUTE(LEFT(INDEX(INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),MATCH(\"P-2*\",INDIRECT(\"'\"&$G$7&\"'!$B$13:$B$22\"),0)),5),\"-\",\"\"),\"\"),\"\")&IF(J86>0,\" on \"&TEXT(J86*'General Information'!$D$26/('General Information'!$D$26+'General Information'!$D$27),\"0\")&\"\"\" P154\",\"\"))"
+   },
+   {
     "cell": "W86",
     "before": null,
     "after": "Concrete"
@@ -6653,7 +6678,7 @@
    {
     "cell": "G87",
     "before": null,
-    "after": "Thickness is not an input. Volume items give inches = 36 x C.Y. / mainline S.Y.; asphalt gives inches = 2,666.67 x tons / (pcf x mainline S.Y.); items measured by area carry no implied thickness. The last column is the section as the quantities describe it: paste it into the alternative description so the two can never disagree. The read-back divides by the mainline area only, so the excavation check is what catches a quantity that also covers the shoulder."
+    "after": "Thickness is not an input. Volume items give inches = 36 x C.Y. / mainline S.Y.; asphalt gives inches = 2,666.67 x tons / (pcf x mainline S.Y.); items measured by area carry no implied thickness. The last column is the section as the quantities describe it: paste it into the alternative description so the two can never disagree. The read-back divides by the mainline area only; when a shoulder area is entered, the last column spreads the same quantities over mainline plus shoulder, which is the reading to use if the quantities were taken off both."
    },
    {
     "cell": "G108",
@@ -6740,7 +6765,7 @@
    {
     "cell": "G8",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.tasp2040.com/wp-content/uploads/2021/03/Updated-TASP-Inventory-Existing-System-Conditions-March-2021-v3.pdf\",\"https://www.tasp2040.com/wp-content/uploads/2021/03/Updated-TASP-Inven\")"
+    "after": "https://www.tasp2040.com/wp-content/uploads/2021/03/Updated-TASP-Inventory-Existing-System-Conditions-March-2021-v3.pdf"
    },
    {
     "cell": "A9",
@@ -6765,7 +6790,7 @@
    {
     "cell": "G9",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.tasp2040.com/wp-content/uploads/2021/03/Updated-TASP-Inventory-Existing-System-Conditions-March-2021-v3.pdf\",\"https://www.tasp2040.com/wp-content/uploads/2021/03/Updated-TASP-Inven\")"
+    "after": "https://www.tasp2040.com/wp-content/uploads/2021/03/Updated-TASP-Inventory-Existing-System-Conditions-March-2021-v3.pdf"
    },
    {
     "cell": "A10",
@@ -6790,7 +6815,7 @@
    {
     "cell": "G10",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.tasp2040.com/wp-content/uploads/2020/12/Chapter-7-Airport-Classifications-and-NPIAS-Evaluation.pdf\",\"https://www.tasp2040.com/wp-content/uploads/2020/12/Chapter-7-Airport-\")"
+    "after": "https://www.tasp2040.com/wp-content/uploads/2020/12/Chapter-7-Airport-Classifications-and-NPIAS-Evaluation.pdf"
    },
    {
     "cell": "A11",
@@ -6815,7 +6840,7 @@
    {
     "cell": "G11",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.appliedpavement.com/tennessee-apms\",\"https://www.appliedpavement.com/tennessee-apms\")"
+    "after": "https://www.appliedpavement.com/tennessee-apms"
    },
    {
     "cell": "A12",
@@ -6840,7 +6865,7 @@
    {
     "cell": "G12",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.tn.gov/content/dam/tn/tdot/aeronautics/TN%20Airport%20Management%20Guide%20FINAL.pdf\",\"https://www.tn.gov/content/dam/tn/tdot/aeronautics/TN%20Airport%20Mana\")"
+    "after": "https://www.tn.gov/content/dam/tn/tdot/aeronautics/TN%20Airport%20Management%20Guide%20FINAL.pdf"
    },
    {
     "cell": "A13",
@@ -6865,7 +6890,7 @@
    {
     "cell": "G13",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.tasp2040.com/wp-content/uploads/2021/09/TASP-Cost-Estimate-Chapter.pdf\",\"https://www.tasp2040.com/wp-content/uploads/2021/09/TASP-Cost-Estimate\")"
+    "after": "https://www.tasp2040.com/wp-content/uploads/2021/09/TASP-Cost-Estimate-Chapter.pdf"
    },
    {
     "cell": "A14",
@@ -6890,7 +6915,7 @@
    {
     "cell": "G14",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.tasp2040.com/wp-content/uploads/2021/09/TASP-Cost-Estimate-Chapter.pdf\",\"https://www.tasp2040.com/wp-content/uploads/2021/09/TASP-Cost-Estimate\")"
+    "after": "https://www.tasp2040.com/wp-content/uploads/2021/09/TASP-Cost-Estimate-Chapter.pdf"
    },
    {
     "cell": "A15",
@@ -6910,7 +6935,7 @@
    {
     "cell": "G15",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.tn.gov/content/dam/tn/tdot/documents/170-02.pdf\",\"https://www.tn.gov/content/dam/tn/tdot/documents/170-02.pdf\")"
+    "after": "https://www.tn.gov/content/dam/tn/tdot/documents/170-02.pdf"
    },
    {
     "cell": "A16",
@@ -6930,7 +6955,7 @@
    {
     "cell": "G16",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.tn.gov/tdot/aeronautics/apmm-contract.html\",\"https://www.tn.gov/tdot/aeronautics/apmm-contract.html\")"
+    "after": "https://www.tn.gov/tdot/aeronautics/apmm-contract.html"
    },
    {
     "cell": "A17",
@@ -6950,7 +6975,7 @@
    {
     "cell": "G17",
     "before": null,
-    "after": "=HYPERLINK(\"https://idea.appliedpavement.com/hosting/tennessee/statewide-summary/inventory-area/area-by-airport-table.html\",\"https://idea.appliedpavement.com/hosting/tennessee/statewide-summary/i\")"
+    "after": "https://idea.appliedpavement.com/hosting/tennessee/statewide-summary/inventory-area/area-by-airport-table.html"
    },
    {
     "cell": "A18",
@@ -6970,7 +6995,7 @@
    {
     "cell": "G18",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.faa.gov/sites/faa.gov/files/airports/planning_capacity/npias/current/ARP-NPIAS-2025-2029-Appendix-A.pdf\",\"https://www.faa.gov/sites/faa.gov/files/airports/planning_capacity/npi\")"
+    "after": "https://www.faa.gov/sites/faa.gov/files/airports/planning_capacity/npias/current/ARP-NPIAS-2025-2029-Appendix-A.pdf"
    },
    {
     "cell": "A19",
@@ -7050,7 +7075,7 @@
    {
     "cell": "G23",
     "before": null,
-    "after": "=HYPERLINK(\"https://en.wikipedia.org/wiki/Murfreesboro_Municipal_Airport\",\"https://en.wikipedia.org/wiki/Murfreesboro_Municipal_Airport\")"
+    "after": "https://en.wikipedia.org/wiki/Murfreesboro_Municipal_Airport"
    },
    {
     "cell": "A24",
@@ -7080,7 +7105,7 @@
    {
     "cell": "G24",
     "before": null,
-    "after": "=HYPERLINK(\"https://en.wikipedia.org/wiki/Shelbyville_Municipal_Airport_(Tennessee)\",\"https://en.wikipedia.org/wiki/Shelbyville_Municipal_Airport_(Tennessee\")"
+    "after": "https://en.wikipedia.org/wiki/Shelbyville_Municipal_Airport_(Tennessee)"
    },
    {
     "cell": "A25",
@@ -7115,7 +7140,7 @@
    {
     "cell": "G25",
     "before": null,
-    "after": "=HYPERLINK(\"https://en.wikipedia.org/wiki/Gatlinburg%E2%80%93Pigeon_Forge_Airport\",\"https://en.wikipedia.org/wiki/Gatlinburg%E2%80%93Pigeon_Forge_Airport\")"
+    "after": "https://en.wikipedia.org/wiki/Gatlinburg%E2%80%93Pigeon_Forge_Airport"
    },
    {
     "cell": "A26",
@@ -7150,7 +7175,7 @@
    {
     "cell": "G26",
     "before": null,
-    "after": "=HYPERLINK(\"https://en.wikipedia.org/wiki/Clarksville%E2%80%93Montgomery_County_Regional_Airport\",\"https://en.wikipedia.org/wiki/Clarksville%E2%80%93Montgomery_County_Re\")"
+    "after": "https://en.wikipedia.org/wiki/Clarksville%E2%80%93Montgomery_County_Regional_Airport"
    },
    {
     "cell": "A27",
@@ -7185,7 +7210,7 @@
    {
     "cell": "G27",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.wbbjtv.com/2024/08/28/mckellar-sipes-regional-airport-set-to-complete-runway-2-20-paving-preparing-for-new-jet-service/\",\"https://www.wbbjtv.com/2024/08/28/mckellar-sipes-regional-airport-set-\")"
+    "after": "https://www.wbbjtv.com/2024/08/28/mckellar-sipes-regional-airport-set-to-complete-runway-2-20-paving-preparing-for-new-jet-service/"
    },
    {
     "cell": "A28",
@@ -7220,7 +7245,7 @@
    {
     "cell": "G28",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.smyrnaairport.com/news-events/smyrna-airport-runway-119-grand-opening\",\"https://www.smyrnaairport.com/news-events/smyrna-airport-runway-119-gr\")"
+    "after": "https://www.smyrnaairport.com/news-events/smyrna-airport-runway-119-grand-opening"
    },
    {
     "cell": "A29",
@@ -7255,7 +7280,7 @@
    {
     "cell": "G29",
     "before": null,
-    "after": "=HYPERLINK(\"https://en.wikipedia.org/wiki/Smyrna_Airport_(Tennessee)\",\"https://en.wikipedia.org/wiki/Smyrna_Airport_(Tennessee)\")"
+    "after": "https://en.wikipedia.org/wiki/Smyrna_Airport_(Tennessee)"
    },
    {
     "cell": "A30",
@@ -7280,7 +7305,7 @@
    {
     "cell": "G30",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.tasp2040.com/wp-content/uploads/2020/12/Chapter-7-Airport-Classifications-and-NPIAS-Evaluation.pdf\",\"https://www.tasp2040.com/wp-content/uploads/2020/12/Chapter-7-Airport-\")"
+    "after": "https://www.tasp2040.com/wp-content/uploads/2020/12/Chapter-7-Airport-Classifications-and-NPIAS-Evaluation.pdf"
    },
    {
     "cell": "A31",
@@ -7375,7 +7400,7 @@
    {
     "cell": "G36",
     "before": null,
-    "after": "=HYPERLINK(\"https://aeronautics.sc.gov/sites/default/files/2025-05/250521_FLO_Rehab_Twy_A.pdf\",\"https://aeronautics.sc.gov/sites/default/files/2025-05/250521_FLO_Reha\")"
+    "after": "https://aeronautics.sc.gov/sites/default/files/2025-05/250521_FLO_Rehab_Twy_A.pdf"
    },
    {
     "cell": "A37",
@@ -7400,7 +7425,7 @@
    {
     "cell": "G37",
     "before": null,
-    "after": "=HYPERLINK(\"https://aeronautics.sc.gov/airport-development/sc-airport-capital-project-bid-tabulations\",\"https://aeronautics.sc.gov/airport-development/sc-airport-capital-proj\")"
+    "after": "https://aeronautics.sc.gov/airport-development/sc-airport-capital-project-bid-tabulations"
    },
    {
     "cell": "A38",
@@ -7435,7 +7460,7 @@
    {
     "cell": "G38",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.dot.state.mn.us/aero/planning/documents/sasp/saspappendixf.pdf\",\"https://www.dot.state.mn.us/aero/planning/documents/sasp/saspappendixf\")"
+    "after": "https://www.dot.state.mn.us/aero/planning/documents/sasp/saspappendixf.pdf"
    },
    {
     "cell": "A39",
@@ -7460,7 +7485,7 @@
    {
     "cell": "G39",
     "before": null,
-    "after": "=HYPERLINK(\"https://aeronautics.sc.gov/airport-development/sc-airport-capital-project-bid-tabulations\",\"https://aeronautics.sc.gov/airport-development/sc-airport-capital-proj\")"
+    "after": "https://aeronautics.sc.gov/airport-development/sc-airport-capital-project-bid-tabulations"
    },
    {
     "cell": "A40",
@@ -7485,7 +7510,7 @@
    {
     "cell": "G40",
     "before": null,
-    "after": "=HYPERLINK(\"https://aeronautics.sc.gov/airport-development/sc-airport-capital-project-bid-tabulations\",\"https://aeronautics.sc.gov/airport-development/sc-airport-capital-proj\")"
+    "after": "https://aeronautics.sc.gov/airport-development/sc-airport-capital-project-bid-tabulations"
    },
    {
     "cell": "A41",
@@ -7515,7 +7540,7 @@
    {
     "cell": "G41",
     "before": null,
-    "after": "=HYPERLINK(\"https://aeronautics.sc.gov/sites/default/files/2025-05/250521_FLO_Rehab_Twy_A.pdf\",\"https://aeronautics.sc.gov/sites/default/files/2025-05/250521_FLO_Reha\")"
+    "after": "https://aeronautics.sc.gov/sites/default/files/2025-05/250521_FLO_Rehab_Twy_A.pdf"
    },
    {
     "cell": "A42",
@@ -7550,7 +7575,7 @@
    {
     "cell": "G42",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.tn.gov/tdot/aeronautics/apmm-contract.html\",\"https://www.tn.gov/tdot/aeronautics/apmm-contract.html\")"
+    "after": "https://www.tn.gov/tdot/aeronautics/apmm-contract.html"
    },
    {
     "cell": "A43",
@@ -7580,7 +7605,7 @@
    {
     "cell": "G43",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.tn.gov/tdot/aeronautics/apmm-contract.html\",\"https://www.tn.gov/tdot/aeronautics/apmm-contract.html\")"
+    "after": "https://www.tn.gov/tdot/aeronautics/apmm-contract.html"
    },
    {
     "cell": "A44",
@@ -7610,7 +7635,7 @@
    {
     "cell": "G44",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.smyrnaairport.com/news-events/smyrna-airport-runway-119-grand-opening\",\"https://www.smyrnaairport.com/news-events/smyrna-airport-runway-119-gr\")"
+    "after": "https://www.smyrnaairport.com/news-events/smyrna-airport-runway-119-grand-opening"
    },
    {
     "cell": "A45",
@@ -7640,7 +7665,7 @@
    {
     "cell": "G45",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.stategazette.com/news/regional-airport-receives-state-grant/article_5fd852fd-1d67-525c-b6fc-b32fbc676bdc.html\",\"https://www.stategazette.com/news/regional-airport-receives-state-gran\")"
+    "after": "https://www.stategazette.com/news/regional-airport-receives-state-grant/article_5fd852fd-1d67-525c-b6fc-b32fbc676bdc.html"
    },
    {
     "cell": "A46",
@@ -8040,7 +8065,7 @@
    {
     "cell": "G65",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.faa.gov/airports/aip/guidance_letters/aip_pgl_22_01\",\"https://www.faa.gov/airports/aip/guidance_letters/aip_pgl_22_01\")"
+    "after": "https://www.faa.gov/airports/aip/guidance_letters/aip_pgl_22_01"
    },
    {
     "cell": "A66",
@@ -8070,7 +8095,7 @@
    {
     "cell": "G66",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.whitehouse.gov/wp-content/uploads/2026/03/CircularA-94Appendix-C.pdf\",\"https://www.whitehouse.gov/wp-content/uploads/2026/03/CircularA-94Appe\")"
+    "after": "https://www.whitehouse.gov/wp-content/uploads/2026/03/CircularA-94Appendix-C.pdf"
    },
    {
     "cell": "A67",
@@ -8095,7 +8120,7 @@
    {
     "cell": "G67",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-23-Rescission-and-Reinstatement-of-Circular-No.-A-94.pdf\",\"https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-23-Rescissi\")"
+    "after": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-23-Rescission-and-Reinstatement-of-Circular-No.-A-94.pdf"
    },
    {
     "cell": "A68",
@@ -8120,7 +8145,7 @@
    {
     "cell": "G68",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.faa.gov/documentLibrary/media/Advisory_Circular/150_5320_6e_part4.pdf\",\"https://www.faa.gov/documentLibrary/media/Advisory_Circular/150_5320_6\")"
+    "after": "https://www.faa.gov/documentLibrary/media/Advisory_Circular/150_5320_6e_part4.pdf"
    },
    {
     "cell": "A69",
@@ -8145,7 +8170,7 @@
    {
     "cell": "G69",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.eng.auburn.edu/research/centers/ncat/files/aaptp/Report.Final.06-06.pdf\",\"https://www.eng.auburn.edu/research/centers/ncat/files/aaptp/Report.Fi\")"
+    "after": "https://www.eng.auburn.edu/research/centers/ncat/files/aaptp/Report.Final.06-06.pdf"
    },
    {
     "cell": "A70",
@@ -8170,7 +8195,7 @@
    {
     "cell": "G70",
     "before": null,
-    "after": "=HYPERLINK(\"https://dot.ca.gov/-/media/dot-media/programs/maintenance/documents/office-of-concrete-pavement/life-cycle-cost-analysis/lcca-25ca-manual-final-aug-1-2013-v2-a11y.pdf\",\"https://dot.ca.gov/-/media/dot-media/programs/maintenance/documents/of\")"
+    "after": "https://dot.ca.gov/-/media/dot-media/programs/maintenance/documents/office-of-concrete-pavement/life-cycle-cost-analysis/lcca-25ca-manual-final-aug-1-2013-v2-a11y.pdf"
    },
    {
     "cell": "A71",
@@ -8200,7 +8225,7 @@
    {
     "cell": "G71",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.faa.gov/documentLibrary/media/Advisory_Circular/150-5320-6G-Pavement-Design.pdf\",\"https://www.faa.gov/documentLibrary/media/Advisory_Circular/150-5320-6\")"
+    "after": "https://www.faa.gov/documentLibrary/media/Advisory_Circular/150-5320-6G-Pavement-Design.pdf"
    },
    {
     "cell": "A72",
@@ -8275,7 +8300,7 @@
    {
     "cell": "G74",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.eng.auburn.edu/research/centers/ncat/files/aaptp/Report.Final.06-06.pdf\",\"https://www.eng.auburn.edu/research/centers/ncat/files/aaptp/Report.Fi\")"
+    "after": "https://www.eng.auburn.edu/research/centers/ncat/files/aaptp/Report.Final.06-06.pdf"
    },
    {
     "cell": "A75",
@@ -8345,7 +8370,7 @@
    {
     "cell": "G79",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.faa.gov/documentlibrary/media/advisory_circular/150-5380-7b.pdf\",\"https://www.faa.gov/documentlibrary/media/advisory_circular/150-5380-7\")"
+    "after": "https://www.faa.gov/documentlibrary/media/advisory_circular/150-5380-7b.pdf"
    },
    {
     "cell": "A80",
@@ -8370,7 +8395,7 @@
    {
     "cell": "G80",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.faa.gov/documentlibrary/media/advisory_circular/150-5380-6c.pdf\",\"https://www.faa.gov/documentlibrary/media/advisory_circular/150-5380-6\")"
+    "after": "https://www.faa.gov/documentlibrary/media/advisory_circular/150-5380-6c.pdf"
    },
    {
     "cell": "A81",
@@ -8400,7 +8425,7 @@
    {
     "cell": "G81",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.acpa.org/wp-content/uploads/2025/03/ACPA-Achieving-the-Goals-of-the-FAAs-Extended-Airport-Pavement-Life-Program.pdf\",\"https://www.acpa.org/wp-content/uploads/2025/03/ACPA-Achieving-the-Goa\")"
+    "after": "https://www.acpa.org/wp-content/uploads/2025/03/ACPA-Achieving-the-Goals-of-the-FAAs-Extended-Airport-Pavement-Life-Program.pdf"
    },
    {
     "cell": "A82",
@@ -8425,7 +8450,7 @@
    {
     "cell": "G82",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.tarmacview.com/glossary/joint-sealant/\",\"https://www.tarmacview.com/glossary/joint-sealant/\")"
+    "after": "https://www.tarmacview.com/glossary/joint-sealant/"
    },
    {
     "cell": "A83",
@@ -8450,7 +8475,7 @@
    {
     "cell": "G83",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.acpa.org/wp-content/uploads/2025/03/ACPA-Achieving-the-Goals-of-the-FAAs-Extended-Airport-Pavement-Life-Program.pdf\",\"https://www.acpa.org/wp-content/uploads/2025/03/ACPA-Achieving-the-Goa\")"
+    "after": "https://www.acpa.org/wp-content/uploads/2025/03/ACPA-Achieving-the-Goals-of-the-FAAs-Extended-Airport-Pavement-Life-Program.pdf"
    },
    {
     "cell": "A84",
@@ -8475,7 +8500,7 @@
    {
     "cell": "G84",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.airporttech.tc.faa.gov/Portals/0/FactSheets/Extended%20Airport%20Pavement%20Life%20Factsheet_May%202024.pdf\",\"https://www.airporttech.tc.faa.gov/Portals/0/FactSheets/Extended%20Air\")"
+    "after": "https://www.airporttech.tc.faa.gov/Portals/0/FactSheets/Extended%20Airport%20Pavement%20Life%20Factsheet_May%202024.pdf"
    },
    {
     "cell": "A85",
@@ -8500,7 +8525,7 @@
    {
     "cell": "G85",
     "before": null,
-    "after": "=HYPERLINK(\"https://nap.nationalacademies.org/catalog/23649/\",\"https://nap.nationalacademies.org/catalog/23649/\")"
+    "after": "https://nap.nationalacademies.org/catalog/23649/"
    },
    {
     "cell": "A86",
@@ -8525,7 +8550,7 @@
    {
     "cell": "G86",
     "before": null,
-    "after": "=HYPERLINK(\"https://www.faa.gov/documentLibrary/media/Advisory_Circular/150-5320-6G-Pavement-Design.pdf\",\"https://www.faa.gov/documentLibrary/media/Advisory_Circular/150-5320-6\")"
+    "after": "https://www.faa.gov/documentLibrary/media/Advisory_Circular/150-5320-6G-Pavement-Design.pdf"
    },
    {
     "cell": "A87",
@@ -9221,7 +9246,7 @@
  ],
  "hashes": {
   "8eaa2547-TDOA_LCCA_Framework_v1.1.2_ARA_Task2_08182026.xlsm": "b0680f2a90e86654a5d7e57eb29ae45e960ddf7b517ccb65bc2978afaee4705a",
-  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "5353ed8c81d6e73eb2fcfe9724cc4a0b412d3f3e36fb626e5ae5df89eeb423f6",
+  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "8cc0a36e63ac3cd49e1873f647e28c3ad0a50b3e6f60dab804c578bf33751a66",
   "TDOT_LCCA_Decision_Workbook.xlsx": "09b8585b8086a163b0a3e44f7d04606f8478a2e735fd72899059d132fefe4856",
   "Output.bas": "7e7e1cad7c0d41cc23d929d643a2e4ce5861761c2885f82e9a0b0757a0a8fd82",
   "35f08cad-TDOA_LCCA_Framework_v1.1.2_MBT_20260521_LostRevenue_1.xlsm": "117135e9facc9395b88883c3ffd4de48b67cb997605d6ad0a1acd7d64edfb08b",

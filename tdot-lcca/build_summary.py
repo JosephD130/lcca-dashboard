@@ -54,7 +54,7 @@ def build_scratch(path):
     ws.column_dimensions['A'].width = 22; ws.column_dimensions['B'].width = 32; ws.column_dimensions['C'].width = 17; ws.column_dimensions['D'].width = 17; ws.column_dimensions['E'].width = 34
     ws.column_dimensions['F'].width = 3
     for c in 'GHIJKLMNOPQRSTUV': ws.column_dimensions[c].width = 14
-    ws.column_dimensions['G'].width = 20; ws.column_dimensions['H'].width = 24
+    ws.column_dimensions['G'].width = 20; ws.column_dimensions['H'].width = 24; ws.column_dimensions['P'].width = 30; ws.column_dimensions['Q'].width = 30
 
     # ---- 1. results table
     ws['G1'] = 'LCCA SUMMARY'; ws['G1'].font = F_T
@@ -198,7 +198,7 @@ def build_scratch(path):
     ws['K81'].font = F_N
     hdr(82, 7, ['Alternative', 'Surface course (in)', 'Aggregate base (in)', 'Subbase (in)', 'Treated subgrade',
                 'Total section (in)', 'Excavation (in)', 'Excavation check', None])
-    hdr(82, 16, ['Section from the quantities'])
+    hdr(82, 16, ['Section from the quantities', 'Same quantities over mainline + shoulder'])
     ws.row_dimensions[82].height = 27
     for i in range(NALT):
         r = 83 + i; g = f'$G${4+i}'
@@ -220,10 +220,14 @@ def build_scratch(path):
         ws.cell(r, 16, f'=IF({g}="","",TEXT(H{r},"0")&"\"\" "&IF({tons}>0,{item("P-4*")},{item("P-501*")})'
                        f'&IF(I{r}>0," on "&TEXT(I{r},"0")&"\"\" "&{item("P-2*")},"")'
                        f'&IF(J{r}>0," on "&TEXT(J{r},"0")&"\"\" P154",""))')
+        fs = f'{AREA}/({AREA}+{SHLD})'   # shoulder reading: bound layers thin out over the larger area, concrete keeps its named thickness
+        ws.cell(r, 17, f'=IF(OR({g}="",{SHLD}=0),"",TEXT(IF({tons}>0,H{r}*{fs},H{r}),"0")&"\"\" "&IF({tons}>0,{item("P-4*")},{item("P-501*")})'
+                       f'&IF(I{r}>0," on "&TEXT(I{r}*{fs},"0")&"\"\" "&{item("P-2*")},"")'
+                       f'&IF(J{r}>0," on "&TEXT(J{r}*{fs},"0")&"\"\" P154",""))')
         for c2 in range(8, 14): ws.cell(r, c2).number_format = '0.00'
-        for c2 in list(range(7, 15)) + [16]: ws.cell(r, c2).font = F_B; ws.cell(r, c2).border = BOX
+        for c2 in list(range(7, 15)) + [16, 17]: ws.cell(r, c2).font = F_B; ws.cell(r, c2).border = BOX
     ws['G87'] = ('Thickness is not an input. Volume items give inches = 36 x C.Y. / mainline S.Y.; asphalt gives inches = 2,666.67 x tons / (pcf x mainline S.Y.); '
-                 'items measured by area carry no implied thickness. The last column is the section as the quantities describe it: paste it into the alternative description so the two can never disagree. The read-back divides by the mainline area only, so the excavation check is what catches a quantity that also covers the shoulder.')
+                 'items measured by area carry no implied thickness. The last column is the section as the quantities describe it: paste it into the alternative description so the two can never disagree. The read-back divides by the mainline area only; when a shoulder area is entered, the last column spreads the same quantities over mainline plus shoulder, which is the reading to use if the quantities were taken off both.')
     ws['G87'].font = F_N
     # chart data for the two section charts (columns W onward, below the by-year block)
     SEC = 74

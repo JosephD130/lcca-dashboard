@@ -58,12 +58,13 @@ populates it with no further steps:
   the lowest in dollars and percent. The decision workbook carries the same block beside RESULTS.
 - G10 now checks the winner at 2% (OMB A-94 real rate, which FAA PGL 22-01 of June 2022 substituted for the
   fixed 7% rule) and at 7% (the pre-2022 AIP rule).
-- Pavement section read-back G80:P86, with charts 6 and 7: the thickness of each layer, derived from the
+- Pavement section read-back G80:Q86, with charts 6 and 7: the thickness of each layer, derived from the
   pay-item quantities already entered against the mainline area, the total section, a cross-check against
   the excavation quantity, and the section written out as a string to paste into the alternative
   description. Asphalt is the only layer needing an assumption, and its unit weight sits in J81 (145 pcf,
   the value that reproduces the Murfreesboro section exactly). Chart 7 fills in only when a shoulder area
-  is entered and shows the same quantities spread over mainline plus shoulder.
+  is entered and shows the same quantities spread over mainline plus shoulder; column Q then also writes that
+  shoulder reading out as a second string.
 - Chart data lives in columns W onward, greyed and labelled "calculated automatically; do not edit".
 - Navigation: dark HYPERLINK button cells "General Information" and "Instructions" at the top of
   Summary, and a "View Summary" button under Alternative Setup on General Information (row 44).
@@ -79,7 +80,7 @@ TN GA runway geometry with a seven-airport sample and areas, the Pay_Items defau
 southeastern bid prices, the closure production rates built into F4:F10, economic parameters (TDOT 3%/30 yr;
 FAA PGL 22-01 pointing to OMB A-94 real rates, 2.0% in 2026; the legacy 7%/20 yr; Caltrans 4%), maintenance
 timing against published service lives, and a live daily-revenue table for the 17 airports. Every row has its
-source URL; see verification/RESEARCH_SOURCES.md for what could and could not be confirmed. General Information
+source URL as plain text (no hyperlink, so nothing on the sheet reaches outside the workbook); see verification/RESEARCH_SOURCES.md for what could and could not be confirmed. General Information
 gets a "Typical Values" button (D46) and short hints in column F beside D25:D38.
 
 ## 3c. Look and first-run usability
@@ -110,6 +111,13 @@ workbook still reads as the same tool.
 - Cell notes on D26 and D39 no longer carry a person's name.
 - Two broken external links to files on a C: drive (v1.1.004 and a Savannah copy) removed.
 - Workbook set to fully recalculate on open.
+- Package hygiene (nothing in the file refers outside it or to an individual): six cached printer-driver
+  parts (printerSettings1-6) dropped with their relationships, page setups keep orientation and scaling;
+  the empty Power Query (DataMashup) stub in customXml removed; the SharePoint path Excel cached as the
+  last save location stripped from workbook.xml; document properties now read creator "TDOT Aeronautics
+  Division / Applied Research Associates", last modified by "ARA", company "TDOT Aeronautics Division".
+  The VBA project binary still carries the path of the machine it was last compiled on; that can only be
+  refreshed by saving the file once in Excel.
 
 ## 5. Not changed (needs a decision)
 
@@ -158,3 +166,13 @@ the year-indexed columns reconcile to the NPW to the dollar, and the Summary tab
 and six charts populate from the MBT data (render in `Summary_sheet_MBT_render.png`). Not
 verified: the charts on the alternative worksheets in Excel itself (LibreOffice does not render
 charts on the ActiveX-bearing sheets); step 3 above covers it.
+
+## 7. Worked examples
+
+Two made-up projects were run end to end on the blank template (verification/examples): Gatlinburg-Pigeon
+Forge Runway 10-28 without shoulders and three alternatives (HMA, 9 in PCC on subbase, 11 in PCC without
+subbase; the 11 in PCC is lowest, $5,852,247, and the answer changes at 7 percent), and McKellar-Sipes
+Runway 2-20 with 25 ft shoulders and four alternatives (two HMA, two PCC; 9 in PCC is lowest, $14,066,568,
+at every rate from 2 to 8 percent). Every block of the Summary was read back and checked against an
+independent calculation (42 and 57 checks, all pass), and the section read-back returned the sections the
+quantities were built from, on the mainline and, for the shoulder example, in the shoulder reading.

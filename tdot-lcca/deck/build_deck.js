@@ -182,7 +182,7 @@ table(s, [
   ['Pavement section', 'New on the Summary: each layer\'s thickness read back from the quantities, the section as a string for the description, a cross-check against the excavation quantity, and two stacked charts (mainline, and mainline plus shoulder when entered)'],
   ['Look and first-run UX', 'How-to card and a live "still needed" status line on General Information; navigation row on every alternative sheet; lowest-cost row highlighted on the Summary; tab colours; General Information prints on one page'],
   ['Typical Values sheet', 'New reference sheet: what TDOT manages, typical runway geometry and areas, workbook unit costs beside 2025 bids, closure production rates, FAA and OMB discount-rate rules, service lives, live daily revenue for the 17 airports; hints beside the General Information inputs'],
-  ['Housekeeping', 'Personal names removed from cell notes; two dead links to files on a C: drive removed; full recalculation on open'],
+  ['Housekeeping', 'Personal names removed from cell notes and document properties; dead links, cached printer settings, Power Query stub and SharePoint path removed; sources on Typical Values as plain text; full recalculation on open'],
   ['Not changed', 'Overview wording (NS rewrite pending Mat\'s approval); salvage, lost-revenue and AIP policy'],
 ], 0.5, 1.3, 9.0, [2.0, 7.0], 10.5);
 s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.5, y: 4.3, w: 9.0, h: 0.65, fill: { color: LIGHT }, line: { color: LIGHT }, rectRadius: 0.06 });
@@ -300,6 +300,7 @@ table(s, [
   ['Decision workbook against an independent engine', 'NPW, categories, break-evens, sensitivity, tornado, 12 scenarios and the decision map agree to the dollar'],
   ['New Summary sheet on the MBT data', 'Table, verdict, categories and closure days match; six charts render; template reads "No alternatives yet" with no errors'],
   ['New project run end to end', 'CKV Runway 17-35 built on the blank template: framework, decision TEMPLATE and an independent engine agree to the dollar'],
+  ['Two worked examples', 'GKT Runway 10-28 (three alternatives, no shoulders) and MKL Runway 2-20 (four alternatives, 25 ft shoulders): 99 independent checks pass; section read-back returns the designed sections'],
   ['Scripted click-through (LibreOffice API)', 'Buttons land where they should; 7% flips the verdict as flagged; 20 years drops late closures; unknown airport gives $0 lost revenue with a warning; deleting an alternative shifts the table with no #REF!; ties and four alternatives read cleanly'],
   ['Not yet verified', 'The alternative-sheet charts in Excel itself (no Excel here); a first-open check is in the notes'],
 ], 0.5, 1.2, 9.0, [3.4, 5.6], 10);

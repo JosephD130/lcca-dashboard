@@ -280,6 +280,7 @@ def main(src, out, mbt_mode=False):
     for p in ['xl/calcChain.xml']:
         if os.path.exists(P(p)): os.remove(P(p))
     if os.path.isdir(P('xl/externalLinks')): shutil.rmtree(P('xl/externalLinks'))
+    package_hygiene(work, P, rd, wr)
     # --- repack
     if os.path.exists(out): os.remove(out)
     with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
@@ -413,6 +414,47 @@ def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs):
     # ---- tab colours elsewhere
     for part, rgb in tabs:
         x = rd(part); wr(part, tab_color(x, rgb))
+
+
+def package_hygiene(work, P, rd, wr):
+    """Strip what does not belong in a distributed workbook: cached printer drivers, the empty Power Query
+    (DataMashup) stub, the author names and the SharePoint path Excel cached in the package."""
+    import glob, datetime
+    # printer settings: drop the parts, their relationships and the r:id on each <pageSetup>
+    for rels in glob.glob(P('xl/worksheets/_rels/*.rels')):
+        r = open(rels, encoding='utf-8').read()
+        ids = re.findall(r'<Relationship Id="(rId\d+)"[^>]*Target="\.\./printerSettings/[^"]*"/>', r)
+        if not ids: continue
+        r = re.sub(r'<Relationship [^>]*Target="\.\./printerSettings/[^"]*"/>', '', r)
+        sheet = 'xl/worksheets/' + os.path.basename(rels)[:-5]
+        x = rd(sheet)
+        for i in ids: x = re.sub(r'(<pageSetup[^>]*?) r:id="%s"' % i, r'\1', x)
+        wr(sheet, x)
+        if '<Relationship ' in r: open(rels, 'w', encoding='utf-8').write(r)
+        else: os.remove(rels)
+    if os.path.isdir(P('xl/printerSettings')): shutil.rmtree(P('xl/printerSettings'))
+    ct = rd('[Content_Types].xml')
+    ct = re.sub(r'<Default Extension="bin" ContentType="[^"]*printerSettings"/>', '', ct)
+    # Power Query stub (customXml DataMashup with no queries)
+    if os.path.isdir(P('customXml')):
+        shutil.rmtree(P('customXml'))
+        ct = re.sub(r'<Override PartName="/customXml/[^"]*"[^>]*/>', '', ct)
+        r = rd('xl/_rels/workbook.xml.rels'); r = re.sub(r'<Relationship [^>]*Target="\.\./customXml/[^"]*"/>', '', r); wr('xl/_rels/workbook.xml.rels', r)
+    wr('[Content_Types].xml', ct)
+    # cached SharePoint path of the last save
+    w = rd('xl/workbook.xml')
+    w = re.sub(r'<mc:AlternateContent[^>]*><mc:Choice Requires="x15"><x15ac:absPath [^>]*/></mc:Choice></mc:AlternateContent>', '', w)
+    wr('xl/workbook.xml', w)
+    # document properties: organisation names instead of individuals, modified date = build date
+    c = rd('docProps/core.xml')
+    c = re.sub(r'<dc:creator>[^<]*</dc:creator>', '<dc:creator>TDOT Aeronautics Division / Applied Research Associates</dc:creator>', c)
+    c = re.sub(r'<cp:lastModifiedBy>[^<]*</cp:lastModifiedBy>', '<cp:lastModifiedBy>ARA</cp:lastModifiedBy>', c)
+    c = re.sub(r'<dcterms:modified xsi:type="dcterms:W3CDTF">[^<]*</dcterms:modified>',
+               '<dcterms:modified xsi:type="dcterms:W3CDTF">%s</dcterms:modified>' % datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'), c)
+    wr('docProps/core.xml', c)
+    a = rd('docProps/app.xml')
+    a = re.sub(r'<Company>[^<]*</Company>', '<Company>TDOT Aeronautics Division</Company>', a) if '<Company>' in a else a.replace('</Properties>', '<Company>TDOT Aeronautics Division</Company></Properties>')
+    wr('docProps/app.xml', a)
 
 if __name__ == '__main__':
     main(sys.argv[1], sys.argv[2], mbt_mode=('--mbt' in sys.argv))
