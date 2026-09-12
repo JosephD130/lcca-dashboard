@@ -275,7 +275,7 @@ table(s, [
   ['Decision workbook, full recalculation', '47,265 formulas, 0 errors'],
   ['Decision workbook against an independent engine', 'NPW, categories, break-evens, sensitivity, tornado, 12 scenarios and the decision map agree to the dollar'],
   ['New Summary sheet on the MBT data', 'Table, verdict, categories and closure days match; six charts render; template reads "No alternatives yet" with no errors'],
-  ['Scripted click-through (LibreOffice API)', 'Buttons land where they should; 7% flips the verdict as flagged; 20 years drops late closures; unknown airport gives $0 lost revenue with a warning, no errors'],
+  ['Scripted click-through (LibreOffice API)', 'Buttons land where they should; 7% flips the verdict as flagged; 20 years drops late closures; unknown airport gives $0 lost revenue with a warning; deleting an alternative shifts the table with no #REF!; ties and four alternatives read cleanly'],
   ['Not yet verified', 'The alternative-sheet charts in Excel itself (no Excel here); a first-open check is in the notes'],
 ], 0.5, 1.2, 9.0, [3.4, 5.6], 10);
 s.addNotes('The first-open check: pick an airport, set Yes, add one HMA and one PCC alternative, confirm Summary and Alt sheet columns L:N.');

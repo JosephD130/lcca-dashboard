@@ -59,9 +59,11 @@ def build_scratch(path):
     hdr(3, 7, ['Worksheet', 'Alternative', 'Type', 'Initial construction', 'Maintenance PW', 'Rehabilitation PW', 'Lost revenue PW', 'Salvage PW', 'Net present worth', 'vs. lowest NPW', 'Closure days in period', 'Runway availability'])
     for i in range(NALT):
         r = 4 + i; dbr = 4 + i; g = f'$G{r}'
-        ws.cell(r, 7, f'=IF(Database!$D${dbr}="","",Database!$D${dbr})')
-        ws.cell(r, 8, f'=IF({g}="","",Database!$A${dbr})')
-        ws.cell(r, 9, f'=IF({g}="","",Database!$B${dbr})')
+        # INDEX on whole columns: the VBA deletes Database rows when an alternative is removed, and a fixed
+        # cell reference (Database!$D$4) would turn into #REF! in Excel; INDEX(...,row) survives the deletion.
+        ws.cell(r, 7, f'=IF(INDEX(Database!$D:$D,{dbr})="","",INDEX(Database!$D:$D,{dbr}))')
+        ws.cell(r, 8, f'=IF({g}="","",INDEX(Database!$A:$A,{dbr}))')
+        ws.cell(r, 9, f'=IF({g}="","",INDEX(Database!$B:$B,{dbr}))')
         B, C, D, E = rng(g, 'B'), rng(g, 'C'), rng(g, 'D'), rng(g, 'E')
         ws.cell(r, 10, f'=IF({g}="","",IFERROR(INDEX(INDIRECT("\'"&{g}&"\'!$G$1:$G$70"),MATCH("Total",INDIRECT("\'"&{g}&"\'!$A$1:$A$70"),0)),0))')
         ws.cell(r, 11, f'=IF({g}="","",IFERROR(SUMIFS({E},{B},"Maintenance*",{B},"<>*Indirect*"),0))')
@@ -78,7 +80,7 @@ def build_scratch(path):
         for c in range(7, 19): ws.cell(r, c).font = F_B; ws.cell(r, c).border = BOX
     S7 = f'${L(DC+1)}${12+20}:${L(DC+NALT)}${12+20}'  # 7.00% row of the sensitivity data block
     ws['G9'] = (f'=IF(COUNT($O$4:$O$7)=0,"No alternatives yet. Go to General Information and click Alternative Setup.",'
-                f'"Lowest present worth: "&INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))&IF(COUNT($O$4:$O$7)<2,"   |   only one alternative so far","   |   margin to next: "&TEXT(SMALL($O$4:$O$7,2)-MIN($O$4:$O$7),"$#,##0"))'
+                f'"Lowest present worth: "&INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))&IF(COUNT($O$4:$O$7)<2,"   |   only one alternative so far",IF(SMALL($O$4:$O$7,2)=MIN($O$4:$O$7),"   |   tied with the next alternative","   |   margin to next: "&TEXT(SMALL($O$4:$O$7,2)-MIN($O$4:$O$7),"$#,##0")))'
                 f'&"   |   "&{GI}!$D$34&"% over "&{GI}!$D$33&" years   |   lost revenue: "&{GI}!$D$38)')
     ws['G9'].font = F_H; ws['G9'].fill = FILL_VERDICT
     for c in range(8, 19): ws.cell(9, c).fill = FILL_VERDICT

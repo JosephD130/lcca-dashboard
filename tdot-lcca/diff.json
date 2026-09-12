@@ -2438,17 +2438,17 @@
    {
     "cell": "G4",
     "before": null,
-    "after": "=IF(Database!$D$4=\"\",\"\",Database!$D$4)"
+    "after": "=IF(INDEX(Database!$D:$D,4)=\"\",\"\",INDEX(Database!$D:$D,4))"
    },
    {
     "cell": "H4",
     "before": null,
-    "after": "=IF($G4=\"\",\"\",Database!$A$4)"
+    "after": "=IF($G4=\"\",\"\",INDEX(Database!$A:$A,4))"
    },
    {
     "cell": "I4",
     "before": null,
-    "after": "=IF($G4=\"\",\"\",Database!$B$4)"
+    "after": "=IF($G4=\"\",\"\",INDEX(Database!$B:$B,4))"
    },
    {
     "cell": "J4",
@@ -2523,17 +2523,17 @@
    {
     "cell": "G5",
     "before": null,
-    "after": "=IF(Database!$D$5=\"\",\"\",Database!$D$5)"
+    "after": "=IF(INDEX(Database!$D:$D,5)=\"\",\"\",INDEX(Database!$D:$D,5))"
    },
    {
     "cell": "H5",
     "before": null,
-    "after": "=IF($G5=\"\",\"\",Database!$A$5)"
+    "after": "=IF($G5=\"\",\"\",INDEX(Database!$A:$A,5))"
    },
    {
     "cell": "I5",
     "before": null,
-    "after": "=IF($G5=\"\",\"\",Database!$B$5)"
+    "after": "=IF($G5=\"\",\"\",INDEX(Database!$B:$B,5))"
    },
    {
     "cell": "J5",
@@ -2608,17 +2608,17 @@
    {
     "cell": "G6",
     "before": null,
-    "after": "=IF(Database!$D$6=\"\",\"\",Database!$D$6)"
+    "after": "=IF(INDEX(Database!$D:$D,6)=\"\",\"\",INDEX(Database!$D:$D,6))"
    },
    {
     "cell": "H6",
     "before": null,
-    "after": "=IF($G6=\"\",\"\",Database!$A$6)"
+    "after": "=IF($G6=\"\",\"\",INDEX(Database!$A:$A,6))"
    },
    {
     "cell": "I6",
     "before": null,
-    "after": "=IF($G6=\"\",\"\",Database!$B$6)"
+    "after": "=IF($G6=\"\",\"\",INDEX(Database!$B:$B,6))"
    },
    {
     "cell": "J6",
@@ -2693,17 +2693,17 @@
    {
     "cell": "G7",
     "before": null,
-    "after": "=IF(Database!$D$7=\"\",\"\",Database!$D$7)"
+    "after": "=IF(INDEX(Database!$D:$D,7)=\"\",\"\",INDEX(Database!$D:$D,7))"
    },
    {
     "cell": "H7",
     "before": null,
-    "after": "=IF($G7=\"\",\"\",Database!$A$7)"
+    "after": "=IF($G7=\"\",\"\",INDEX(Database!$A:$A,7))"
    },
    {
     "cell": "I7",
     "before": null,
-    "after": "=IF($G7=\"\",\"\",Database!$B$7)"
+    "after": "=IF($G7=\"\",\"\",INDEX(Database!$B:$B,7))"
    },
    {
     "cell": "J7",
@@ -2803,7 +2803,7 @@
    {
     "cell": "G9",
     "before": null,
-    "after": "=IF(COUNT($O$4:$O$7)=0,\"No alternatives yet. Go to General Information and click Alternative Setup.\",\"Lowest present worth: \"&INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))&IF(COUNT($O$4:$O$7)<2,\"   |   only one alternative so far\",\"   |   margin to next: \"&TEXT(SMALL($O$4:$O$7,2)-MIN($O$4:$O$7),\"$#,##0\"))&\"   |   \"&'General Information'!$D$34&\"% over \"&'General Information'!$D$33&\" years   |   lost revenue: \"&'General Information'!$D$38)"
+    "after": "=IF(COUNT($O$4:$O$7)=0,\"No alternatives yet. Go to General Information and click Alternative Setup.\",\"Lowest present worth: \"&INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))&IF(COUNT($O$4:$O$7)<2,\"   |   only one alternative so far\",IF(SMALL($O$4:$O$7,2)=MIN($O$4:$O$7),\"   |   tied with the next alternative\",\"   |   margin to next: \"&TEXT(SMALL($O$4:$O$7,2)-MIN($O$4:$O$7),\"$#,##0\")))&\"   |   \"&'General Information'!$D$34&\"% over \"&'General Information'!$D$33&\" years   |   lost revenue: \"&'General Information'!$D$38)"
    },
    {
     "cell": "W9",
@@ -5805,11 +5805,16 @@
    8,
    "5. Go to the worksheet for each alternative included in the LCCA and fill in cells C4 through C8, and F4 through F10 (for analyses accounting for indirect costs). Select the appropriate pay items in cells C13 through C22 for the alternative (only select the cells you need; leave extra cells blank). Enter the quantities for each selected pay item in cells E13 through E22.",
    "5. Go to the worksheet for each alternative included in the LCCA and fill in cells C4 through C8, and F4 through F10 (for analyses accounting for indirect costs). Select the appropriate pay items in cells C13 through C22 for the alternative (only select the cells you need; leave extra cells blank). Enter the quantities for each selected pay item in cells E13 through E22. Closure durations in cells F4 through F10 are pre-filled from production-rate defaults (surface treatment 15,000 SY/day, mill and overlay 3,800 SY/day, PCC joint and slab work) and may be overridden with project-specific values."
+  ],
+  [
+   9,
+   "6. Once the pay items and quantities have been filled in, the Net Present Worth (NPW) table and summary graph below the pay items should be automatically filled in for the alternative. The \u201cSummary\u201d worksheet will also automatically fill with alternative costs as the individual alternative worksheets are completed. The Summary worksheet provides a summary table and chart for the initial construction cost and NPW for each included alternative.",
+   "6. Once the pay items and quantities have been filled in, the Net Present Worth (NPW) table and summary graph below the pay items should be automatically filled in for the alternative. The \u201cSummary\u201d worksheet will also automatically fill with alternative costs as the individual alternative worksheets are completed. The Summary worksheet shows a results table for each alternative (initial construction, maintenance, rehabilitation, lost revenue and salvage present worth, net present worth, closure days), a line naming the lowest-cost alternative and whether it still wins at the FAA AIP rate of 7%, and five charts. It updates by itself whenever an input changes. Use the \"View Summary\" button under Alternative Setup to open it and the buttons at the top of the Summary to return."
   ]
  ],
  "hashes": {
   "8eaa2547-TDOA_LCCA_Framework_v1.1.2_ARA_Task2_08182026.xlsm": "b0680f2a90e86654a5d7e57eb29ae45e960ddf7b517ccb65bc2978afaee4705a",
-  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "658bc324ab1f46e5e5f59e92317c991c7e6c3bcc926238123ca95bf98759ccc8",
+  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "c60aaf177ceac3c8011b1d896a84bfe39ee2cb1d9f93d660151449ad37ab4af4",
   "TDOT_LCCA_Decision_Workbook.xlsx": "27626ed0e58784a85c3894dcd7cafc8108c0576d5db7acd7eb47e0c5a34ed658",
   "Output.bas": "7e7e1cad7c0d41cc23d929d643a2e4ce5861761c2885f82e9a0b0757a0a8fd82",
   "35f08cad-TDOA_LCCA_Framework_v1.1.2_MBT_20260521_LostRevenue_1.xlsm": "117135e9facc9395b88883c3ffd4de48b67cb997605d6ad0a1acd7d64edfb08b",

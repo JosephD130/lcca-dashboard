@@ -9,15 +9,15 @@
  ],
  [
   "G4",
-  "=IF(Database!$D$4=\"\",\"\",Database!$D$4)"
+  "=IF(INDEX(Database!$D:$D,4)=\"\",\"\",INDEX(Database!$D:$D,4))"
  ],
  [
   "H4",
-  "=IF($G4=\"\",\"\",Database!$A$4)"
+  "=IF($G4=\"\",\"\",INDEX(Database!$A:$A,4))"
  ],
  [
   "I4",
-  "=IF($G4=\"\",\"\",Database!$B$4)"
+  "=IF($G4=\"\",\"\",INDEX(Database!$B:$B,4))"
  ],
  [
   "J4",
@@ -57,7 +57,7 @@
  ],
  [
   "G9",
-  "=IF(COUNT($O$4:$O$7)=0,\"No alternatives yet. Go to General Information and click Alternative Setup.\",\"Lowest present worth: \"&INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))&IF(COUNT($O$4:$O$7)<2,\"   |   only one alternative so far\",\"   |   margin to next: \"&TEXT(SMALL($O$4:$O$7,2)-MIN($O$4:$O$7),\"$#,##0\"))&\"   |   \"&'General Information'!$D$34&\"% over \"&'General Information'!$D$33&\" years   |   lost revenue: \"&'General Information'!$D$38)"
+  "=IF(COUNT($O$4:$O$7)=0,\"No alternatives yet. Go to General Information and click Alternative Setup.\",\"Lowest present worth: \"&INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))&IF(COUNT($O$4:$O$7)<2,\"   |   only one alternative so far\",IF(SMALL($O$4:$O$7,2)=MIN($O$4:$O$7),\"   |   tied with the next alternative\",\"   |   margin to next: \"&TEXT(SMALL($O$4:$O$7,2)-MIN($O$4:$O$7),\"$#,##0\")))&\"   |   \"&'General Information'!$D$34&\"% over \"&'General Information'!$D$33&\" years   |   lost revenue: \"&'General Information'!$D$38)"
  ],
  [
   "G10",

@@ -44,7 +44,10 @@ populates it with no further steps:
   rehabilitation PW, lost revenue PW, salvage PW, net present worth, difference to the lowest,
   closure days in the analysis period, runway availability.
 - Verdict line G9: lowest-cost alternative and its margin to the next (or "only one alternative so
-  far"); G10 flags whether the same alternative is lowest at the FAA AIP rate of 7%.
+  far" / "tied with the next alternative"); G10 flags whether the same alternative is lowest at the
+  FAA AIP rate of 7%.
+- The names come from the hidden Database sheet through INDEX on whole columns, because the VBA
+  deletes a Database row when an alternative is removed; a fixed cell reference would become #REF!.
 - Closure days count only activities inside the analysis period (from the by-year block), so a
   20-year run drops the late maintenance closures; with lost revenue off it falls back to F4:F10.
 - Five charts: 1 present worth by category (stacked, salvage below zero); 2 NPW versus discount
@@ -62,7 +65,9 @@ populates it with no further steps:
 - Instructions text box: ActiveX "blocked content" steps added (Trust Center > ActiveX Settings,
   then restart Excel; contact IT if greyed out); step 1 now says D9:D39; step 2 names the
   "Alternative Setup" button; step 4 rewritten for the hidden RevenueData sheet and the
-  17-airport rule, including how to unhide a sheet; step 5 notes the pre-filled closure days.
+  17-airport rule, including how to unhide a sheet; step 5 notes the pre-filled closure days;
+  step 6 describes the new Summary and the "View Summary" button. The text box was extended
+  (rows 9 to 76) so the longer text is not clipped.
 - Cell notes on D26 and D39 no longer carry a person's name.
 - Two broken external links to files on a C: drive (v1.1.004 and a Savannah copy) removed.
 - Workbook set to fully recalculate on open.
@@ -96,7 +101,12 @@ Scripted click-through done here (LibreOffice, UNO API): every button target exi
 visible sheet; changing D34 to 7 flips the verdict to Alternative 1 (the 7% flag already warned);
 D33 = 20 drops HMA closure days from 57 to 43 and PCC rehabilitation to $0; an airport outside the
 17 gives lost revenue $0 with the warning in G2 and no error cells; one alternative and none both
-read cleanly. Values were not saved.
+read cleanly. A second round emulated the VBA's Database row deletion (Summary shifts up, no
+#REF!), a tie between two alternatives, four alternatives at once, the airport dropdown (79
+entries, no blanks or duplicates), unique pay-item descriptions, and the Summary page setup
+(landscape, one page wide). Values were not saved. A package audit (verification/audit_xml.py)
+checks cell order, style and string counts, relationships, content types and that only one sheet
+is selected on open.
 
 Verification done here (LibreOffice Calc, full recalculation): the template workbook recalculates
 with 2,240 formulas and 0 errors (v1.1.2 shows 99 error cells under the same recalc). The same

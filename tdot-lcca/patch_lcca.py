@@ -214,7 +214,12 @@ def main(src, out, mbt_mode=False):
         set_run(4, lambda t: t.replace('D9 through D38', 'D9 through D39'))
         set_run(5, lambda t: t.replace('“Create Alternatives”', '“Alternative Setup”').replace('"Create Alternatives"', '"Alternative Setup"'))
         set_run(7, lambda t: '4. To include lost airport revenue during runway closures, set cell D38 on the "General Information" worksheet to Yes before creating alternatives. The average daily revenue for the selected airport is pulled automatically from the hidden RevenueData worksheet, which covers the 17 airports meeting Aeronautics\' activity criteria (cell D39 shows the value). If the airport is not in that list, D39 reads "Missing Airport Revenue", lost revenue is carried as $0, and a warning appears on each alternative worksheet; contact Aeronautics to add revenue data. To view the hidden worksheet: Home > Format > Hide & Unhide > Unhide Sheet.')
+        set_run(9, lambda t: t.replace('The Summary worksheet provides a summary table and chart for the initial construction cost and NPW for each included alternative.', 'The Summary worksheet shows a results table for each alternative (initial construction, maintenance, rehabilitation, lost revenue and salvage present worth, net present worth, closure days), a line naming the lowest-cost alternative and whether it still wins at the FAA AIP rate of 7%, and five charts. It updates by itself whenever an input changes. Use the "View Summary" button under Alternative Setup to open it and the buttons at the top of the Summary to return.'))
         set_run(8, lambda t: t + ' Closure durations in cells F4 through F10 are pre-filled from production-rate defaults (surface treatment 15,000 SY/day, mill and overlay 3,800 SY/day, PCC joint and slab work) and may be overridden with project-specific values.')
+        # the text grew by about a third and the box clips overflow (vertOverflow="clip"): extend it from row 59 to row 76
+        assert '<xdr:row>59</xdr:row><xdr:rowOff>114300</xdr:rowOff></xdr:to>' in d
+        d = d.replace('<xdr:row>59</xdr:row><xdr:rowOff>114300</xdr:rowOff></xdr:to>', '<xdr:row>76</xdr:row><xdr:rowOff>114300</xdr:rowOff></xdr:to>')
+        d = d.replace('<a:ext cx="7334250" cy="8210550"/>', '<a:ext cx="7334250" cy="10963275"/>')
         wr('xl/drawings/drawing3.xml', d)
     # --- formula-driven Summary sheet with embedded charts (no VBA import needed)
     if mbt_mode:

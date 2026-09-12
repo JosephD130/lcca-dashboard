@@ -3,7 +3,7 @@ from com.sun.star.beans import PropertyValue
 S='/tmp/claude-0/-home-user-lcca-dashboard/444ca227-15d7-51d4-a51e-a0ae3dbe81ed/scratchpad'
 def pv(n,v):
     p=PropertyValue(); p.Name=n; p.Value=v; return p
-proc=subprocess.Popen(['soffice','--headless','--invisible','--norestore','--nologo','--accept=socket,host=localhost,port=2002;urp;'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+proc=subprocess.Popen(['soffice','-env:UserInstallation=file:///tmp/lo_uno_profile','--headless','--invisible','--norestore','--nologo','--accept=socket,host=localhost,port=2002;urp;'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
 ctx=None
 for i in range(60):
     try:
