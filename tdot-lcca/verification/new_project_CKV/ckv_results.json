@@ -662,7 +662,7 @@
    23.103372872790807,
    0.0,
    "no excavation item",
-   "9\" P401 on 6\" P209 on 8\" P154"
+   ""
   ],
   [
    "Alternative 2",
@@ -673,7 +673,7 @@
    22.99997000015,
    0.0,
    "no excavation item",
-   "9\" P501 on 6\" P209 on 8\" P154"
+   ""
   ]
  ],
  "section_unitweight": 145.0,
@@ -776,7 +776,7 @@
    23.103372872790807,
    0.0,
    "no excavation item",
-   "9\" P401 on 6\" P209 on 8\" P154"
+   ""
   ],
   [
    "Alternative 2",
@@ -787,7 +787,7 @@
    22.99997000015,
    0.0,
    "no excavation item",
-   "9\" P501 on 6\" P209 on 8\" P154"
+   ""
   ]
  ],
  "errors": {}

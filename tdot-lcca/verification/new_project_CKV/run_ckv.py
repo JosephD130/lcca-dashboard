@@ -54,12 +54,12 @@ for r in (4,5):
 out['summary']['G9']=txt(sm,'G9'); out['summary']['G10']=txt(sm,'G10')
 out['summary']['sens']={rate:[num(sm,f'X{r}'),num(sm,f'Y{r}')] for r,rate in [(12,2),(16,3),(24,5),(32,7),(36,8)]}
 out['summary']['byyear']=[(int(num(sm,f'X{r}')),num(sm,f'Y{r}'),num(sm,f'Z{r}'),num(sm,f'AC{r}'),num(sm,f'AD{r}'),num(sm,f'AG{r}'),num(sm,f'AH{r}')) for r in range(41,72)]
-out['section']=[[ (sm.getCellRangeByName(f'{c}{r}').getString() if c in 'GKNO' else num(sm,f'{c}{r}')) for c in 'GHIJKLMNO'] for r in (83,84)]
+out['section']=[[ (sm.getCellRangeByName(f'{c}{r}').getString() if c in 'GKNO' else num(sm,f'{c}{r}')) for c in 'GHIJKLMNP'] for r in (83,84)]
 out['section_unitweight']=num(sm,'J81')
 out['section_chart']=[[ (txt(sm,f'{c}{r}') if c=='W' else num(sm,f'{c}{r}')) for c in ['W','X','Y']] for r in range(75,87)]
 gi.getCellRangeByName('D27').setValue(8000); doc.calculateAll()
 out['section_shoulder']=[[ (txt(sm,f'{c}{r}') if c=='W' else num(sm,f'{c}{r}')) for c in ['W','X','Y']] for r in range(82,87)]
-out['section_shoulder_table']=[[ (sm.getCellRangeByName(f'{c}{r}').getString() if c in 'GKNO' else num(sm,f'{c}{r}')) for c in 'GHIJKLMNO'] for r in (83,84)]
+out['section_shoulder_table']=[[ (sm.getCellRangeByName(f'{c}{r}').getString() if c in 'GKNO' else num(sm,f'{c}{r}')) for c in 'GHIJKLMNP'] for r in (83,84)]
 gi.getCellRangeByName('D27').setValue(0); doc.calculateAll()
 out['summary']['catsum']=[sum(num(sm,f'{c}{k}') for k in range(5,10)) for c in 'XY']
 out['summary']['AtoE']=[[txt(sm,f'{c}{r}') if c in 'ABE' else num(sm,f'{c}{r}') for c in 'ABCDE'] for r in (4,5)]
