@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #8A8F98; font-family: Arial, Helvetica, sans-serif; color: #1D2733; }
+    a { color: #2A78D6; } a:hover { color: #1D5BA6; }
+    .panel { background: #FFFFFF; min-height: 100%; box-sizing: border-box; padding: 0 0 14px; display: flex; flex-direction: column; }
+    .band { background: #1D2733; color: #FFFFFF; font-weight: bold; font-size: 13px; padding: 7px 16px; letter-spacing: .02em; }
+    .sub { background: #EAF2FB; color: #1D2733; font-size: 11.5px; padding: 6px 16px; line-height: 1.5; }
+    .cols { display: flex; gap: 28px; padding: 14px 16px 0; }
+    .col { flex: 1 1 0; min-width: 0; }
+    .col h3 { margin: 0 0 8px; font-size: 13px; font-weight: bold; }
+    .col h3 span { font-weight: normal; color: #595959; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #BFBFBF; padding: 3px 6px; font-size: 11px; text-align: left; }
+    th { background: #D9D9D9; font-weight: bold; }
+    td.n { text-align: right; }
+    td.t { text-align: right; font-weight: bold; }
+    .foot { padding: 12px 16px 0; font-size: 11.5px; color: #1D2733; line-height: 1.55; }
+    .foot b { font-weight: bold; }
+    .foot code { font-family: Consolas, "Courier New", monospace; font-size: 11px; background: #F2F3F5; padding: 1px 4px; }
+    .flag { margin-top: 8px; background: #FFF3CD; color: #7F6000; padding: 7px 10px; font-size: 11.5px; line-height: 1.5; }
+  </style>
+</helmet>
+<div class="panel">
+
+  <div class="band">PAVEMENT SECTION &mdash; what the quantities add up to</div>
+  <div class="sub">There is no thickness input in the workbook. Each layer's thickness falls out of the quantity entered against the mainline area, so it can be read back and drawn without asking the user for anything new. Outlaw Field (CKV), 66,667 S.Y. mainline.</div>
+
+  <div class="cols">
+
+    <div class="col">
+      <h3>Alternative 1 &mdash; New HMA <span>&nbsp; 9&Prime; P-401 on 6&Prime; P-209</span></h3>
+      <svg viewBox="0 0 540 400" width="540" height="400" role="img">
+        <defs>
+          <pattern id="lime" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="8" height="8" fill="#A79B86"></rect>
+            <line x1="0" y1="0" x2="0" y2="8" stroke="#8D8271" stroke-width="2"></line>
+          </pattern>
+        </defs>
+        <rect x="20" y="10" width="330" height="57" fill="#2F3437"></rect>
+        <rect x="20" y="67" width="330" height="71" fill="#4A5055"></rect>
+        <rect x="20" y="138" width="330" height="84" fill="#C8A96E"></rect>
+        <rect x="20" y="222" width="330" height="112" fill="#DCCBA0"></rect>
+        <rect x="20" y="334" width="330" height="34" fill="url(#lime)"></rect>
+        <rect x="20" y="10" width="330" height="358" fill="none" stroke="#6B7280"></rect>
+        <line x1="20" y1="380" x2="350" y2="380" stroke="#8A8272" stroke-width="2" stroke-dasharray="6 4"></line>
+        <text x="24" y="394" font-size="10" fill="#595959">existing subgrade</text>
+
+        <line x1="350" y1="38" x2="372" y2="38" stroke="#9AA0A6"></line>
+        <text x="378" y="35" font-size="11.5" fill="#1D2733" font-weight="bold">4.05&Prime;</text>
+        <text x="378" y="48" font-size="10.5" fill="#595959">P-401 Asphalt Surface Course</text>
+
+        <line x1="350" y1="102" x2="372" y2="102" stroke="#9AA0A6"></line>
+        <text x="378" y="99" font-size="11.5" fill="#1D2733" font-weight="bold">5.06&Prime;</text>
+        <text x="378" y="112" font-size="10.5" fill="#595959">P-401 Asphalt Base Course</text>
+
+        <line x1="350" y1="180" x2="372" y2="180" stroke="#9AA0A6"></line>
+        <text x="378" y="177" font-size="11.5" fill="#1D2733" font-weight="bold">6.00&Prime;</text>
+        <text x="378" y="190" font-size="10.5" fill="#595959">P-209 Crushed Aggregate Base</text>
+
+        <line x1="350" y1="278" x2="372" y2="278" stroke="#9AA0A6"></line>
+        <text x="378" y="275" font-size="11.5" fill="#1D2733" font-weight="bold">8.00&Prime;</text>
+        <text x="378" y="288" font-size="10.5" fill="#595959">P-154 Subbase Course</text>
+
+        <line x1="350" y1="351" x2="372" y2="351" stroke="#9AA0A6"></line>
+        <text x="378" y="348" font-size="11.5" fill="#1D2733" font-weight="bold">by area</text>
+        <text x="378" y="361" font-size="10.5" fill="#595959">P-155 Lime Treated Subgrade</text>
+      </svg>
+
+      <table>
+        <tr><th>Pay item</th><th>Quantity</th><th>Thickness</th></tr>
+        <tr><td>P-401 Asphalt Surface Course</td><td class="n">14,667 TON</td><td class="t">4.05&Prime;</td></tr>
+        <tr><td>P-401 Asphalt Base Course</td><td class="n">18,333 TON</td><td class="t">5.06&Prime;</td></tr>
+        <tr><td>P-209 Crushed Aggregate Base Course</td><td class="n">11,111 C.Y.</td><td class="t">6.00&Prime;</td></tr>
+        <tr><td>P-154 Subbase Course</td><td class="n">14,815 C.Y.</td><td class="t">8.00&Prime;</td></tr>
+        <tr><td>P-155 Lime Treated Subgrade</td><td class="n">66,667 S.Y.</td><td class="t">by area</td></tr>
+      </table>
+    </div>
+
+    <div class="col">
+      <h3>Alternative 2 &mdash; New PCC <span>&nbsp; 9&Prime; P-501 on 6&Prime; P-209</span></h3>
+      <svg viewBox="0 0 540 400" width="540" height="400" role="img">
+        <defs>
+          <pattern id="lime2" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="8" height="8" fill="#A79B86"></rect>
+            <line x1="0" y1="0" x2="0" y2="8" stroke="#8D8271" stroke-width="2"></line>
+          </pattern>
+        </defs>
+        <rect x="20" y="10" width="330" height="126" fill="#C6CBD0"></rect>
+        <line x1="130" y1="10" x2="130" y2="136" stroke="#8F969C" stroke-width="2"></line>
+        <line x1="240" y1="10" x2="240" y2="136" stroke="#8F969C" stroke-width="2"></line>
+        <rect x="20" y="136" width="330" height="84" fill="#C8A96E"></rect>
+        <rect x="20" y="220" width="330" height="112" fill="#DCCBA0"></rect>
+        <rect x="20" y="332" width="330" height="34" fill="url(#lime2)"></rect>
+        <rect x="20" y="10" width="330" height="356" fill="none" stroke="#6B7280"></rect>
+        <line x1="20" y1="380" x2="350" y2="380" stroke="#8A8272" stroke-width="2" stroke-dasharray="6 4"></line>
+        <text x="24" y="394" font-size="10" fill="#595959">existing subgrade</text>
+        <text x="60" y="26" font-size="10" fill="#6B7280">joints</text>
+
+        <line x1="350" y1="73" x2="372" y2="73" stroke="#9AA0A6"></line>
+        <text x="378" y="70" font-size="11.5" fill="#1D2733" font-weight="bold">9.00&Prime;</text>
+        <text x="378" y="83" font-size="10.5" fill="#595959">P-501 Concrete Pavement, 9-inch</text>
+
+        <line x1="350" y1="178" x2="372" y2="178" stroke="#9AA0A6"></line>
+        <text x="378" y="175" font-size="11.5" fill="#1D2733" font-weight="bold">6.00&Prime;</text>
+        <text x="378" y="188" font-size="10.5" fill="#595959">P-209 Crushed Aggregate Base</text>
+
+        <line x1="350" y1="276" x2="372" y2="276" stroke="#9AA0A6"></line>
+        <text x="378" y="273" font-size="11.5" fill="#1D2733" font-weight="bold">8.00&Prime;</text>
+        <text x="378" y="286" font-size="10.5" fill="#595959">P-154 Subbase Course</text>
+
+        <line x1="350" y1="349" x2="372" y2="349" stroke="#9AA0A6"></line>
+        <text x="378" y="346" font-size="11.5" fill="#1D2733" font-weight="bold">by area</text>
+        <text x="378" y="359" font-size="10.5" fill="#595959">P-155 Lime Treated Subgrade</text>
+      </svg>
+
+      <table>
+        <tr><th>Pay item</th><th>Quantity</th><th>Thickness</th></tr>
+        <tr><td>P-501 Concrete Pavement, 9-inch</td><td class="n">66,667 S.Y.</td><td class="t">9.00&Prime;</td></tr>
+        <tr><td>P-209 Crushed Aggregate Base Course</td><td class="n">11,111 C.Y.</td><td class="t">6.00&Prime;</td></tr>
+        <tr><td>P-154 Subbase Course</td><td class="n">14,815 C.Y.</td><td class="t">8.00&Prime;</td></tr>
+        <tr><td>P-155 Lime Treated Subgrade</td><td class="n">66,667 S.Y.</td><td class="t">by area</td></tr>
+        <tr><td colspan="3" style="border: none; padding-top: 8px; color: #595959; font-style: italic;">Concrete is the one material whose pay item names its own thickness.</td></tr>
+      </table>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <b>How each thickness is read back.</b>&nbsp; Volume items: <code>inches = C.Y. &times; 27 &times; 12 / (mainline S.Y. &times; 9)</code>. Asphalt by weight: <code>inches = TON &times; 2000 / 145 pcf &times; 12 / (mainline S.Y. &times; 9)</code>. Items measured by area carry no implied thickness.
+    <br><b>Checked against the completed runs.</b>&nbsp; Murfreesboro's quantities read back as 5.00&Prime; P-401 on 16.00&Prime; P-209, exactly the section typed into its Alternative Description, and 145 pcf is the unit weight that reproduces it to the hundredth of an inch.
+    <div class="flag"><b>Worth a look:</b> the Murfreesboro concrete alternative is described as 8&Prime; P-501 but priced on the 9-inch pay item. There is no 8-inch item in the list, so the estimate carries 9&Prime;. A read-back like this one would have caught it.</div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

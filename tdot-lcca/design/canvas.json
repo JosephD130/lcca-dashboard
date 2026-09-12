@@ -21,7 +21,7 @@
       "file": "AltSheet.dc.html",
       "title": "Alternative worksheet (v1.2.0)",
       "x": 0,
-      "y": 1320,
+      "y": 1380,
       "w": 1340,
       "h": 420
     },
@@ -29,7 +29,7 @@
       "file": "TypicalValues.dc.html",
       "title": "Typical Values (new sheet)",
       "x": 1480,
-      "y": 1320,
+      "y": 1380,
       "w": 1450,
       "h": 520
     },
@@ -37,7 +37,7 @@
       "file": "BeforeGeneralInfo.dc.html",
       "title": "General Information (v1.1.2)",
       "x": 0,
-      "y": 1900,
+      "y": 2080,
       "w": 1210,
       "h": 920
     },
@@ -45,9 +45,17 @@
       "file": "BeforeSummary.dc.html",
       "title": "Summary (v1.1.2)",
       "x": 1330,
-      "y": 1900,
+      "y": 2080,
       "w": 900,
       "h": 460
+    },
+    {
+      "file": "PavementSection.dc.html",
+      "title": "Pavement section (proposed read-back)",
+      "x": 3050,
+      "y": 1380,
+      "w": 1160,
+      "h": 640
     }
   ],
   "annotations": [
@@ -68,16 +76,23 @@
     {
       "id": "support-note",
       "x": 0,
-      "y": 1180,
+      "y": 1240,
       "w": 760,
       "text": "Every alternative worksheet gets a way back to the form and the Summary. Typical Values is a new reference sheet: workbook defaults beside recent bid prices, a source on every row."
     },
     {
       "id": "before-label",
       "x": 0,
-      "y": 1830,
+      "y": 1950,
       "w": 520,
       "text": "v1.1.2 - what it looks like today\nNo guidance on the form, and a Summary of five columns and one chart."
+    },
+    {
+      "id": "section-note",
+      "x": 3050,
+      "y": 1240,
+      "w": 760,
+      "text": "Asked for: the pavement structure. There is no thickness input - it falls out of each quantity against the mainline area, so it can be drawn from what is already entered."
     }
   ],
   "launch": {
