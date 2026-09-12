@@ -19,7 +19,7 @@
     .rh::before { content: counter(row); }
     .colstrip .rh::before { content: ""; }
     .c { display: flex; align-items: center; padding: 0 5px; box-sizing: border-box; font-size: 12px; line-height: 1.15; overflow: hidden; white-space: nowrap; flex: none; }
-    .wA { width: 120px; } .wB { width: 165px; } .wC { width: 95px; } .wD { width: 95px; } .wE { width: 190px; }
+    .wA { width: 165px; } .wB { width: 120px; } .wC { width: 95px; } .wD { width: 95px; } .wE { width: 190px; }
     .wF { width: 16px; } .wG { width: 120px; } .wH { width: 118px; } .wI { width: 78px; }
     .wJ { width: 96px; } .wK { width: 96px; } .wL { width: 96px; } .wM { width: 92px; } .wN { width: 88px; }
     .wO { width: 100px; } .wP { width: 92px; } .wQ { width: 78px; } .wR { width: 88px; }
@@ -28,12 +28,12 @@
     .cell { border: 1px solid #BFBFBF; }
     .low { background: #DDEBF7; color: #1F3864; font-weight: bold; }
     .verdict { background: #EAF2FB; font-weight: bold; font-size: 12px; }
-    .note { color: #595959; font-style: italic; font-size: 10.5px; }
+    .note { color: #595959; font-style: italic; font-size: 10.5px; white-space: normal; line-height: 1.25; }
     .title { font-weight: bold; font-size: 14px; }
     .btn { background: #1D2733; color: #FFFFFF; font-weight: bold; font-size: 12px; justify-content: center; }
     .btn.blue { background: #2A78D6; }
-    .charts { display: grid; grid-template-columns: 600px 600px; gap: 26px 30px; padding: 6px 0 0 6px; }
-    .chart { border: 1px solid #D4D8DD; background: #FFFFFF; padding: 8px 10px 6px; }
+    .charts { display: grid; grid-template-columns: 560px 560px; gap: 28px; padding: 6px 0 0 0; }
+    .chart { box-sizing: border-box; border: 1px solid #D4D8DD; background: #FFFFFF; padding: 8px 10px 6px; }
     .chart h4 { margin: 0 0 2px; font-size: 13px; text-align: center; line-height: 1.25; }
     .chart .lg { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; font-size: 9.5px; color: #3C4450; margin-top: 3px; }
     .chart .lg i { display: inline-block; width: 8px; height: 8px; margin-right: 3px; }
@@ -64,29 +64,29 @@
     <div class="r">
       <div class="rh"></div>
       <div class="c wA"></div><div class="c wB"></div><div class="c wC"></div><div class="c wD"></div><div class="c wE"></div><div class="c wF"></div>
-      <div class="c note" style="width: 1000px;">Everything from this column onward calculates from the alternative worksheets and updates by itself. Columns A:E and "Chart 1" are written by the Alternative Setup form as before.</div>
+      <div class="c note" style="width: 1000px;">Everything from this column onward calculates from the alternative worksheets and updates by itself. Columns A:E and the Alternatives Comparison chart are written by the Alternative Setup form as before.</div>
     </div>
 
-    <div class="r" style="height: 34px;">
+    <div class="r" style="height: 44px;">
       <div class="rh"></div>
-      <div class="c wA hdr" style="height: 34px;">Alternative</div>
-      <div class="c wB hdr" style="height: 34px;">Name</div>
-      <div class="c wC hdr" style="height: 34px;">Initial Construction</div>
-      <div class="c wD hdr" style="height: 34px;">Present Worth</div>
-      <div class="c wE hdr" style="height: 34px;">Alternative Description</div>
+      <div class="c wA hdr" style="height: 44px;">Alternative</div>
+      <div class="c wB hdr" style="height: 44px;">Name</div>
+      <div class="c wC hdr" style="height: 44px;">Initial Construction</div>
+      <div class="c wD hdr" style="height: 44px;">Present Worth</div>
+      <div class="c wE hdr" style="height: 44px;">Alternative Description</div>
       <div class="c wF"></div>
-      <div class="c wG hdr" style="height: 34px;">Worksheet</div>
-      <div class="c wH hdr" style="height: 34px;">Alternative</div>
-      <div class="c wI hdr" style="height: 34px;">Type</div>
-      <div class="c wJ hdr" style="height: 34px;">Initial construction</div>
-      <div class="c wK hdr" style="height: 34px;">Maintenance PW</div>
-      <div class="c wL hdr" style="height: 34px;">Rehabilitation PW</div>
-      <div class="c wM hdr" style="height: 34px;">Lost revenue PW</div>
-      <div class="c wN hdr" style="height: 34px;">Salvage PW</div>
-      <div class="c wO hdr" style="height: 34px;">Net present worth</div>
-      <div class="c wP hdr" style="height: 34px;">vs. lowest NPW</div>
-      <div class="c wQ hdr" style="height: 34px;">Closure days in period</div>
-      <div class="c wR hdr" style="height: 34px;">Runway availability</div>
+      <div class="c wG hdr" style="height: 44px;">Worksheet</div>
+      <div class="c wH hdr" style="height: 44px;">Alternative</div>
+      <div class="c wI hdr" style="height: 44px;">Type</div>
+      <div class="c wJ hdr" style="height: 44px;">Initial construction</div>
+      <div class="c wK hdr" style="height: 44px;">Maintenance PW</div>
+      <div class="c wL hdr" style="height: 44px;">Rehabilitation PW</div>
+      <div class="c wM hdr" style="height: 44px;">Lost revenue PW</div>
+      <div class="c wN hdr" style="height: 44px;">Salvage PW</div>
+      <div class="c wO hdr" style="height: 44px;">Net present worth</div>
+      <div class="c wP hdr" style="height: 44px;">vs. lowest NPW</div>
+      <div class="c wQ hdr" style="height: 44px;">Closure days in period</div>
+      <div class="c wR hdr" style="height: 44px;">Runway availability</div>
     </div>
 
     <div class="r">
@@ -147,19 +147,19 @@
       <div class="c title" style="width: 1153px;">COMPARISON  (RealCost layout: agency cost, user cost, total; present worth and equivalent uniform annual cost)</div>
     </div>
 
-    <div class="r" style="height: 30px;">
+    <div class="r" style="height: 40px;">
       <div class="rh"></div>
       <div class="c wA"></div><div class="c wB"></div><div class="c wC"></div><div class="c wD"></div><div class="c wE"></div><div class="c wF"></div>
-      <div class="c wG hdr" style="height: 30px;">Alternative</div>
-      <div class="c wH hdr" style="height: 30px;">Agency cost PW</div>
-      <div class="c wI hdr" style="height: 30px;">Agency EUAC</div>
-      <div class="c wJ hdr" style="height: 30px;">User cost PW (lost revenue)</div>
-      <div class="c wK hdr" style="height: 30px;">User EUAC</div>
-      <div class="c wL hdr" style="height: 30px;">Total PW</div>
-      <div class="c wM hdr" style="height: 30px;">Total EUAC</div>
-      <div class="c wN hdr" style="height: 30px;">vs. lowest ($)</div>
-      <div class="c wO hdr" style="height: 30px;">vs. lowest (%)</div>
-      <div class="c wP hdr" style="height: 30px;">Lowest?</div>
+      <div class="c wG hdr" style="height: 40px;">Alternative</div>
+      <div class="c wH hdr" style="height: 40px;">Agency cost PW</div>
+      <div class="c wI hdr" style="height: 40px;">Agency EUAC</div>
+      <div class="c wJ hdr" style="height: 40px;">User cost PW (lost revenue)</div>
+      <div class="c wK hdr" style="height: 40px;">User EUAC</div>
+      <div class="c wL hdr" style="height: 40px;">Total PW</div>
+      <div class="c wM hdr" style="height: 40px;">Total EUAC</div>
+      <div class="c wN hdr" style="height: 40px;">vs. lowest ($)</div>
+      <div class="c wO hdr" style="height: 40px;">vs. lowest (%)</div>
+      <div class="c wP hdr" style="height: 40px;">Lowest?</div>
     </div>
 
     <div class="r">
@@ -206,12 +206,12 @@
 
     <div class="r" style="height: 700px;">
       <div class="rh" style="height: 700px;"></div>
-      <div class="c" style="width: 585px; height: 700px;"></div>
+      <div class="c" style="width: 681px; height: 700px;"></div>
       <div class="charts">
 
         <div class="chart">
           <h4>1. Present worth by category<br>(salvage below zero)</h4>
-          <svg viewBox="0 0 560 150" width="560" height="150" role="img">
+          <svg viewBox="0 0 560 150" width="536" height="144" role="img">
             <line x1="52" y1="122" x2="548" y2="122" stroke="#C9CED4"></line>
             <text x="46" y="20" font-size="9" fill="#6B7280" text-anchor="end">$10M</text>
             <text x="46" y="72" font-size="9" fill="#6B7280" text-anchor="end">$5M</text>
@@ -219,11 +219,13 @@
             <rect x="120" y="46" width="70" height="76" fill="#4A4A4A"></rect>
             <rect x="120" y="30" width="70" height="16" fill="#8C8C8C"></rect>
             <rect x="120" y="20" width="70" height="10" fill="#646464"></rect>
-            <rect x="120" y="122" width="70" height="4" fill="#DCDCDC"></rect>
+            <rect x="120" y="19" width="70" height="1.3" fill="#B8B6AE"></rect>
+            <rect x="120" y="122" width="70" height="1" fill="#DCDCDC"></rect>
             <rect x="330" y="27" width="70" height="95" fill="#4A4A4A"></rect>
             <rect x="330" y="22" width="70" height="5" fill="#8C8C8C"></rect>
             <rect x="330" y="17" width="70" height="5" fill="#646464"></rect>
-            <rect x="330" y="122" width="70" height="12" fill="#DCDCDC"></rect>
+            <rect x="330" y="16.5" width="70" height="0.5" fill="#B8B6AE"></rect>
+            <rect x="330" y="122" width="70" height="9" fill="#DCDCDC"></rect>
             <text x="155" y="146" font-size="9.5" fill="#3C4450" text-anchor="middle">Alternative 1</text>
             <text x="365" y="146" font-size="9.5" fill="#3C4450" text-anchor="middle">Alternative 2</text>
           </svg>
@@ -232,16 +234,16 @@
 
         <div class="chart">
           <h4>2. Net present worth vs. discount rate<br>(TDOT 3%, FAA 2%, pre-2022 rule 7%)</h4>
-          <svg viewBox="0 0 560 150" width="560" height="150" role="img">
+          <svg viewBox="0 0 560 150" width="536" height="144" role="img">
             <line x1="52" y1="122" x2="548" y2="122" stroke="#C9CED4"></line>
             <text x="46" y="24" font-size="9" fill="#6B7280" text-anchor="end">$10M</text>
             <text x="46" y="80" font-size="9" fill="#6B7280" text-anchor="end">$9M</text>
             <polyline points="60,22 140,44 220,63 300,80 380,95 460,108 540,118" fill="none" stroke="#4472C4" stroke-width="2"></polyline>
             <polyline points="60,72 140,70 220,69 300,68 380,68 460,69 540,70" fill="none" stroke="#ED7D31" stroke-width="2"></polyline>
             <line x1="140" y1="12" x2="140" y2="122" stroke="#B9C0C8" stroke-dasharray="3 3"></line>
-            <line x1="300" y1="12" x2="300" y2="122" stroke="#B9C0C8" stroke-dasharray="3 3"></line>
+            <line x1="250" y1="12" x2="250" y2="122" stroke="#B9C0C8" stroke-dasharray="3 3"></line>
             <text x="143" y="20" font-size="9" fill="#6B7280">3% TDOT</text>
-            <text x="303" y="20" font-size="9" fill="#6B7280">5% crossover</text>
+            <text x="253" y="20" font-size="9" fill="#6B7280">4.3% crossover</text>
             <text x="60" y="136" font-size="9" fill="#6B7280">2%</text>
             <text x="534" y="136" font-size="9" fill="#6B7280">8%</text>
           </svg>
@@ -250,7 +252,7 @@
 
         <div class="chart">
           <h4>3. Expenditure stream by<br>calendar year (undiscounted)</h4>
-          <svg viewBox="0 0 560 150" width="560" height="150" role="img">
+          <svg viewBox="0 0 560 150" width="536" height="144" role="img">
             <line x1="52" y1="110" x2="548" y2="110" stroke="#C9CED4"></line>
             <text x="46" y="24" font-size="9" fill="#6B7280" text-anchor="end">$10M</text>
             <text x="46" y="114" font-size="9" fill="#6B7280" text-anchor="end">$0</text>
@@ -275,13 +277,13 @@
 
         <div class="chart">
           <h4>4. Cumulative discounted cost</h4>
-          <svg viewBox="0 0 560 150" width="560" height="150" role="img">
+          <svg viewBox="0 0 560 150" width="536" height="144" role="img">
             <line x1="52" y1="122" x2="548" y2="122" stroke="#C9CED4"></line>
             <text x="46" y="24" font-size="9" fill="#6B7280" text-anchor="end">$10M</text>
             <text x="46" y="76" font-size="9" fill="#6B7280" text-anchor="end">$5M</text>
             <text x="46" y="126" font-size="9" fill="#6B7280" text-anchor="end">$0</text>
-            <polyline points="60,52 140,52 140,48 220,48 220,44 300,44 300,40 340,40 340,30 420,30 420,28 500,28 500,34 540,34" fill="none" stroke="#4472C4" stroke-width="2"></polyline>
-            <polyline points="60,32 330,32 330,28 460,28 460,24 500,24 500,30 540,30" fill="none" stroke="#ED7D31" stroke-width="2"></polyline>
+            <polyline points="60,51 140,51 140,49 200,49 200,47 258,47 258,44 316,44 316,42 374,42 374,33 432,33 432,31 490,31 490,29 524,29 524,26 540,26" fill="none" stroke="#4472C4" stroke-width="2"></polyline>
+            <polyline points="60,33 330,33 330,28 460,28 460,23 524,23 524,32 540,32" fill="none" stroke="#ED7D31" stroke-width="2"></polyline>
             <text x="60" y="140" font-size="9" fill="#6B7280">2028</text>
             <text x="516" y="140" font-size="9" fill="#6B7280">2058</text>
           </svg>
@@ -290,7 +292,7 @@
 
         <div class="chart">
           <h4>5. Runway closure days by<br>calendar year</h4>
-          <svg viewBox="0 0 560 150" width="560" height="150" role="img">
+          <svg viewBox="0 0 560 150" width="536" height="144" role="img">
             <line x1="52" y1="122" x2="548" y2="122" stroke="#C9CED4"></line>
             <text x="46" y="26" font-size="9" fill="#6B7280" text-anchor="end">20</text>
             <text x="46" y="76" font-size="9" fill="#6B7280" text-anchor="end">10</text>
@@ -312,7 +314,7 @@
 
         <div class="chart legacy">
           <h4>Alternatives Comparison</h4>
-          <svg viewBox="0 0 560 150" width="560" height="150" role="img">
+          <svg viewBox="0 0 560 150" width="536" height="144" role="img">
             <line x1="60" y1="122" x2="548" y2="122" stroke="#C9CED4"></line>
             <text x="54" y="24" font-size="9" fill="#6B7280" text-anchor="end">$10M</text>
             <text x="54" y="126" font-size="9" fill="#6B7280" text-anchor="end">$0</text>
@@ -329,8 +331,8 @@
       </div>
     </div>
 
-    <div class="r" style="height: 26px;">
-      <div class="rh" style="height: 26px;"></div>
+    <div class="r" style="height: 30px;">
+      <div class="rh" style="height: 30px;"></div>
       <div class="c wA"></div><div class="c wB"></div><div class="c wC"></div><div class="c wD"></div><div class="c wE"></div><div class="c wF"></div>
       <div class="c note" style="width: 1153px;">How to read: 1 shows where each alternative's cost sits; 2 whether the lowest-cost alternative holds at other discount rates; 3 and 4 when the money is spent and when the higher first cost is paid back; 5 how often and how long the runway closes.</div>
     </div>

@@ -27,7 +27,7 @@
     .sec { background: #EAF2FB; font-weight: bold; font-size: 12px; }
     .btn { background: #1D2733; color: #FFFFFF; font-weight: bold; font-size: 12px; justify-content: center; }
     .btn.blue { background: #2A78D6; }
-    .note { color: #595959; font-style: italic; font-size: 10.5px; }
+    .note { color: #595959; font-style: italic; font-size: 10.5px; white-space: normal; line-height: 1.3; }
     .title { font-weight: bold; font-size: 14px; }
     .lnk { color: #1F4E9C; text-decoration: underline; font-size: 10px; }
     .tabs { display: flex; gap: 3px; padding: 5px 8px 6px; background: #F2F3F5; border-top: 1px solid #D7DBE0; align-items: flex-end; flex: none; }
@@ -50,11 +50,10 @@
       <div class="c wA btn" style="height: 22px;">&#9668; General Information</div>
       <div class="c wB btn blue" style="height: 22px;">Summary</div>
     </div>
-    <div class="r"><div class="rh"></div><div class="c note" style="width: 700px;">Reference sheet: nothing here feeds the calculation.</div></div>
     <div class="r"><div class="rh"></div><div class="c title" style="width: 700px;">TYPICAL VALUES AND HELPERS FOR THE INPUTS</div></div>
     <div class="r" style="height: 28px;">
       <div class="rh" style="height: 28px;"></div>
-      <div class="c note" style="width: 1395px; height: 28px;">Reference only: nothing on this sheet feeds the calculation. Use it to sanity-check what you type on General Information and the alternative worksheets. Values are ranges from the cited sources as of the date in the source column; confirm against current bid tabulations for a specific project.</div>
+      <div class="c note" style="width: 1395px; height: 28px;">Reference only: nothing on this sheet feeds the calculation. Use it to sanity-check what you type on General Information and the alternative worksheets. Seven sections: 1 what TDOT Aeronautics manages, 2 runway geometry, 3 unit costs (below), 4 closure-day rates, 5 economic parameters, 6 maintenance timing, 7 daily revenue by airport. Values are ranges from the cited sources as of the date in the source column; confirm against current bid tabulations for a specific project.</div>
     </div>
 
     <div class="r"><div class="rh"></div></div>
@@ -85,15 +84,15 @@
       <div class="c wF cell" style="height: 34px;">Workbook default looks low against 2025 southeastern bids; confirm before relying on the default</div>
       <div class="c wG cell" style="height: 34px;"><span class="lnk">aeronautics.sc.gov/&hellip;/250521_FLO_Rehab_Twy_A.pdf</span></div>
     </div>
-    <div class="r" style="height: 26px;">
-      <div class="rh" style="height: 26px;"></div>
-      <div class="c wA cell" style="height: 26px;">P-401 Asphalt Base Course</div>
-      <div class="c wB cell right" style="height: 26px;">120.00</div>
-      <div class="c wC cell" style="height: 26px;">$/ton</div>
-      <div class="c wD cell" style="height: 26px;">typically 5 to 10% below surface course</div>
-      <div class="c wE cell" style="height: 26px;"></div>
-      <div class="c wF cell" style="height: 26px;"></div>
-      <div class="c wG cell" style="height: 26px;"><span class="lnk">aeronautics.sc.gov/&hellip;/bid-tabulations</span></div>
+    <div class="r" style="height: 34px;">
+      <div class="rh" style="height: 34px;"></div>
+      <div class="c wA cell" style="height: 34px;">P-401 Asphalt Base Course</div>
+      <div class="c wB cell right" style="height: 34px;">120.00</div>
+      <div class="c wC cell" style="height: 34px;">$/ton</div>
+      <div class="c wD cell" style="height: 34px;">typically 5 to 10% below surface course</div>
+      <div class="c wE cell" style="height: 34px;"></div>
+      <div class="c wF cell" style="height: 34px;"></div>
+      <div class="c wG cell" style="height: 34px;"><span class="lnk">aeronautics.sc.gov/&hellip;/bid-tabulations</span></div>
     </div>
     <div class="r" style="height: 34px;">
       <div class="rh" style="height: 34px;"></div>
@@ -105,35 +104,35 @@
       <div class="c wF cell" style="height: 34px;">Planning value from another state DOT; obtain a TN or southeastern PCC bid before use</div>
       <div class="c wG cell" style="height: 34px;"><span class="lnk">dot.state.mn.us/aero/&hellip;/saspappendixf.pdf</span></div>
     </div>
-    <div class="r" style="height: 26px;">
-      <div class="rh" style="height: 26px;"></div>
-      <div class="c wA cell" style="height: 26px;">P-209 Crushed Aggregate Base Course</div>
-      <div class="c wB cell right" style="height: 26px;">65.00</div>
-      <div class="c wC cell" style="height: 26px;">$/CY</div>
-      <div class="c wD cell" style="height: 26px;">not found in open sources; see SC bid tabs</div>
-      <div class="c wE cell" style="height: 26px;"></div>
-      <div class="c wF cell" style="height: 26px;"></div>
-      <div class="c wG cell" style="height: 26px;"><span class="lnk">aeronautics.sc.gov/&hellip;/bid-tabulations</span></div>
+    <div class="r" style="height: 34px;">
+      <div class="rh" style="height: 34px;"></div>
+      <div class="c wA cell" style="height: 34px;">P-209 Crushed Aggregate Base Course</div>
+      <div class="c wB cell right" style="height: 34px;">65.00</div>
+      <div class="c wC cell" style="height: 34px;">$/CY</div>
+      <div class="c wD cell" style="height: 34px;">not found in open sources; see SC bid tabs</div>
+      <div class="c wE cell" style="height: 34px;"></div>
+      <div class="c wF cell" style="height: 34px;"></div>
+      <div class="c wG cell" style="height: 34px;"><span class="lnk">aeronautics.sc.gov/&hellip;/bid-tabulations</span></div>
     </div>
-    <div class="r" style="height: 26px;">
-      <div class="rh" style="height: 26px;"></div>
-      <div class="c wA cell" style="height: 26px;">P-101 Cold Milling</div>
-      <div class="c wB cell right" style="height: 26px;">5.00</div>
-      <div class="c wC cell" style="height: 26px;">$/SY</div>
-      <div class="c wD cell" style="height: 26px;">4.70 (3-in, low bid) to 10.00 (variable depth, EE)</div>
-      <div class="c wE cell right" style="height: 26px;">2025</div>
-      <div class="c wF cell" style="height: 26px;"></div>
-      <div class="c wG cell" style="height: 26px;"><span class="lnk">aeronautics.sc.gov/&hellip;/250521_FLO_Rehab_Twy_A.pdf</span></div>
+    <div class="r" style="height: 34px;">
+      <div class="rh" style="height: 34px;"></div>
+      <div class="c wA cell" style="height: 34px;">P-101 Cold Milling</div>
+      <div class="c wB cell right" style="height: 34px;">5.00</div>
+      <div class="c wC cell" style="height: 34px;">$/SY</div>
+      <div class="c wD cell" style="height: 34px;">4.70 (3-in, low bid) to 10.00 (variable depth, EE)</div>
+      <div class="c wE cell right" style="height: 34px;">2025</div>
+      <div class="c wF cell" style="height: 34px;"></div>
+      <div class="c wG cell" style="height: 34px;"><span class="lnk">aeronautics.sc.gov/&hellip;/250521_FLO_Rehab_Twy_A.pdf</span></div>
     </div>
-    <div class="r" style="height: 26px;">
-      <div class="rh" style="height: 26px;"></div>
-      <div class="c wA cell" style="height: 26px;">P-620 Markings (reflective)</div>
-      <div class="c wB cell right" style="height: 26px;">0.67</div>
-      <div class="c wC cell" style="height: 26px;">$/SF</div>
-      <div class="c wD cell" style="height: 26px;">TDOT APMM 2022 Summary of Bids</div>
-      <div class="c wE cell right" style="height: 26px;">2022</div>
-      <div class="c wF cell" style="height: 26px;"></div>
-      <div class="c wG cell" style="height: 26px;"><span class="lnk">tn.gov/tdot/aeronautics/apmm-contract.html</span></div>
+    <div class="r" style="height: 34px;">
+      <div class="rh" style="height: 34px;"></div>
+      <div class="c wA cell" style="height: 34px;">P-620 Markings (reflective)</div>
+      <div class="c wB cell right" style="height: 34px;">0.67</div>
+      <div class="c wC cell" style="height: 34px;">$/SF</div>
+      <div class="c wD cell" style="height: 34px;">not published as an open unit price</div>
+      <div class="c wE cell right" style="height: 34px;">2022</div>
+      <div class="c wF cell" style="height: 34px;">State maintenance contract price</div>
+      <div class="c wG cell" style="height: 34px;"><span class="lnk">tn.gov/tdot/aeronautics/apmm-contract.html</span></div>
     </div>
     <div class="r" style="height: 34px;">
       <div class="rh" style="height: 34px;"></div>
@@ -146,8 +145,8 @@
       <div class="c wG cell" style="height: 34px;"><span class="lnk">smyrnaairport.com/&hellip;/runway-119-grand-opening</span></div>
     </div>
 
-    <div class="r" style="height: 26px;">
-      <div class="rh" style="height: 26px;"></div>
+    <div class="r" style="height: 34px;">
+      <div class="rh" style="height: 34px;"></div>
       <div class="c note" style="width: 1395px; height: 26px;">Pay_Items column F holds the default unit cost used by the alternative sheets. The defaults date from the 2022 framework; the 2025 comparison rows suggest the asphalt default is below current bids. Updating Pay_Items is the only place a cost needs to change.</div>
     </div>
 
