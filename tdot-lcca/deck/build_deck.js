@@ -190,8 +190,8 @@ s.addNotes('The Summary formulas read the Database sheet the form writes, so the
 s = pres.addSlide(); s.background = { color: WHITE };
 title(s, 'The new Summary sheet');
 sub(s, 'MBT data loaded. Table, verdict line, five charts and the original comparison chart, all live formulas.');
-let y = img(s, 'summary_sheet.png', 1.25, 1.35, 7.5, 2.05);
-caption(s, 'Buttons at top left return to General Information and Instructions; a "View Summary" button sits under Alternative Setup. Chart data lives in columns W onward, marked "do not edit".', 0.5, y + 0.05, 9.0);
+let y = img(s, 'summary_sheet.png', 0.9, 1.35, 8.2, 2.178);
+caption(s, 'Buttons at top left return to General Information and Instructions; a matching "View Summary" button sits under Alternative Setup. Chart data lives in columns W onward, marked "do not edit".', 0.5, y + 0.05, 9.0);
 
 // ---------------------------------------------------------------- 9 decision workbook intro
 s = pres.addSlide(); s.background = { color: WHITE };

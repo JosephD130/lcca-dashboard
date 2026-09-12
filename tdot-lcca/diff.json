@@ -579,7 +579,12 @@
     "after": "=IF(D38<>\"Yes\",\"\",IF(COUNTIF(RevenueData!$A:$A,$D$10)=0,\"Missing Airport Revenue\",SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,$D$10,RevenueData!$H:$H)))"
    },
    {
-    "cell": "B43",
+    "cell": "B44",
+    "before": null,
+    "after": "LCCA Summary:"
+   },
+   {
+    "cell": "D44",
     "before": null,
     "after": "=HYPERLINK(\"#Summary!G1\",\"View Summary  \u25ba\")"
    }
@@ -5804,7 +5809,7 @@
  ],
  "hashes": {
   "8eaa2547-TDOA_LCCA_Framework_v1.1.2_ARA_Task2_08182026.xlsm": "b0680f2a90e86654a5d7e57eb29ae45e960ddf7b517ccb65bc2978afaee4705a",
-  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "ca9080b777c4ab7f3567c01c55ae1b75f9911c30d70192dd9ce3a1dbd89d2c94",
+  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "68da37c3f338cf181eddfaa93763fb9136b3607b07e8770148f4895d99f7296b",
   "TDOT_LCCA_Decision_Workbook.xlsx": "27626ed0e58784a85c3894dcd7cafc8108c0576d5db7acd7eb47e0c5a34ed658",
   "Output.bas": "7e7e1cad7c0d41cc23d929d643a2e4ce5861761c2885f82e9a0b0757a0a8fd82",
   "35f08cad-TDOA_LCCA_Framework_v1.1.2_MBT_20260521_LostRevenue_1.xlsm": "117135e9facc9395b88883c3ffd4de48b67cb997605d6ad0a1acd7d64edfb08b",

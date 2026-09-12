@@ -1,11 +1,11 @@
 # TDOA LCCA Framework v1.2.0 — change notes
 
 Base: `TDOA_LCCA_Framework_v1.1.2_ARA_Task2_08182026.xlsm`
-Output: `TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm` plus `Output.bas`
+Output: `TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm` (self-contained, nothing to import)
 
 All workbook edits were made directly in the sheet XML so the VBA project, the 192 ActiveX
-pay-item comboboxes, the charts, tables and data validations are untouched. The VBA change is a
-single module replacement (`Output`) that must be imported in Excel; see "Install" below.
+pay-item comboboxes, the tables and data validations are untouched. The new Summary sheet is
+formulas and charts only; no VBA was added or changed.
 
 ## 1. Calculation fixes (these change answers)
 
@@ -32,19 +32,28 @@ analysis period, and the chart has calendar years on the category axis. The indi
 now a stacked column of Direct + Lost revenue (undiscounted); the mixed discounted series was
 removed. Column N (total discounted by year) is kept for the Summary.
 
-## 3. Summary worksheet (VBA, `Output.bas`)
+## 3. Summary worksheet (formulas, no macro)
 
-`SetupSummaryWs` keeps its name and is still called when the Alternative Setup form closes. It now
-writes, all as live formulas into the alternative sheets:
+Columns A:E are still written by the Alternative Setup form exactly as in v1.1.2, and the original
+"Alternatives Comparison" chart is kept (moved to the bottom right). Everything from column G
+onward is ordinary worksheet formulas that read the hidden Database sheet (alternative names,
+types and worksheet names) and reach into each alternative worksheet with INDIRECT, so any project
+populates it with no further steps:
 
-- Results table: Initial, Maintenance PW, Rehabilitation PW, Lost Revenue PW, Salvage PW, NPW,
-  delta vs. lowest, closure days over the analysis period, description.
-- Present worth by category (stacked column per alternative).
-- Expenditure stream by calendar year (clustered column, undiscounted).
-- Cumulative discounted cost by year (line).
-- NPW vs. discount rate 2% to 8% (line), with a "same winner at 7% (FAA AIP)?" flag.
-
-Charts are coloured by pavement type: HMA blue, PCC orange (second alternative of a type is a tint).
+- Results table G3:R7: worksheet, alternative, type, initial construction, maintenance PW,
+  rehabilitation PW, lost revenue PW, salvage PW, net present worth, difference to the lowest,
+  closure days in the analysis period, runway availability.
+- Verdict line G9: lowest-cost alternative and its margin to the next; G10 flags whether the same
+  alternative is lowest at the FAA AIP rate of 7%.
+- Five charts: 1 present worth by category (stacked, salvage below zero); 2 NPW versus discount
+  rate 2% to 8% in 0.25 steps; 3 expenditure stream by calendar year (undiscounted); 4 cumulative
+  discounted cost by year; 5 runway closure days by calendar year.
+- Chart data lives in columns W onward, greyed and labelled "calculated automatically; do not edit".
+- Navigation: dark HYPERLINK button cells "General Information" and "Instructions" at the top of
+  Summary, and a "View Summary" button under Alternative Setup on General Information (row 44).
+  They need no macro, so they work when ActiveX is blocked.
+- Print area A1:U70, landscape, one page wide. Empty alternative rows show blank; with no
+  alternatives the verdict line reads "No alternatives yet".
 
 ## 4. Housekeeping
 
@@ -68,21 +77,23 @@ Charts are coloured by pavement type: HMA blue, PCC orange (second alternative o
 - FAA AIP funding (7%, 20-year life) is shown in the sensitivity block, not enforced.
 - RevenueData hygiene: MBT and MQY rows are identical; XNX and M54 hold text where numbers belong.
 
-## 6. Install and verify in Excel
+## 6. First open in Excel
 
-1. Open `TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm`, enable content.
-2. Alt+F11 > in the project tree right-click the `Output` module > Remove (No to export) >
-   File > Import File > `Output.bas`. Save.
-3. General Information: pick an airport, set D38 = Yes, D26 = 52777.7, D28 = 5433, D25 = 2027.
-   Alternative Setup > add one New HMA and one New PCC > Close. Summary should populate with
-   four charts and no #N/A.
-4. On an Alt sheet check that columns L:N sum to the NPW table (sum of N = Net Present Worth) and
+1. Open `TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm`, enable content. Nothing to install.
+2. General Information: pick an airport, set D38 = Yes, D26 = 52777.7, D28 = 5433, D25 = 2027.
+   Alternative Setup > add one New HMA and one New PCC > Close. Click "View Summary": the table,
+   verdict line and five charts should populate with no #N/A.
+3. On an Alt sheet check that columns L:N sum to the NPW table (sum of N = Net Present Worth) and
    that the chart axis shows 2027 to 2057.
-5. Set D33 = 20 and confirm Maintenance 5 and 6 drop to $0 discounted and the chart ends at 2047.
-6. Pick an airport outside the 17 with D38 = Yes: G2 on each Alt sheet should show the warning and
+4. Set D33 = 20 and confirm Maintenance 5 and 6 drop to $0 discounted and the chart ends at 2047.
+5. Pick an airport outside the 17 with D38 = Yes: G2 on each Alt sheet should show the warning and
    lost revenue should be $0, not #N/A.
+6. Click the three navigation buttons.
 
-Verification done here: XML validated, zip integrity checked, and the new year-indexed formulas
-were simulated against the MBT workbook's cached values (they reconcile to the workbook NPW of
-$8,809,266 and $8,028,734 to the dollar). LibreOffice was not available in this environment, and
-the VBA module could not be executed, so steps 3 to 6 above are the first live run.
+Verification done here (LibreOffice Calc, full recalculation): the template workbook recalculates
+with 2,240 formulas and 0 errors (v1.1.2 shows 99 error cells under the same recalc). The same
+patch applied to the populated MBT workbook leaves NPW unchanged at $8,809,266 and $8,028,734,
+the year-indexed columns reconcile to the NPW to the dollar, and the Summary table, verdict line
+and six charts populate from the MBT data (render in `Summary_sheet_MBT_render.png`). Not
+verified: the charts on the alternative worksheets in Excel itself (LibreOffice does not render
+charts on the ActiveX-bearing sheets); step 3 above covers it.

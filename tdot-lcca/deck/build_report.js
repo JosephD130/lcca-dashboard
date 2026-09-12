@@ -257,7 +257,7 @@ children.push(table([
   ['Chart 2 (N14)', 'NPW versus discount rate, 2 to 8 percent in 0.25 steps', 'Sensitivity block W10:AA36: initial + SUMPRODUCT((year <= period) x cost / (1+r)^year) per alternative'],
   ['Charts 3 and 4 (G32, N32)', 'Expenditure by calendar year (undiscounted) and cumulative discounted cost', 'By-year block W39:AJ71: SUMIF on Year Applied, running sum of the discounted column'],
   ['Chart 5 (G50)', 'Runway closure days by calendar year', 'Indirect-cost rows divided by daily revenue (F2), by year'],
-  ['Navigation', '"General Information" and "Instructions" buttons on Summary; "View Summary" under Alternative Setup', 'HYPERLINK cells; no macro, so they work when ActiveX is blocked'],
+  ['Navigation', '"General Information" and "Instructions" buttons on Summary; "LCCA Summary: View Summary" button under Alternative Setup on General Information (B44, D44)', 'HYPERLINK cells; no macro, so they work when ActiveX is blocked'],
 ], [1900, 3300, 4160], { size: 14 }));
 children.push(p(''));
 children.push(p('The chart-data blocks are labelled "calculated automatically; do not edit". The print area covers the table and charts one page wide in landscape. Appendix B lists the formulas as they stand in row 4 and in the first row of each block; the remaining rows repeat them with the row number substituted. A first draft of this update replaced the VBA Output module instead (Output.bas); it was superseded by this formula-driven sheet so that nothing has to be imported, and it is not part of the deliverable.'));

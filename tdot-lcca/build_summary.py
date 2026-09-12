@@ -103,7 +103,7 @@ def build_scratch(path):
     hdr(11, DC, ['Rate (%)'] + [None] * NALT)
     for i in range(NALT): ws.cell(11, DC + 1 + i, f'={d(1+i)}$4')
     for k in range(25):
-        r = 12 + k; c = ws.cell(r, DC, 2 + 0.25 * k); c.number_format = '0.00'; c.font = F_DATA
+        r = 12 + k; c = ws.cell(r, DC, 2 + 0.25 * k); c.number_format = '0.00"%"'; c.font = F_DATA
         for i in range(NALT):
             g = f'$G${4+i}'; C, D = rng(g, 'C'), rng(g, 'D')
             c = ws.cell(r, DC + 1 + i, f'=IF({g}="",0,IFERROR($J${4+i}+SUMPRODUCT(({C}<={GI}!$D$33)*{D}/(1+${d(0)}{r}/100)^{C}),0))'); c.number_format = CUR; c.font = F_DATA
@@ -141,13 +141,13 @@ def build_scratch(path):
     ch.add_data(Reference(ws, min_col=DC, max_col=DC + NALT, min_row=5, max_row=9), titles_from_data=True, from_rows=True)
     ch.set_categories(Reference(ws, min_col=DC + 1, max_col=DC + NALT, min_row=4, max_row=4))
     for s, rgb in zip(ch.series, ['4A4A4A', '8C8C8C', '646464', 'B8B6AE', 'DCDCDC']): s.graphicalProperties.solidFill = rgb; s.graphicalProperties.line.solidFill = rgb
-    style(ch, '1. Present worth by category (salvage below zero)'); ws.add_chart(ch, 'G14')
+    ch.x_axis.tickLblPos = 'low'; style(ch, '1. Present worth by category (salvage below zero)'); ws.add_chart(ch, 'G14')
     ch = LineChart()
     ch.add_data(Reference(ws, min_col=DC + 1, max_col=DC + NALT, min_row=11, max_row=SENS1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC, min_row=SENS0, max_row=SENS1))
-    colour(ch, line=True); ch.x_axis.tickLblSkip = 4; ch.x_axis.numFmt = '0.00'; style(ch, '2. Net present worth vs. discount rate (TDOT 3%, FAA AIP 7%)'); ws.add_chart(ch, 'N14')
+    colour(ch, line=True); ch.x_axis.tickLblSkip = 4; ch.x_axis.numFmt = '0.00"%"'; style(ch, '2. Net present worth vs. discount rate (TDOT 3%, FAA AIP 7%)'); ws.add_chart(ch, 'N14')
     ch = BarChart(); ch.type = 'col'; ch.grouping = 'clustered'; ch.gapWidth = 40
     ch.add_data(Reference(ws, min_col=DC + 2, max_col=DC + 1 + NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
-    colour(ch); ch.x_axis.tickLblSkip = 5; style(ch, '3. Expenditure stream by calendar year (undiscounted)'); ws.add_chart(ch, 'G32')
+    colour(ch); ch.x_axis.tickLblSkip = 5; ch.x_axis.tickLblPos = 'low'; style(ch, '3. Expenditure stream by calendar year (undiscounted)'); ws.add_chart(ch, 'G32')
     ch = LineChart()
     ch.add_data(Reference(ws, min_col=DC + 2 + NALT, max_col=DC + 1 + 2 * NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
     colour(ch, line=True); ch.x_axis.tickLblSkip = 5; style(ch, '4. Cumulative discounted cost'); ws.add_chart(ch, 'N32')
