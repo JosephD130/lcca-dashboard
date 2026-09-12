@@ -3,8 +3,10 @@
 Edits sheet XML in place inside the .xlsm zip so VBA, ActiveX comboboxes, charts,
 tables and data validations are preserved (openpyxl would drop them).
 """
-import re, sys, os, zipfile, shutil, html
-from build_summary import transplant
+import re, html, sys, os, zipfile, shutil
+from build_summary import transplant, add_plain_sheet
+import build_helpers, helpers_content
+build_helpers.set_sections(helpers_content.sections()); build_helpers.HINTS.update(helpers_content.HINTS)
 
 GI = "'General Information'"
 
@@ -234,6 +236,14 @@ def main(src, out, mbt_mode=False):
     x = put_cell(x, 'B44', '<c r="B44"%s t="inlineStr"><is><t>LCCA Summary:</t></is></c>' % (' s="%s"' % lab if lab else ''))
     x = put_cell(x, 'D44', '<c r="D44"%s t="str"><f>HYPERLINK("#Summary!G1","View Summary  \u25ba")</f><v>View Summary  \u25ba</v></c>' % (' s="%s"' % btn if btn else ''))
     x = re.sub(r'<row r="44" ', '<row r="44" ht="21" customHeight="1" ', x, count=1)
+    # --- 'Typical Values' reference sheet (appended last, so no sheet indices shift) + button and input hints on General Information
+    helper_part = add_plain_sheet(work, build_helpers.build, 'Typical Values')
+    hint_style = style_of(rd(helper_part), 'A2')
+    x = put_cell(x, 'B46', '<c r="B46"%s t="inlineStr"><is><t>Typical input values:</t></is></c>' % (' s="%s"' % lab if lab else ''))
+    x = put_cell(x, 'D46', '<c r="D46"%s t="str"><f>HYPERLINK("#\'Typical Values\'!A1","Typical Values  \u25ba")</f><v>Typical Values  \u25ba</v></c>' % (' s="%s"' % btn if btn else ''))
+    x = re.sub(r'<row r="46" ', '<row r="46" ht="21" customHeight="1" ', x, count=1)
+    for row, hint in build_helpers.HINTS.items():
+        x = put_cell(x, 'F%d' % row, '<c r="F%d"%s t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>' % (row, ' s="%s"' % hint_style if hint_style else '', html.escape(hint, quote=False)))
     wr(gi_part, x)
     # --- workbook: drop broken external links, force full recalculation on open
     w = rd('xl/workbook.xml')

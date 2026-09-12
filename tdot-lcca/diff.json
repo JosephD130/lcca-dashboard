@@ -569,9 +569,54 @@
   ],
   "General Information": [
    {
+    "cell": "F25",
+    "before": null,
+    "after": "Construction year; the analysis runs D33 years from here."
+   },
+   {
+    "cell": "F26",
+    "before": null,
+    "after": "Length x width / 9. TN GA runways: 4,000-6,000 ft x 75 or 100 ft = 33,000-67,000 SY (see Typical Values)."
+   },
+   {
+    "cell": "F27",
+    "before": null,
+    "after": "Paved shoulders only; usually 0 at TN GA airports."
+   },
+   {
+    "cell": "F28",
+    "before": null,
+    "after": "Full runway marking set: roughly 2,000-3,000 SF per 1,000 ft; use the marking plan quantity when known."
+   },
+   {
     "cell": "D33",
     "before": "10",
     "after": "30"
+   },
+   {
+    "cell": "F33",
+    "before": null,
+    "after": "TDOT policy 30 years. FAA PGL 22-01 (2022) leaves the period to the engineer; 20 years was the old AIP rule."
+   },
+   {
+    "cell": "F34",
+    "before": null,
+    "after": "TDOT 3%. FAA now uses the OMB A-94 real rate (2.0% in 2026); 7% was the pre-2022 rule. Summary checks both."
+   },
+   {
+    "cell": "F36",
+    "before": null,
+    "after": "Mobilization 10% of pay items is the workbook default."
+   },
+   {
+    "cell": "F37",
+    "before": null,
+    "after": "Engineering 5% of pay items; now applied to initial construction as well as M&R."
+   },
+   {
+    "cell": "F38",
+    "before": null,
+    "after": "Yes counts lost airport revenue during closures; 17 airports have revenue data (Typical Values)."
    },
    {
     "cell": "D39",
@@ -587,6 +632,16 @@
     "cell": "D44",
     "before": null,
     "after": "=HYPERLINK(\"#Summary!G1\",\"View Summary  \u25ba\")"
+   },
+   {
+    "cell": "B46",
+    "before": null,
+    "after": "Typical input values:"
+   },
+   {
+    "cell": "D46",
+    "before": null,
+    "after": "=HYPERLINK(\"#'Typical Values'!A1\",\"Typical Values  \u25ba\")"
    }
   ],
   "Pay_Items": [
@@ -2828,7 +2883,7 @@
    {
     "cell": "G10",
     "before": null,
-    "after": "=IF(COUNT($O$4:$O$7)<2,\"\",IF(INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))=INDEX($H$4:$H$7,MATCH(MIN($X$32:$AA$32),$X$32:$AA$32,0)),\"The same alternative is lowest at the FAA AIP rate of 7%.\",\"At the FAA AIP rate of 7% the lowest-cost alternative changes: see chart 2.\"))"
+    "after": "=IF(COUNT($O$4:$O$7)<2,\"\",IF(INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))=INDEX($H$4:$H$7,MATCH(SMALL($X$12:$AA$12,COUNTIF($X$12:$AA$12,0)+1),$X$12:$AA$12,0)),\"Same lowest-cost alternative at 2% (OMB A-94 real rate, FAA PGL 22-01)\",\"At 2% (OMB A-94 real rate, FAA PGL 22-01) the lowest-cost alternative changes\")&\"   |   \"&IF(INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))=INDEX($H$4:$H$7,MATCH(SMALL($X$32:$AA$32,COUNTIF($X$32:$AA$32,0)+1),$X$32:$AA$32,0)),\"same at 7% (pre-2022 AIP rule)\",\"changes at 7% (pre-2022 AIP rule): see chart 2\"))"
    },
    {
     "cell": "W10",
@@ -2868,7 +2923,7 @@
    {
     "cell": "G12",
     "before": null,
-    "after": "CHARTS"
+    "after": "COMPARISON  (RealCost layout: agency cost, user cost, total; present worth and equivalent uniform annual cost)"
    },
    {
     "cell": "W12",
@@ -2896,6 +2951,56 @@
     "after": "=IF($G$7=\"\",0,IFERROR($J$7+SUMPRODUCT((INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")<='General Information'!$D$33)*INDIRECT(\"'\"&$G$7&\"'!$D$37:$D$52\")/(1+$W13/100)^INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")),0))"
    },
    {
+    "cell": "G13",
+    "before": null,
+    "after": "Alternative"
+   },
+   {
+    "cell": "H13",
+    "before": null,
+    "after": "Agency cost PW"
+   },
+   {
+    "cell": "I13",
+    "before": null,
+    "after": "Agency EUAC"
+   },
+   {
+    "cell": "J13",
+    "before": null,
+    "after": "User cost PW (lost revenue)"
+   },
+   {
+    "cell": "K13",
+    "before": null,
+    "after": "User EUAC"
+   },
+   {
+    "cell": "L13",
+    "before": null,
+    "after": "Total PW"
+   },
+   {
+    "cell": "M13",
+    "before": null,
+    "after": "Total EUAC"
+   },
+   {
+    "cell": "N13",
+    "before": null,
+    "after": "vs. lowest ($)"
+   },
+   {
+    "cell": "O13",
+    "before": null,
+    "after": "vs. lowest (%)"
+   },
+   {
+    "cell": "P13",
+    "before": null,
+    "after": "Lowest?"
+   },
+   {
     "cell": "W13",
     "before": null,
     "after": "2.25"
@@ -2919,6 +3024,56 @@
     "cell": "AA14",
     "before": null,
     "after": "=IF($G$7=\"\",0,IFERROR($J$7+SUMPRODUCT((INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")<='General Information'!$D$33)*INDIRECT(\"'\"&$G$7&\"'!$D$37:$D$52\")/(1+$W14/100)^INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")),0))"
+   },
+   {
+    "cell": "G14",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",$H$4)"
+   },
+   {
+    "cell": "H14",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",$J$4+$K$4+$L$4+$N$4)"
+   },
+   {
+    "cell": "I14",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",H14*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+   },
+   {
+    "cell": "J14",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",$M$4)"
+   },
+   {
+    "cell": "K14",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",J14*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+   },
+   {
+    "cell": "L14",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",$O$4)"
+   },
+   {
+    "cell": "M14",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",L14*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+   },
+   {
+    "cell": "N14",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",$P$4)"
+   },
+   {
+    "cell": "O14",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",IFERROR($P$4/MIN($O$4:$O$7),0))"
+   },
+   {
+    "cell": "P14",
+    "before": null,
+    "after": "=IF($G$4=\"\",\"\",IF($O$4=MIN($O$4:$O$7),\"lowest\",\"\"))"
    },
    {
     "cell": "W14",
@@ -2946,6 +3101,56 @@
     "after": "=IF($G$7=\"\",0,IFERROR($J$7+SUMPRODUCT((INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")<='General Information'!$D$33)*INDIRECT(\"'\"&$G$7&\"'!$D$37:$D$52\")/(1+$W15/100)^INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")),0))"
    },
    {
+    "cell": "G15",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",$H$5)"
+   },
+   {
+    "cell": "H15",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",$J$5+$K$5+$L$5+$N$5)"
+   },
+   {
+    "cell": "I15",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",H15*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+   },
+   {
+    "cell": "J15",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",$M$5)"
+   },
+   {
+    "cell": "K15",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",J15*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+   },
+   {
+    "cell": "L15",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",$O$5)"
+   },
+   {
+    "cell": "M15",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",L15*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+   },
+   {
+    "cell": "N15",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",$P$5)"
+   },
+   {
+    "cell": "O15",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",IFERROR($P$5/MIN($O$4:$O$7),0))"
+   },
+   {
+    "cell": "P15",
+    "before": null,
+    "after": "=IF($G$5=\"\",\"\",IF($O$5=MIN($O$4:$O$7),\"lowest\",\"\"))"
+   },
+   {
     "cell": "W15",
     "before": null,
     "after": "2.75"
@@ -2969,6 +3174,56 @@
     "cell": "AA16",
     "before": null,
     "after": "=IF($G$7=\"\",0,IFERROR($J$7+SUMPRODUCT((INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")<='General Information'!$D$33)*INDIRECT(\"'\"&$G$7&\"'!$D$37:$D$52\")/(1+$W16/100)^INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")),0))"
+   },
+   {
+    "cell": "G16",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",$H$6)"
+   },
+   {
+    "cell": "H16",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",$J$6+$K$6+$L$6+$N$6)"
+   },
+   {
+    "cell": "I16",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",H16*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+   },
+   {
+    "cell": "J16",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",$M$6)"
+   },
+   {
+    "cell": "K16",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",J16*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+   },
+   {
+    "cell": "L16",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",$O$6)"
+   },
+   {
+    "cell": "M16",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",L16*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+   },
+   {
+    "cell": "N16",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",$P$6)"
+   },
+   {
+    "cell": "O16",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",IFERROR($P$6/MIN($O$4:$O$7),0))"
+   },
+   {
+    "cell": "P16",
+    "before": null,
+    "after": "=IF($G$6=\"\",\"\",IF($O$6=MIN($O$4:$O$7),\"lowest\",\"\"))"
    },
    {
     "cell": "W16",
@@ -2996,6 +3251,56 @@
     "after": "=IF($G$7=\"\",0,IFERROR($J$7+SUMPRODUCT((INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")<='General Information'!$D$33)*INDIRECT(\"'\"&$G$7&\"'!$D$37:$D$52\")/(1+$W17/100)^INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")),0))"
    },
    {
+    "cell": "G17",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",$H$7)"
+   },
+   {
+    "cell": "H17",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",$J$7+$K$7+$L$7+$N$7)"
+   },
+   {
+    "cell": "I17",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",H17*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+   },
+   {
+    "cell": "J17",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",$M$7)"
+   },
+   {
+    "cell": "K17",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",J17*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+   },
+   {
+    "cell": "L17",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",$O$7)"
+   },
+   {
+    "cell": "M17",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",L17*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+   },
+   {
+    "cell": "N17",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",$P$7)"
+   },
+   {
+    "cell": "O17",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",IFERROR($P$7/MIN($O$4:$O$7),0))"
+   },
+   {
+    "cell": "P17",
+    "before": null,
+    "after": "=IF($G$7=\"\",\"\",IF($O$7=MIN($O$4:$O$7),\"lowest\",\"\"))"
+   },
+   {
     "cell": "W17",
     "before": null,
     "after": "3.25"
@@ -3019,6 +3324,11 @@
     "cell": "AA18",
     "before": null,
     "after": "=IF($G$7=\"\",0,IFERROR($J$7+SUMPRODUCT((INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")<='General Information'!$D$33)*INDIRECT(\"'\"&$G$7&\"'!$D$37:$D$52\")/(1+$W18/100)^INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")),0))"
+   },
+   {
+    "cell": "G18",
+    "before": null,
+    "after": "Agency cost = initial construction + maintenance + rehabilitation + salvage. User cost = lost airport revenue during runway closures, the airport-side counterpart of the user delay cost in the Caltrans/FHWA RealCost layout. EUAC = PW x r(1+r)^P / ((1+r)^P - 1) at the discount rate and analysis period on General Information. \"vs. lowest (%)\" is the difference as a share of the lowest total PW."
    },
    {
     "cell": "W18",
@@ -3069,6 +3379,11 @@
     "cell": "AA20",
     "before": null,
     "after": "=IF($G$7=\"\",0,IFERROR($J$7+SUMPRODUCT((INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")<='General Information'!$D$33)*INDIRECT(\"'\"&$G$7&\"'!$D$37:$D$52\")/(1+$W20/100)^INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\")),0))"
+   },
+   {
+    "cell": "G20",
+    "before": null,
+    "after": "CHARTS"
    },
    {
     "cell": "W20",
@@ -5576,11 +5891,6 @@
     "after": "=IF($G$7=\"\",0,IF(W69>'General Information'!$D$33,0,IFERROR(SUMIFS(INDIRECT(\"'\"&$G$7&\"'!$D$37:$D$52\"),INDIRECT(\"'\"&$G$7&\"'!$C$37:$C$52\"),W69,INDIRECT(\"'\"&$G$7&\"'!$B$37:$B$52\"),\"*Indirect*\")/INDIRECT(\"'\"&$G$7&\"'!$F$2\"),0)))"
    },
    {
-    "cell": "G69",
-    "before": null,
-    "after": "How to read: 1 shows where each alternative's cost sits; 2 whether the lowest-cost alternative holds at other discount rates (FAA AIP uses 7%); 3 and 4 when the money is spent and when the higher first cost is paid back; 5 how often and how long the runway closes."
-   },
-   {
     "cell": "W69",
     "before": null,
     "after": "28"
@@ -5739,6 +6049,2498 @@
     "cell": "Z71",
     "before": null,
     "after": "=IF($G$5=\"\",0,IF(W71>'General Information'!$D$33,0,IF(W71=0,$J$5,IFERROR(SUMIF(INDIRECT(\"'\"&$G$5&\"'!$C$37:$C$52\"),W71,INDIRECT(\"'\"&$G$5&\"'!$D$37:$D$52\")),0))))"
+   },
+   {
+    "cell": "G77",
+    "before": null,
+    "after": "How to read: 1 shows where each alternative's cost sits; 2 whether the lowest-cost alternative holds at other discount rates (FAA now uses the OMB A-94 real rate, about 2%; 7% was the rule before 2022); 3 and 4 when the money is spent and when the higher first cost is paid back; 5 how often and how long the runway closes."
+   }
+  ],
+  "Typical Values": [
+   {
+    "cell": "A1",
+    "before": null,
+    "after": "=HYPERLINK(\"#'General Information'!D9\",\"\u25c4 General Information\")"
+   },
+   {
+    "cell": "B1",
+    "before": null,
+    "after": "=HYPERLINK(\"#Summary!G1\",\"Summary\")"
+   },
+   {
+    "cell": "A2",
+    "before": null,
+    "after": "Reference sheet: nothing here feeds the calculation."
+   },
+   {
+    "cell": "A3",
+    "before": null,
+    "after": "TYPICAL VALUES AND HELPERS FOR THE INPUTS"
+   },
+   {
+    "cell": "A4",
+    "before": null,
+    "after": "Reference only: nothing on this sheet feeds the calculation. Use it to sanity-check what you type on General Information and the alternative worksheets. Values are ranges from the cited sources as of the date in the source column; confirm against current bid tabulations for a specific project."
+   },
+   {
+    "cell": "A6",
+    "before": null,
+    "after": "1. What TDOT Aeronautics manages (context for project size)"
+   },
+   {
+    "cell": "A7",
+    "before": null,
+    "after": "Item"
+   },
+   {
+    "cell": "B7",
+    "before": null,
+    "after": "Value"
+   },
+   {
+    "cell": "C7",
+    "before": null,
+    "after": "Unit"
+   },
+   {
+    "cell": "D7",
+    "before": null,
+    "after": "Year"
+   },
+   {
+    "cell": "G7",
+    "before": null,
+    "after": "Source"
+   },
+   {
+    "cell": "A8",
+    "before": null,
+    "after": "Public-use airports in the Tennessee system (TASP 2040)"
+   },
+   {
+    "cell": "B8",
+    "before": null,
+    "after": "78"
+   },
+   {
+    "cell": "C8",
+    "before": null,
+    "after": "airports"
+   },
+   {
+    "cell": "D8",
+    "before": null,
+    "after": "2021"
+   },
+   {
+    "cell": "G8",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.tasp2040.com/wp-content/uploads/2021/03/Updated-TASP-Inventory-Existing-System-Conditions-March-2021-v3.pdf\",\"https://www.tasp2040.com/wp-content/uploads/2021/03/Updated-TASP-Inven\")"
+   },
+   {
+    "cell": "A9",
+    "before": null,
+    "after": "Commercial service / general aviation"
+   },
+   {
+    "cell": "B9",
+    "before": null,
+    "after": "6 / 72"
+   },
+   {
+    "cell": "C9",
+    "before": null,
+    "after": "airports"
+   },
+   {
+    "cell": "D9",
+    "before": null,
+    "after": "2021"
+   },
+   {
+    "cell": "G9",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.tasp2040.com/wp-content/uploads/2021/03/Updated-TASP-Inventory-Existing-System-Conditions-March-2021-v3.pdf\",\"https://www.tasp2040.com/wp-content/uploads/2021/03/Updated-TASP-Inven\")"
+   },
+   {
+    "cell": "A10",
+    "before": null,
+    "after": "Airports in the FAA NPIAS (eligible for AIP)"
+   },
+   {
+    "cell": "B10",
+    "before": null,
+    "after": "69"
+   },
+   {
+    "cell": "C10",
+    "before": null,
+    "after": "airports"
+   },
+   {
+    "cell": "D10",
+    "before": null,
+    "after": "2021"
+   },
+   {
+    "cell": "G10",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.tasp2040.com/wp-content/uploads/2020/12/Chapter-7-Airport-Classifications-and-NPIAS-Evaluation.pdf\",\"https://www.tasp2040.com/wp-content/uploads/2020/12/Chapter-7-Airport-\")"
+   },
+   {
+    "cell": "A11",
+    "before": null,
+    "after": "Airports in the TDOT pavement management network (APTech APMS, PCI per ASTM D5340)"
+   },
+   {
+    "cell": "B11",
+    "before": null,
+    "after": "~70"
+   },
+   {
+    "cell": "C11",
+    "before": null,
+    "after": "airports"
+   },
+   {
+    "cell": "D11",
+    "before": null,
+    "after": "2022"
+   },
+   {
+    "cell": "G11",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.appliedpavement.com/tennessee-apms\",\"https://www.appliedpavement.com/tennessee-apms\")"
+   },
+   {
+    "cell": "A12",
+    "before": null,
+    "after": "PCI performance objective, runways / taxiways"
+   },
+   {
+    "cell": "B12",
+    "before": null,
+    "after": "78 / 75"
+   },
+   {
+    "cell": "C12",
+    "before": null,
+    "after": "PCI"
+   },
+   {
+    "cell": "D12",
+    "before": null,
+    "after": "2021"
+   },
+   {
+    "cell": "G12",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.tn.gov/content/dam/tn/tdot/aeronautics/TN%20Airport%20Management%20Guide%20FINAL.pdf\",\"https://www.tn.gov/content/dam/tn/tdot/aeronautics/TN%20Airport%20Mana\")"
+   },
+   {
+    "cell": "A13",
+    "before": null,
+    "after": "TASP system-wide estimate: pavement rehabilitation (10-yr life goal)"
+   },
+   {
+    "cell": "B13",
+    "before": null,
+    "after": "70865874"
+   },
+   {
+    "cell": "C13",
+    "before": null,
+    "after": "$"
+   },
+   {
+    "cell": "D13",
+    "before": null,
+    "after": "2021"
+   },
+   {
+    "cell": "G13",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.tasp2040.com/wp-content/uploads/2021/09/TASP-Cost-Estimate-Chapter.pdf\",\"https://www.tasp2040.com/wp-content/uploads/2021/09/TASP-Cost-Estimate\")"
+   },
+   {
+    "cell": "A14",
+    "before": null,
+    "after": "TASP system-wide estimate: pavement new / reconstruction (20-yr life goal)"
+   },
+   {
+    "cell": "B14",
+    "before": null,
+    "after": "173117648"
+   },
+   {
+    "cell": "C14",
+    "before": null,
+    "after": "$"
+   },
+   {
+    "cell": "D14",
+    "before": null,
+    "after": "2021"
+   },
+   {
+    "cell": "G14",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.tasp2040.com/wp-content/uploads/2021/09/TASP-Cost-Estimate-Chapter.pdf\",\"https://www.tasp2040.com/wp-content/uploads/2021/09/TASP-Cost-Estimate\")"
+   },
+   {
+    "cell": "A15",
+    "before": null,
+    "after": "State share on GA capital projects (federal or state funded)"
+   },
+   {
+    "cell": "B15",
+    "before": null,
+    "after": "up to 90% (10% local); 95/5 on federal discretionary"
+   },
+   {
+    "cell": "D15",
+    "before": null,
+    "after": "2023"
+   },
+   {
+    "cell": "G15",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.tn.gov/content/dam/tn/tdot/documents/170-02.pdf\",\"https://www.tn.gov/content/dam/tn/tdot/documents/170-02.pdf\")"
+   },
+   {
+    "cell": "A16",
+    "before": null,
+    "after": "Statewide Airfield Pavement and Marking Maintenance Program (crack seal, seal coat, markings)"
+   },
+   {
+    "cell": "B16",
+    "before": null,
+    "after": "100% state funded, no local share"
+   },
+   {
+    "cell": "D16",
+    "before": null,
+    "after": "2024"
+   },
+   {
+    "cell": "G16",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.tn.gov/tdot/aeronautics/apmm-contract.html\",\"https://www.tn.gov/tdot/aeronautics/apmm-contract.html\")"
+   },
+   {
+    "cell": "A17",
+    "before": null,
+    "after": "Pavement areas and PCI by airport (statewide tables)"
+   },
+   {
+    "cell": "B17",
+    "before": null,
+    "after": "see APTech IDEA portal"
+   },
+   {
+    "cell": "D17",
+    "before": null,
+    "after": "2022"
+   },
+   {
+    "cell": "G17",
+    "before": null,
+    "after": "=HYPERLINK(\"https://idea.appliedpavement.com/hosting/tennessee/statewide-summary/inventory-area/area-by-airport-table.html\",\"https://idea.appliedpavement.com/hosting/tennessee/statewide-summary/i\")"
+   },
+   {
+    "cell": "A18",
+    "before": null,
+    "after": "NPIAS 2025-2029 classification of each TN airport (National / Regional / Local / Basic)"
+   },
+   {
+    "cell": "B18",
+    "before": null,
+    "after": "see Appendix A"
+   },
+   {
+    "cell": "D18",
+    "before": null,
+    "after": "2024"
+   },
+   {
+    "cell": "G18",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.faa.gov/sites/faa.gov/files/airports/planning_capacity/npias/current/ARP-NPIAS-2025-2029-Appendix-A.pdf\",\"https://www.faa.gov/sites/faa.gov/files/airports/planning_capacity/npi\")"
+   },
+   {
+    "cell": "A19",
+    "before": null,
+    "after": "The workbook dropdown holds the TASP airports (count in the live section below). The 17 airports with revenue data are those meeting Aeronautics' activity criteria."
+   },
+   {
+    "cell": "A21",
+    "before": null,
+    "after": "2. Typical runway geometry at Tennessee GA airports (for D26 mainline area and D28 markings)"
+   },
+   {
+    "cell": "A22",
+    "before": null,
+    "after": "Airport"
+   },
+   {
+    "cell": "B22",
+    "before": null,
+    "after": "Runway"
+   },
+   {
+    "cell": "C22",
+    "before": null,
+    "after": "Length x width (ft)"
+   },
+   {
+    "cell": "D22",
+    "before": null,
+    "after": "Mainline area (SY)"
+   },
+   {
+    "cell": "E22",
+    "before": null,
+    "after": "Role"
+   },
+   {
+    "cell": "F22",
+    "before": null,
+    "after": "Note"
+   },
+   {
+    "cell": "G22",
+    "before": null,
+    "after": "Source"
+   },
+   {
+    "cell": "A23",
+    "before": null,
+    "after": "Murfreesboro Municipal (MBT)"
+   },
+   {
+    "cell": "B23",
+    "before": null,
+    "after": "18/36"
+   },
+   {
+    "cell": "C23",
+    "before": null,
+    "after": "4,753 x 100"
+   },
+   {
+    "cell": "D23",
+    "before": null,
+    "after": "52811"
+   },
+   {
+    "cell": "E23",
+    "before": null,
+    "after": "GA, Middle"
+   },
+   {
+    "cell": "F23",
+    "before": null,
+    "after": "workbook MBT run used 52,778 SY"
+   },
+   {
+    "cell": "G23",
+    "before": null,
+    "after": "=HYPERLINK(\"https://en.wikipedia.org/wiki/Murfreesboro_Municipal_Airport\",\"https://en.wikipedia.org/wiki/Murfreesboro_Municipal_Airport\")"
+   },
+   {
+    "cell": "A24",
+    "before": null,
+    "after": "Bomar Field, Shelbyville (SYI)"
+   },
+   {
+    "cell": "B24",
+    "before": null,
+    "after": "18/36"
+   },
+   {
+    "cell": "C24",
+    "before": null,
+    "after": "5,503 x 100"
+   },
+   {
+    "cell": "D24",
+    "before": null,
+    "after": "61144"
+   },
+   {
+    "cell": "E24",
+    "before": null,
+    "after": "GA, Middle"
+   },
+   {
+    "cell": "G24",
+    "before": null,
+    "after": "=HYPERLINK(\"https://en.wikipedia.org/wiki/Shelbyville_Municipal_Airport_(Tennessee)\",\"https://en.wikipedia.org/wiki/Shelbyville_Municipal_Airport_(Tennessee\")"
+   },
+   {
+    "cell": "A25",
+    "before": null,
+    "after": "Gatlinburg-Pigeon Forge (GKT)"
+   },
+   {
+    "cell": "B25",
+    "before": null,
+    "after": "10/28"
+   },
+   {
+    "cell": "C25",
+    "before": null,
+    "after": "5,506 x 75"
+   },
+   {
+    "cell": "D25",
+    "before": null,
+    "after": "45883"
+   },
+   {
+    "cell": "E25",
+    "before": null,
+    "after": "GA, East"
+   },
+   {
+    "cell": "F25",
+    "before": null,
+    "after": "75-ft width"
+   },
+   {
+    "cell": "G25",
+    "before": null,
+    "after": "=HYPERLINK(\"https://en.wikipedia.org/wiki/Gatlinburg%E2%80%93Pigeon_Forge_Airport\",\"https://en.wikipedia.org/wiki/Gatlinburg%E2%80%93Pigeon_Forge_Airport\")"
+   },
+   {
+    "cell": "A26",
+    "before": null,
+    "after": "Outlaw Field, Clarksville (CKV)"
+   },
+   {
+    "cell": "B26",
+    "before": null,
+    "after": "17/35"
+   },
+   {
+    "cell": "C26",
+    "before": null,
+    "after": "5,999 x 100"
+   },
+   {
+    "cell": "D26",
+    "before": null,
+    "after": "66656"
+   },
+   {
+    "cell": "E26",
+    "before": null,
+    "after": "GA, Middle"
+   },
+   {
+    "cell": "F26",
+    "before": null,
+    "after": "used in the new-project test"
+   },
+   {
+    "cell": "G26",
+    "before": null,
+    "after": "=HYPERLINK(\"https://en.wikipedia.org/wiki/Clarksville%E2%80%93Montgomery_County_Regional_Airport\",\"https://en.wikipedia.org/wiki/Clarksville%E2%80%93Montgomery_County_Re\")"
+   },
+   {
+    "cell": "A27",
+    "before": null,
+    "after": "McKellar-Sipes Regional (MKL)"
+   },
+   {
+    "cell": "B27",
+    "before": null,
+    "after": "2/20"
+   },
+   {
+    "cell": "C27",
+    "before": null,
+    "after": "6,005 x 150"
+   },
+   {
+    "cell": "D27",
+    "before": null,
+    "after": "100083"
+   },
+   {
+    "cell": "E27",
+    "before": null,
+    "after": "GA, West"
+   },
+   {
+    "cell": "F27",
+    "before": null,
+    "after": "rebuilt 2024, ~$28M all-in"
+   },
+   {
+    "cell": "G27",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.wbbjtv.com/2024/08/28/mckellar-sipes-regional-airport-set-to-complete-runway-2-20-paving-preparing-for-new-jet-service/\",\"https://www.wbbjtv.com/2024/08/28/mckellar-sipes-regional-airport-set-\")"
+   },
+   {
+    "cell": "A28",
+    "before": null,
+    "after": "Smyrna (MQY)"
+   },
+   {
+    "cell": "B28",
+    "before": null,
+    "after": "1/19"
+   },
+   {
+    "cell": "C28",
+    "before": null,
+    "after": "5,546 x 100"
+   },
+   {
+    "cell": "D28",
+    "before": null,
+    "after": "61622"
+   },
+   {
+    "cell": "E28",
+    "before": null,
+    "after": "GA, Middle"
+   },
+   {
+    "cell": "F28",
+    "before": null,
+    "after": "reconstructed 2025, ~$13M all-in"
+   },
+   {
+    "cell": "G28",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.smyrnaairport.com/news-events/smyrna-airport-runway-119-grand-opening\",\"https://www.smyrnaairport.com/news-events/smyrna-airport-runway-119-gr\")"
+   },
+   {
+    "cell": "A29",
+    "before": null,
+    "after": "Smyrna (MQY)"
+   },
+   {
+    "cell": "B29",
+    "before": null,
+    "after": "14/32"
+   },
+   {
+    "cell": "C29",
+    "before": null,
+    "after": "8,038 x 150"
+   },
+   {
+    "cell": "D29",
+    "before": null,
+    "after": "133967"
+   },
+   {
+    "cell": "E29",
+    "before": null,
+    "after": "GA, Middle"
+   },
+   {
+    "cell": "F29",
+    "before": null,
+    "after": "former military"
+   },
+   {
+    "cell": "G29",
+    "before": null,
+    "after": "=HYPERLINK(\"https://en.wikipedia.org/wiki/Smyrna_Airport_(Tennessee)\",\"https://en.wikipedia.org/wiki/Smyrna_Airport_(Tennessee)\")"
+   },
+   {
+    "cell": "A30",
+    "before": null,
+    "after": "Typical TN GA runway"
+   },
+   {
+    "cell": "C30",
+    "before": null,
+    "after": "4,000 to 6,000 x 75 or 100"
+   },
+   {
+    "cell": "D30",
+    "before": null,
+    "after": "33,000 to 67,000"
+   },
+   {
+    "cell": "F30",
+    "before": null,
+    "after": "TASP Regional Service minimum width 100 ft"
+   },
+   {
+    "cell": "G30",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.tasp2040.com/wp-content/uploads/2020/12/Chapter-7-Airport-Classifications-and-NPIAS-Evaluation.pdf\",\"https://www.tasp2040.com/wp-content/uploads/2020/12/Chapter-7-Airport-\")"
+   },
+   {
+    "cell": "A31",
+    "before": null,
+    "after": "Markings area rule of thumb"
+   },
+   {
+    "cell": "F31",
+    "before": null,
+    "after": "2,000 to 3,000 SF per 1,000 ft of runway for a full runway marking set (centerline, thresholds, designators, aiming points, TDZ where applicable); use the marking plan quantity when available"
+   },
+   {
+    "cell": "G31",
+    "before": null,
+    "after": "engineering judgement; verify with the marking plan"
+   },
+   {
+    "cell": "A32",
+    "before": null,
+    "after": "Mainline area = length x width / 9. Shoulders (D27) are usually unpaved at TN GA airports; enter paved shoulders only. Area drives the closure-day defaults on the alternative sheets."
+   },
+   {
+    "cell": "A34",
+    "before": null,
+    "after": "3. Unit costs: workbook defaults (Pay_Items, column F) against recent bids"
+   },
+   {
+    "cell": "A35",
+    "before": null,
+    "after": "Pay item"
+   },
+   {
+    "cell": "B35",
+    "before": null,
+    "after": "Workbook default (live)"
+   },
+   {
+    "cell": "C35",
+    "before": null,
+    "after": "Unit"
+   },
+   {
+    "cell": "D35",
+    "before": null,
+    "after": "Recent bid range"
+   },
+   {
+    "cell": "E35",
+    "before": null,
+    "after": "Year"
+   },
+   {
+    "cell": "F35",
+    "before": null,
+    "after": "Reading"
+   },
+   {
+    "cell": "G35",
+    "before": null,
+    "after": "Source"
+   },
+   {
+    "cell": "A36",
+    "before": null,
+    "after": "P-401 Asphalt Surface Course"
+   },
+   {
+    "cell": "B36",
+    "before": null,
+    "after": "=IFERROR(VLOOKUP(\"Asphalt Surface Course\",Pay_Items!$D:$F,3,0),\"\")"
+   },
+   {
+    "cell": "C36",
+    "before": null,
+    "after": "$/ton"
+   },
+   {
+    "cell": "D36",
+    "before": null,
+    "after": "185 (low bid) to 232 (engineer's estimate)"
+   },
+   {
+    "cell": "E36",
+    "before": null,
+    "after": "2025"
+   },
+   {
+    "cell": "F36",
+    "before": null,
+    "after": "Workbook default looks low against 2025 southeastern bids; confirm before relying on the default"
+   },
+   {
+    "cell": "G36",
+    "before": null,
+    "after": "=HYPERLINK(\"https://aeronautics.sc.gov/sites/default/files/2025-05/250521_FLO_Rehab_Twy_A.pdf\",\"https://aeronautics.sc.gov/sites/default/files/2025-05/250521_FLO_Reha\")"
+   },
+   {
+    "cell": "A37",
+    "before": null,
+    "after": "P-401 Asphalt Base Course"
+   },
+   {
+    "cell": "B37",
+    "before": null,
+    "after": "=IFERROR(VLOOKUP(\"Asphalt Base Course\",Pay_Items!$D:$F,3,0),\"\")"
+   },
+   {
+    "cell": "C37",
+    "before": null,
+    "after": "$/ton"
+   },
+   {
+    "cell": "D37",
+    "before": null,
+    "after": "typically 5 to 10% below surface course"
+   },
+   {
+    "cell": "G37",
+    "before": null,
+    "after": "=HYPERLINK(\"https://aeronautics.sc.gov/airport-development/sc-airport-capital-project-bid-tabulations\",\"https://aeronautics.sc.gov/airport-development/sc-airport-capital-proj\")"
+   },
+   {
+    "cell": "A38",
+    "before": null,
+    "after": "P-501 Concrete Pavement, 9-inch"
+   },
+   {
+    "cell": "B38",
+    "before": null,
+    "after": "=IFERROR(VLOOKUP(\"Concrete Pavement, 9-inch\",Pay_Items!$D:$F,3,0),\"\")"
+   },
+   {
+    "cell": "C38",
+    "before": null,
+    "after": "$/SY"
+   },
+   {
+    "cell": "D38",
+    "before": null,
+    "after": "165 (8-in doweled apron, planning value)"
+   },
+   {
+    "cell": "E38",
+    "before": null,
+    "after": "2023"
+   },
+   {
+    "cell": "F38",
+    "before": null,
+    "after": "Planning value from another state DOT; obtain a TN or southeastern PCC bid before use"
+   },
+   {
+    "cell": "G38",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.dot.state.mn.us/aero/planning/documents/sasp/saspappendixf.pdf\",\"https://www.dot.state.mn.us/aero/planning/documents/sasp/saspappendixf\")"
+   },
+   {
+    "cell": "A39",
+    "before": null,
+    "after": "P-209 Crushed Aggregate Base Course"
+   },
+   {
+    "cell": "B39",
+    "before": null,
+    "after": "=IFERROR(VLOOKUP(\"Crushed Aggregate Base Course\",Pay_Items!$D:$F,3,0),\"\")"
+   },
+   {
+    "cell": "C39",
+    "before": null,
+    "after": "$/CY"
+   },
+   {
+    "cell": "D39",
+    "before": null,
+    "after": "not found in open sources; see SC bid tabs"
+   },
+   {
+    "cell": "G39",
+    "before": null,
+    "after": "=HYPERLINK(\"https://aeronautics.sc.gov/airport-development/sc-airport-capital-project-bid-tabulations\",\"https://aeronautics.sc.gov/airport-development/sc-airport-capital-proj\")"
+   },
+   {
+    "cell": "A40",
+    "before": null,
+    "after": "P-154 Subbase Course"
+   },
+   {
+    "cell": "B40",
+    "before": null,
+    "after": "=IFERROR(VLOOKUP(\"Subbase Course\",Pay_Items!$D:$F,3,0),\"\")"
+   },
+   {
+    "cell": "C40",
+    "before": null,
+    "after": "$/CY"
+   },
+   {
+    "cell": "D40",
+    "before": null,
+    "after": "not found in open sources; see SC bid tabs"
+   },
+   {
+    "cell": "G40",
+    "before": null,
+    "after": "=HYPERLINK(\"https://aeronautics.sc.gov/airport-development/sc-airport-capital-project-bid-tabulations\",\"https://aeronautics.sc.gov/airport-development/sc-airport-capital-proj\")"
+   },
+   {
+    "cell": "A41",
+    "before": null,
+    "after": "P-101 Cold Milling"
+   },
+   {
+    "cell": "B41",
+    "before": null,
+    "after": "=IFERROR(VLOOKUP(\"Cold Milling\",Pay_Items!$D:$F,3,0),\"\")"
+   },
+   {
+    "cell": "C41",
+    "before": null,
+    "after": "$/SY"
+   },
+   {
+    "cell": "D41",
+    "before": null,
+    "after": "4.70 (3-in, low bid) to 10.00 (variable depth, EE)"
+   },
+   {
+    "cell": "E41",
+    "before": null,
+    "after": "2025"
+   },
+   {
+    "cell": "G41",
+    "before": null,
+    "after": "=HYPERLINK(\"https://aeronautics.sc.gov/sites/default/files/2025-05/250521_FLO_Rehab_Twy_A.pdf\",\"https://aeronautics.sc.gov/sites/default/files/2025-05/250521_FLO_Reha\")"
+   },
+   {
+    "cell": "A42",
+    "before": null,
+    "after": "P-608 Emulsified Asphalt Surface Treatment"
+   },
+   {
+    "cell": "B42",
+    "before": null,
+    "after": "=IFERROR(VLOOKUP(\"Emulsified Asphalt Surface Treatment\",Pay_Items!$D:$F,3,0),\"\")"
+   },
+   {
+    "cell": "C42",
+    "before": null,
+    "after": "$/SY"
+   },
+   {
+    "cell": "D42",
+    "before": null,
+    "after": "TDOT APMM 2022 Summary of Bids"
+   },
+   {
+    "cell": "E42",
+    "before": null,
+    "after": "2022"
+   },
+   {
+    "cell": "F42",
+    "before": null,
+    "after": "State maintenance contract prices apply to seal coats and crack sealing"
+   },
+   {
+    "cell": "G42",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.tn.gov/tdot/aeronautics/apmm-contract.html\",\"https://www.tn.gov/tdot/aeronautics/apmm-contract.html\")"
+   },
+   {
+    "cell": "A43",
+    "before": null,
+    "after": "P-620 Markings (reflective)"
+   },
+   {
+    "cell": "B43",
+    "before": null,
+    "after": "=IFERROR(VLOOKUP(\"Markings (prep, markings, reflective media)\",Pay_Items!$D:$F,3,0),\"\")"
+   },
+   {
+    "cell": "C43",
+    "before": null,
+    "after": "$/SF"
+   },
+   {
+    "cell": "D43",
+    "before": null,
+    "after": "TDOT APMM 2022 Summary of Bids"
+   },
+   {
+    "cell": "E43",
+    "before": null,
+    "after": "2022"
+   },
+   {
+    "cell": "G43",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.tn.gov/tdot/aeronautics/apmm-contract.html\",\"https://www.tn.gov/tdot/aeronautics/apmm-contract.html\")"
+   },
+   {
+    "cell": "A44",
+    "before": null,
+    "after": "All-in runway reconstruction, TN 2024-2025 (pavement + lighting + grading)"
+   },
+   {
+    "cell": "C44",
+    "before": null,
+    "after": "$/SY"
+   },
+   {
+    "cell": "D44",
+    "before": null,
+    "after": "210 (Smyrna 1/19) to 280 (MKL 2/20)"
+   },
+   {
+    "cell": "E44",
+    "before": null,
+    "after": "2025"
+   },
+   {
+    "cell": "F44",
+    "before": null,
+    "after": "Project-level figures; the LCCA compares pavement pay items only"
+   },
+   {
+    "cell": "G44",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.smyrnaairport.com/news-events/smyrna-airport-runway-119-grand-opening\",\"https://www.smyrnaairport.com/news-events/smyrna-airport-runway-119-gr\")"
+   },
+   {
+    "cell": "A45",
+    "before": null,
+    "after": "State maintenance project example (Dyersburg): >200,000 LF crack seal, >121,000 SY seal coat, markings"
+   },
+   {
+    "cell": "B45",
+    "before": null,
+    "after": "820000"
+   },
+   {
+    "cell": "C45",
+    "before": null,
+    "after": "$"
+   },
+   {
+    "cell": "E45",
+    "before": null,
+    "after": "2023"
+   },
+   {
+    "cell": "F45",
+    "before": null,
+    "after": "about $5/SY of runway treated"
+   },
+   {
+    "cell": "G45",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.stategazette.com/news/regional-airport-receives-state-grant/article_5fd852fd-1d67-525c-b6fc-b32fbc676bdc.html\",\"https://www.stategazette.com/news/regional-airport-receives-state-gran\")"
+   },
+   {
+    "cell": "A46",
+    "before": null,
+    "after": "Pay_Items column F holds the default unit cost used by the alternative sheets (regional columns G:I are blank in v1.2.0). The defaults date from the 2022 framework; the 2025 comparison rows suggest the asphalt default is below current bids. Updating Pay_Items is the only place a cost needs to change."
+   },
+   {
+    "cell": "A48",
+    "before": null,
+    "after": "4. Closure-day defaults built into the alternative sheets (cells F4:F10; override with project-specific values)"
+   },
+   {
+    "cell": "A49",
+    "before": null,
+    "after": "Operation"
+   },
+   {
+    "cell": "B49",
+    "before": null,
+    "after": "Production rate in the formula"
+   },
+   {
+    "cell": "C49",
+    "before": null,
+    "after": "Days for a 6,000 x 100 ft runway (66,667 SY, 15,000 SF markings)"
+   },
+   {
+    "cell": "D49",
+    "before": null,
+    "after": "Where used"
+   },
+   {
+    "cell": "E49",
+    "before": null,
+    "after": "Note"
+   },
+   {
+    "cell": "G49",
+    "before": null,
+    "after": "Source"
+   },
+   {
+    "cell": "A50",
+    "before": null,
+    "after": "Surface treatment (seal coat)"
+   },
+   {
+    "cell": "B50",
+    "before": null,
+    "after": "15,000 SY/day"
+   },
+   {
+    "cell": "C50",
+    "before": null,
+    "after": "=ROUNDUP(66667/15000,0)"
+   },
+   {
+    "cell": "D50",
+    "before": null,
+    "after": "HMA Maintenance 1-6"
+   },
+   {
+    "cell": "E50",
+    "before": null,
+    "after": "each operation is rounded up to whole days"
+   },
+   {
+    "cell": "G50",
+    "before": null,
+    "after": "this workbook (MBT and SRB runs)"
+   },
+   {
+    "cell": "A51",
+    "before": null,
+    "after": "Markings: paint / layout and removal"
+   },
+   {
+    "cell": "B51",
+    "before": null,
+    "after": "20,000 SF/day and 50,000 SF/day"
+   },
+   {
+    "cell": "C51",
+    "before": null,
+    "after": "=ROUNDUP(15000/20000,0)+ROUNDUP(15000/50000,0)"
+   },
+   {
+    "cell": "D51",
+    "before": null,
+    "after": "every HMA activity"
+   },
+   {
+    "cell": "G51",
+    "before": null,
+    "after": "this workbook"
+   },
+   {
+    "cell": "A52",
+    "before": null,
+    "after": "Patching"
+   },
+   {
+    "cell": "B52",
+    "before": null,
+    "after": "10,000 SY of pavement per day at the policy rate (0.75% to 1.25% of area)"
+   },
+   {
+    "cell": "C52",
+    "before": null,
+    "after": "=ROUNDUP(66667*0.0075/10000,0)"
+   },
+   {
+    "cell": "D52",
+    "before": null,
+    "after": "HMA Maintenance 3, 4, 6"
+   },
+   {
+    "cell": "G52",
+    "before": null,
+    "after": "this workbook"
+   },
+   {
+    "cell": "A53",
+    "before": null,
+    "after": "Crack sealing"
+   },
+   {
+    "cell": "B53",
+    "before": null,
+    "after": "5,000 SY of pavement per day at the policy rate (3.25% to 4% of area)"
+   },
+   {
+    "cell": "C53",
+    "before": null,
+    "after": "=ROUNDUP(66667*0.0325/5000,0)"
+   },
+   {
+    "cell": "D53",
+    "before": null,
+    "after": "HMA Maintenance 3, 4, 6"
+   },
+   {
+    "cell": "G53",
+    "before": null,
+    "after": "this workbook"
+   },
+   {
+    "cell": "A54",
+    "before": null,
+    "after": "Mill and overlay (4 in)"
+   },
+   {
+    "cell": "B54",
+    "before": null,
+    "after": "3,800 SY/day"
+   },
+   {
+    "cell": "C54",
+    "before": null,
+    "after": "=ROUNDUP(66667/3800,0)+ROUNDUP(15000/50000,0)"
+   },
+   {
+    "cell": "D54",
+    "before": null,
+    "after": "HMA Rehabilitation 1"
+   },
+   {
+    "cell": "E54",
+    "before": null,
+    "after": "the largest HMA closure"
+   },
+   {
+    "cell": "G54",
+    "before": null,
+    "after": "this workbook"
+   },
+   {
+    "cell": "A55",
+    "before": null,
+    "after": "PCC joint resealing"
+   },
+   {
+    "cell": "B55",
+    "before": null,
+    "after": "about 1 LF of joint per SY of slab, 10,000 LF/day"
+   },
+   {
+    "cell": "C55",
+    "before": null,
+    "after": "=ROUNDUP(66667*550/(50*100/9)/10000,0)"
+   },
+   {
+    "cell": "D55",
+    "before": null,
+    "after": "PCC Maintenance 1 and Rehabilitation 1"
+   },
+   {
+    "cell": "G55",
+    "before": null,
+    "after": "this workbook"
+   },
+   {
+    "cell": "A56",
+    "before": null,
+    "after": "PCC crack sealing, partial- and full-depth patching"
+   },
+   {
+    "cell": "B56",
+    "before": null,
+    "after": "5,000 to 10,000 SY of pavement per day at the policy rate"
+   },
+   {
+    "cell": "C56",
+    "before": null,
+    "after": "=ROUNDUP(66667*0.003/10000,0)+ROUNDUP(66667*0.0013/5000,0)+ROUNDUP(66667*0.0025/5000,0)"
+   },
+   {
+    "cell": "D56",
+    "before": null,
+    "after": "PCC Maintenance 1"
+   },
+   {
+    "cell": "G56",
+    "before": null,
+    "after": "this workbook"
+   },
+   {
+    "cell": "A57",
+    "before": null,
+    "after": "PCC slab replacement (2% of area) + cure"
+   },
+   {
+    "cell": "B57",
+    "before": null,
+    "after": "1,000 SY/day plus 7 days cure"
+   },
+   {
+    "cell": "C57",
+    "before": null,
+    "after": "=ROUNDUP(66667*0.02/1000,0)+7"
+   },
+   {
+    "cell": "D57",
+    "before": null,
+    "after": "PCC Rehabilitation 1"
+   },
+   {
+    "cell": "E57",
+    "before": null,
+    "after": "the largest PCC closure"
+   },
+   {
+    "cell": "G57",
+    "before": null,
+    "after": "this workbook"
+   },
+   {
+    "cell": "A58",
+    "before": null,
+    "after": "Typical totals over 30 years"
+   },
+   {
+    "cell": "C58",
+    "before": null,
+    "after": "HMA 57 to 67 days in 7 closures; PCC 27 to 29 days in 2 closures"
+   },
+   {
+    "cell": "D58",
+    "before": null,
+    "after": "Summary column Q"
+   },
+   {
+    "cell": "E58",
+    "before": null,
+    "after": "MBT (52,778 SY) and CKV test (66,667 SY)"
+   },
+   {
+    "cell": "G58",
+    "before": null,
+    "after": "this workbook"
+   },
+   {
+    "cell": "A59",
+    "before": null,
+    "after": "Initial construction is not a closure in the model (the runway is assumed closed for construction regardless of alternative). Lost revenue = closure days x airport daily revenue x 100%; a per-category \"share lost\" factor is a policy decision listed in the change notes."
+   },
+   {
+    "cell": "A61",
+    "before": null,
+    "after": "5. Economic parameters (D33 analysis period, D34 discount rate, salvage)"
+   },
+   {
+    "cell": "A62",
+    "before": null,
+    "after": "Parameter"
+   },
+   {
+    "cell": "B62",
+    "before": null,
+    "after": "Value"
+   },
+   {
+    "cell": "C62",
+    "before": null,
+    "after": "Applies to"
+   },
+   {
+    "cell": "D62",
+    "before": null,
+    "after": "Year"
+   },
+   {
+    "cell": "F62",
+    "before": null,
+    "after": "Reading"
+   },
+   {
+    "cell": "G62",
+    "before": null,
+    "after": "Source"
+   },
+   {
+    "cell": "A63",
+    "before": null,
+    "after": "TDOT policy discount rate (workbook default)"
+   },
+   {
+    "cell": "B63",
+    "before": null,
+    "after": "='General Information'!$D$34"
+   },
+   {
+    "cell": "C63",
+    "before": null,
+    "after": "%"
+   },
+   {
+    "cell": "F63",
+    "before": null,
+    "after": "live from General Information D34"
+   },
+   {
+    "cell": "G63",
+    "before": null,
+    "after": "this workbook"
+   },
+   {
+    "cell": "A64",
+    "before": null,
+    "after": "TDOT policy analysis period (workbook default)"
+   },
+   {
+    "cell": "B64",
+    "before": null,
+    "after": "='General Information'!$D$33"
+   },
+   {
+    "cell": "C64",
+    "before": null,
+    "after": "years"
+   },
+   {
+    "cell": "F64",
+    "before": null,
+    "after": "live from General Information D33"
+   },
+   {
+    "cell": "G64",
+    "before": null,
+    "after": "this workbook"
+   },
+   {
+    "cell": "A65",
+    "before": null,
+    "after": "FAA AIP: discount rate for pavement cost-effectiveness (PGL 22-01, June 2022)"
+   },
+   {
+    "cell": "B65",
+    "before": null,
+    "after": "OMB Circular A-94 Appendix C real rate for the analysis period"
+   },
+   {
+    "cell": "C65",
+    "before": null,
+    "after": "%"
+   },
+   {
+    "cell": "D65",
+    "before": null,
+    "after": "2022"
+   },
+   {
+    "cell": "F65",
+    "before": null,
+    "after": "Replaced the fixed 7% rule; the analysis period is now the engineer's choice (the fixed 20-year requirement was removed)"
+   },
+   {
+    "cell": "G65",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.faa.gov/airports/aip/guidance_letters/aip_pgl_22_01\",\"https://www.faa.gov/airports/aip/guidance_letters/aip_pgl_22_01\")"
+   },
+   {
+    "cell": "A66",
+    "before": null,
+    "after": "OMB A-94 Appendix C real rate, 20-year and 30-year (calendar 2026)"
+   },
+   {
+    "cell": "B66",
+    "before": null,
+    "after": "2"
+   },
+   {
+    "cell": "C66",
+    "before": null,
+    "after": "%"
+   },
+   {
+    "cell": "D66",
+    "before": null,
+    "after": "2026"
+   },
+   {
+    "cell": "F66",
+    "before": null,
+    "after": "Revised March 2026 (OMB memo M-26-09); 2025 values were 1.8% (10-yr) and 2.3% (30-yr)"
+   },
+   {
+    "cell": "G66",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.whitehouse.gov/wp-content/uploads/2026/03/CircularA-94Appendix-C.pdf\",\"https://www.whitehouse.gov/wp-content/uploads/2026/03/CircularA-94Appe\")"
+   },
+   {
+    "cell": "A67",
+    "before": null,
+    "after": "Legacy FAA AIP rule before PGL 22-01"
+   },
+   {
+    "cell": "B67",
+    "before": null,
+    "after": "7% and 20 years"
+   },
+   {
+    "cell": "D67",
+    "before": null,
+    "after": "2014"
+   },
+   {
+    "cell": "F67",
+    "before": null,
+    "after": "AIP Handbook (Order 5100.38D) pavement LCCA table; also the 1992 A-94 benefit-cost base case reinstated by OMB M-25-23 (April 2025) for BCA, not for cost-effectiveness"
+   },
+   {
+    "cell": "G67",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-23-Rescission-and-Reinstatement-of-Circular-No.-A-94.pdf\",\"https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-23-Rescissi\")"
+   },
+   {
+    "cell": "A68",
+    "before": null,
+    "after": "FAA AC 150/5320-6E Appendix 1 (superseded)"
+   },
+   {
+    "cell": "B68",
+    "before": null,
+    "after": "4% and 20 years; straight-line residual value"
+   },
+   {
+    "cell": "D68",
+    "before": null,
+    "after": "2009"
+   },
+   {
+    "cell": "F68",
+    "before": null,
+    "after": "Dropped in 6F/6G; still widely cited"
+   },
+   {
+    "cell": "G68",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.faa.gov/documentLibrary/media/Advisory_Circular/150_5320_6e_part4.pdf\",\"https://www.faa.gov/documentLibrary/media/Advisory_Circular/150_5320_6\")"
+   },
+   {
+    "cell": "A69",
+    "before": null,
+    "after": "AAPTP 06-06 airport LCCA guide (Auburn/NCAT)"
+   },
+   {
+    "cell": "B69",
+    "before": null,
+    "after": "4%, 20 years, NPW, remaining-life salvage; user cost includes lost airport revenue"
+   },
+   {
+    "cell": "D69",
+    "before": null,
+    "after": "2011"
+   },
+   {
+    "cell": "F69",
+    "before": null,
+    "after": "Basis for the \"airport daily revenue\" approach used here"
+   },
+   {
+    "cell": "G69",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.eng.auburn.edu/research/centers/ncat/files/aaptp/Report.Final.06-06.pdf\",\"https://www.eng.auburn.edu/research/centers/ncat/files/aaptp/Report.Fi\")"
+   },
+   {
+    "cell": "A70",
+    "before": null,
+    "after": "Caltrans LCCA manual / RealCost"
+   },
+   {
+    "cell": "B70",
+    "before": null,
+    "after": "4% real; 20 / 35 / 55 years (CAPM / rehabilitation / new construction)"
+   },
+   {
+    "cell": "D70",
+    "before": null,
+    "after": "2013"
+   },
+   {
+    "cell": "F70",
+    "before": null,
+    "after": "Agency and user costs reported as present value and EUAC; the Summary comparison block follows that layout"
+   },
+   {
+    "cell": "G70",
+    "before": null,
+    "after": "=HYPERLINK(\"https://dot.ca.gov/-/media/dot-media/programs/maintenance/documents/office-of-concrete-pavement/life-cycle-cost-analysis/lcca-25ca-manual-final-aug-1-2013-v2-a11y.pdf\",\"https://dot.ca.gov/-/media/dot-media/programs/maintenance/documents/of\")"
+   },
+   {
+    "cell": "A71",
+    "before": null,
+    "after": "Structural design life (FAARFIELD, AC 150/5320-6G)"
+   },
+   {
+    "cell": "B71",
+    "before": null,
+    "after": "20"
+   },
+   {
+    "cell": "C71",
+    "before": null,
+    "after": "years"
+   },
+   {
+    "cell": "D71",
+    "before": null,
+    "after": "2021"
+   },
+   {
+    "cell": "F71",
+    "before": null,
+    "after": "design life, not service life"
+   },
+   {
+    "cell": "G71",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.faa.gov/documentLibrary/media/Advisory_Circular/150-5320-6G-Pavement-Design.pdf\",\"https://www.faa.gov/documentLibrary/media/Advisory_Circular/150-5320-6\")"
+   },
+   {
+    "cell": "A72",
+    "before": null,
+    "after": "Salvage: HMA"
+   },
+   {
+    "cell": "B72",
+    "before": null,
+    "after": "='Maintenance Policies'!$D$32"
+   },
+   {
+    "cell": "C72",
+    "before": null,
+    "after": "fraction of the last mill-and-overlay"
+   },
+   {
+    "cell": "F72",
+    "before": null,
+    "after": "live from Maintenance Policies D32 (policy: 2 of 16 years remaining)"
+   },
+   {
+    "cell": "G72",
+    "before": null,
+    "after": "this workbook"
+   },
+   {
+    "cell": "A73",
+    "before": null,
+    "after": "Salvage: PCC"
+   },
+   {
+    "cell": "B73",
+    "before": null,
+    "after": "='Maintenance Policies'!$D$46"
+   },
+   {
+    "cell": "C73",
+    "before": null,
+    "after": "fraction of initial construction"
+   },
+   {
+    "cell": "F73",
+    "before": null,
+    "after": "live from Maintenance Policies D46 (policy: 10 of 40 years remaining)"
+   },
+   {
+    "cell": "G73",
+    "before": null,
+    "after": "this workbook"
+   },
+   {
+    "cell": "A74",
+    "before": null,
+    "after": "Salvage method in FAA / AAPTP guidance"
+   },
+   {
+    "cell": "B74",
+    "before": null,
+    "after": "remaining life / expected life x cost of the last treatment (straight line)"
+   },
+   {
+    "cell": "D74",
+    "before": null,
+    "after": "2011"
+   },
+   {
+    "cell": "F74",
+    "before": null,
+    "after": "the workbook policy follows this form; the fractions above are the policy decision flagged in the change notes"
+   },
+   {
+    "cell": "G74",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.eng.auburn.edu/research/centers/ncat/files/aaptp/Report.Final.06-06.pdf\",\"https://www.eng.auburn.edu/research/centers/ncat/files/aaptp/Report.Fi\")"
+   },
+   {
+    "cell": "A75",
+    "before": null,
+    "after": "The Summary sensitivity chart runs 2% to 8% so both the current FAA rate (about 2%) and the legacy 7% are on the curve. G10 on the Summary states whether the lowest-cost alternative changes at either rate."
+   },
+   {
+    "cell": "A77",
+    "before": null,
+    "after": "6. Maintenance timing and service life (Maintenance Policies sheet against published experience)"
+   },
+   {
+    "cell": "A78",
+    "before": null,
+    "after": "Item"
+   },
+   {
+    "cell": "B78",
+    "before": null,
+    "after": "Workbook policy (live)"
+   },
+   {
+    "cell": "C78",
+    "before": null,
+    "after": "Published range"
+   },
+   {
+    "cell": "D78",
+    "before": null,
+    "after": "Year"
+   },
+   {
+    "cell": "F78",
+    "before": null,
+    "after": "Reading"
+   },
+   {
+    "cell": "G78",
+    "before": null,
+    "after": "Source"
+   },
+   {
+    "cell": "A79",
+    "before": null,
+    "after": "HMA surface treatment / markings"
+   },
+   {
+    "cell": "B79",
+    "before": null,
+    "after": "=\"years \"&'Maintenance Policies'!$E$10&\", \"&'Maintenance Policies'!$E$12&\", \"&'Maintenance Policies'!$E$26"
+   },
+   {
+    "cell": "C79",
+    "before": null,
+    "after": "preventive-maintenance window PCI 60-80; inspect PCI every 3 years (AIP airports)"
+   },
+   {
+    "cell": "D79",
+    "before": null,
+    "after": "2014"
+   },
+   {
+    "cell": "F79",
+    "before": null,
+    "after": "FAA ACs give the PCI window, not fixed year intervals; 4-year cycles are the TDOT policy"
+   },
+   {
+    "cell": "G79",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.faa.gov/documentlibrary/media/advisory_circular/150-5380-7b.pdf\",\"https://www.faa.gov/documentlibrary/media/advisory_circular/150-5380-7\")"
+   },
+   {
+    "cell": "A80",
+    "before": null,
+    "after": "HMA patching + crack sealing + treatment"
+   },
+   {
+    "cell": "B80",
+    "before": null,
+    "after": "=\"years \"&'Maintenance Policies'!$E$14&\", \"&'Maintenance Policies'!$E$18&\", \"&'Maintenance Policies'!$E$28"
+   },
+   {
+    "cell": "C80",
+    "before": null,
+    "after": "crack sealing, patching, seal coats per AC 150/5380-6C"
+   },
+   {
+    "cell": "D80",
+    "before": null,
+    "after": "2014"
+   },
+   {
+    "cell": "G80",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.faa.gov/documentlibrary/media/advisory_circular/150-5380-6c.pdf\",\"https://www.faa.gov/documentlibrary/media/advisory_circular/150-5380-6\")"
+   },
+   {
+    "cell": "A81",
+    "before": null,
+    "after": "HMA mill and overlay"
+   },
+   {
+    "cell": "B81",
+    "before": null,
+    "after": "=\"year \"&'Maintenance Policies'!$E$22"
+   },
+   {
+    "cell": "C81",
+    "before": null,
+    "after": "asphalt runways reach PCI 70 in about 12 to 15 years (FAA 2014 performance trends)"
+   },
+   {
+    "cell": "D81",
+    "before": null,
+    "after": "2014"
+   },
+   {
+    "cell": "F81",
+    "before": null,
+    "after": "policy year 20 is at the optimistic end of the published range"
+   },
+   {
+    "cell": "G81",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.acpa.org/wp-content/uploads/2025/03/ACPA-Achieving-the-Goals-of-the-FAAs-Extended-Airport-Pavement-Life-Program.pdf\",\"https://www.acpa.org/wp-content/uploads/2025/03/ACPA-Achieving-the-Goa\")"
+   },
+   {
+    "cell": "A82",
+    "before": null,
+    "after": "PCC joint resealing + patching"
+   },
+   {
+    "cell": "B82",
+    "before": null,
+    "after": "=\"year \"&'Maintenance Policies'!$E$37"
+   },
+   {
+    "cell": "C82",
+    "before": null,
+    "after": "hot-pour sealant 3-8 yr; silicone 8-15 yr; compression seals 15-20 yr"
+   },
+   {
+    "cell": "F82",
+    "before": null,
+    "after": "policy year 19 assumes silicone-class sealant life"
+   },
+   {
+    "cell": "G82",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.tarmacview.com/glossary/joint-sealant/\",\"https://www.tarmacview.com/glossary/joint-sealant/\")"
+   },
+   {
+    "cell": "A83",
+    "before": null,
+    "after": "PCC slab replacement (2%) + joints"
+   },
+   {
+    "cell": "B83",
+    "before": null,
+    "after": "=\"year \"&'Maintenance Policies'!$E$41"
+   },
+   {
+    "cell": "C83",
+    "before": null,
+    "after": "PCC runways reach PCI 70 at about 40 years (FAA 2014)"
+   },
+   {
+    "cell": "D83",
+    "before": null,
+    "after": "2014"
+   },
+   {
+    "cell": "G83",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.acpa.org/wp-content/uploads/2025/03/ACPA-Achieving-the-Goals-of-the-FAAs-Extended-Airport-Pavement-Life-Program.pdf\",\"https://www.acpa.org/wp-content/uploads/2025/03/ACPA-Achieving-the-Goa\")"
+   },
+   {
+    "cell": "A84",
+    "before": null,
+    "after": "Expected service life"
+   },
+   {
+    "cell": "B84",
+    "before": null,
+    "after": "HMA 20 yr design; PCC 30-40 yr"
+   },
+   {
+    "cell": "C84",
+    "before": null,
+    "after": "FAA Extended Airport Pavement Life program targets 40 years"
+   },
+   {
+    "cell": "D84",
+    "before": null,
+    "after": "2024"
+   },
+   {
+    "cell": "G84",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.airporttech.tc.faa.gov/Portals/0/FactSheets/Extended%20Airport%20Pavement%20Life%20Factsheet_May%202024.pdf\",\"https://www.airporttech.tc.faa.gov/Portals/0/FactSheets/Extended%20Air\")"
+   },
+   {
+    "cell": "A85",
+    "before": null,
+    "after": "Treatment fact sheets with life and cost by treatment"
+   },
+   {
+    "cell": "C85",
+    "before": null,
+    "after": "ACRP Report 159 (GA airports) and ACRP Synthesis 22"
+   },
+   {
+    "cell": "D85",
+    "before": null,
+    "after": "2016"
+   },
+   {
+    "cell": "F85",
+    "before": null,
+    "after": "use for project-specific overrides of the policy years"
+   },
+   {
+    "cell": "G85",
+    "before": null,
+    "after": "=HYPERLINK(\"https://nap.nationalacademies.org/catalog/23649/\",\"https://nap.nationalacademies.org/catalog/23649/\")"
+   },
+   {
+    "cell": "A86",
+    "before": null,
+    "after": "Minimum layer thickness, AC 150/5320-6G"
+   },
+   {
+    "cell": "C86",
+    "before": null,
+    "after": "P-401 surface 4 in (>= 12,500 lb); P-209 base 6 in; P-501 6 in (5 in under 12,500 lb)"
+   },
+   {
+    "cell": "D86",
+    "before": null,
+    "after": "2021"
+   },
+   {
+    "cell": "F86",
+    "before": null,
+    "after": "check the pay-item quantities against these minimums"
+   },
+   {
+    "cell": "G86",
+    "before": null,
+    "after": "=HYPERLINK(\"https://www.faa.gov/documentLibrary/media/Advisory_Circular/150-5320-6G-Pavement-Design.pdf\",\"https://www.faa.gov/documentLibrary/media/Advisory_Circular/150-5320-6\")"
+   },
+   {
+    "cell": "A87",
+    "before": null,
+    "after": "Maintenance Policies drives every activity year and rate; this section only shows them next to the published ranges. Sources were read from search excerpts in September 2026 because the FAA and OMB sites could not be opened from the build environment; confirm the cited paragraphs before quoting them to FAA."
+   },
+   {
+    "cell": "A89",
+    "before": null,
+    "after": "Airport daily revenue used for lost-revenue cost (the 17 airports with revenue data; live from RevenueData)"
+   },
+   {
+    "cell": "A90",
+    "before": null,
+    "after": "Airport ID"
+   },
+   {
+    "cell": "B90",
+    "before": null,
+    "after": "Daily revenue ($/day)"
+   },
+   {
+    "cell": "C90",
+    "before": null,
+    "after": "Lost revenue, 7-day closure ($)"
+   },
+   {
+    "cell": "D90",
+    "before": null,
+    "after": "Lost revenue, 19-day closure ($)"
+   },
+   {
+    "cell": "E90",
+    "before": null,
+    "after": "Columns holding text (counted as $0)"
+   },
+   {
+    "cell": "G90",
+    "before": null,
+    "after": "Source"
+   },
+   {
+    "cell": "A91",
+    "before": null,
+    "after": "=IF(RevenueData!A2=\"\",\"\",RevenueData!A2)"
+   },
+   {
+    "cell": "B91",
+    "before": null,
+    "after": "=IF(A91=\"\",\"\",SUMIF(RevenueData!$A:$A,A91,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A91,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A91,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A91,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A91,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A91,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A91,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C91",
+    "before": null,
+    "after": "=IF(A91=\"\",\"\",B91*7)"
+   },
+   {
+    "cell": "D91",
+    "before": null,
+    "after": "=IF(A91=\"\",\"\",B91*19)"
+   },
+   {
+    "cell": "E91",
+    "before": null,
+    "after": "=IF(A91=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B2),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C2),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G2),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H2),\"\",\"other\")))"
+   },
+   {
+    "cell": "G91",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A92",
+    "before": null,
+    "after": "=IF(RevenueData!A3=\"\",\"\",RevenueData!A3)"
+   },
+   {
+    "cell": "B92",
+    "before": null,
+    "after": "=IF(A92=\"\",\"\",SUMIF(RevenueData!$A:$A,A92,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A92,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A92,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A92,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A92,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A92,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A92,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C92",
+    "before": null,
+    "after": "=IF(A92=\"\",\"\",B92*7)"
+   },
+   {
+    "cell": "D92",
+    "before": null,
+    "after": "=IF(A92=\"\",\"\",B92*19)"
+   },
+   {
+    "cell": "E92",
+    "before": null,
+    "after": "=IF(A92=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B3),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C3),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G3),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H3),\"\",\"other\")))"
+   },
+   {
+    "cell": "G92",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A93",
+    "before": null,
+    "after": "=IF(RevenueData!A4=\"\",\"\",RevenueData!A4)"
+   },
+   {
+    "cell": "B93",
+    "before": null,
+    "after": "=IF(A93=\"\",\"\",SUMIF(RevenueData!$A:$A,A93,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A93,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A93,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A93,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A93,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A93,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A93,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C93",
+    "before": null,
+    "after": "=IF(A93=\"\",\"\",B93*7)"
+   },
+   {
+    "cell": "D93",
+    "before": null,
+    "after": "=IF(A93=\"\",\"\",B93*19)"
+   },
+   {
+    "cell": "E93",
+    "before": null,
+    "after": "=IF(A93=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B4),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C4),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G4),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H4),\"\",\"other\")))"
+   },
+   {
+    "cell": "G93",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A94",
+    "before": null,
+    "after": "=IF(RevenueData!A5=\"\",\"\",RevenueData!A5)"
+   },
+   {
+    "cell": "B94",
+    "before": null,
+    "after": "=IF(A94=\"\",\"\",SUMIF(RevenueData!$A:$A,A94,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A94,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A94,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A94,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A94,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A94,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A94,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C94",
+    "before": null,
+    "after": "=IF(A94=\"\",\"\",B94*7)"
+   },
+   {
+    "cell": "D94",
+    "before": null,
+    "after": "=IF(A94=\"\",\"\",B94*19)"
+   },
+   {
+    "cell": "E94",
+    "before": null,
+    "after": "=IF(A94=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B5),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C5),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G5),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H5),\"\",\"other\")))"
+   },
+   {
+    "cell": "G94",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A95",
+    "before": null,
+    "after": "=IF(RevenueData!A6=\"\",\"\",RevenueData!A6)"
+   },
+   {
+    "cell": "B95",
+    "before": null,
+    "after": "=IF(A95=\"\",\"\",SUMIF(RevenueData!$A:$A,A95,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A95,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A95,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A95,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A95,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A95,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A95,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C95",
+    "before": null,
+    "after": "=IF(A95=\"\",\"\",B95*7)"
+   },
+   {
+    "cell": "D95",
+    "before": null,
+    "after": "=IF(A95=\"\",\"\",B95*19)"
+   },
+   {
+    "cell": "E95",
+    "before": null,
+    "after": "=IF(A95=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B6),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C6),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G6),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H6),\"\",\"other\")))"
+   },
+   {
+    "cell": "G95",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A96",
+    "before": null,
+    "after": "=IF(RevenueData!A7=\"\",\"\",RevenueData!A7)"
+   },
+   {
+    "cell": "B96",
+    "before": null,
+    "after": "=IF(A96=\"\",\"\",SUMIF(RevenueData!$A:$A,A96,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A96,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A96,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A96,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A96,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A96,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A96,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C96",
+    "before": null,
+    "after": "=IF(A96=\"\",\"\",B96*7)"
+   },
+   {
+    "cell": "D96",
+    "before": null,
+    "after": "=IF(A96=\"\",\"\",B96*19)"
+   },
+   {
+    "cell": "E96",
+    "before": null,
+    "after": "=IF(A96=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B7),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C7),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G7),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H7),\"\",\"other\")))"
+   },
+   {
+    "cell": "G96",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A97",
+    "before": null,
+    "after": "=IF(RevenueData!A8=\"\",\"\",RevenueData!A8)"
+   },
+   {
+    "cell": "B97",
+    "before": null,
+    "after": "=IF(A97=\"\",\"\",SUMIF(RevenueData!$A:$A,A97,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A97,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A97,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A97,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A97,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A97,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A97,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C97",
+    "before": null,
+    "after": "=IF(A97=\"\",\"\",B97*7)"
+   },
+   {
+    "cell": "D97",
+    "before": null,
+    "after": "=IF(A97=\"\",\"\",B97*19)"
+   },
+   {
+    "cell": "E97",
+    "before": null,
+    "after": "=IF(A97=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B8),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C8),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G8),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H8),\"\",\"other\")))"
+   },
+   {
+    "cell": "G97",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A98",
+    "before": null,
+    "after": "=IF(RevenueData!A9=\"\",\"\",RevenueData!A9)"
+   },
+   {
+    "cell": "B98",
+    "before": null,
+    "after": "=IF(A98=\"\",\"\",SUMIF(RevenueData!$A:$A,A98,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A98,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A98,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A98,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A98,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A98,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A98,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C98",
+    "before": null,
+    "after": "=IF(A98=\"\",\"\",B98*7)"
+   },
+   {
+    "cell": "D98",
+    "before": null,
+    "after": "=IF(A98=\"\",\"\",B98*19)"
+   },
+   {
+    "cell": "E98",
+    "before": null,
+    "after": "=IF(A98=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B9),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C9),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G9),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H9),\"\",\"other\")))"
+   },
+   {
+    "cell": "G98",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A99",
+    "before": null,
+    "after": "=IF(RevenueData!A10=\"\",\"\",RevenueData!A10)"
+   },
+   {
+    "cell": "B99",
+    "before": null,
+    "after": "=IF(A99=\"\",\"\",SUMIF(RevenueData!$A:$A,A99,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A99,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A99,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A99,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A99,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A99,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A99,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C99",
+    "before": null,
+    "after": "=IF(A99=\"\",\"\",B99*7)"
+   },
+   {
+    "cell": "D99",
+    "before": null,
+    "after": "=IF(A99=\"\",\"\",B99*19)"
+   },
+   {
+    "cell": "E99",
+    "before": null,
+    "after": "=IF(A99=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B10),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C10),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G10),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H10),\"\",\"other\")))"
+   },
+   {
+    "cell": "G99",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A100",
+    "before": null,
+    "after": "=IF(RevenueData!A11=\"\",\"\",RevenueData!A11)"
+   },
+   {
+    "cell": "B100",
+    "before": null,
+    "after": "=IF(A100=\"\",\"\",SUMIF(RevenueData!$A:$A,A100,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A100,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A100,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A100,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A100,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A100,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A100,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C100",
+    "before": null,
+    "after": "=IF(A100=\"\",\"\",B100*7)"
+   },
+   {
+    "cell": "D100",
+    "before": null,
+    "after": "=IF(A100=\"\",\"\",B100*19)"
+   },
+   {
+    "cell": "E100",
+    "before": null,
+    "after": "=IF(A100=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B11),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C11),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G11),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H11),\"\",\"other\")))"
+   },
+   {
+    "cell": "G100",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A101",
+    "before": null,
+    "after": "=IF(RevenueData!A12=\"\",\"\",RevenueData!A12)"
+   },
+   {
+    "cell": "B101",
+    "before": null,
+    "after": "=IF(A101=\"\",\"\",SUMIF(RevenueData!$A:$A,A101,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A101,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A101,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A101,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A101,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A101,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A101,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C101",
+    "before": null,
+    "after": "=IF(A101=\"\",\"\",B101*7)"
+   },
+   {
+    "cell": "D101",
+    "before": null,
+    "after": "=IF(A101=\"\",\"\",B101*19)"
+   },
+   {
+    "cell": "E101",
+    "before": null,
+    "after": "=IF(A101=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B12),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C12),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G12),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H12),\"\",\"other\")))"
+   },
+   {
+    "cell": "G101",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A102",
+    "before": null,
+    "after": "=IF(RevenueData!A13=\"\",\"\",RevenueData!A13)"
+   },
+   {
+    "cell": "B102",
+    "before": null,
+    "after": "=IF(A102=\"\",\"\",SUMIF(RevenueData!$A:$A,A102,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A102,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A102,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A102,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A102,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A102,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A102,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C102",
+    "before": null,
+    "after": "=IF(A102=\"\",\"\",B102*7)"
+   },
+   {
+    "cell": "D102",
+    "before": null,
+    "after": "=IF(A102=\"\",\"\",B102*19)"
+   },
+   {
+    "cell": "E102",
+    "before": null,
+    "after": "=IF(A102=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B13),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C13),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G13),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H13),\"\",\"other\")))"
+   },
+   {
+    "cell": "G102",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A103",
+    "before": null,
+    "after": "=IF(RevenueData!A14=\"\",\"\",RevenueData!A14)"
+   },
+   {
+    "cell": "B103",
+    "before": null,
+    "after": "=IF(A103=\"\",\"\",SUMIF(RevenueData!$A:$A,A103,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A103,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A103,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A103,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A103,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A103,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A103,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C103",
+    "before": null,
+    "after": "=IF(A103=\"\",\"\",B103*7)"
+   },
+   {
+    "cell": "D103",
+    "before": null,
+    "after": "=IF(A103=\"\",\"\",B103*19)"
+   },
+   {
+    "cell": "E103",
+    "before": null,
+    "after": "=IF(A103=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B14),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C14),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G14),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H14),\"\",\"other\")))"
+   },
+   {
+    "cell": "G103",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A104",
+    "before": null,
+    "after": "=IF(RevenueData!A15=\"\",\"\",RevenueData!A15)"
+   },
+   {
+    "cell": "B104",
+    "before": null,
+    "after": "=IF(A104=\"\",\"\",SUMIF(RevenueData!$A:$A,A104,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A104,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A104,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A104,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A104,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A104,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A104,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C104",
+    "before": null,
+    "after": "=IF(A104=\"\",\"\",B104*7)"
+   },
+   {
+    "cell": "D104",
+    "before": null,
+    "after": "=IF(A104=\"\",\"\",B104*19)"
+   },
+   {
+    "cell": "E104",
+    "before": null,
+    "after": "=IF(A104=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B15),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C15),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G15),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H15),\"\",\"other\")))"
+   },
+   {
+    "cell": "G104",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A105",
+    "before": null,
+    "after": "=IF(RevenueData!A16=\"\",\"\",RevenueData!A16)"
+   },
+   {
+    "cell": "B105",
+    "before": null,
+    "after": "=IF(A105=\"\",\"\",SUMIF(RevenueData!$A:$A,A105,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A105,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A105,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A105,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A105,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A105,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A105,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C105",
+    "before": null,
+    "after": "=IF(A105=\"\",\"\",B105*7)"
+   },
+   {
+    "cell": "D105",
+    "before": null,
+    "after": "=IF(A105=\"\",\"\",B105*19)"
+   },
+   {
+    "cell": "E105",
+    "before": null,
+    "after": "=IF(A105=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B16),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C16),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G16),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H16),\"\",\"other\")))"
+   },
+   {
+    "cell": "G105",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A106",
+    "before": null,
+    "after": "=IF(RevenueData!A17=\"\",\"\",RevenueData!A17)"
+   },
+   {
+    "cell": "B106",
+    "before": null,
+    "after": "=IF(A106=\"\",\"\",SUMIF(RevenueData!$A:$A,A106,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A106,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A106,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A106,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A106,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A106,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A106,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C106",
+    "before": null,
+    "after": "=IF(A106=\"\",\"\",B106*7)"
+   },
+   {
+    "cell": "D106",
+    "before": null,
+    "after": "=IF(A106=\"\",\"\",B106*19)"
+   },
+   {
+    "cell": "E106",
+    "before": null,
+    "after": "=IF(A106=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B17),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C17),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G17),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H17),\"\",\"other\")))"
+   },
+   {
+    "cell": "G106",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A107",
+    "before": null,
+    "after": "=IF(RevenueData!A18=\"\",\"\",RevenueData!A18)"
+   },
+   {
+    "cell": "B107",
+    "before": null,
+    "after": "=IF(A107=\"\",\"\",SUMIF(RevenueData!$A:$A,A107,RevenueData!$B:$B)+SUMIF(RevenueData!$A:$A,A107,RevenueData!$C:$C)+SUMIF(RevenueData!$A:$A,A107,RevenueData!$D:$D)+SUMIF(RevenueData!$A:$A,A107,RevenueData!$E:$E)+SUMIF(RevenueData!$A:$A,A107,RevenueData!$F:$F)+SUMIF(RevenueData!$A:$A,A107,RevenueData!$G:$G)+SUMIF(RevenueData!$A:$A,A107,RevenueData!$H:$H))"
+   },
+   {
+    "cell": "C107",
+    "before": null,
+    "after": "=IF(A107=\"\",\"\",B107*7)"
+   },
+   {
+    "cell": "D107",
+    "before": null,
+    "after": "=IF(A107=\"\",\"\",B107*19)"
+   },
+   {
+    "cell": "E107",
+    "before": null,
+    "after": "=IF(A107=\"\",\"\",TRIM(IF(ISNUMBER(RevenueData!B18),\"\",\"100LL \")&IF(ISNUMBER(RevenueData!C18),\"\",\"Jet-A \")&IF(ISNUMBER(RevenueData!G18),\"\",\"tenant \")&IF(ISNUMBER(RevenueData!H18),\"\",\"other\")))"
+   },
+   {
+    "cell": "G107",
+    "before": null,
+    "after": "RevenueData sheet in this workbook (hidden)"
+   },
+   {
+    "cell": "A108",
+    "before": null,
+    "after": "Same SUMIF chain as General Information D39: text entries in RevenueData (\" $-   \", \" NA \", descriptions on XNX and M54) count as zero. 7 days is a typical surface-treatment closure and 19 days a mill-and-overlay closure for a 6,000 x 100 ft runway (see production rates)."
+   },
+   {
+    "cell": "A110",
+    "before": null,
+    "after": "Airports in the General Information dropdown"
+   },
+   {
+    "cell": "A111",
+    "before": null,
+    "after": "Item"
+   },
+   {
+    "cell": "B111",
+    "before": null,
+    "after": "Value"
+   },
+   {
+    "cell": "G111",
+    "before": null,
+    "after": "Source"
+   },
+   {
+    "cell": "A112",
+    "before": null,
+    "after": "Airports selectable in D9"
+   },
+   {
+    "cell": "B112",
+    "before": null,
+    "after": "=COUNTA('General Information'!$L$10:$L$88)"
+   },
+   {
+    "cell": "G112",
+    "before": null,
+    "after": "General Information, hidden columns L:P"
+   },
+   {
+    "cell": "A113",
+    "before": null,
+    "after": "Airports with revenue data"
+   },
+   {
+    "cell": "B113",
+    "before": null,
+    "after": "=COUNTA(RevenueData!$A$2:$A$60)"
+   },
+   {
+    "cell": "G113",
+    "before": null,
+    "after": "RevenueData"
+   },
+   {
+    "cell": "A114",
+    "before": null,
+    "after": "Airports with a Middle / West / East region tag"
+   },
+   {
+    "cell": "B114",
+    "before": null,
+    "after": "=COUNTIF('General Information'!$P$10:$P$88,\"Middle\")&\" / \"&COUNTIF('General Information'!$P$10:$P$88,\"West\")&\" / \"&COUNTIF('General Information'!$P$10:$P$88,\"East\")"
+   },
+   {
+    "cell": "G114",
+    "before": null,
+    "after": "General Information, hidden columns L:P"
    }
   ]
  },
@@ -5814,8 +8616,8 @@
  ],
  "hashes": {
   "8eaa2547-TDOA_LCCA_Framework_v1.1.2_ARA_Task2_08182026.xlsm": "b0680f2a90e86654a5d7e57eb29ae45e960ddf7b517ccb65bc2978afaee4705a",
-  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "c60aaf177ceac3c8011b1d896a84bfe39ee2cb1d9f93d660151449ad37ab4af4",
-  "TDOT_LCCA_Decision_Workbook.xlsx": "27626ed0e58784a85c3894dcd7cafc8108c0576d5db7acd7eb47e0c5a34ed658",
+  "TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm": "836ac0b450c70f5453ba4503c8cb5eb3a32fd8b3d90e0f9b64914050c88531d6",
+  "TDOT_LCCA_Decision_Workbook.xlsx": "09b8585b8086a163b0a3e44f7d04606f8478a2e735fd72899059d132fefe4856",
   "Output.bas": "7e7e1cad7c0d41cc23d929d643a2e4ce5861761c2885f82e9a0b0757a0a8fd82",
   "35f08cad-TDOA_LCCA_Framework_v1.1.2_MBT_20260521_LostRevenue_1.xlsm": "117135e9facc9395b88883c3ffd4de48b67cb997605d6ad0a1acd7d64edfb08b",
   "527a5482-TDOA_LCCA_Framework_v1.1.2_SRB_20260521_LostRevenue.xlsm": "b0d001b1beaac7a40569329939d43c732a33a780f2c0d1db89ef1e1fcabc1b68"

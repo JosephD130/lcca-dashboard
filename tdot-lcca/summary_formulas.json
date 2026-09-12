@@ -61,7 +61,47 @@
  ],
  [
   "G10",
-  "=IF(COUNT($O$4:$O$7)<2,\"\",IF(INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))=INDEX($H$4:$H$7,MATCH(MIN($X$32:$AA$32),$X$32:$AA$32,0)),\"The same alternative is lowest at the FAA AIP rate of 7%.\",\"At the FAA AIP rate of 7% the lowest-cost alternative changes: see chart 2.\"))"
+  "=IF(COUNT($O$4:$O$7)<2,\"\",IF(INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))=INDEX($H$4:$H$7,MATCH(SMALL($X$12:$AA$12,COUNTIF($X$12:$AA$12,0)+1),$X$12:$AA$12,0)),\"Same lowest-cost alternative at 2% (OMB A-94 real rate, FAA PGL 22-01)\",\"At 2% (OMB A-94 real rate, FAA PGL 22-01) the lowest-cost alternative changes\")&\"   |   \"&IF(INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))=INDEX($H$4:$H$7,MATCH(SMALL($X$32:$AA$32,COUNTIF($X$32:$AA$32,0)+1),$X$32:$AA$32,0)),\"same at 7% (pre-2022 AIP rule)\",\"changes at 7% (pre-2022 AIP rule): see chart 2\"))"
+ ],
+ [
+  "G14",
+  "=IF($G$4=\"\",\"\",$H$4)"
+ ],
+ [
+  "H14",
+  "=IF($G$4=\"\",\"\",$J$4+$K$4+$L$4+$N$4)"
+ ],
+ [
+  "I14",
+  "=IF($G$4=\"\",\"\",H14*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+ ],
+ [
+  "J14",
+  "=IF($G$4=\"\",\"\",$M$4)"
+ ],
+ [
+  "K14",
+  "=IF($G$4=\"\",\"\",J14*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+ ],
+ [
+  "L14",
+  "=IF($G$4=\"\",\"\",$O$4)"
+ ],
+ [
+  "M14",
+  "=IF($G$4=\"\",\"\",L14*(('General Information'!$D$34/100)*(1+'General Information'!$D$34/100)^'General Information'!$D$33/((1+'General Information'!$D$34/100)^'General Information'!$D$33-1)))"
+ ],
+ [
+  "N14",
+  "=IF($G$4=\"\",\"\",$P$4)"
+ ],
+ [
+  "O14",
+  "=IF($G$4=\"\",\"\",IFERROR($P$4/MIN($O$4:$O$7),0))"
+ ],
+ [
+  "P14",
+  "=IF($G$4=\"\",\"\",IF($O$4=MIN($O$4:$O$7),\"lowest\",\"\"))"
  ],
  [
   "X4",

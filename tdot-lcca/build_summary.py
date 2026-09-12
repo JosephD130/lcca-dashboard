@@ -10,7 +10,8 @@ Setup form) through INDIRECT, so they follow whichever alternatives exist.
 Layout (left to right, top to bottom, as a user reads it):
   A:E   the original table written by the Alternative Setup form (unchanged, VBA-managed)
   G:R   results table, verdict line, FAA 7% note
-  G12+  five charts, two per row
+  G12   RealCost-style comparison block (agency / user / total PW and EUAC)
+  G20+  five charts, two per row
   W+    chart data (calculated; labelled "do not edit")
 """
 import os, re, zipfile, shutil, tempfile, html
@@ -84,8 +85,12 @@ def build_scratch(path):
                 f'&"   |   "&{GI}!$D$34&"% over "&{GI}!$D$33&" years   |   lost revenue: "&{GI}!$D$38)')
     ws['G9'].font = F_H; ws['G9'].fill = FILL_VERDICT
     for c in range(8, 19): ws.cell(9, c).fill = FILL_VERDICT
-    ws['G10'] = (f'=IF(COUNT($O$4:$O$7)<2,"",IF(INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))=INDEX($H$4:$H$7,MATCH(MIN({S7}),{S7},0)),'
-                 f'"The same alternative is lowest at the FAA AIP rate of 7%.","At the FAA AIP rate of 7% the lowest-cost alternative changes: see chart 2."))')
+    S2 = f'${L(DC+1)}$12:${L(DC+NALT)}$12'  # 2.00% row (OMB A-94 real rate used by FAA PGL 22-01; 2.0% in 2026)
+    low = 'INDEX($H$4:$H$7,MATCH(MIN($O$4:$O$7),$O$4:$O$7,0))'
+    ws['G10'] = (f'=IF(COUNT($O$4:$O$7)<2,"",'
+                 f'IF({low}=INDEX($H$4:$H$7,MATCH(SMALL({S2},COUNTIF({S2},0)+1),{S2},0)),"Same lowest-cost alternative at 2% (OMB A-94 real rate, FAA PGL 22-01)","At 2% (OMB A-94 real rate, FAA PGL 22-01) the lowest-cost alternative changes")'
+                 f'&"   |   "&IF({low}=INDEX($H$4:$H$7,MATCH(SMALL({S7},COUNTIF({S7},0)+1),{S7},0)),"same at 7% (pre-2022 AIP rule)","changes at 7% (pre-2022 AIP rule): see chart 2"))')
+    # SMALL(range, COUNTIF(range,0)+1) = smallest non-zero value: unused alternative columns hold 0 and must not win
     ws['G10'].font = F_N
 
     # ---- chart data (column W onward)
@@ -139,25 +144,48 @@ def build_scratch(path):
         for s, rgb in zip(ch.series, ALT_COLORS):
             if line: s.graphicalProperties.line.solidFill = rgb; s.graphicalProperties.line.width = 22000; s.marker.symbol = 'none'; s.smooth = False
             else: s.graphicalProperties.solidFill = rgb; s.graphicalProperties.line.solidFill = rgb
-    ws['G12'] = 'CHARTS'; ws['G12'].font = F_T
+    # ---- RealCost-style comparison block (agency cost / user cost / total, present worth and EUAC)
+    ws['G12'] = 'COMPARISON  (RealCost layout: agency cost, user cost, total; present worth and equivalent uniform annual cost)'; ws['G12'].font = F_T
+    hdr(13, 7, ['Alternative', 'Agency cost PW', 'Agency EUAC', 'User cost PW (lost revenue)', 'User EUAC', 'Total PW', 'Total EUAC', 'vs. lowest ($)', 'vs. lowest (%)', 'Lowest?'])
+    CRF = f'(({GI}!$D$34/100)*(1+{GI}!$D$34/100)^{GI}!$D$33/((1+{GI}!$D$34/100)^{GI}!$D$33-1))'
+    for i in range(NALT):
+        r = 14 + i; src = 4 + i; g = f'$G${src}'
+        ws.cell(r, 7, f'=IF({g}="","",$H${src})')
+        ws.cell(r, 8, f'=IF({g}="","",$J${src}+$K${src}+$L${src}+$N${src})')
+        ws.cell(r, 9, f'=IF({g}="","",H{r}*{CRF})')
+        ws.cell(r, 10, f'=IF({g}="","",$M${src})')
+        ws.cell(r, 11, f'=IF({g}="","",J{r}*{CRF})')
+        ws.cell(r, 12, f'=IF({g}="","",$O${src})')
+        ws.cell(r, 13, f'=IF({g}="","",L{r}*{CRF})')
+        ws.cell(r, 14, f'=IF({g}="","",$P${src})')
+        ws.cell(r, 15, f'=IF({g}="","",IFERROR($P${src}/MIN($O$4:$O$7),0))')
+        ws.cell(r, 16, f'=IF({g}="","",IF($O${src}=MIN($O$4:$O$7),"lowest",""))')
+        for c in range(8, 15): ws.cell(r, c).number_format = CUR
+        ws.cell(r, 15).number_format = '0.0%'
+        for c in range(7, 17): ws.cell(r, c).font = F_B; ws.cell(r, c).border = BOX
+    ws.row_dimensions[13].height = 27
+    ws['G18'] = ('Agency cost = initial construction + maintenance + rehabilitation + salvage. User cost = lost airport revenue during runway closures, the airport-side counterpart of the user delay cost in the Caltrans/FHWA RealCost layout. '
+                 'EUAC = PW x r(1+r)^P / ((1+r)^P - 1) at the discount rate and analysis period on General Information. "vs. lowest (%)" is the difference as a share of the lowest total PW.')
+    ws['G18'].font = F_N
+    ws['G20'] = 'CHARTS'; ws['G20'].font = F_T
     ch = BarChart(); ch.type = 'col'; ch.grouping = 'stacked'; ch.overlap = 100; ch.gapWidth = 60
     ch.add_data(Reference(ws, min_col=DC, max_col=DC + NALT, min_row=5, max_row=9), titles_from_data=True, from_rows=True)
     ch.set_categories(Reference(ws, min_col=DC + 1, max_col=DC + NALT, min_row=4, max_row=4))
     for s, rgb in zip(ch.series, ['4A4A4A', '8C8C8C', '646464', 'B8B6AE', 'DCDCDC']): s.graphicalProperties.solidFill = rgb; s.graphicalProperties.line.solidFill = rgb
-    ch.x_axis.tickLblPos = 'low'; style(ch, '1. Present worth by category (salvage below zero)'); ws.add_chart(ch, 'G14')
+    ch.x_axis.tickLblPos = 'low'; style(ch, '1. Present worth by category (salvage below zero)'); ws.add_chart(ch, 'G22')
     ch = LineChart()
     ch.add_data(Reference(ws, min_col=DC + 1, max_col=DC + NALT, min_row=11, max_row=SENS1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC, min_row=SENS0, max_row=SENS1))
-    colour(ch, line=True); ch.x_axis.tickLblSkip = 4; ch.x_axis.numFmt = '0.00"%"'; style(ch, '2. Net present worth vs. discount rate (TDOT 3%, FAA AIP 7%)'); ws.add_chart(ch, 'N14')
+    colour(ch, line=True); ch.x_axis.tickLblSkip = 4; ch.x_axis.numFmt = '0.00"%"'; style(ch, '2. Net present worth vs. discount rate (TDOT 3%; FAA: OMB A-94 real rate, 2% in 2026; 7% before 2022)'); ws.add_chart(ch, 'N22')
     ch = BarChart(); ch.type = 'col'; ch.grouping = 'clustered'; ch.gapWidth = 40
     ch.add_data(Reference(ws, min_col=DC + 2, max_col=DC + 1 + NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
-    colour(ch); ch.x_axis.tickLblSkip = 5; ch.x_axis.tickLblPos = 'low'; style(ch, '3. Expenditure stream by calendar year (undiscounted)'); ws.add_chart(ch, 'G32')
+    colour(ch); ch.x_axis.tickLblSkip = 5; ch.x_axis.tickLblPos = 'low'; style(ch, '3. Expenditure stream by calendar year (undiscounted)'); ws.add_chart(ch, 'G40')
     ch = LineChart()
     ch.add_data(Reference(ws, min_col=DC + 2 + NALT, max_col=DC + 1 + 2 * NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
-    colour(ch, line=True); ch.x_axis.tickLblSkip = 5; style(ch, '4. Cumulative discounted cost'); ws.add_chart(ch, 'N32')
+    colour(ch, line=True); ch.x_axis.tickLblSkip = 5; style(ch, '4. Cumulative discounted cost'); ws.add_chart(ch, 'N40')
     ch = BarChart(); ch.type = 'col'; ch.grouping = 'clustered'; ch.gapWidth = 40
     ch.add_data(Reference(ws, min_col=DC + 2 + 2 * NALT, max_col=DC + 1 + 3 * NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
-    colour(ch); ch.x_axis.tickLblSkip = 5; style(ch, '5. Runway closure days by calendar year'); ch.y_axis.numFmt = '0'; ws.add_chart(ch, 'G50')
-    ws['G69'] = "How to read: 1 shows where each alternative's cost sits; 2 whether the lowest-cost alternative holds at other discount rates (FAA AIP uses 7%); 3 and 4 when the money is spent and when the higher first cost is paid back; 5 how often and how long the runway closes."; ws['G69'].font = F_N
+    colour(ch); ch.x_axis.tickLblSkip = 5; style(ch, '5. Runway closure days by calendar year'); ch.y_axis.numFmt = '0'; ws.add_chart(ch, 'G58')
+    ws['G77'] = "How to read: 1 shows where each alternative's cost sits; 2 whether the lowest-cost alternative holds at other discount rates (FAA now uses the OMB A-94 real rate, about 2%; 7% was the rule before 2022); 3 and 4 when the money is spent and when the higher first cost is paid back; 5 how often and how long the runway closes."; ws['G77'].font = F_N
     ws.freeze_panes = 'A4'
     wb.save(path)
 
@@ -232,7 +260,7 @@ def transplant(work, sheet_part, drawing_part, chart_start, sheet_index):
     sx = re.sub(r'<pageMargins[^>]*/>', lambda m: m.group(0) + '<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/>', sx, count=1)
     wbx = rd('xl/workbook.xml')
     if '_xlnm.Print_Area" localSheetId="%d"' % sheet_index not in wbx:
-        pa = '<definedName name="_xlnm.Print_Area" localSheetId="%d">Summary!$A$1:$U$70</definedName>' % sheet_index
+        pa = '<definedName name="_xlnm.Print_Area" localSheetId="%d">Summary!$A$1:$U$78</definedName>' % sheet_index
         wbx = wbx.replace('</definedNames>', pa + '</definedNames>') if '</definedNames>' in wbx else wbx.replace('</sheets>', '</sheets><definedNames>' + pa + '</definedNames>', 1)
         wr('xl/workbook.xml', wbx)
     if 'xmlns:r=' not in sx[:600]: sx = sx.replace('<worksheet ', '<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ', 1)
@@ -261,7 +289,7 @@ def transplant(work, sheet_part, drawing_part, chart_start, sheet_index):
     bdraw = rd(drawing_part); brels = rd(rels_part)
     # move the form-managed "Chart 1" out of the results table area, next to chart 5
     bdraw = re.sub(r'(<xdr:twoCellAnchor>)<xdr:from>.*?</xdr:from><xdr:to>.*?</xdr:to>',
-                   r'\1<xdr:from><xdr:col>13</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>49</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from><xdr:to><xdr:col>20</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>66</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>', bdraw, count=1, flags=re.S)
+                   r'\1<xdr:from><xdr:col>13</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>57</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from><xdr:to><xdr:col>20</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>74</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>', bdraw, count=1, flags=re.S)
     next_rid = max(int(x) for x in re.findall(r'Id="rId(\d+)"', brels)) + 1
     anchors = re.findall(r'<xdr:(?:one|two)CellAnchor\b.*?</xdr:(?:one|two)CellAnchor>', sdraw, re.S)
     out = []; new_rels = []
@@ -285,3 +313,74 @@ def transplant(work, sheet_part, drawing_part, chart_start, sheet_index):
 
 if __name__ == '__main__':
     build_scratch('/tmp/summary_scratch.xlsx'); print('scratch written')
+
+
+# ---------------------------------------------------------------------------------------------
+# Plain reference sheet (no charts): appended as the last sheet so no localSheetId shifts.
+def _merge_styles(work, sd):
+    """Append the scratch workbook's styles to the package styles; return the cellXfs offset."""
+    rd = lambda p: open(os.path.join(work, p), encoding='utf-8').read()
+    bs = rd('xl/styles.xml'); ss = open(os.path.join(sd, 'xl/styles.xml'), encoding='utf-8').read()
+    def append(xml, tag, new_items):
+        m = re.search(r'<%s count="(\d+)"' % tag, xml); cnt = int(m.group(1))
+        xml = re.sub(r'<%s count="\d+"' % tag, '<%s count="%d"' % (tag, cnt + len(new_items)), xml, count=1)
+        end = xml.index('</%s>' % tag); return xml[:end] + ''.join(new_items) + xml[end:], cnt
+    nfs = _children_xml(ss, 'numFmts')
+    base_nf_ids = [int(x) for x in re.findall(r'<numFmt numFmtId="(\d+)"', bs)]
+    next_nf = max(base_nf_ids + [163]) + 1; nf_map = {}; new_nfs = []
+    for nf in nfs:
+        old = int(re.search(r'numFmtId="(\d+)"', nf).group(1)); nf_map[old] = next_nf
+        new_nfs.append(re.sub(r'numFmtId="\d+"', 'numFmtId="%d"' % next_nf, nf)); next_nf += 1
+    if new_nfs:
+        if '<numFmts' in bs: bs, _ = append(bs, 'numFmts', new_nfs)
+        else: bs = bs.replace('<fonts', '<numFmts count="%d">%s</numFmts><fonts' % (len(new_nfs), ''.join(new_nfs)), 1)
+    bs, font_off = append(bs, 'fonts', _children_xml(ss, 'fonts'))
+    bs, fill_off = append(bs, 'fills', _children_xml(ss, 'fills'))
+    bs, border_off = append(bs, 'borders', _children_xml(ss, 'borders'))
+    new_xfs = []
+    for xf in _children_xml(ss, 'cellXfs'):
+        xf = re.sub(r'fontId="(\d+)"', lambda m: 'fontId="%d"' % (int(m.group(1)) + font_off), xf)
+        xf = re.sub(r'fillId="(\d+)"', lambda m: 'fillId="%d"' % (int(m.group(1)) + fill_off), xf)
+        xf = re.sub(r'borderId="(\d+)"', lambda m: 'borderId="%d"' % (int(m.group(1)) + border_off), xf)
+        xf = re.sub(r'numFmtId="(\d+)"', lambda m: 'numFmtId="%d"' % nf_map.get(int(m.group(1)), int(m.group(1))), xf)
+        xf = re.sub(r'xfId="\d+"', 'xfId="0"', xf); new_xfs.append(xf)
+    bs, xf_off = append(bs, 'cellXfs', new_xfs)
+    minidom.parseString(bs)
+    open(os.path.join(work, 'xl/styles.xml'), 'w', encoding='utf-8').write(bs)
+    return xf_off
+
+
+def add_plain_sheet(work, build_fn, sheet_name):
+    """Build a sheet with openpyxl (build_fn(path) must create a workbook whose first sheet is the content)
+    and append it to the unpacked package as the last worksheet. Returns the new sheet part name."""
+    tmp = tempfile.mkdtemp(); scratch = os.path.join(tmp, 's.xlsx'); build_fn(scratch)
+    sd = os.path.join(tmp, 'u'); zipfile.ZipFile(scratch).extractall(sd)
+    rd = lambda p: open(os.path.join(work, p), encoding='utf-8').read()
+    wr = lambda p, s: open(os.path.join(work, p), 'w', encoding='utf-8').write(s)
+    xf_off = _merge_styles(work, sd)
+    sx = open(os.path.join(sd, 'xl/worksheets/sheet1.xml'), encoding='utf-8').read()
+    ssp = os.path.join(sd, 'xl/sharedStrings.xml')
+    strings = [html.unescape(''.join(re.findall(r'<t[^>]*>(.*?)</t>', si, re.S))) for si in re.findall(r'<si>(.*?)</si>', open(ssp, encoding='utf-8').read(), re.S)] if os.path.exists(ssp) else []
+    sx = re.sub(r'<c r="([A-Z]+\d+)"([^>]*?) t="s"([^>]*)><v>(\d+)</v></c>',
+                lambda m: '<c r="%s"%s t="inlineStr"%s><is><t xml:space="preserve">%s</t></is></c>' % (m.group(1), m.group(2), m.group(3), html.escape(strings[int(m.group(4))], quote=False)), sx)
+    sx = re.sub(r' s="(\d+)"', lambda m: ' s="%d"' % (int(m.group(1)) + xf_off), sx)
+    sx = re.sub(r'<pageSetup [^>]*/>', '', sx)
+    sx = re.sub(r'<pageMargins[^>]*/>', lambda m: m.group(0) + '<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/>', sx, count=1)
+    # exactly one sheetPr, carrying pageSetUpPr fitToPage (Excel rejects a second sheetPr element)
+    sx = re.sub(r'<pageSetUpPr[^>]*/>', '', sx)
+    if re.search(r'<sheetPr[^>]*/>', sx): sx = re.sub(r'<sheetPr([^>]*)/>', r'<sheetPr\1><pageSetUpPr fitToPage="1"/></sheetPr>', sx, count=1)
+    elif '<sheetPr' in sx: sx = sx.replace('</sheetPr>', '<pageSetUpPr fitToPage="1"/></sheetPr>', 1)
+    else: sx = sx.replace('<dimension', '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><dimension', 1)
+    assert sx.count('<sheetPr') == 1
+    minidom.parseString(sx)
+    existing = [int(m) for m in re.findall(r'worksheets/sheet(\d+)\.xml', rd('xl/_rels/workbook.xml.rels'))]
+    n = max(existing) + 1; part = 'xl/worksheets/sheet%d.xml' % n
+    wr(part, sx)
+    wbx = rd('xl/workbook.xml'); rels = rd('xl/_rels/workbook.xml.rels')
+    rid = 'rId%d' % (max(int(x) for x in re.findall(r'Id="rId(\d+)"', rels)) + 1)
+    sid = max(int(x) for x in re.findall(r'sheetId="(\d+)"', wbx)) + 1
+    wbx = wbx.replace('</sheets>', '<sheet name="%s" sheetId="%d" r:id="%s"/></sheets>' % (html.escape(sheet_name, quote=True), sid, rid), 1)
+    rels = rels.replace('</Relationships>', '<Relationship Id="%s" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet%d.xml"/></Relationships>' % (rid, n))
+    ct = rd('[Content_Types].xml').replace('</Types>', '<Override PartName="/%s" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>' % part)
+    wr('xl/workbook.xml', wbx); wr('xl/_rels/workbook.xml.rels', rels); wr('[Content_Types].xml', ct)
+    return part

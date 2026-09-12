@@ -65,6 +65,10 @@ selected=[]
 for sh in sheets:
     part='xl/'+wrels[sh.get('{%s}id'%NS['r'])]
     x=ET.fromstring(z.read(part))
+    if len(x.findall('m:sheetPr',NS))>1: issues.append(f'{sh.get("name")}: {len(x.findall("m:sheetPr",NS))} sheetPr elements')
+    kids=[k.tag.split('}')[1] for k in x]; order=['sheetPr','dimension','sheetViews','sheetFormatPr','cols','sheetData','sheetCalcPr','sheetProtection','protectedRanges','scenarios','autoFilter','sortState','dataConsolidate','customSheetViews','mergeCells','phoneticPr','conditionalFormatting','dataValidations','hyperlinks','printOptions','pageMargins','pageSetup','headerFooter','rowBreaks','colBreaks','customProperties','cellWatches','ignoredErrors','smartTags','drawing','legacyDrawing','legacyDrawingHF','picture','oleObjects','controls','webPublishItems','tableParts','extLst']
+    idx=[order.index(k) for k in kids if k in order]
+    if idx!=sorted(idx): issues.append(f'{sh.get("name")}: child order {kids}')
     sv=x.find('m:sheetViews/m:sheetView',NS)
     if sv is not None and sv.get('tabSelected')=='1': selected.append(sh.get('name'))
     lastr=0

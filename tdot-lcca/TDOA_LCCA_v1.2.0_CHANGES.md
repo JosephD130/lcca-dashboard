@@ -53,12 +53,28 @@ populates it with no further steps:
 - Five charts: 1 present worth by category (stacked, salvage below zero); 2 NPW versus discount
   rate 2% to 8% in 0.25 steps; 3 expenditure stream by calendar year (undiscounted); 4 cumulative
   discounted cost by year; 5 runway closure days by calendar year.
+- Comparison block G12:P17 in the Caltrans/FHWA RealCost layout: agency cost (initial + M&R + salvage) and
+  user cost (lost airport revenue) as present worth and equivalent uniform annual cost, total, difference to
+  the lowest in dollars and percent. The decision workbook carries the same block beside RESULTS.
+- G10 now checks the winner at 2% (OMB A-94 real rate, which FAA PGL 22-01 of June 2022 substituted for the
+  fixed 7% rule) and at 7% (the pre-2022 AIP rule).
 - Chart data lives in columns W onward, greyed and labelled "calculated automatically; do not edit".
 - Navigation: dark HYPERLINK button cells "General Information" and "Instructions" at the top of
   Summary, and a "View Summary" button under Alternative Setup on General Information (row 44).
   They need no macro, so they work when ActiveX is blocked.
 - Print area A1:U70, landscape, one page wide. Empty alternative rows show blank; with no
   alternatives the verdict line reads "No alternatives yet".
+
+## 3b. Typical Values sheet and input hints
+
+A new last sheet, "Typical Values", is reference only (nothing feeds the calculation): what TDOT Aeronautics
+manages (78 public-use airports, 6 commercial / 72 GA, 69 NPIAS, ~70 in the APTech pavement network), typical
+TN GA runway geometry with a seven-airport sample and areas, the Pay_Items defaults shown live beside 2025
+southeastern bid prices, the closure production rates built into F4:F10, economic parameters (TDOT 3%/30 yr;
+FAA PGL 22-01 pointing to OMB A-94 real rates, 2.0% in 2026; the legacy 7%/20 yr; Caltrans 4%), maintenance
+timing against published service lives, and a live daily-revenue table for the 17 airports. Every row has its
+source URL; see verification/RESEARCH_SOURCES.md for what could and could not be confirmed. General Information
+gets a "Typical Values" button (D46) and short hints in column F beside D25:D38.
 
 ## 4. Housekeeping
 
@@ -81,7 +97,9 @@ populates it with no further steps:
   block makes it visible.
 - Lost revenue counts gross fuel sales and tenant rent as lost during a runway closure. A per-category
   "% lost during closure" factor on RevenueData would be more defensible.
-- FAA AIP funding (7%, 20-year life) is shown in the sensitivity block, not enforced.
+- FAA AIP discount rate: PGL 22-01 (June 2022) replaced the fixed 7% with OMB A-94 real rates (2.0% for
+  2026) and dropped the fixed 20-year period. The Summary checks the winner at both 2% and 7%; Aeronautics
+  should decide which rule to cite for AIP-funded projects.
 - RevenueData hygiene: MBT and MQY rows are identical; XNX and M54 hold text where numbers belong.
 
 ## 6. First open in Excel

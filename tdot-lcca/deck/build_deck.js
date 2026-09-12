@@ -77,7 +77,7 @@ bullets(s, [
   'RevenueData is hidden and the manual never says how to unhide a sheet',
   'Choosing an airport outside the 17 with revenue data produced #N/A in the alternative and the Summary',
   'Cells D33:D37 use gray text, not gray fill, so users cannot tell what is editable',
-  'FAA AIP handbook requires 7 percent and a 20-year life; the tool defaults to 3 percent and 30 years',
+  'FAA rate rule changed in 2022 (OMB A-94 real rate, 2.0% for 2026, not the old 7%); the tool defaults to 3 percent and 30 years',
 ], 5.7, 1.55, 3.8, 3.4, 12);
 s.addNotes('Every item here is from the NS review docs. The last one is a real policy conflict for AIP-funded projects.');
 
@@ -117,7 +117,7 @@ title(s, 'Policy questions the tool was hiding');
 sub(s, 'Not bugs. Assumptions that decide the answer and were invisible in the outputs.');
 const pol = [
   ['$3.9M vs $0.4M', 'SRB salvage credit, PCC vs HMA. PCC recovers 25% of total initial cost; HMA 12.5% of one mill-and-overlay. That single line is larger than the NPW gap.', ORANGE],
-  ['7% and 20 years', 'FAA AIP Handbook Appendix U for AIP-funded projects. TDOT default is 3% over 30 years. MBT changes winner at 4.5%.', INK],
+  ['Which FAA rate?', 'PGL 22-01 (2022) replaced the fixed 7% with the OMB A-94 real rate, 2.0% for 2026. TDOT uses 3% over 30 years. MBT changes winner at 4.5%, so the rule decides the answer.', INK],
   ['100% of gross', 'Lost revenue counts gross fuel sales, hangar rent and tenant revenue as lost on every closure day. Margin-based revenue would be far lower.', INK],
   ['17 of 79 airports', 'RevenueData covers 17 airports. MBT and MQY rows are identical; XNX and M54 hold text where numbers belong.', INK],
 ];
@@ -178,7 +178,8 @@ table(s, [
   ['Area', 'What changed'],
   ['Instructions', 'ActiveX "blocked content" steps (Trust Center, then restart Excel, or ask IT); correct button name; D9:D39; how to unhide RevenueData and the 17-airport rule'],
   ['Alternative chart', 'Year-indexed data keyed on Year Applied; calendar years on the axis; undiscounted direct and lost revenue stacked; mixed discounted series removed'],
-  ['Summary sheet', 'Formula-driven, no macro: results table with PW by category, delta to lowest, closure days and runway availability; five charts (category, rate sensitivity 2 to 8%, expenditure stream, cumulative cost, closure days); navigation buttons that work with macros blocked'],
+  ['Summary sheet', 'Formula-driven, no macro: results table with PW by category, delta to lowest, closure days and runway availability; a RealCost-style comparison block (agency and user cost as PW and EUAC); five charts; navigation buttons that work with macros blocked'],
+  ['Typical Values sheet', 'New reference sheet: what TDOT manages, typical runway geometry and areas, workbook unit costs beside 2025 bids, closure production rates, FAA and OMB discount-rate rules, service lives, live daily revenue for the 17 airports; hints beside the General Information inputs'],
   ['Housekeeping', 'Personal names removed from cell notes; two dead links to files on a C: drive removed; full recalculation on open'],
   ['Not changed', 'Overview wording (NS rewrite pending Mat\'s approval); salvage, lost-revenue and AIP policy'],
 ], 0.5, 1.3, 9.0, [2.0, 7.0], 10.5);
@@ -189,9 +190,23 @@ s.addNotes('The Summary formulas read the Database sheet the form writes, so the
 // ---------------------------------------------------------------- 8b the new Summary sheet
 s = pres.addSlide(); s.background = { color: WHITE };
 title(s, 'The new Summary sheet');
-sub(s, 'MBT data loaded. Table, verdict line, five charts and the original comparison chart, all live formulas.');
-let y = img(s, 'summary_sheet.png', 0.9, 1.35, 8.2, 2.178);
-caption(s, 'Buttons at top left return to General Information and Instructions; a matching "View Summary" button sits under Alternative Setup. Chart data lives in columns W onward, marked "do not edit".', 0.5, y + 0.05, 9.0);
+sub(s, 'MBT data loaded. Table, verdict line, RealCost-style comparison block, five charts, all live formulas.');
+let y = img(s, 'summary_sheet.png', 1.1, 1.42, 7.8, 1.987);
+caption(s, 'The comparison block under the verdict line follows the RealCost layout: agency and user cost, each as present worth and EUAC.', 0.5, y + 0.02, 9.0);
+
+// ---------------------------------------------------------------- 8c typical values
+s = pres.addSlide(); s.background = { color: WHITE };
+title(s, 'Typical values for the inputs');
+sub(s, 'A reference sheet answering "is this number reasonable" while filling in General Information.');
+y = img(s, 'typical_values.png', 0.5, 1.5, 9.0, 4.737);
+caption(s, 'Section 3: each Pay_Items default read live from the workbook, beside recent bid prices and what they mean. Six more sections cover system context, runway geometry, closure rates, discount rates and service lives.', 0.5, y + 0.05, 9.0);
+bullets(s, [
+  'TDOT Aeronautics manages 78 public-use airports; 69 are in the NPIAS and about 70 are in the pavement management network',
+  'Typical TN general aviation runway: 4,000 to 6,000 ft by 75 or 100 ft, which is 33,000 to 67,000 SY of mainline',
+  'The $130 per ton asphalt default sits below 2025 southeastern bids of $185 to $232',
+  'Discount rate: TDOT 3 percent; FAA now points to the OMB A-94 real rate, 2.0 percent for 2026, not the old 7 percent',
+], 0.5, y + 0.55, 9.0, 0.9, 11.5);
+s.addNotes('Every row has a source; the research note in the repo says which figures still need the primary PDF.');
 
 // ---------------------------------------------------------------- 9 decision workbook intro
 s = pres.addSlide(); s.background = { color: WHITE };
@@ -275,6 +290,7 @@ table(s, [
   ['Decision workbook, full recalculation', '47,265 formulas, 0 errors'],
   ['Decision workbook against an independent engine', 'NPW, categories, break-evens, sensitivity, tornado, 12 scenarios and the decision map agree to the dollar'],
   ['New Summary sheet on the MBT data', 'Table, verdict, categories and closure days match; six charts render; template reads "No alternatives yet" with no errors'],
+  ['New project run end to end', 'CKV Runway 17-35 built on the blank template: framework, decision TEMPLATE and an independent engine agree to the dollar'],
   ['Scripted click-through (LibreOffice API)', 'Buttons land where they should; 7% flips the verdict as flagged; 20 years drops late closures; unknown airport gives $0 lost revenue with a warning; deleting an alternative shifts the table with no #REF!; ties and four alternatives read cleanly'],
   ['Not yet verified', 'The alternative-sheet charts in Excel itself (no Excel here); a first-open check is in the notes'],
 ], 0.5, 1.2, 9.0, [3.4, 5.6], 10);

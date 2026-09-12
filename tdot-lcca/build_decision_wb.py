@@ -181,6 +181,29 @@ def build_project(wb, key, pr):
     ws.cell(rv+1,2,f'=IF(({NPW(tables["P"],rate=7)})<({NPW(tables["H"],rate=7)}),"PCC","HMA")')
     ws.cell(rv+1,3,f'=IF(B{rv+1}=B{rv},"Yes","No - decision depends on the discount rate")').font=F_H
 
+    # ---- RealCost-style comparison block (agency / user / total, PW and EUAC), beside RESULTS
+    ws.cell(R,7,'COMPARISON  (RealCost layout)').font=F_TITLE
+    hdr(ws,R+1,7,['Measure','HMA','PCC','PCC - HMA'])
+    crf=f'(({RATE}/100)*(1+{RATE}/100)^{PER}/((1+{RATE}/100)^{PER}-1))'
+    rI,rM,rR,rL,rS,rN=R+2,R+3,R+4,R+5,R+6,R+7
+    cmp_rows=[('Agency cost PW (initial + M&R + salvage)',lambda c:f'={c}{rI}+{c}{rM}+{c}{rR}+{c}{rS}',CUR),
+              ('Agency EUAC',lambda c:f'=({c}{rI}+{c}{rM}+{c}{rR}+{c}{rS})*{crf}',CUR),
+              ('User cost PW (lost airport revenue)',lambda c:f'={c}{rL}',CUR),
+              ('User EUAC',lambda c:f'={c}{rL}*{crf}',CUR),
+              ('Total PW',lambda c:f'={c}{rN}',CUR),
+              ('Total EUAC',lambda c:f'={c}{rN}*{crf}',CUR)]
+    for i,(lab,fn,fmt) in enumerate(cmp_rows):
+        r=R+2+i; ws.cell(r,7,lab).font=F_B
+        ws.cell(r,8,fn('B')).number_format=fmt; ws.cell(r,9,fn('C')).number_format=fmt; ws.cell(r,10,f'=I{r}-H{r}').number_format=fmt
+        for cc in range(7,11): ws.cell(r,cc).border=BOX
+    rT=R+2+4
+    r=R+2+len(cmp_rows); ws.cell(r,7,'Difference vs. lowest total PW (%)').font=F_B; ws.cell(r,8,f'=IFERROR((H{rT}-MIN(H{rT},I{rT}))/MIN(H{rT},I{rT}),0)').number_format='0.0%'; ws.cell(r,9,f'=IFERROR((I{rT}-MIN(H{rT},I{rT}))/MIN(H{rT},I{rT}),0)').number_format='0.0%'
+    for cc in range(7,11): ws.cell(r,cc).border=BOX
+    r+=1; ws.cell(r,7,'Lowest total PW').font=F_H; ws.cell(r,8,f'=IF(H{rT}<=I{rT},"lowest","")').font=F_H; ws.cell(r,9,f'=IF(I{rT}<H{rT},"lowest","")').font=F_H
+    for cc in range(7,11): ws.cell(r,cc).border=BOX
+    ws.cell(r+1,7,'Agency cost = initial + maintenance + rehabilitation + salvage; user cost = lost airport revenue during closures (the airport-side counterpart of RealCost user delay cost); EUAC at the rate and period above.').font=F_NOTE
+    ws.column_dimensions['G'].width=max(ws.column_dimensions['G'].width or 0, 36)
+
     # ---- break-even block
     BE=rv+4
     ws.cell(BE,1,'BREAK-EVEN VALUES (where PCC and HMA present worth are equal)').font=F_TITLE
