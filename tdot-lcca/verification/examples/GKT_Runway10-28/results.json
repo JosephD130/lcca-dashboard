@@ -450,8 +450,8 @@
     "11\" P-501 on 6\" P-209 (no subbase)"
    ]
   ],
-  "G9": "Lowest present worth: Alternative 3   |   margin to next: $212,978   |   3% over 30 years   |   lost revenue: Yes",
-  "G10": "Same lowest-cost alternative at 2% (OMB A-94 real rate, FAA PGL 22-01)   |   changes at 7% (pre-2022 AIP rule): see chart 2",
+  "verdict": "Lowest present worth: Alternative 3   |   margin to next: $212,978   |   3% over 30 years   |   lost revenue: Yes",
+  "verdict2": "Same lowest-cost alternative at 2% (OMB A-94 real rate, FAA PGL 22-01)   |   changes at 7% (pre-2022 AIP rule): see chart 2",
   "comparison": [
    {
     "G": "Alternative 1",
@@ -1218,11 +1218,6 @@
    ]
   },
   "chart_shoulder": {
-   "Layer": [
-    0.0,
-    0.0,
-    0.0
-   ],
    "Subbase (P-154)": [
     0.0,
     0.0,
@@ -1526,7 +1521,7 @@
   {
    "check": "Shoulder chart rows stay at zero without a shoulder area",
    "ok": true,
-   "detail": "{'Layer': [0.0, 0.0, 0.0], 'Subbase (P-154)': [0.0, 0.0, 0.0], 'Aggregate base': [0.0, 0.0, 0.0], 'Asphalt': [0.0, 0.0, 0.0], 'Concrete': [0.0, 0.0, 0.0]}"
+   "detail": "{'Subbase (P-154)': [0.0, 0.0, 0.0], 'Aggregate base': [0.0, 0.0, 0.0], 'Asphalt': [0.0, 0.0, 0.0], 'Concrete': [0.0, 0.0, 0.0]}"
   },
   {
    "check": "No formula errors on any visible sheet",

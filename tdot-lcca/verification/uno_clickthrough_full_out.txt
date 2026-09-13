@@ -54,7 +54,8 @@
   PASS  asphalt thickness follows the unit weight cell  |  5.000 -> 4.833 at 150 pcf
   PASS  shoulder chart is empty with no shoulder area
   PASS  shoulder chart scales the derived layers  |  0.00 -> 0.00
-  PASS  named concrete thickness does not scale  |  0.00 / 0.00
+  PASS  named concrete thickness does not scale with the shoulder  |  9.00 -> 9.00
+  PASS  asphalt thickness does scale with the shoulder  |  5.00 -> 4.34
   PASS  discount rate 7%: verdict recomputes  |  Lowest present worth: Alternative 1   |   margin to next: $1,025,177   |   7% over 30 years   | 
   PASS  discount rate 7%: no new errors
   PASS  analysis period 20 years: verdict recomputes  |  Lowest present worth: Alternative 2   |   margin to next: $755,381   |   3% over 20 years   |   
@@ -67,4 +68,4 @@
   PASS  restored to two alternatives
 
 ==============================================================================
-60 passed, 0 failed
+61 passed, 0 failed
