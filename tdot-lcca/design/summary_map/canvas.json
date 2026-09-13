@@ -9,6 +9,14 @@
    "title": "A. Header card (recommended)"
   },
   {
+   "file": "Dashboard.dc.html",
+   "x": 0,
+   "y": 880,
+   "w": 1240,
+   "h": 880,
+   "title": "A+. Dashboard treatment (proposed)"
+  },
+  {
    "file": "OptionB.dc.html",
    "x": 1300,
    "y": 0,
@@ -19,7 +27,7 @@
   {
    "file": "MapDetail.dc.html",
    "x": 0,
-   "y": 880,
+   "y": 1900,
    "w": 1080,
    "h": 760,
    "title": "The map itself"
@@ -39,6 +47,13 @@
    "y": -150,
    "w": 520,
    "text": "Both options carry the same new content: divisions on the map, and a line saying the unit costs are statewide while the Middle/West/East columns in Pay_Items sit empty."
+  },
+  {
+   "id": "dash",
+   "x": 0,
+   "y": 730,
+   "w": 560,
+   "text": "Proposed next step: same placement, read as a dashboard.\nSix KPI tiles, bars inside the present-worth column, and a unit-cost benchmark. Nothing moves rows; every value already exists in a cell."
   }
  ],
  "launch": {
