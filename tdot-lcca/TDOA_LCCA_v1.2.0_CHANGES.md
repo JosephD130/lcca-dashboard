@@ -97,6 +97,30 @@ timing against published service lives, and a live daily-revenue table for the 1
 source URL as plain text (no hyperlink, so nothing on the sheet reaches outside the workbook); see verification/RESEARCH_SOURCES.md for what could and could not be confirmed. General Information
 gets a "Typical Values" button (D46) and short hints in column F beside D25:D38.
 
+## 3ba. Project identity, locator map and Google Earth export
+
+The Summary never said which project it was. It now opens with a one-line identity above the results table
+(airport and FAA identifier, city, TDOT region, branch, project type, construction year, period and rate),
+and a PROJECT LOCATION block to the right of the table: a locator map of Tennessee with all 79 airports in
+the dropdown as grey dots and this project as a labelled orange dot, and under it the airport, city and
+county, region, coordinates, elevation, branch and mainline area.
+
+The map is an ordinary scatter chart. The state outline and the airport coordinates are embedded in the
+workbook (map-data block on the Summary at row 115, outside the print area, with the rest of the chart data),
+so it draws with no internet connection, no Bing map service and no add-in: the file stays self-contained.
+Coordinates come from airportsdata (PyPI, FAA/OurAirports values) and the outline from basemap-data's
+intermediate-resolution political boundaries, both retrieved 13 September 2026 and cited in geo_data.py.
+Five small private fields in the dropdown have no published coordinates; they plot no dot and the sheet says so.
+
+A Google Earth export ships as a VBA module, `LCCA_KML_Export.bas`, to import once (Alt+F11, File, Import
+File, then save). Running ExportLCCAKML writes a .kml beside the workbook containing the airport with the
+whole result in its bubble (every alternative with initial cost, net present worth, closure days and section,
+plus the verdict), a schematic runway footprint per alternative oriented from the runway number and sized
+from the area entered, an extruded bar per alternative whose height is its net present worth, and every
+maintenance and rehabilitation event as a placemark stamped with the calendar year it happens, so the time
+slider walks the analysis period. The macro reads cells and writes a text file; it changes nothing and goes
+nowhere. A sample produced from the McKellar-Sipes example is in verification/examples.
+
 ## 3bb. Method sheet
 
 A second reference sheet, "Method" (last sheet, nothing on it feeds the calculation), states every calculation

@@ -178,6 +178,8 @@ table(s, [
   ['Area', 'What changed'],
   ['Instructions', 'ActiveX "blocked content" steps (Trust Center, then restart Excel, or ask IT); correct button name; D9:D39; how to unhide RevenueData and the 17-airport rule'],
   ['Alternative chart', 'Year-indexed data keyed on Year Applied; calendar years on the axis; undiscounted direct and lost revenue stacked; mixed discounted series removed'],
+  ['Project identity and map', 'The Summary names the project and shows where it is: a locator map of Tennessee drawn from embedded coordinates, no internet, no add-in'],
+  ['Google Earth export', 'A VBA module writes a KML: the result in the airport bubble, a runway footprint and a present-worth bar per alternative, and every event stamped with its year for the time slider'],
   ['Chart axes', 'Every chart in both workbooks now names its x and y axis; legends moved beside the plots so they no longer collide with the category labels'],
   ['Summary layout', 'The duplicate table in columns A to F is hidden (the form still writes it), so the results table and the charts start at the left edge'],
   ['Summary sheet', 'Formula-driven, no macro: results table with PW by category, delta to lowest, closure days and runway availability; a RealCost-style comparison block (agency and user cost as PW and EUAC); five charts; navigation buttons that work with macros blocked'],

@@ -36,12 +36,12 @@ PASS  section block present with both description strings
 PASS  asphalt unit weight is an input cell
 PASS  chart-data block labelled do not edit
 PASS  an alternative that does not exist gets no name   |   =IF($H$4="","",$H$4)
-PASS  print areas defined for the Summary and General Information   |   ['Summary!$A$1:$U$112', "'General Information'!$A$1:$J$48"]
+PASS  print areas defined for the Summary and General Information   |   ['Summary!$A$1:$V$112', "'General Information'!$A$1:$J$48"]
 
 ==============================================================================
 CHARTS
 ==============================================================================
-PASS  thirteen charts: six original, seven new on the Summary   |   13
+PASS  fourteen charts: six original, seven new on the Summary, one locator map   |   14
 PASS  chart1.xml names both axes   |   ['Alternative 2', 'Calendar year', 'Cost ($)']
 PASS  chart2.xml names both axes   |   ['Alternative 1', 'Calendar year', 'Cost ($)']
 PASS  chart3.xml names both axes   |   ['Alternative 1', 'Calendar year', 'Cost ($)']
@@ -55,10 +55,26 @@ PASS  chart10.xml names both axes   |   ['4. Cumulative discounted cost', 'Calen
 PASS  chart11.xml names both axes   |   ['5. Runway closure days by calendar year', 'Calendar year', 'Closure days']
 PASS  chart12.xml names both axes   |   ['6. Pavement section, mainline (inches, surface on top)', 'Alternative', 'Thickness (inches)']
 PASS  chart13.xml names both axes   |   ['7. Pavement section with the shoulder (empty unless a shoulder area is entered)', 'Alternative', 'Thickness (inches)']
+PASS  chart14.xml names both axes   |   ['Longitude', 'Latitude']
 PASS  the seven Summary charts put the legend beside the plot   |   [['r'], ['r'], ['r'], ['r'], ['r'], ['r'], ['r']]
 PASS  money axes read to one decimal in millions
 PASS  the original Alternatives Comparison chart plots the hidden columns
 PASS  the alternative-sheet charts keep calendar years on the category axis
+
+==============================================================================
+LOCATOR MAP AND PROJECT IDENTITY
+==============================================================================
+PASS  project identity line at the top of the Summary
+PASS  map data block labelled and outside the print area
+PASS  79 airports in the map block, 74 with published coordinates   |   (79, 74)
+PASS  coordinates fall inside Tennessee
+PASS  state outline embedded with gaps between segments   |   (192, 213)
+PASS  the selected airport is looked up, not typed
+PASS  locator map is a scatter chart with outline, airports and this project   |   [('barChart', 5), ('lineChart', 4), ('barChart', 4), ('lineChart', 4), ('barChart', 4), ('barChart', 4), ('barChart', 4), ('scatterChart', 3), ('barChart', 2)]
+PASS  map axes are named and their degree labels suppressed
+PASS  project block names airport, county, region, coordinates, elevation   |   ['Airport', 'City / county', 'TDOT region', 'Coordinates', 'Elevation', 'Branch / project', 'Mainline area']
+PASS  the sheet says where the coordinates come from and how to export KML
+PASS  print area widened to take the map
 
 ==============================================================================
 METHOD AND TYPICAL VALUES

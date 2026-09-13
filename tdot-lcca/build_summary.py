@@ -20,7 +20,11 @@ from openpyxl import Workbook
 from openpyxl.formatting.rule import Rule
 from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.chart import BarChart, LineChart, Reference
+from openpyxl.chart import BarChart, LineChart, ScatterChart, Reference, Series
+from openpyxl.chart.data_source import StrRef
+from openpyxl.chart.series import SeriesLabel
+from openpyxl.chart.label import DataLabelList
+import geo_data
 from openpyxl.utils import get_column_letter as L
 
 GI = "'General Information'"
@@ -273,6 +277,85 @@ def build_scratch(path):
                   'and then shows the same quantities spread over mainline plus shoulder, which is the lower bound on each thickness.')
     ws['G108'].font = F_N
     ws['G77'] = "How to read: 1 shows where each alternative's cost sits; 2 whether the lowest-cost alternative holds at other discount rates (FAA now uses the OMB A-94 real rate, about 2%; 7% was the rule before 2022); 3 and 4 when the money is spent and when the higher first cost is paid back; 5 how often and how long the runway closes."; ws['G77'].font = F_N
+    # ---- project identity and the locator map. Coordinates and the state outline are embedded (geo_data.py),
+    # so the map draws with no internet connection, no add-in and no external reference.
+    GI_ = GI
+    ws['L1'] = (f'=IF({GI_}!$D$9="","No airport selected yet: pick one on General Information.",'
+                f'{GI_}!$D$9&" ("&{GI_}!$D$10&")  |  "&{GI_}!$D$11&", "&{GI_}!$D$13&" region"'
+                f'&IF({GI_}!$D$22="",""," |  "&{GI_}!$D$22)&IF({GI_}!$D$23="",""," ("&{GI_}!$D$23&")")'
+                f'&"  |  construction "&TEXT({GI_}!$D$25,"0")&"  |  "&TEXT({GI_}!$D$33,"0")&" years at "&TEXT({GI_}!$D$34,"0.##")&"%")')
+    ws['L1'].font = F_H
+
+    MAP0 = 115                                   # map data, below every other block and outside the print area
+    A0 = MAP0 + 2                                # first airport row
+    ws.cell(MAP0, DC, 'MAP DATA (embedded coordinates and state outline; reference only, do not edit)').font = F_H
+    hdr(MAP0 + 1, DC, ['Airport', 'FAA ID', 'Longitude', 'Latitude', 'Region', 'Elevation (ft)', None,
+                       'This project: longitude', 'Latitude', 'Label', None, 'Outline longitude', 'Outline latitude'])
+    for i, (name, ident, region, lon, lat, elev) in enumerate(geo_data.AIRPORTS):
+        r = A0 + i
+        for k, v in enumerate([name, ident, lon, lat, region, elev]):
+            c = ws.cell(r, DC + k, v); c.font = F_DATA
+            if k in (2, 3): c.number_format = '0.00000'
+    AN = len(geo_data.AIRPORTS)
+    ID_ = f'${L(DC+1)}${A0}:${L(DC+1)}${A0+AN-1}'
+    LON_ = f'${L(DC+2)}${A0}:${L(DC+2)}${A0+AN-1}'
+    LAT_ = f'${L(DC+3)}${A0}:${L(DC+3)}${A0+AN-1}'
+    ELV_ = f'${L(DC+5)}${A0}:${L(DC+5)}${A0+AN-1}'
+    pick = lambda rng_: f'=IFERROR(IF(INDEX({rng_},MATCH({GI_}!$D$10,{ID_},0))="","",INDEX({rng_},MATCH({GI_}!$D$10,{ID_},0))),"")'
+    c = ws.cell(A0, DC + 7, pick(LON_)); c.number_format = '0.00000'; c.font = F_DATA
+    c = ws.cell(A0, DC + 8, pick(LAT_)); c.number_format = '0.00000'; c.font = F_DATA
+    ws.cell(A0, DC + 9, f'=IF({GI_}!$D$9="","",{GI_}!$D$10)').font = F_DATA   # short label: the block below spells the name out
+    br = A0
+    for seg in geo_data.BORDER:                  # a blank row between segments leaves a gap instead of a join
+        for lon, lat in seg:
+            c = ws.cell(br, DC + 11, lon); c.number_format = '0.00000'; c.font = F_DATA
+            c = ws.cell(br, DC + 12, lat); c.number_format = '0.00000'; c.font = F_DATA
+            br += 1
+        br += 1
+    BN = br - 1
+
+    mc = ScatterChart(); mc.height = 5.2; mc.width = 11.0; mc.legend = None
+    def scatter(col_x, col_y, r1, r2):
+        return Series(Reference(ws, min_col=col_y, min_row=r1, max_row=r2), Reference(ws, min_col=col_x, min_row=r1, max_row=r2))
+    outline = scatter(DC + 11, DC + 12, A0, BN)
+    outline.marker.symbol = 'none'; outline.graphicalProperties.line.solidFill = '9AA0A6'; outline.graphicalProperties.line.width = 9525
+    outline.tx = SeriesLabel(v='Tennessee')
+    dots = scatter(DC + 2, DC + 3, A0, A0 + AN - 1)
+    dots.marker.symbol = 'circle'; dots.marker.size = 4
+    dots.marker.graphicalProperties.solidFill = 'BFC5CC'; dots.marker.graphicalProperties.line.solidFill = 'BFC5CC'
+    dots.graphicalProperties.line.noFill = True; dots.tx = SeriesLabel(v='Airports in the dropdown')
+    here = scatter(DC + 7, DC + 8, A0, A0)
+    here.marker.symbol = 'circle'; here.marker.size = 9
+    here.marker.graphicalProperties.solidFill = 'C1440E'; here.marker.graphicalProperties.line.solidFill = '7F2D09'
+    here.graphicalProperties.line.noFill = True
+    here.tx = SeriesLabel(strRef=StrRef(f"Summary!${L(DC+9)}${A0}"))
+    here.dLbls = DataLabelList(showSerName=True, showVal=False, showCatName=False, showLegendKey=False, dLblPos='r')
+    for sr in (outline, dots, here): mc.series.append(sr)
+    mc.x_axis.scaling.min, mc.x_axis.scaling.max = -90.6, -81.4
+    mc.y_axis.scaling.min, mc.y_axis.scaling.max = 34.8, 36.9
+    for ax, t in ((mc.x_axis, 'Longitude'), (mc.y_axis, 'Latitude')):
+        ax.delete = False; ax.title = t; ax.majorTickMark = 'none'; ax.minorTickMark = 'none'
+        ax.majorGridlines = None; ax.numFmt = ';;;'      # the axes are named but degree values would only be noise
+    ws['S2'] = 'PROJECT LOCATION'; ws['S2'].font = F_H
+    ws.add_chart(mc, 'S3')
+
+    ws['S19'] = 'PROJECT'; ws['S19'].font = F_H
+    county = f'IFERROR(VLOOKUP({GI_}!$D$9,{GI_}!$L$10:$Q$88,4,FALSE),"")'
+    rowsS = [('Airport', f'=IF({GI_}!$D$9="","",{GI_}!$D$9&" ("&{GI_}!$D$10&")")'),
+             ('City / county', f'=IF({GI_}!$D$9="","",{GI_}!$D$11&IF({county}="",""," / "&{county}&" County"))'),
+             ('TDOT region', f'=IF({GI_}!$D$9="","",{GI_}!$D$13)'),
+             ('Coordinates', f'=IF({L(DC+8)}{A0}="","not in the reference list",TEXT({L(DC+8)}{A0},"0.0000")&"\u00b0 N, "&TEXT(-{L(DC+7)}{A0},"0.0000")&"\u00b0 W")'),
+             ('Elevation', f'=IFERROR(IF(INDEX({ELV_},MATCH({GI_}!$D$10,{ID_},0))="","",TEXT(INDEX({ELV_},MATCH({GI_}!$D$10,{ID_},0)),"#,##0")&" ft"),"")'),
+             ('Branch / project', f'=IF({GI_}!$D$22="","",{GI_}!$D$22&IF({GI_}!$D$23=""," ",", "&{GI_}!$D$23))'),
+             ('Mainline area', f'=IF({GI_}!$D$26="","",TEXT({GI_}!$D$26,"#,##0")&" S.Y."&IF({GI_}!$D$27>0," + "&TEXT({GI_}!$D$27,"#,##0")&" S.Y. shoulder",""))')]
+    for k, (lab, f) in enumerate(rowsS):
+        ws.cell(20 + k, 19, lab).font = F_B
+        ws.cell(20 + k, 20, f).font = F_B
+    ws['S27'] = 'Coordinates are embedded (Method sheet); nothing here goes online. Five private fields have none and plot no dot.'
+    ws['S28'] = 'Google Earth: import LCCA_KML_Export.bas once (Alt+F11, File, Import File), then Alt+F8 and run ExportLCCAKML.'
+    ws['S27'].font = F_N
+    ws['S28'].font = F_N
+
     dxf_low = DifferentialStyle(fill=PatternFill(bgColor='FFDDEBF7'), font=Font(bold=True, color='FF1F3864'))
     for sqref, f in [('G4:R7', 'AND($G4<>"",COUNT($O$4:$O$7)>0,$O4=MIN($O$4:$O$7))'),
                      ('G14:P17', 'AND($G14<>"",COUNT($L$14:$L$17)>0,$L14=MIN($L$14:$L$17))')]:
@@ -358,7 +441,7 @@ def transplant(work, sheet_part, drawing_part, chart_start, sheet_index):
     sx = re.sub(r'<pageMargins[^>]*/>', lambda m: m.group(0) + '<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/>', sx, count=1)
     wbx = rd('xl/workbook.xml')
     if '_xlnm.Print_Area" localSheetId="%d"' % sheet_index not in wbx:
-        pa = '<definedName name="_xlnm.Print_Area" localSheetId="%d">Summary!$A$1:$U$112</definedName>' % sheet_index
+        pa = '<definedName name="_xlnm.Print_Area" localSheetId="%d">Summary!$A$1:$V$112</definedName>' % sheet_index
         wbx = wbx.replace('</definedNames>', pa + '</definedNames>') if '</definedNames>' in wbx else wbx.replace('</sheets>', '</sheets><definedNames>' + pa + '</definedNames>', 1)
         wr('xl/workbook.xml', wbx)
     if 'xmlns:r=' not in sx[:600]: sx = sx.replace('<worksheet ', '<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ', 1)
