@@ -351,10 +351,13 @@ def build_scratch(path):
     for k, (lab, f) in enumerate(rowsS):
         ws.cell(20 + k, 19, lab).font = F_B
         ws.cell(20 + k, 20, f).font = F_B
-    ws['S27'] = 'Coordinates are embedded (Method sheet); nothing here goes online. Five private fields have none and plot no dot.'
-    ws['S28'] = 'Google Earth: import LCCA_KML_Export.bas once (Alt+F11, File, Import File), then Alt+F8 and run ExportLCCAKML.'
-    ws['S27'].font = F_N
+    ws['S27'] = 'Runway width for the map export (ft)'; ws['S27'].font = F_B
+    c = ws['T27']; c.value = 100; c.number_format = '0'; c.font = F_B
+    c.fill = PatternFill('solid', fgColor='D9D9D9'); c.border = BOX
+    ws['S28'] = 'Coordinates are embedded (Method sheet); nothing here goes online. Five private fields have none and plot no dot.'
+    ws['S29'] = 'Google Earth: import LCCA_KML_Export.bas once (Alt+F11, File, Import File), then Alt+F8 and run ExportLCCAKML.'
     ws['S28'].font = F_N
+    ws['S29'].font = F_N
 
     dxf_low = DifferentialStyle(fill=PatternFill(bgColor='FFDDEBF7'), font=Font(bold=True, color='FF1F3864'))
     for sqref, f in [('G4:R7', 'AND($G4<>"",COUNT($O$4:$O$7)>0,$O4=MIN($O$4:$O$7))'),

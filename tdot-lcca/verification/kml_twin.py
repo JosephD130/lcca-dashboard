@@ -10,8 +10,8 @@ import sys, math, re, warnings
 from openpyxl import load_workbook
 warnings.filterwarnings('ignore')
 
-RUNWAY_WIDTH_FT = 100.0
-BAR_METRES_PER_MILLION = 180.0
+DEFAULT_WIDTH_FT = 100.0
+TALLEST_BAR_M = 700.0
 FT_PER_DEG_LAT = 364000.0
 
 
@@ -55,8 +55,21 @@ def build(path_wb, path_out):
     w('<Document>')
     docname = '%s (%s) - %s' % (g('D9'), g('D10'), g('D16') or g('D22'))
     w('  <name>%s</name>' % X(docname))
-    intro = 'Life-cycle cost analysis, %s years at %s%%. Generated from the TDOT Aeronautics LCCA Framework v1.2.0.' % (g('D33'), g('D34'))
-    w('  <description>%s</description>' % X(intro))
+    bearing = runway_bearing(g('D22'))
+    legend = ('<p>Life-cycle cost analysis, %s years at %s%%. Generated from the TDOT Aeronautics LCCA Framework v1.2.0.</p>'
+              % (g('D33'), g('D34')))
+    legend += '<p><b>Legend</b></p><table cellpadding="3" cellspacing="0">'
+    for rgb, label in [('#1f8b2e', 'Lowest net present worth'), ('#1f78d6', 'Other alternatives'),
+                       ('#c1440e', 'Maintenance or rehabilitation event, shown in the year it happens')]:
+        legend += '<tr><td bgcolor="%s" width="18">&nbsp;</td><td>%s</td></tr>' % (rgb, label)
+    legend += ('</table><p>Each alternative has a runway footprint (schematic: sized from the area entered and the width '
+               'on the Summary, turned to the runway number) and a bar whose height is its net present worth, the tallest '
+               'drawn 700 m high. The events carry a date, so the time slider at the top of Google Earth walks the '
+               'analysis period.</p>')
+    w('  <description><![CDATA[%s]]></description>' % legend)
+    w('  <LookAt><longitude>%s</longitude><latitude>%s</latitude><altitude>0</altitude><heading>%s</heading>'
+      '<tilt>55</tilt><range>4200</range><altitudeMode>relativeToGround</altitudeMode></LookAt>'
+      % (num(lon, 6), num(lat, 6), num(bearing, 1)))
     for sid, line, poly in [('altLow', 'ff2e8b1f', '662e8b1f'), ('alt', 'ffd6781f', '66d6781f'), ('event', 'ff0e44c1', '660e44c1')]:
         w(f'  <Style id="{sid}">')
         w(f'    <LineStyle><color>{line}</color><width>2</width></LineStyle>')
@@ -86,15 +99,17 @@ def build(path_wb, path_out):
     d += f'<p><b>{sm["G9"].value}</b><br/>{sm["G10"].value}</p>'
     w('  <Placemark>')
     w('    <name>%s</name>' % X('%s (%s)' % (g('D9'), g('D10'))))
-    w('    <styleUrl>#airport</styleUrl>')
     w(f'    <description><![CDATA[{d}]]></description>')
+    w('    <styleUrl>#airport</styleUrl>')
     w(f'    <Point><coordinates>{num(lon, 6)},{num(lat, 6)},0</coordinates></Point>')
     w('  </Placemark>')
 
-    bearing = runway_bearing(g('D22'))
-    length_ft = (g('D26') or 0) * 9.0 / RUNWAY_WIDTH_FT
+    width_ft = sm['T27'].value if isinstance(sm['T27'].value, (int, float)) and sm['T27'].value > 0 else DEFAULT_WIDTH_FT
+    length_ft = (g('D26') or 0) * 9.0 / width_ft
     yr0, period = int(g('D25')), int(g('D33'))
     best = min(r[4] for r in rows)
+    worst = max(r[4] for r in rows)
+    bar_scale = TALLEST_BAR_M / (worst / 1e6) if worst > 0 else 0
 
     for k, (r, name, typ, init, npw, days, sec, wsname) in enumerate(rows):
         style = 'altLow' if npw == best else 'alt'
@@ -102,22 +117,22 @@ def build(path_wb, path_out):
         w(f'    <name>{X(f"{name} - {money(npw)}" + (" (lowest)" if npw == best else ""))}</name>')
         # schematic runway footprint
         if length_ft > 0:
-            off = (k - 1.5) * RUNWAY_WIDTH_FT * 2.2
-            hx, hy = length_ft / 2.0, RUNWAY_WIDTH_FT / 2.0
+            off = (k - 1.5) * width_ft * 2.2
+            hx, hy = length_ft / 2.0, width_ft / 2.0
             c = [corner3(lat, lon, bearing, -hx, -hy + off), corner3(lat, lon, bearing, hx, -hy + off),
                  corner3(lat, lon, bearing, hx, hy + off), corner3(lat, lon, bearing, -hx, hy + off)]
             c.append(c[0])
             w('    <Placemark>')
             w(f'      <name>{X(name + " footprint")}</name>')
-            w(f'      <styleUrl>#{style}</styleUrl>')
-            w(f'      <description><![CDATA[{X2(sec)}<br/>Schematic footprint: {length_ft:,.0f} x {RUNWAY_WIDTH_FT:,.0f} ft '
+            w(f'      <description><![CDATA[{X2(sec)}<br/>Schematic footprint: {length_ft:,.0f} x {width_ft:,.0f} ft '
               'from the area entered, turned to the runway number. Not survey geometry.]]></description>')
+            w(f'      <styleUrl>#{style}</styleUrl>')
             w('      <Polygon><tessellate>1</tessellate><outerBoundaryIs><LinearRing><coordinates>')
             for p in c: w('        ' + p)
             w('      </coordinates></LinearRing></outerBoundaryIs></Polygon>')
             w('    </Placemark>')
         # extruded net present worth bar
-        h = (npw / 1e6) * BAR_METRES_PER_MILLION
+        h = (npw / 1e6) * bar_scale
         s, e = 260.0, 1200.0 + k * 700.0
         c = [corner3(lat, lon, 90.0, e, 0.0, h), corner3(lat, lon, 90.0, e + s, 0.0, h),
              corner3(lat, lon, 90.0, e + s, s, h), corner3(lat, lon, 90.0, e, s, h)]
@@ -152,13 +167,14 @@ def build(path_wb, path_out):
                 days_ = nxt / daily
             pos = (n / 8.0 - 0.45) * length_ft
             year = yr0 + int(yoff)
+            short = name.replace('Alternative ', 'Alt ') if str(name).startswith('Alternative ') else name
             w('    <Placemark>')
-            w(f'      <name>{X(f"{item} {year}")}</name>')
-            w('      <styleUrl>#event</styleUrl>')
-            w(f'      <TimeSpan><begin>{year}-01-01</begin><end>{year}-12-31</end></TimeSpan>')
+            w(f'      <name>{X(f"{short} {item} {year}")}</name>')
             w(f'      <description><![CDATA[<b>{X2(name)}</b><br/>{X2(item)}<br/>Year {year} ({int(yoff)} years after '
               f'construction)<br/>Cost in the year: {money(cv)}' +
               (f'<br/>Runway closed about {days_:.0f} days' if days_ > 0 else '') + ']]></description>')
+            w(f'      <TimeSpan><begin>{year}-01-01</begin><end>{year}-12-31</end></TimeSpan>')
+            w('      <styleUrl>#event</styleUrl>')
             w(f'      <Point><coordinates>{corner3(lat, lon, bearing, pos, (k - 1.5) * 220.0, 0.0)}</coordinates></Point>')
             w('    </Placemark>')
             n += 1

@@ -74,6 +74,7 @@ PASS  locator map is a scatter chart with outline, airports and this project   |
 PASS  map axes are named and their degree labels suppressed
 PASS  project block names airport, county, region, coordinates, elevation   |   ['Airport', 'City / county', 'TDOT region', 'Coordinates', 'Elevation', 'Branch / project', 'Mainline area']
 PASS  the sheet says where the coordinates come from and how to export KML
+PASS  runway width for the export footprint is an input cell   |   ('Runway width for the map export (ft)', 100)
 PASS  print area widened to take the map
 
 ==============================================================================

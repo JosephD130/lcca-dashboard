@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+<Document>
+  <name>Gatlinburg-Pigeon Forge Airport (GKT) - Runway 10-28 Reconstruction</name>
+  <description><![CDATA[<p>Life-cycle cost analysis, 30 years at 3%. Generated from the TDOT Aeronautics LCCA Framework v1.2.0.</p><p><b>Legend</b></p><table cellpadding="3" cellspacing="0"><tr><td bgcolor="#1f8b2e" width="18">&nbsp;</td><td>Lowest net present worth</td></tr><tr><td bgcolor="#1f78d6" width="18">&nbsp;</td><td>Other alternatives</td></tr><tr><td bgcolor="#c1440e" width="18">&nbsp;</td><td>Maintenance or rehabilitation event, shown in the year it happens</td></tr></table><p>Each alternative has a runway footprint (schematic: sized from the area entered and the width on the Summary, turned to the runway number) and a bar whose height is its net present worth, the tallest drawn 700 m high. The events carry a date, so the time slider at the top of Google Earth walks the analysis period.</p>]]></description>
+  <LookAt><longitude>-83.528700</longitude><latitude>35.857760</latitude><altitude>0</altitude><heading>100.0</heading><tilt>55</tilt><range>4200</range><altitudeMode>relativeToGround</altitudeMode></LookAt>
+  <Style id="altLow">
+    <LineStyle><color>ff2e8b1f</color><width>2</width></LineStyle>
+    <PolyStyle><color>662e8b1f</color></PolyStyle>
+    <IconStyle><color>ff2e8b1f</color><scale>0.9</scale></IconStyle>
+  </Style>
+  <Style id="alt">
+    <LineStyle><color>ffd6781f</color><width>2</width></LineStyle>
+    <PolyStyle><color>66d6781f</color></PolyStyle>
+    <IconStyle><color>ffd6781f</color><scale>0.9</scale></IconStyle>
+  </Style>
+  <Style id="event">
+    <LineStyle><color>ff0e44c1</color><width>2</width></LineStyle>
+    <PolyStyle><color>660e44c1</color></PolyStyle>
+    <IconStyle><color>ff0e44c1</color><scale>0.9</scale></IconStyle>
+  </Style>
+  <Style id="airport"><IconStyle><scale>1.2</scale></IconStyle><LabelStyle><scale>1.0</scale></LabelStyle></Style>
+  <Placemark>
+    <name>Gatlinburg-Pigeon Forge Airport (GKT)</name>
+    <description><![CDATA[<h3>Gatlinburg-Pigeon Forge Airport (GKT)</h3><p>Sevierville, East region<br/>Runway 10-28, Reconstruction<br/>Construction 2028, 30 years at 3%</p><table border="1" cellpadding="4" cellspacing="0"><tr><th>Alternative</th><th>Type</th><th>Initial</th><th>Net present worth</th><th>Closure days</th><th>Section</th></tr><tr><td>Alternative 1</td><td>HMA-New</td><td align="right">$4,285,512</td><td align="right">$6,156,578</td><td align="right">56</td><td>8" P401 on 6" P209 on 6" P154</td></tr><tr><td>Alternative 2</td><td>PCC-New</td><td align="right">$5,918,906</td><td align="right">$6,065,225</td><td align="right">24</td><td>9" P501 on 6" P209 on 6" P154</td></tr><tr><td>Alternative 3</td><td>PCC-New</td><td align="right">$5,681,474</td><td align="right">$5,852,247</td><td align="right">24</td><td>11" P501 on 6" P209</td></tr></table><p><b>Lowest present worth: Alternative 3   |   margin to next: $212,978   |   3% over 30 years   |   lost revenue: Yes</b><br/>Same lowest-cost alternative at 2% (OMB A-94 real rate, FAA PGL 22-01)   |   changes at 7% (pre-2022 AIP rule): see chart 2</p>]]></description>
+    <styleUrl>#airport</styleUrl>
+    <Point><coordinates>-83.528700,35.857760,0</coordinates></Point>
+  </Placemark>
+  <Folder>
+    <name>Alternative 1 - $6,156,578</name>
+    <Placemark>
+      <name>Alternative 1 footprint</name>
+      <description><![CDATA[8" P401 on 6" P209 on 6" P154<br/>Schematic footprint: 5,506 x 75 ft from the area entered, turned to the runway number. Not survey geometry.]]></description>
+      <styleUrl>#alt</styleUrl>
+      <Polygon><tessellate>1</tessellate><outerBoundaryIs><LinearRing><coordinates>
+        -83.537722,35.859844,0.0
+        -83.519342,35.857218,0.0
+        -83.519386,35.857015,0.0
+        -83.537766,35.859641,0.0
+        -83.537722,35.859844,0.0
+      </coordinates></LinearRing></outerBoundaryIs></Polygon>
+    </Placemark>
+    <Placemark>
+      <name>Alternative 1: $6,156,578</name>
+      <styleUrl>#alt</styleUrl>
+      <Polygon><extrude>1</extrude><altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs><LinearRing><coordinates>
+          -83.524632,35.857760,700.0
+          -83.523751,35.857760,700.0
+          -83.523751,35.857046,700.0
+          -83.524632,35.857046,700.0
+          -83.524632,35.857760,700.0
+      </coordinates></LinearRing></outerBoundaryIs></Polygon>
+    </Placemark>
+    <Placemark>
+      <name>Alt 1 Initial Construction 2028</name>
+      <description><![CDATA[<b>Alternative 1</b><br/>Initial Construction<br/>Year 2028 (0 years after construction)<br/>Cost in the year: $4,285,512]]></description>
+      <TimeSpan><begin>2028-01-01</begin><end>2028-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.536777,35.859835,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 1 Maintenance 1 2032</name>
+      <description><![CDATA[<b>Alternative 1</b><br/>Maintenance 1<br/>Year 2032 (4 years after construction)<br/>Cost in the year: $230,995<br/>Runway closed about 6 days]]></description>
+      <TimeSpan><begin>2032-01-01</begin><end>2032-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.534479,35.859506,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 1 Maintenance 2 2036</name>
+      <description><![CDATA[<b>Alternative 1</b><br/>Maintenance 2<br/>Year 2036 (8 years after construction)<br/>Cost in the year: $230,995<br/>Runway closed about 6 days]]></description>
+      <TimeSpan><begin>2036-01-01</begin><end>2036-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.532182,35.859178,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 1 Maintenance 3 2040</name>
+      <description><![CDATA[<b>Alternative 1</b><br/>Maintenance 3<br/>Year 2040 (12 years after construction)<br/>Cost in the year: $323,005<br/>Runway closed about 8 days]]></description>
+      <TimeSpan><begin>2040-01-01</begin><end>2040-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.529884,35.858850,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 1 Maintenance 4 2044</name>
+      <description><![CDATA[<b>Alternative 1</b><br/>Maintenance 4<br/>Year 2044 (16 years after construction)<br/>Cost in the year: $337,845<br/>Runway closed about 8 days]]></description>
+      <TimeSpan><begin>2044-01-01</begin><end>2044-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.527587,35.858521,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 1 Rehabilitation 1 2048</name>
+      <description><![CDATA[<b>Alternative 1</b><br/>Rehabilitation 1<br/>Year 2048 (20 years after construction)<br/>Cost in the year: $1,168,589<br/>Runway closed about 14 days]]></description>
+      <TimeSpan><begin>2048-01-01</begin><end>2048-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.525289,35.858193,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 1 Maintenance 5 2052</name>
+      <description><![CDATA[<b>Alternative 1</b><br/>Maintenance 5<br/>Year 2052 (24 years after construction)<br/>Cost in the year: $230,995<br/>Runway closed about 6 days]]></description>
+      <TimeSpan><begin>2052-01-01</begin><end>2052-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.522992,35.857865,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 1 Maintenance 6 2056</name>
+      <description><![CDATA[<b>Alternative 1</b><br/>Maintenance 6<br/>Year 2056 (28 years after construction)<br/>Cost in the year: $357,434<br/>Runway closed about 8 days]]></description>
+      <TimeSpan><begin>2056-01-01</begin><end>2056-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.520694,35.857536,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 1 Salvage 2058</name>
+      <description><![CDATA[<b>Alternative 1</b><br/>Salvage<br/>Year 2058 (30 years after construction)<br/>Cost in the year: $-146,074]]></description>
+      <TimeSpan><begin>2058-01-01</begin><end>2058-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.518397,35.857208,0.0</coordinates></Point>
+    </Placemark>
+  </Folder>
+  <Folder>
+    <name>Alternative 2 - $6,065,225</name>
+    <Placemark>
+      <name>Alternative 2 footprint</name>
+      <description><![CDATA[9" P501 on 6" P209 on 6" P154<br/>Schematic footprint: 5,506 x 75 ft from the area entered, turned to the runway number. Not survey geometry.]]></description>
+      <styleUrl>#alt</styleUrl>
+      <Polygon><tessellate>1</tessellate><outerBoundaryIs><LinearRing><coordinates>
+        -83.537819,35.859398,0.0
+        -83.519439,35.856771,0.0
+        -83.519484,35.856568,0.0
+        -83.537863,35.859195,0.0
+        -83.537819,35.859398,0.0
+      </coordinates></LinearRing></outerBoundaryIs></Polygon>
+    </Placemark>
+    <Placemark>
+      <name>Alternative 2: $6,065,225</name>
+      <styleUrl>#alt</styleUrl>
+      <Polygon><extrude>1</extrude><altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs><LinearRing><coordinates>
+          -83.522260,35.857760,689.6
+          -83.521378,35.857760,689.6
+          -83.521378,35.857046,689.6
+          -83.522260,35.857046,689.6
+          -83.522260,35.857760,689.6
+      </coordinates></LinearRing></outerBoundaryIs></Polygon>
+    </Placemark>
+    <Placemark>
+      <name>Alt 2 Initial Construction 2028</name>
+      <description><![CDATA[<b>Alternative 2</b><br/>Initial Construction<br/>Year 2028 (0 years after construction)<br/>Cost in the year: $5,918,906]]></description>
+      <TimeSpan><begin>2028-01-01</begin><end>2028-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.536906,35.859240,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 2 Maintenance 1 2047</name>
+      <description><![CDATA[<b>Alternative 2</b><br/>Maintenance 1<br/>Year 2047 (19 years after construction)<br/>Cost in the year: $630,653<br/>Runway closed about 8 days]]></description>
+      <TimeSpan><begin>2047-01-01</begin><end>2047-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.534609,35.858911,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 2 Rehabilitation 1 2055</name>
+      <description><![CDATA[<b>Alternative 2</b><br/>Rehabilitation 1<br/>Year 2055 (27 years after construction)<br/>Cost in the year: $738,083<br/>Runway closed about 16 days]]></description>
+      <TimeSpan><begin>2055-01-01</begin><end>2055-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.532311,35.858583,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 2 Salvage 2058</name>
+      <description><![CDATA[<b>Alternative 2</b><br/>Salvage<br/>Year 2058 (30 years after construction)<br/>Cost in the year: $-1,479,727]]></description>
+      <TimeSpan><begin>2058-01-01</begin><end>2058-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.530014,35.858255,0.0</coordinates></Point>
+    </Placemark>
+  </Folder>
+  <Folder>
+    <name>Alternative 3 - $5,852,247 (lowest)</name>
+    <Placemark>
+      <name>Alternative 3 footprint</name>
+      <description><![CDATA[11" P501 on 6" P209<br/>Schematic footprint: 5,506 x 75 ft from the area entered, turned to the runway number. Not survey geometry.]]></description>
+      <styleUrl>#altLow</styleUrl>
+      <Polygon><tessellate>1</tessellate><outerBoundaryIs><LinearRing><coordinates>
+        -83.537916,35.858952,0.0
+        -83.519537,35.856325,0.0
+        -83.519581,35.856122,0.0
+        -83.537961,35.858749,0.0
+        -83.537916,35.858952,0.0
+      </coordinates></LinearRing></outerBoundaryIs></Polygon>
+    </Placemark>
+    <Placemark>
+      <name>Alternative 3: $5,852,247</name>
+      <styleUrl>#altLow</styleUrl>
+      <Polygon><extrude>1</extrude><altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs><LinearRing><coordinates>
+          -83.519887,35.857760,665.4
+          -83.519005,35.857760,665.4
+          -83.519005,35.857046,665.4
+          -83.519887,35.857046,665.4
+          -83.519887,35.857760,665.4
+      </coordinates></LinearRing></outerBoundaryIs></Polygon>
+    </Placemark>
+    <Placemark>
+      <name>Alt 3 Initial Construction 2028</name>
+      <description><![CDATA[<b>Alternative 3</b><br/>Initial Construction<br/>Year 2028 (0 years after construction)<br/>Cost in the year: $5,681,474]]></description>
+      <TimeSpan><begin>2028-01-01</begin><end>2028-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.537036,35.858644,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 3 Maintenance 1 2047</name>
+      <description><![CDATA[<b>Alternative 3</b><br/>Maintenance 1<br/>Year 2047 (19 years after construction)<br/>Cost in the year: $630,653<br/>Runway closed about 8 days]]></description>
+      <TimeSpan><begin>2047-01-01</begin><end>2047-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.534738,35.858316,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 3 Rehabilitation 1 2055</name>
+      <description><![CDATA[<b>Alternative 3</b><br/>Rehabilitation 1<br/>Year 2055 (27 years after construction)<br/>Cost in the year: $738,083<br/>Runway closed about 16 days]]></description>
+      <TimeSpan><begin>2055-01-01</begin><end>2055-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.532441,35.857988,0.0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>Alt 3 Salvage 2058</name>
+      <description><![CDATA[<b>Alternative 3</b><br/>Salvage<br/>Year 2058 (30 years after construction)<br/>Cost in the year: $-1,420,368]]></description>
+      <TimeSpan><begin>2058-01-01</begin><end>2058-12-31</end></TimeSpan>
+      <styleUrl>#event</styleUrl>
+      <Point><coordinates>-83.530143,35.857659,0.0</coordinates></Point>
+    </Placemark>
+  </Folder>
+</Document>
+</kml>

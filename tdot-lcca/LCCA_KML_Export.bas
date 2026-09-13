@@ -17,8 +17,8 @@ Attribute VB_Name = "LCCA_KML_Export"
 '==============================================================================================
 Option Explicit
 
-Private Const RUNWAY_WIDTH_FT As Double = 100#   ' used only for the schematic footprint
-Private Const BAR_METRES_PER_MILLION As Double = 180#
+Private Const DEFAULT_WIDTH_FT As Double = 100#   ' used if Summary T27 is empty
+Private Const TALLEST_BAR_M As Double = 700#      ' the largest present worth stands this high
 Private Const FT_PER_DEG_LAT As Double = 364000#
 
 Public Sub ExportLCCAKML()
@@ -58,8 +58,10 @@ Public Sub ExportLCCAKML()
     Print #f, "<kml xmlns=""http://www.opengis.net/kml/2.2"" xmlns:gx=""http://www.google.com/kml/ext/2.2"">"
     Print #f, "<Document>"
     Print #f, "  <name>" & X(DocName(gi)) & "</name>"
-    Print #f, "  <description>" & X("Life-cycle cost analysis, " & CStr(gi.Range("D33").Value) & " years at " & _
-                                    CStr(gi.Range("D34").Value) & "%. Generated from the TDOT Aeronautics LCCA Framework v1.2.0.") & "</description>"
+    WriteLegend f, gi
+    Print #f, "  <LookAt><longitude>" & Num(lon, 6) & "</longitude><latitude>" & Num(lat, 6) & "</latitude>" & _
+              "<altitude>0</altitude><heading>" & Num(RunwayBearing(CStr(gi.Range("D22").Value)), 1) & "</heading>" & _
+              "<tilt>55</tilt><range>4200</range><altitudeMode>relativeToGround</altitudeMode></LookAt>"
     WriteStyles f
     WriteAirport f, gi, sm, lat, lon
     WriteAlternatives f, gi, sm, lat, lon
@@ -77,6 +79,30 @@ Fail:
 End Sub
 
 '---------------------------------------------------------------- document pieces
+
+' What the colours mean. Google Earth shows this when the reader clicks the document in Places.
+Private Sub WriteLegend(ByVal f As Integer, gi As Worksheet)
+    Dim d As String
+    d = "<p>Life-cycle cost analysis, " & CStr(gi.Range("D33").Value) & " years at " & CStr(gi.Range("D34").Value) & _
+        "%. Generated from the TDOT Aeronautics LCCA Framework v1.2.0.</p>"
+    d = d & "<p><b>Legend</b></p><table cellpadding=" & Q & "3" & Q & " cellspacing=" & Q & "0" & Q & ">"
+    d = d & LegendRow("#1f8b2e", "Lowest net present worth")
+    d = d & LegendRow("#1f78d6", "Other alternatives")
+    d = d & LegendRow("#c1440e", "Maintenance or rehabilitation event, shown in the year it happens")
+    d = d & "</table>"
+    d = d & "<p>Each alternative has a runway footprint (schematic: sized from the area entered and the width on the " & _
+        "Summary, turned to the runway number) and a bar whose height is its net present worth, the tallest drawn " & _
+        "700 m high. The events carry a date, so the time slider at the top of Google Earth walks the analysis period.</p>"
+    Print #f, "  <description><![CDATA[" & d & "]]></description>"
+End Sub
+
+Private Function LegendRow(ByVal rgb As String, ByVal label As String) As String
+    LegendRow = "<tr><td bgcolor=" & Q & rgb & Q & " width=" & Q & "18" & Q & ">&nbsp;</td><td>" & label & "</td></tr>"
+End Function
+
+Private Function Q() As String
+    Q = Chr$(34)
+End Function
 
 Private Sub WriteStyles(ByVal f As Integer)
     WriteStyle f, "altLow", "ff2e8b1f", "662e8b1f"      ' green: lowest present worth
@@ -120,8 +146,8 @@ Private Sub WriteAirport(ByVal f As Integer, gi As Worksheet, sm As Worksheet, B
 
     Print #f, "  <Placemark>"
     Print #f, "    <name>" & X(CStr(gi.Range("D9").Value) & " (" & CStr(gi.Range("D10").Value) & ")") & "</name>"
-    Print #f, "    <styleUrl>#airport</styleUrl>"
     Print #f, "    <description><![CDATA[" & d & "]]></description>"
+    Print #f, "    <styleUrl>#airport</styleUrl>"
     Print #f, "    <Point><coordinates>" & Num(lon, 6) & "," & Num(lat, 6) & ",0</coordinates></Point>"
     Print #f, "  </Placemark>"
 End Sub
@@ -131,24 +157,32 @@ Private Sub WriteAlternatives(ByVal f As Integer, gi As Worksheet, sm As Workshe
     Dim r As Long, k As Long
     Dim wsName As String, altName As String, ws As Worksheet
     Dim bearing As Double, lengthFt As Double, npw As Double, best As Double
+    Dim widthFt As Double, worst As Double, barScale As Double
     Dim yr0 As Long, period As Long, style As String
 
     bearing = RunwayBearing(CStr(gi.Range("D22").Value))
+    widthFt = DEFAULT_WIDTH_FT
+    If IsNumeric(sm.Range("T27").Value) Then
+        If CDbl(sm.Range("T27").Value) > 0 Then widthFt = CDbl(sm.Range("T27").Value)
+    End If
     lengthFt = 0
     If IsNumeric(gi.Range("D26").Value) Then
-        If CDbl(gi.Range("D26").Value) > 0 Then lengthFt = CDbl(gi.Range("D26").Value) * 9# / RUNWAY_WIDTH_FT
+        If CDbl(gi.Range("D26").Value) > 0 Then lengthFt = CDbl(gi.Range("D26").Value) * 9# / widthFt
     End If
     yr0 = CLng(gi.Range("D25").Value)
     period = CLng(gi.Range("D33").Value)
 
-    best = 0
+    best = 0: worst = 0
     For r = 4 To 7
         If Len(CStr(sm.Cells(r, 7).Value)) > 0 Then
             npw = CDbl(sm.Cells(r, 15).Value)
             If best = 0 Then best = npw
             If npw < best Then best = npw
+            If npw > worst Then worst = npw
         End If
     Next r
+    barScale = 0
+    If worst > 0 Then barScale = TALLEST_BAR_M / (worst / 1000000#)   ' the tallest bar is always the same height
 
     k = 0
     For r = 4 To 7
@@ -160,9 +194,9 @@ Private Sub WriteAlternatives(ByVal f As Integer, gi As Worksheet, sm As Workshe
             Print #f, "  <Folder>"
             Print #f, "    <name>" & X(altName & " - " & Money(npw) & IIf(npw = best, " (lowest)", "")) & "</name>"
 
-            If lengthFt > 0 Then WriteRunway f, lat, lon, bearing, lengthFt, RUNWAY_WIDTH_FT, k, style, _
+            If lengthFt > 0 Then WriteRunway f, lat, lon, bearing, lengthFt, widthFt, k, style, _
                                               altName & " footprint", CStr(sm.Cells(79 + r, 16).Value)
-            WriteBar f, lat, lon, k, style, altName, npw
+            WriteBar f, lat, lon, k, style, altName, npw, barScale
             On Error Resume Next
             Set ws = ThisWorkbook.Worksheets(wsName)
             On Error GoTo 0
@@ -189,9 +223,9 @@ Private Sub WriteRunway(ByVal f As Integer, ByVal lat As Double, ByVal lon As Do
     c(4) = c(0)
     Print #f, "    <Placemark>"
     Print #f, "      <name>" & X(nm) & "</name>"
-    Print #f, "      <styleUrl>#" & style & "</styleUrl>"
     Print #f, "      <description><![CDATA[" & X2(section) & "<br/>Schematic footprint: " & Format$(lengthFt, "#,##0") & _
               " x " & Format$(widthFt, "#,##0") & " ft from the area entered, turned to the runway number. Not survey geometry.]]></description>"
+    Print #f, "      <styleUrl>#" & style & "</styleUrl>"
     Print #f, "      <Polygon><tessellate>1</tessellate><outerBoundaryIs><LinearRing><coordinates>"
     For i = 0 To 4
         Print #f, "        " & c(i)
@@ -202,10 +236,10 @@ End Sub
 
 ' One extruded bar per alternative: height proportional to net present worth.
 Private Sub WriteBar(ByVal f As Integer, ByVal lat As Double, ByVal lon As Double, ByVal k As Long, _
-                     ByVal style As String, ByVal altName As String, ByVal npw As Double)
+                     ByVal style As String, ByVal altName As String, ByVal npw As Double, ByVal barScale As Double)
     Dim h As Double, s As Double, i As Long, e As Double
     Dim c(0 To 4) As String
-    h = (npw / 1000000#) * BAR_METRES_PER_MILLION
+    h = (npw / 1000000#) * barScale
     s = 260#                                             ' bar footprint, feet
     e = 1200# + k * 700#                                 ' set the bars off to one side, in a row
     c(0) = Corner3(lat, lon, 90#, e, 0#, h)
@@ -258,16 +292,16 @@ Private Sub WriteEvents(ByVal f As Integer, ws As Worksheet, ByVal lat As Double
                         End If
                     End If
                     pos = (n / 8# - 0.45) * lengthFt                  ' walk the events along the runway
-                    lab = item & " " & CStr(yr0 + CLng(yrOff))
+                    lab = ShortAlt(altName) & " " & item & " " & CStr(yr0 + CLng(yrOff))
                     Print #f, "    <Placemark>"
                     Print #f, "      <name>" & X(lab) & "</name>"
-                    Print #f, "      <styleUrl>#event</styleUrl>"
-                    Print #f, "      <TimeSpan><begin>" & CStr(yr0 + CLng(yrOff)) & "-01-01</begin><end>" & _
-                              CStr(yr0 + CLng(yrOff)) & "-12-31</end></TimeSpan>"
                     Print #f, "      <description><![CDATA[<b>" & X2(altName) & "</b><br/>" & X2(item) & _
                               "<br/>Year " & CStr(yr0 + CLng(yrOff)) & " (" & CStr(CLng(yrOff)) & " years after construction)" & _
                               "<br/>Cost in the year: " & Money(cost) & _
                               IIf(days > 0, "<br/>Runway closed about " & Format$(days, "0") & " days", "") & "]]></description>"
+                    Print #f, "      <TimeSpan><begin>" & CStr(yr0 + CLng(yrOff)) & "-01-01</begin><end>" & _
+                              CStr(yr0 + CLng(yrOff)) & "-12-31</end></TimeSpan>"
+                    Print #f, "      <styleUrl>#event</styleUrl>"
                     Print #f, "      <Point><coordinates>" & Corner3(lat, lon, bearing, pos, (k - 1.5) * 220#, 0#) & "</coordinates></Point>"
                     Print #f, "    </Placemark>"
                     n = n + 1
@@ -311,6 +345,15 @@ Private Function RunwayBearing(ByVal branch As String) As Double
         RunwayBearing = 0
     Else
         RunwayBearing = (CDbl(digits) Mod 36) * 10#
+    End If
+End Function
+
+' "Alternative 2" -> "Alt 2", so the labels on the globe stay short.
+Private Function ShortAlt(ByVal s As String) As String
+    If InStr(1, s, "Alternative ", vbTextCompare) = 1 Then
+        ShortAlt = "Alt " & Mid$(s, 13)
+    Else
+        ShortAlt = s
     End If
 End Function
 

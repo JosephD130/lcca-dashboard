@@ -18,7 +18,8 @@
   "rate": 3,
   "mob": 10,
   "eng": 5,
-  "indirect": "Yes"
+  "indirect": "Yes",
+  "rw_width": 75
  },
  "alternatives": [
   {

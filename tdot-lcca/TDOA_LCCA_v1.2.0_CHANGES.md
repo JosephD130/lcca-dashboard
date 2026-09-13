@@ -119,7 +119,20 @@ plus the verdict), a schematic runway footprint per alternative oriented from th
 from the area entered, an extruded bar per alternative whose height is its net present worth, and every
 maintenance and rehabilitation event as a placemark stamped with the calendar year it happens, so the time
 slider walks the analysis period. The macro reads cells and writes a text file; it changes nothing and goes
-nowhere. A sample produced from the McKellar-Sipes example is in verification/examples.
+nowhere, and the KML carries no external icon references so it renders on a machine with no internet.
+
+The output was linted (verification/kml_check.py: element order, style resolution, closed rings, coordinate
+range, time stamps, extruded geometry) and four things were corrected before release. Elements inside each
+placemark now follow the KML 2.2 sequence (name, description, time, style, geometry); Google Earth tolerated
+the earlier order but a strict GIS reader need not. The document carries a legend with colour swatches
+(green for the lowest present worth, blue for the others, orange for an event) and a LookAt, so opening the
+file flies to the runway at a sensible angle instead of leaving the reader to find it. The footprint length
+now comes from a runway width entered on the Summary (T27, default 100 ft) rather than a fixed assumption:
+at McKellar-Sipes the 100 ft assumption drew a 9,008 ft runway against the real 6,005 ft, and with the true
+150 ft width the footprint lands on the pavement. The present-worth bars are scaled so the tallest is always
+700 m, instead of a fixed 180 m per million which put a 3.4 km spike over a 1.8 km runway.
+
+Samples produced from both worked examples are in verification/examples, with the checker output.
 
 ## 3bb. Method sheet
 

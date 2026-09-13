@@ -119,7 +119,9 @@ check('project block names airport, county, region, coordinates, elevation',
       ['Airport', 'City / county', 'TDOT region', 'Coordinates', 'Elevation', 'Branch / project', 'Mainline area'],
       [ws.cell(20 + k, 19).value for k in range(7)])
 check('the sheet says where the coordinates come from and how to export KML',
-      'embedded' in str(ws['S27'].value) and 'ExportLCCAKML' in str(ws['S28'].value))
+      'embedded' in str(ws['S28'].value) and 'ExportLCCAKML' in str(ws['S29'].value))
+check('runway width for the export footprint is an input cell', ws['S27'].value == 'Runway width for the map export (ft)'
+      and ws['T27'].value == 100, (ws['S27'].value, ws['T27'].value))
 check('print area widened to take the map', 'Summary!$A$1:$V$112' in rd('xl/workbook.xml'))
 
 print(); print('=' * 78); print('METHOD AND TYPICAL VALUES'); print('=' * 78)

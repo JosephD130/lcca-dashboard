@@ -1,0 +1,22 @@
+file            examples/ex2_MKL/MKL_Runway_2_20_LCCA.kml  (19,667 bytes)
+root            {http://www.opengis.net/kml/2.2}kml
+styles          4 defined: airport, alt, altLow, event
+geometry        27 points, 8 rings, extent lon -88.92089..-88.90358 lat 35.59159..35.60872
+                north-south spread 1,906 m
+time            26 timed placemarks, slider spans 2027 to 2057; 9 features always visible
+
+TIME SLIDER WALK (what appears as you scroll)
+  2027  Alt 1 Initial Construction 2027; Alt 2 Initial Construction 2027; Alt 3 Initial Construction 2027; Alt 4 Initial Construction 2027
+  2031  Alt 1 Maintenance 1 2031; Alt 3 Maintenance 1 2031
+  2035  Alt 1 Maintenance 2 2035; Alt 3 Maintenance 2 2035
+  2039  Alt 1 Maintenance 3 2039; Alt 3 Maintenance 3 2039
+  2043  Alt 1 Maintenance 4 2043; Alt 3 Maintenance 4 2043
+  2046  Alt 2 Maintenance 1 2046; Alt 4 Maintenance 1 2046
+  2047  Alt 1 Rehabilitation 1 2047; Alt 3 Rehabilitation 1 2047
+  2051  Alt 1 Maintenance 5 2051; Alt 3 Maintenance 5 2051
+  2054  Alt 2 Rehabilitation 1 2054; Alt 4 Rehabilitation 1 2054
+  2055  Alt 1 Maintenance 6 2055; Alt 3 Maintenance 6 2055
+  2057  Alt 1 Salvage 2057; Alt 2 Salvage 2057; Alt 3 Salvage 2057; Alt 4 Salvage 2057
+
+
+0 issues, 0 notes

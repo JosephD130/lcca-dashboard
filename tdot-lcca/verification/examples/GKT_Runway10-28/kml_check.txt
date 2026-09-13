@@ -1,0 +1,22 @@
+file            examples/ex1_GKT/GKT_Runway_10_28_LCCA.kml  (14,341 bytes)
+root            {http://www.opengis.net/kml/2.2}kml
+styles          4 defined: airport, alt, altLow, event
+geometry        18 points, 6 rings, extent lon -83.53796..-83.51840 lat 35.85612..35.85984
+                north-south spread 414 m
+time            17 timed placemarks, slider spans 2028 to 2058; 7 features always visible
+
+TIME SLIDER WALK (what appears as you scroll)
+  2028  Alt 1 Initial Construction 2028; Alt 2 Initial Construction 2028; Alt 3 Initial Construction 2028
+  2032  Alt 1 Maintenance 1 2032
+  2036  Alt 1 Maintenance 2 2036
+  2040  Alt 1 Maintenance 3 2040
+  2044  Alt 1 Maintenance 4 2044
+  2047  Alt 2 Maintenance 1 2047; Alt 3 Maintenance 1 2047
+  2048  Alt 1 Rehabilitation 1 2048
+  2052  Alt 1 Maintenance 5 2052
+  2055  Alt 2 Rehabilitation 1 2055; Alt 3 Rehabilitation 1 2055
+  2056  Alt 1 Maintenance 6 2056
+  2058  Alt 1 Salvage 2058; Alt 2 Salvage 2058; Alt 3 Salvage 2058
+
+
+0 issues, 0 notes

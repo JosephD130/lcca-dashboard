@@ -23,7 +23,8 @@ if EX == 'gkt':
     A = 45883                    # 5,506 x 75 ft runway
     SC = dict(airport='Gatlinburg-Pigeon Forge Airport', consultant='ARA', projno='6101', projname='Runway 10-28 Reconstruction',
               branch_type='Runway', branch='Runway 10-28', ptype='Reconstruction', desc='Full-depth reconstruction, 5,506 x 75 ft, no paved shoulders',
-              year=2028, area=A, shoulder=0, markings=12000, mark_type='Reflective', period=30, rate=3, mob=10, eng=5, indirect='Yes')
+              year=2028, area=A, shoulder=0, markings=12000, mark_type='Reflective', period=30, rate=3, mob=10, eng=5, indirect='Yes',
+              rw_width=75)    # runway 10-28 is 75 ft wide: used only by the Google Earth footprint
     ALTS = [
         ('HMA', '4" P-401 surface + 4" P-401 base on 6" P-209 on 6" P-154',
          [('Unclassified Excavation', cy(20, A)), ('Subbase Course', cy(6, A)), ('Crushed Aggregate Base Course', cy(6, A)),
@@ -41,7 +42,8 @@ elif EX == 'mkl':
     C = A + SH                    # asphalt, base and subbase quantities are taken off the combined area
     SC = dict(airport='McKellar-Sipes Regional Airport', consultant='ARA', projno='6102', projname='Runway 2-20 Reconstruction',
               branch_type='Runway', branch='Runway 2-20', ptype='Reconstruction', desc='Full-depth reconstruction, 6,005 x 150 ft with 25 ft paved shoulders',
-              year=2027, area=A, shoulder=SH, markings=25000, mark_type='Reflective', period=30, rate=3, mob=10, eng=5, indirect='Yes')
+              year=2027, area=A, shoulder=SH, markings=25000, mark_type='Reflective', period=30, rate=3, mob=10, eng=5, indirect='Yes',
+              rw_width=150)   # runway 2-20 is 150 ft wide: used only by the Google Earth footprint
     ALTS = [
         ('HMA', '3" P-401 surface + 5" P-401 base on 6" P-209 on 6" P-154 (mainline and shoulders)',
          [('Unclassified Excavation', cy(20, C)), ('Subbase Course', cy(6, C)), ('Crushed Aggregate Base Course', cy(6, C)),
@@ -95,6 +97,7 @@ for r in range(3, 80):
 
 # what the Alternative Setup form does
 db = doc.Sheets.getByName('Database'); sm = doc.Sheets.getByName('Summary')
+setv(sm, 'T27', SC['rw_width'])          # runway width for the Google Earth footprint
 sheets, n0 = [], doc.Sheets.getCount()
 for i, (kind, desc, items) in enumerate(ALTS):
     name = f'Alt {i+1} (New {kind})'
