@@ -3,13 +3,19 @@
 Source for the published design canvas at
 https://claude.ai/code/artifact/8737d07a-9a78-4b05-aab6-5e4140172752
 
-Three pages.
+Four pages.
 
 **Summary as a dashboard** carries one artboard, `SummaryDashboard.dc.html`: the whole
 Summary sheet drawn as a dashboard, top to bottom. Six KPI tiles, the results table with
 bars inside the present-worth column, the locator map and the Google Earth export in one
 card, the RealCost comparison block, the seven charts on a two-column grid with the
 unit-cost benchmark in the eighth cell, and the pavement-section read-back.
+
+**Where the logo goes** carries the placement pass: what the mark looked like before (four sheets,
+each anchored and sized differently, all of them drawn 8 to 11 percent taller than the artwork), and
+the three placements considered. Option C was chosen and built: row 1 is a 40 point band on all
+thirteen sheets a user can reach, with the mark at the right at the artwork's own aspect, and row 1
+is a print title so it prints at the top of every page.
 
 **Setup flow and the reference sheets** carries the three artboards that document the rest of
 what shipped: the five steps a project moves through and which sheets are only reference, and
@@ -29,6 +35,10 @@ the workbook.
 | File | Artboard |
 |---|---|
 | `SummaryDashboard.dc.html` | The whole Summary sheet, read as a dashboard (generated) |
+| `LogoAudit.dc.html` | Where the mark was, and the stretch on every placement (generated) |
+| `LogoHeader.dc.html` | Option A: the page header |
+| `LogoMasthead.dc.html` | Option B: masthead where the sheet is read |
+| `LogoBand.dc.html` | Option C: a branded band in row 1 (built) |
 | `SetupFlow.dc.html` | The five steps, and what is only reference |
 | `PayItems.dc.html` | Pay_Items, redesigned (generated) |
 | `MaintenancePolicies.dc.html` | Maintenance Policies, redesigned (generated) |
@@ -39,3 +49,5 @@ the workbook.
 | `canvas.json` | Pages, layout, artboard titles and the sticky notes |
 | `make_dashboard.py` | Builds `SummaryDashboard.dc.html` from the MKL run |
 | `make_sheets.py` | Builds the flow, Pay_Items and Maintenance Policies artboards from the workbook |
+| `make_logo.py` | Builds the logo artboards, reading the placements out of the package |
+| `tdot-logo.png` | The mark itself, extracted from the workbook |

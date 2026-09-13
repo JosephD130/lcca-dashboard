@@ -48,6 +48,10 @@ CH67, NOTE67 = 100, 120
 VBACH = 123       # where the chart the Alternative Setup form maintains is parked
 T1 = T0 + NALT - 1
 CMP1 = CMP0 + NALT - 1
+SENS0, SENS1 = 12, 36      # the discount-rate block in the chart-data columns
+RATE0, RATE1 = 2.0, 8.0    # the range it covers, in 0.25 point steps
+Y0 = 39                    # the by-year block: title row, header, then 31 calendar years
+Y1 = Y0 + 2 + 30
 R0, R1 = 36, 52   # NPW-table window on the alternative sheets (covers HMA and PCC layouts)
 DC = 23           # first chart-data column (W)
 
@@ -70,7 +74,7 @@ def build_scratch(path):
     # ---- navigation buttons (macro-free hyperlinks) and the VBA-managed header, kept identical
     button('G1', '◄ General Information', "'General Information'!D9")
     button('H1', 'Instructions', 'Instructions!B9', FILL_BTN2)
-    ws.row_dimensions[1].height = 22
+    ws.row_dimensions[1].height = 40
     hdr(3, 1, ['Alternative', 'Name', 'Initial Construction', 'Present Worth', 'Alternative Description'])
     ws.column_dimensions['A'].width = 22; ws.column_dimensions['B'].width = 32; ws.column_dimensions['C'].width = 17; ws.column_dimensions['D'].width = 17; ws.column_dimensions['E'].width = 34
     ws.column_dimensions['F'].width = 3
@@ -82,8 +86,10 @@ def build_scratch(path):
 
     # ---- 1. results table
     ws['J1'] = 'LCCA SUMMARY'; ws['J1'].font = F_T
-    ws['G2'] = ('STEP 5 of 5: the comparison. Everything here calculates from the alternative worksheets and updates by itself. Columns A to F are hidden: the Alternative Setup form still writes '
-                'its own small table and "Chart 1" there, and this table repeats all of it with more detail. Unhide A:F if you want to type an alternative description.'); ws['G2'].font = F_N
+    ws[f'G{HDR-1}'] = ('STEP 5 of 5: the comparison. Everything here calculates from the alternative worksheets and updates by itself. Columns A to F are hidden: the Alternative Setup form still writes '
+                       'its own small table and "Chart 1" there, and this table repeats all of it with more detail. Unhide A:F if you want to type an alternative description.')
+    ws[f'G{HDR-1}'].font = F_N
+    ws.row_dimensions[HDR - 1].height = 13
     hdr(HDR, 7, ['Worksheet', 'Alternative', 'Type', 'Initial construction', 'Maintenance PW', 'Rehabilitation PW', 'Lost revenue PW', 'Salvage PW', 'Net present worth', 'vs. lowest NPW', 'Closure days in period', 'Runway availability'])
     for i in range(NALT):
         r = T0 + i; dbr = 4 + i; g = f'$G{r}'
@@ -101,7 +107,7 @@ def build_scratch(path):
         ws.cell(r, 15, f'=IF({g}="","",IFERROR(INDEX(INDIRECT("\'"&{g}&"\'!$E$1:$E$70"),MATCH("Net Present Worth",INDIRECT("\'"&{g}&"\'!$B$1:$B$70"),0)),0))')
         ws.cell(r, 16, f'=IF({g}="","",O{r}-MIN($O${T0}:$O${T1}))')
         dcol = L(DC + 2 + 2 * NALT + i)  # this alternative's closure-days column in the by-year block (period-aware)
-        ws.cell(r, 17, f'=IF({g}="","",IF(IFERROR(INDIRECT("\'"&{g}&"\'!$F$2"),0)>0,SUM(${dcol}$41:${dcol}$71),IFERROR(SUM(INDIRECT("\'"&{g}&"\'!$F$4:$F$10")),0)))')
+        ws.cell(r, 17, f'=IF({g}="","",IF(IFERROR(INDIRECT("\'"&{g}&"\'!$F$2"),0)>0,SUM(${dcol}${Y0+2}:${dcol}${Y1}),IFERROR(SUM(INDIRECT("\'"&{g}&"\'!$F$4:$F$10")),0)))')
         ws.cell(r, 18, f'=IF({g}="","",1-Q{r}/({GI}!$D$33*365))')
         for c in range(10, 17): ws.cell(r, c).number_format = CUR
         ws.cell(r, 18).number_format = '0.00%'
@@ -112,7 +118,6 @@ def build_scratch(path):
     F_KLAB = Font(name='Arial', size=8, bold=True, color='595959')
     F_KVAL = Font(name='Arial', size=16, bold=True, color='1D2733')
     F_KVAL_W = Font(name='Arial', size=16, bold=True, color='7F6000')
-    F_KVAL_G = Font(name='Arial', size=16, bold=True, color='2E8B1F')
     F_KSUB = Font(name='Arial', size=9, color='595959')
     TILE_COLS = [(7, 10), (11, 14), (15, 18)]          # G:J, K:N, O:R
     top = Side(style='thin', color='BFC7D1')
@@ -121,10 +126,10 @@ def build_scratch(path):
     LOWROW = f'MATCH(MIN($O${T0}:$O${T1}),$O${T0}:$O${T1},0)'
     MARGIN = f'IF(COUNT($O${T0}:$O${T1})<2,0,SMALL($O${T0}:$O${T1},2)-MIN($O${T0}:$O${T1}))'
     CRF_ = f'(({GI}!$D$34/100)*(1+{GI}!$D$34/100)^{GI}!$D$33/((1+{GI}!$D$34/100)^{GI}!$D$33-1))'
-    S2R = f'${L(DC+1)}$12:${L(DC+NALT)}$12'
-    S7R = f'${L(DC+1)}${12+20}:${L(DC+NALT)}${12+20}'
-    holds = (f'AND({LOWNAME}=INDEX($H${T0}:$H${T1},MATCH(SMALL({S2R},COUNTIF({S2R},0)+1),{S2R},0)),'
-             f'{LOWNAME}=INDEX($H${T0}:$H${T1},MATCH(SMALL({S7R},COUNTIF({S7R},0)+1),{S7R},0)))')
+    # the sensitivity block carries a column naming the lowest-cost alternative at each rate, so the tile
+    # tests all 25 rates rather than only the two ends of the range
+    WIN = f'${L(DC+1+NALT)}${SENS0}:${L(DC+1+NALT)}${SENS1}'
+    holds = f'COUNTIF({WIN},{LOWNAME})={SENS1-SENS0+1}'
     TILES = [
         ('LOWEST PRESENT WORTH',
          f'=IF({NONE_ANY},"-",TEXT(MIN($O${T0}:$O${T1}),"$#,##0"))',
@@ -147,15 +152,15 @@ def build_scratch(path):
          '="initial construction over the mainline area; see the benchmark under chart 5"',
          'plain'),
         ('RATE SENSITIVITY',
-         f'=IF(COUNT($O${T0}:$O${T1})<2,"-",IF({holds},"holds 2-8%","the winner changes"))',
-         f'=IF(COUNT($O${T0}:$O${T1})<2,"needs two alternatives",IF({holds},"the lowest-cost alternative is the same at every rate tested","the lowest-cost alternative is not the same at every rate: see chart 2"))',
-         'good'),
+         f'=IF(COUNT($O${T0}:$O${T1})<2,"-",IF({holds},"holds {RATE0:g}-{RATE1:g}%","the winner changes"))',
+         f'=IF(COUNT($O${T0}:$O${T1})<2,"needs two alternatives",IF({holds},"the same alternative is lowest at all {SENS1-SENS0+1} rates tested, {RATE0:g}% to {RATE1:g}%","the lowest-cost alternative is not the same at every rate: see chart 2"))',
+         'flagrate'),
     ]
     for k, (label, value, sub, tone) in enumerate(TILES):
         r0 = KPI0 + 4 * (k // 3)
         c0, c1 = TILE_COLS[k % 3]
         fill = PatternFill('solid', fgColor='F5F7FA')   # the margin tile is re-coloured by the rule below
-        for rr, val, fnt in ((r0, label, F_KLAB), (r0 + 1, value, {'good': F_KVAL_G}.get(tone, F_KVAL)),
+        for rr, val, fnt in ((r0, label, F_KLAB), (r0 + 1, value, F_KVAL),
                              (r0 + 2, sub, F_KSUB)):
             ws.merge_cells(start_row=rr, start_column=c0, end_row=rr, end_column=c1)
             c = ws.cell(rr, c0, val); c.font = fnt
@@ -169,10 +174,13 @@ def build_scratch(path):
         ws.row_dimensions[r0 + 1].height = 24
         ws.row_dimensions[r0 + 2].height = 15
     ws.row_dimensions[KPI0 + 3].height = 6         # the gap between the two bands of tiles
-    ws.row_dimensions[HDR - 1].height = 6          # and between the strip and the results table
+
     # the margin tile turns amber when the two best alternatives are within five percent of each other
     KPI_FLAG = (f'AND(COUNT($O${T0}:$O${T1})>1,'
                 f'(SMALL($O${T0}:$O${T1},2)-MIN($O${T0}:$O${T1}))/MIN($O${T0}:$O${T1})<0.05)')
+    # and the rate-sensitivity tile is green only while it actually says the winner holds
+    KPI_HOLD = f'AND(COUNT($O${T0}:$O${T1})>1,{holds})'
+    KPI_TURN = f'AND(COUNT($O${T0}:$O${T1})>1,NOT({holds}))'
 
 
     S7 = f'${L(DC+1)}${12+20}:${L(DC+NALT)}${12+20}'  # 7.00% row of the sensitivity data block
@@ -206,14 +214,21 @@ def build_scratch(path):
     ws.cell(10, DC, 'Net present worth vs. discount rate').font = F_H
     hdr(11, DC, ['Rate (%)'] + [None] * NALT)
     for i in range(NALT): ws.cell(11, DC + 1 + i, f'=IF({d(1+i)}$4="","",{d(1+i)}$4)')
-    for k in range(25):
-        r = 12 + k; c = ws.cell(r, DC, 2 + 0.25 * k); c.number_format = '0.00"%"'; c.font = F_DATA
+    # one more column names the lowest-cost alternative at each rate, so the rate-sensitivity tile can test
+    # every rate in the block instead of only its two ends
+    ws.cell(11, DC + 1 + NALT, 'Lowest at this rate').font = F_H
+    for k in range(SENS1 - SENS0 + 1):
+        r = SENS0 + k
+        c = ws.cell(r, DC, RATE0 + 0.25 * k); c.number_format = '0.00"%"'; c.font = F_DATA
         for i in range(NALT):
             g = f'$G${T0+i}'; C, D = rng(g, 'C'), rng(g, 'D')
             c = ws.cell(r, DC + 1 + i, f'=IF({g}="",0,IFERROR($J${T0+i}+SUMPRODUCT(({C}<={GI}!$D$33)*{D}/(1+${d(0)}{r}/100)^{C}),0))'); c.number_format = CUR; c.font = F_DATA
-    SENS0, SENS1 = 12, 36
+        row = f'${d(1)}{r}:${d(NALT)}{r}'
+        # unused alternative columns hold 0, so the lowest is the smallest non-zero value
+        c = ws.cell(r, DC + 1 + NALT,
+                    f'=IF(COUNTIF({row},"<>0")=0,"",INDEX($H${T0}:$H${T1},MATCH(SMALL({row},COUNTIF({row},0)+1),{row},0)))')
+        c.font = F_DATA
     # by-year block rows 39-71
-    Y0 = 39
     ws.cell(Y0, DC, 'By calendar year: spend (undiscounted), cumulative discounted cost, closure days').font = F_H
     hdr(Y0 + 1, DC, ['Year', 'Calendar year'] + [None] * (3 * NALT))
     for i in range(NALT):
@@ -231,7 +246,6 @@ def build_scratch(path):
             c = ws.cell(r, DC + 2 + NALT + i, f'=IF({g}="",0,{prev}{pv})'); c.number_format = CUR; c.font = F_DATA
             days = f'IFERROR(SUMIFS({D},{C},{yr},{B},"*Indirect*")/INDIRECT("\'"&{g}&"\'!$F$2"),0)'
             c = ws.cell(r, DC + 2 + 2 * NALT + i, f'=IF({g}="",0,IF({yr}>{GI}!$D$33,0,{days}))'); c.number_format = '0'; c.font = F_DATA
-    Y1 = Y0 + 2 + 30
 
     # ---- charts, two per row under the results table
     def style(ch, title, h=8.0, w=16.5, xt='Alternative', yt='Present worth ($)'):
@@ -409,11 +423,12 @@ def build_scratch(path):
     # ---- project identity and the locator map. Coordinates and the state outline are embedded (geo_data.py),
     # so the map draws with no internet connection, no add-in and no external reference.
     GI_ = GI
-    ws['L1'] = (f'=IF({GI_}!$D$9="","No airport selected yet: pick one on General Information.",'
+    ws['G2'] = (f'=IF({GI_}!$D$9="","No airport selected yet: pick one on General Information.",'
                 f'{GI_}!$D$9&" ("&{GI_}!$D$10&")  |  "&{GI_}!$D$11&", "&{GI_}!$D$13&" region"'
                 f'&IF({GI_}!$D$22="",""," |  "&{GI_}!$D$22)&IF({GI_}!$D$23="",""," ("&{GI_}!$D$23&")")'
                 f'&"  |  construction "&TEXT({GI_}!$D$25,"0")&"  |  "&TEXT({GI_}!$D$33,"0")&" years at "&TEXT({GI_}!$D$34,"0.##")&"%")')
-    ws['L1'].font = F_H
+    ws['G2'].font = F_H
+    ws.row_dimensions[2].height = 17
 
     MAP0 = 130                                   # map data, below every other block and outside the print area
     A0 = MAP0 + 2                                # first airport row
@@ -522,7 +537,10 @@ def build_scratch(path):
                                   DataBarRule(start_type='num', start_value=0, end_type='max',
                                               color='FFBBD4EE', showValue=True, minLength=None, maxLength=None))
     dxf_flag = DifferentialStyle(fill=PatternFill(bgColor='FFFFF3CD'), font=Font(bold=True, color='FF7F6000'))
+    dxf_hold = DifferentialStyle(font=Font(bold=True, color='FF2E8B1F'))
     ws.conditional_formatting.add(f'K{KPI0}:N{KPI0+2}', Rule(type='expression', formula=[KPI_FLAG], stopIfTrue=False, dxf=dxf_flag))
+    ws.conditional_formatting.add(f'O{KPI0+4+1}', Rule(type='expression', formula=[KPI_HOLD], stopIfTrue=True, dxf=dxf_hold))
+    ws.conditional_formatting.add(f'O{KPI0+4+1}', Rule(type='expression', formula=[KPI_TURN], stopIfTrue=False, dxf=dxf_flag))
     for sqref, f in [(f'G{T0}:R{T1}', f'AND($G{T0}<>"",COUNT($O${T0}:$O${T1})>0,$O{T0}=MIN($O${T0}:$O${T1}))'),
                      (f'G{CMP0}:P{CMP1}', f'AND($G{CMP0}<>"",COUNT($L${CMP0}:$L${CMP1})>0,$L{CMP0}=MIN($L${CMP0}:$L${CMP1}))')]:
         rule = Rule(type='expression', formula=[f], stopIfTrue=False, dxf=dxf_low)

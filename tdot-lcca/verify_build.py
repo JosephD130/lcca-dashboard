@@ -19,11 +19,16 @@ KPI0, HDR, T0, T1 = 3, 11, 12, 15
 VER, VER2, CMP, CMPH, CMP0 = 17, 18, 20, 21, 22
 CHT, HOW, C1, C2, C3, BMN = 28, 29, 30, 48, 66, 87
 SEC_T, CH67, NOTE67, MAP0, A0 = 90, 100, 120, 130, 132
+VBACH = 123       # where the chart the Alternative Setup form maintains is parked
+SENS0, SENS1 = 12, 36
 BM = 89           # unit-cost benchmark data block, in the chart-data columns
 fails = []
+checks = 0
 
 
 def check(name, ok, detail=''):
+    global checks
+    checks += 1
     print(('PASS  ' if ok else 'FAIL  ') + name + (('   |   ' + str(detail)[:160]) if detail else ''))
     if not ok: fails.append(name)
 
@@ -61,7 +66,7 @@ check('column G onward visible', not ws.column_dimensions['G'].hidden)
 check('navigation buttons sit in the first visible column', 'HYPERLINK' in str(ws['G1'].value) and 'HYPERLINK' in str(ws['H1'].value),
       (ws['G1'].value, ws['H1'].value))
 check('title moved beside the buttons', ws['J1'].value == 'LCCA SUMMARY')
-check('note explains the hidden block', 'hidden' in str(ws['G2'].value) and 'Unhide' in str(ws['G2'].value))
+check('note explains the hidden block', 'hidden' in str(ws.cell(HDR - 1, 7).value) and 'Unhide' in str(ws.cell(HDR - 1, 7).value))
 check('results table header intact', [ws.cell(HDR, c).value for c in range(7, 19)] ==
       ['Worksheet', 'Alternative', 'Type', 'Initial construction', 'Maintenance PW', 'Rehabilitation PW', 'Lost revenue PW',
        'Salvage PW', 'Net present worth', 'vs. lowest NPW', 'Closure days in period', 'Runway availability'],
@@ -72,7 +77,36 @@ check('comparison block present (RealCost layout)', str(ws.cell(CMP, 7).value).s
 check('section block present with both description strings', ws.cell(SEC_T + 2, 16).value == 'Section from the quantities'
       and ws.cell(SEC_T + 2, 17).value == 'Same quantities over mainline + shoulder')
 check('asphalt unit weight is an input cell', ws.cell(SEC_T + 1, 10).value == 145)
+check('the two verdict lines sit under the results table',
+      str(ws.cell(VER, 7).value).startswith('=IF(COUNT($O$%d:$O$%d)=0' % (T0, T1))
+      and 'lowest-cost alternative' in str(ws.cell(VER2, 7).value),
+      (str(ws.cell(VER, 7).value)[:40], str(ws.cell(VER2, 7).value)[:40]))
+check('the charts block is labelled and carries its how-to-read line',
+      ws.cell(CHT, 7).value == 'CHARTS' and str(ws.cell(HOW, 7).value).startswith('How to read'),
+      (ws.cell(CHT, 7).value, str(ws.cell(HOW, 7).value)[:30]))
+check('the notes under the chart rows are where the row map says',
+      'per S.Y.' in str(ws.cell(BMN, 7).value) and 'Charts 6 and 7' in str(ws.cell(NOTE67, 7).value)
+      and 'Alternative Setup form draws' in str(ws.cell(VBACH - 1, 7).value),
+      (str(ws.cell(NOTE67, 7).value)[:30], str(ws.cell(VBACH - 1, 7).value)[:30]))
+draw = rd('xl/drawings/drawing10.xml')
+anchors = [(int(c), int(r)) for c, r in
+           re.findall(r'<xdr:from><xdr:col>(\d+)</xdr:col><xdr:colOff>\d+</xdr:colOff>'
+                      r'<xdr:row>(\d+)</xdr:row>', draw)]
+want = [(6, C1 - 1), (13, C1 - 1), (6, C2 - 1), (13, C2 - 1), (6, C3 - 1), (13, C3 - 1),
+        (6, CH67 - 1), (13, CH67 - 1)]
+check('the eight Summary charts are anchored where the row map says',
+      all(a in anchors for a in want), sorted(set(anchors)))
+check('the chart the form maintains is parked below the dashboard', (6, VBACH - 1) in anchors,
+      [a for a in anchors if a[0] == 6])
 check('chart-data block labelled do not edit', 'do not edit' in str(ws.cell(1, 23).value))
+check('the sensitivity block names the lowest alternative at each of its rates',
+      ws.cell(SENS0 - 1, 23 + 1 + 4).value == 'Lowest at this rate'
+      and str(ws.cell(SENS0, 28).value).startswith('=IF(COUNTIF(')
+      and str(ws.cell(SENS1, 28).value).startswith('=IF(COUNTIF('),
+      ws.cell(SENS0 - 1, 28).value)
+check('the rate-sensitivity tile tests every rate in that block, not just its ends',
+      'COUNTIF($AB$%d:$AB$%d' % (SENS0, SENS1) in str(ws.cell(KPI0 + 5, 15).value),
+      str(ws.cell(KPI0 + 5, 15).value)[:90])
 check('an alternative that does not exist gets no name', all('""' in str(ws.cell(4, c).value) for c in range(24, 28)),
       ws.cell(4, 24).value)
 wbx = rd('xl/workbook.xml')
@@ -138,7 +172,8 @@ check('chart 8 sits beside chart 5 and carries its own note',
 
 
 print(); print('=' * 78); print('LOCATOR MAP AND PROJECT IDENTITY'); print('=' * 78)
-check('project identity line at the top of the Summary', 'D$9' in str(ws['L1'].value) and 'construction' in str(ws['L1'].value))
+check('project identity line on its own row under the band',
+      'D$9' in str(ws['G2'].value) and 'construction' in str(ws['G2'].value), str(ws['G2'].value)[:50])
 check('map data block labelled and outside the print area', 'MAP DATA' in str(ws.cell(MAP0, 23).value))
 coords = [(ws.cell(r, 25).value, ws.cell(r, 26).value) for r in range(A0, A0 + 79)]
 check('79 airports in the map block, 74 with published coordinates',
@@ -230,9 +265,9 @@ check('the how-to card names all five steps in order',
 check('five navigation buttons on General Information, one per destination',
       all('HYPERLINK' in str(gi[c].value) for c in ('D44', 'D46', 'D48', 'D50', 'D52')),
       [str(gi[c].value)[:40] for c in ('D44', 'D46', 'D48', 'D50', 'D52')])
-steps = {'Overview': wb['Overview']['H1'].value, 'Instructions': wb['Instructions']['H1'].value,
-         'Pay_Items': wb['Pay_Items']['D1'].value, 'TMP(NewHMA)': wb['TMP(NewHMA)']['D1'].value,
-         'Summary': ws['G2'].value}
+steps = {'Overview': wb['Overview']['G1'].value, 'Instructions': wb['Instructions']['G1'].value,
+         'Pay_Items': wb['Pay_Items']['C1'].value, 'TMP(NewHMA)': wb['TMP(NewHMA)']['D1'].value,
+         'Summary': ws.cell(HDR - 1, 7).value}
 check('every sheet in the flow says which step it is',
       [str(v).strip()[:11] for v in steps.values()] == ['STEP 1 of 5', 'STEP 1 of 5', 'STEP 3 of 5', 'STEP 4 of 5', 'STEP 5 of 5'],
       {k: str(v).strip()[:14] for k, v in steps.items()})
@@ -254,8 +289,8 @@ check('Pay_Items says what the empty division columns mean and how many items ca
       'West' in str(pi['A62'].value) and 'no unit cost' in str(pi['A63'].value), str(pi['A63'].value)[:50])
 check('Pay_Items part headings band the left of the table',
       all(pi.cell(r, 1).font.bold for r in (4, 26, 34, 37, 44, 48, 54)))
-check('Pay_Items freezes the header and repeats it in print',
-      pi.freeze_panes == 'A3' and 'Pay_Items!$2:$2' in rd('xl/workbook.xml'), pi.freeze_panes)
+check('Pay_Items freezes the header and repeats the band and the header in print',
+      pi.freeze_panes == 'A3' and 'Pay_Items!$1:$2' in rd('xl/workbook.xml'), pi.freeze_panes)
 mp = wb['Maintenance Policies']
 check('Maintenance Policies says it is reference and which table drives which alternative',
       'Reference' in str(mp['C3'].value) and 'Table 1' in str(mp['C4'].value) and 'Rate' in str(mp['C5'].value),
@@ -265,7 +300,37 @@ check('the four maintenance tables carry a header band',
       [mp.cell(r, 2).value for r in (9, 36, 50, 75)])
 
 
+print(); print('=' * 78); print('THE TDOT MARK'); print('=' * 78)
+LOGO_SHEETS = ['xl/drawings/drawing%d.xml' % i for i in range(1, 14)]
+anchors, aspects = {}, set()
+for n in LOGO_SHEETS:
+    if n not in names: continue
+    d = rd(n)
+    m = re.search(r'<xdr:oneCellAnchor><xdr:from><xdr:col>(\d+)</xdr:col><xdr:colOff>(\d+)</xdr:colOff>'
+                  r'<xdr:row>(\d+)</xdr:row><xdr:rowOff>(\d+)</xdr:rowOff></xdr:from>'
+                  r'<xdr:ext cx="(\d+)" cy="(\d+)"/>(?:(?!</xdr:oneCellAnchor>).)*?TDOT logo', d, re.S)
+    if m:
+        col, off, row, roff, cx, cy = (int(v) for v in m.groups())
+        anchors[n] = (col, row)
+        aspects.add(round(cx / float(cy), 3))
+check('the mark is on all thirteen sheets a user can reach', len(anchors) == 13, sorted(anchors))
+check('every one of them sits in row 1', all(r == 0 for _, r in anchors.values()), sorted(set(r for _, r in anchors.values())))
+check('and at the artwork aspect, not stretched', aspects == {2.288}, aspects)
+check('no placement is left at the old B2 anchor',
+      not any('<xdr:pic>' in rd(n).split('<xdr:oneCellAnchor>')[0] for n in anchors), '')
+rows1 = {sh.title: wb[sh.title].row_dimensions[1].height for sh in wb.worksheets
+         if sh.sheet_state == 'visible' or sh.title.startswith('TMP(')}
+check('row 1 is the same height on every one of them',
+      sorted(set(v for k, v in rows1.items() if k != 'TMP(PCCRehab)')) == [40.0], rows1)
+titles = re.findall(r'<definedName name="_xlnm.Print_Titles" localSheetId="(\d+)">([^<]*)</definedName>', rd('xl/workbook.xml'))
+check('row 1 repeats at the top of every printed page, so the mark prints throughout',
+      len(titles) == 13 and all(t.endswith('$1:$1') or t.endswith('$1:$2') for _, t in titles),
+      [t for _, t in titles][:3])
+check('Pay_Items repeats its table header as well as the band',
+      any(t.endswith("Pay_Items!$1:$2") for _, t in titles), [t for _, t in titles if 'Pay_Items' in t])
+
+
 print(); print('=' * 78)
-print('%d checks, %d failed' % (len(fails) + sum(1 for _ in []) + 0 if False else 0, len(fails)) if False else
-      ('ALL PASS' if not fails else 'FAILED: ' + '; '.join(fails)))
+print('%d checks, %d failed' % (checks, len(fails)))
+print('ALL PASS' if not fails else 'FAILED: ' + '; '.join(fails))
 sys.exit(1 if fails else 0)

@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #8A8F98; font-family: Arial, Helvetica, sans-serif; color: #1D2733; }
+    a { color: #2A78D6; } a:hover { color: #1D5BA6; }
+    .sheet { background: #FFFFFF; box-sizing: border-box; padding: 20px 22px 24px; }
+    .title { font-size: 15px; font-weight: bold; letter-spacing: .03em; }
+    .lede { font-size: 11px; color: #595959; line-height: 1.5; }
+    .lab { font-size: 9.5px; color: #595959; letter-spacing: .05em; text-transform: uppercase; }
+    .card { border: 1px solid #D4D8DD; }
+    .hd { background: #1D2733; color: #FFFFFF; font-size: 10.5px; font-weight: bold;
+          letter-spacing: .05em; padding: 5px 9px; }
+    .rule { border-top: 2px solid #1D2733; margin-top: 4px; }
+    table.kv { border-collapse: collapse; width: 100%; }
+    table.kv th { background: #D9D9D9; border: 1px solid #BFBFBF; font-size: 10px; padding: 4px 7px;
+                  text-align: left; }
+    table.kv td { border: 1px solid #D0D4D9; font-size: 10.5px; padding: 4px 7px; }
+    td.n { text-align: right; font-variant-numeric: tabular-nums; }
+    .yes { color: #2E8B1F; font-weight: bold; }
+    .no { color: #C1440E; font-weight: bold; }
+    .note { font-size: 10px; color: #595959; line-height: 1.45; }
+    .pill { display: inline-block; font-size: 9.5px; font-weight: bold; letter-spacing: .04em;
+            padding: 3px 8px; text-transform: uppercase; }
+    /* a schematic sheet: row bands, so a placement can be shown without redrawing the sheet */
+    .mini { border: 1px solid #C6CBD0; background: #FFFFFF; }
+    .r { height: 7px; background: #EDF0F3; margin: 3px 5px; }
+    .r.hdr { background: #1D2733; height: 9px; margin: 5px 5px 4px; }
+    .r.band { background: #EAF2FB; }
+    .r.tall { height: 22px; }
+    .frozen { border-bottom: 2px dashed #9AA0A6; }
+    .hdrzone { background: repeating-linear-gradient(135deg, #F4F6F8, #F4F6F8 6px, #EAEDF1 6px, #EAEDF1 12px);
+               border-bottom: 1px solid #C6CBD0; padding: 5px; }
+  </style>
+</helmet>
+<div class="sheet">
+<div class="title">WHERE THE LOGO IS TODAY</div><div class="lede" style="margin: 6px 0 16px; max-width: 780px;">Four of the nine sheets a user opens carry the mark, each anchored and sized a little differently, and all four are drawn taller than the artwork. The file is 723 &times; 316, an aspect of 2.288; every placement is squarer than that, so the lettering is stretched vertically.</div><div style="display: flex; gap: 26px; align-items: flex-start;"><div style="flex: none;"><div class="lab">The artwork</div><img src="tdot-logo.png" alt="TDOT" style="width: 210px; height: 91.8px; display: block;"/><div class="note" style="margin-top: 6px; width: 210px;">723 &times; 316 px<br/>aspect 2.288</div></div><div style="flex: none;"><div class="lab">As placed, +11%</div><div style="border: 1px dashed #C1440E; padding: 4px; display: inline-block;"><img src="tdot-logo.png" alt="TDOT" style="width: 150px; height: 72.8px; display: block;"/></div><div class="note" style="margin-top: 6px; width: 210px; color: #C1440E;">The tallest of the four. The &ldquo;TN&rdquo; square is no longer square.</div></div><div style="flex: 1 1 0; min-width: 0;"><table class="kv"><tr><th>Sheet</th><th>Width in</th><th>Height in</th><th>Aspect</th><th>Stretch</th><th>Anchored at</th></tr><tr><td>General Information</td><td class="n">1.93</td><td class="n">0.94</td><td class="n">2.060</td><td class="n" style="color: #C1440E; font-weight: bold;">+11.1%</td><td>column B, row 2</td></tr><tr><td>Instructions</td><td class="n">1.95</td><td class="n">0.92</td><td class="n">2.123</td><td class="n" style="color: #C1440E; font-weight: bold;">+7.8%</td><td>column B, row 2</td></tr><tr><td>Maintenance Policies</td><td class="n">1.93</td><td class="n">0.94</td><td class="n">2.060</td><td class="n" style="color: #C1440E; font-weight: bold;">+11.1%</td><td>column B, row 2</td></tr><tr><td>Overview</td><td class="n">1.95</td><td class="n">0.92</td><td class="n">2.123</td><td class="n" style="color: #C1440E; font-weight: bold;">+7.8%</td><td>column B, row 2</td></tr><tr><td>Pay_Items</td><td colspan="5" class="no">no logo</td></tr><tr><td>Summary</td><td colspan="5" class="no">no logo</td></tr><tr><td>Typical Values</td><td colspan="5" class="no">no logo</td></tr><tr><td>Method</td><td colspan="5" class="no">no logo</td></tr><tr><td>Alternative worksheets (5 templates)</td><td colspan="5" class="no">no logo</td></tr></table><div class="note" style="margin-top: 7px;">At the native aspect a 1.95 in wide lockup is 0.85 in tall, not 0.92 in. Whatever placement rule is chosen, this is worth correcting in the same pass.</div></div></div></div>
+</x-dc>
+</body>
+</html>

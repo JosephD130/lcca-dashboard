@@ -177,13 +177,19 @@ Private Sub WriteAlternatives(ByVal f As Integer, gi As Worksheet, sm As Workshe
     yr0 = CLng(gi.Range("D25").Value)
     period = CLng(gi.Range("D33").Value)
 
-    best = 0: worst = 0
+    ' seeded on the first alternative found, not on zero: a net present worth of exactly 0 is a value,
+    ' not an empty slot, and seeding on zero would hand the "lowest" style to the wrong alternative
+    Dim seeded As Boolean
+    seeded = False: best = 0: worst = 0
     For r = ROW0 To ROW1
         If Len(CStr(sm.Cells(r, 7).Value)) > 0 Then
             npw = CDbl(sm.Cells(r, 15).Value)
-            If best = 0 Then best = npw
-            If npw < best Then best = npw
-            If npw > worst Then worst = npw
+            If Not seeded Then
+                best = npw: worst = npw: seeded = True
+            Else
+                If npw < best Then best = npw
+                If npw > worst Then worst = npw
+            End If
         End If
     Next r
     barScale = 0

@@ -34,9 +34,16 @@ PASS  results table reads the Database sheet by INDEX (survives a row deletion)
 PASS  comparison block present (RealCost layout)
 PASS  section block present with both description strings
 PASS  asphalt unit weight is an input cell
+PASS  the two verdict lines sit under the results table   |   ('=IF(COUNT($O$12:$O$15)=0,"No alternative', '=IF(COUNT($O$12:$O$15)<2,"",IF(INDEX($H$')
+PASS  the charts block is labelled and carries its how-to-read line   |   ('CHARTS', 'How to read: 1 shows where eac')
+PASS  the notes under the chart rows are where the row map says   |   ('Charts 6 and 7 stack the layer', 'Below: "Chart 1", the chart th')
+PASS  the eight Summary charts are anchored where the row map says   |   [(6, 29), (6, 47), (6, 65), (6, 99), (6, 122), (13, 29), (13, 47), (13, 65), (13, 99), (18, 2), (20, 0)]
+PASS  the chart the form maintains is parked below the dashboard   |   [(6, 122), (6, 29), (6, 47), (6, 65), (6, 99)]
 PASS  chart-data block labelled do not edit
+PASS  the sensitivity block names the lowest alternative at each of its rates   |   Lowest at this rate
+PASS  the rate-sensitivity tile tests every rate in that block, not just its ends   |   =IF(COUNT($O$12:$O$15)<2,"-",IF(COUNTIF($AB$12:$AB$36,INDEX($H$12:$H$15,MATCH(MIN($O$12:$O
 PASS  an alternative that does not exist gets no name   |   =IF($H$12="","",$H$12)
-PASS  print areas defined for the Summary and General Information   |   ['Summary!$A$1:$V$141', "'General Information'!$A$1:$J$52"]
+PASS  print areas defined for the Summary and General Information   |   ['Summary!$A$1:$V$141', "'General Information'!$A$1:$J$52", "'TMP(NewHMA)_IndirectCost'!$A$1:$G$56", "'TMP(NewHMA)'!$A$1:$G$56", "'TMP(NewPCC)_IndirectCost'!$A$
 
 ==============================================================================
 CHARTS
@@ -68,9 +75,9 @@ DASHBOARD STRIP
 PASS  six KPI tiles above the results table   |   ['LOWEST PRESENT WORTH', 'MARGIN TO NEXT', 'EQUIVALENT ANNUAL COST', 'INITIAL CONSTRUCTION', 'UNIT COST', 'RATE SENSITIVITY']
 PASS  every tile is a formula over cells that already exist   |   ['=IF(COUNT($O$12:$O$15)=0,"-",TEXT(MIN($O$12:$O$15),"$#,##0"))', '=IF(COUNT($O$12:$O$15)<2,"-",TEXT(IF(COUNT($O$12:$O$15)<2,0,SMALL($O$12:$O$15,2)-MIN($O$12:$O
 PASS  the tiles are merged across four columns each   |   21
-PASS  bars inside the net present worth column   |   {'O12:O15': 'dataBar', 'K3:N5': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
-PASS  the margin tile turns amber only when the two best are within five percent   |   {'O12:O15': 'dataBar', 'K3:N5': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
-PASS  lowest-cost row still highlighted in both tables   |   {'O12:O15': 'dataBar', 'K3:N5': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
+PASS  bars inside the net present worth column   |   {'O12:O15': 'dataBar', 'K3:N5': 'expression', 'O8': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
+PASS  the margin tile turns amber only when the two best are within five percent   |   {'O12:O15': 'dataBar', 'K3:N5': 'expression', 'O8': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
+PASS  lowest-cost row still highlighted in both tables   |   {'O12:O15': 'dataBar', 'K3:N5': 'expression', 'O8': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
 PASS  chart 8 is the unit-cost benchmark: a stacked bar whose first series is invisible   |   (1, True, True)
 PASS  the published band is one grey point carrying its own value label   |   (1, 1)
 PASS  the band comes from cells, so it can be moved without touching the chart   |   (210, 70)
@@ -79,7 +86,7 @@ PASS  chart 8 sits beside chart 5 and carries its own note   |   Chart 8 divides
 ==============================================================================
 LOCATOR MAP AND PROJECT IDENTITY
 ==============================================================================
-PASS  project identity line at the top of the Summary
+PASS  project identity line on its own row under the band   |   =IF('General Information'!$D$9="","No airport sele
 PASS  map data block labelled and outside the print area
 PASS  79 airports in the map block, 74 with published coordinates   |   (79, 74)
 PASS  coordinates fall inside Tennessee
@@ -133,7 +140,7 @@ SETUP FLOW AND THE REFERENCE SHEETS
 ==============================================================================
 PASS  the how-to card names all five steps in order   |   1.   Overview and Instructions: what the framework does and the rules behind it.
 PASS  five navigation buttons on General Information, one per destination   |   ['=HYPERLINK("#Summary!G1","View Summary  ', '=HYPERLINK("#\'Typical Values\'!A1","Typic', '=HYPERLINK("#Method!A1","Method  ►")', '=HYPERLINK("#Pay_Items!A1","
-PASS  every sheet in the flow says which step it is   |   {'Overview': 'STEP 1 of 5: w', 'Instructions': 'STEP 1 of 5: h', 'Pay_Items': 'STEP 3 of 5: t', 'TMP(NewHMA)': 'STEP 4 of 5: t', 'Summary': 'STEP 5 of 5: t'}
+PASS  every sheet in the flow says which step it is   |   {'Overview': 'STEP 1 of 5', 'Instructions': 'STEP 1 of 5', 'Pay_Items': 'STEP 3 of 5', 'TMP(NewHMA)': 'STEP 4 of 5', 'Summary': 'STEP 5 of 5: t'}
 PASS  Overview carries the navigation row   |   [None, '=HYPERLINK("#\'General Information\'!D9","◄ General Information")']
 PASS  Instructions carries the navigation row   |   [None, '=HYPERLINK("#\'General Information\'!D9","◄ General Information")']
 PASS  Pay_Items carries the navigation row   |   ['=HYPERLINK("#\'General Information\'!D9","◄ General Information")', '=HYPERLINK("#Summary!G1","Summary")']
@@ -143,9 +150,21 @@ PASS  Pay_Items keeps all 56 items, the 27 that carry a cost and the three that 
 PASS  its Table2 is still declared over C2:I59
 PASS  Pay_Items says what the empty division columns mean and how many items carry no cost   |   29 of the 56 pay items carry no unit cost. An alte
 PASS  Pay_Items part headings band the left of the table
-PASS  Pay_Items freezes the header and repeats it in print   |   A3
+PASS  Pay_Items freezes the header and repeats the band and the header in print   |   A3
 PASS  Maintenance Policies says it is reference and which table drives which alternative   |   Table 1 drives a New HMA alternative, Table 2 a New PCC alte
 PASS  the four maintenance tables carry a header band   |   ['Asphalt Maintenance', 'Concrete Maintenance', 'Asphalt Maintenance', 'Concrete Maintenance']
 
 ==============================================================================
+THE TDOT MARK
+==============================================================================
+PASS  the mark is on all thirteen sheets a user can reach   |   ['xl/drawings/drawing1.xml', 'xl/drawings/drawing10.xml', 'xl/drawings/drawing11.xml', 'xl/drawings/drawing12.xml', 'xl/drawings/drawing13.xml', 'xl/drawings/dr
+PASS  every one of them sits in row 1   |   [0]
+PASS  and at the artwork aspect, not stretched   |   {2.288}
+PASS  no placement is left at the old B2 anchor
+PASS  row 1 is the same height on every one of them   |   {'TMP(NewPCC)_IndirectCost': 40.0, 'Overview': 40.0, 'Instructions': 40.0, 'General Information': 40.0, 'Pay_Items': 40.0, 'Maintenance Policies': 40.0, 'TMP(Ne
+PASS  row 1 repeats at the top of every printed page, so the mark prints throughout   |   ['Overview!$1:$1', 'Instructions!$1:$1', "'General Information'!$1:$1"]
+PASS  Pay_Items repeats its table header as well as the band   |   ['Pay_Items!$1:$2']
+
+==============================================================================
+123 checks, 0 failed
 ALL PASS

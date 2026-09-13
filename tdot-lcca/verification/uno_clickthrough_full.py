@@ -104,7 +104,12 @@ check('shoulder chart is empty with no shoulder area', num(sm, 'X83') == 0 and n
 gi.getCellRangeByName('D27').setValue(8000); doc.calculateAll()
 f = num(gi, 'D26') / (num(gi, 'D26') + 8000)
 check('shoulder chart scales the derived layers', abs(num(sm, 'Y83') - num(sm, 'Y76') * f) < 0.01, f'{num(sm,"Y76"):.2f} -> {num(sm,"Y83"):.2f}')
-check('named concrete thickness does not scale', num(sm, 'Z85') == num(sm, 'Z78') or num(sm, 'Z85') == 0, f'{num(sm,"Z78"):.2f} / {num(sm,"Z85"):.2f}')
+conc_m, conc_s = num(sm, 'Y79'), num(sm, 'Y86')
+check('named concrete thickness does not scale with the shoulder',
+      conc_m > 0 and abs(conc_s - conc_m) < 0.001, '%.2f -> %.2f' % (conc_m, conc_s))
+asph_m, asph_s = num(sm, 'X78'), num(sm, 'X85')
+check('asphalt thickness does scale with the shoulder',
+      asph_m > 0 and abs(asph_s - asph_m * f) < 0.01, '%.2f -> %.2f' % (asph_m, asph_s))
 gi.getCellRangeByName('D27').setValue(0); doc.calculateAll()
 for label, ref, val, expect in [('discount rate 7%', 'D34', 7, 'Alternative 1'), ('analysis period 20 years', 'D33', 20, 'Alternative 2'),
                                 ('lost revenue off', 'D38', 'No', 'Alternative 2')]:

@@ -4,6 +4,7 @@ Edits sheet XML in place inside the .xlsm zip so VBA, ActiveX comboboxes, charts
 tables and data validations are preserved (openpyxl would drop them).
 """
 import re, html, sys, os, zipfile, shutil
+from xml.dom import minidom
 from build_summary import transplant, add_plain_sheet, add_style, add_dxf, FONT, FILL, BORDER_BOTTOM, BORDER_BOX
 import build_helpers, helpers_content, build_method
 build_helpers.set_sections(helpers_content.sections()); build_helpers.HINTS.update(helpers_content.HINTS)
@@ -341,12 +342,13 @@ def main(src, out, mbt_mode=False):
 
 
 
-GUIDE_HMA = ('STEP 4 of 5: the quantities for this alternative. Grey cells are yours: C4 to C8 project data '
-             '(filled from General Information), F4 to F10 closure days, C13 to C22 pay items and E13 to E22 '
-             'quantities. Everything else calculates. Unit costs come from Pay_Items.')
-GUIDE_PCC = ('STEP 4 of 5: the quantities for this alternative. Grey cells are yours: C4 to C7 project data '
-             '(filled from General Information), F4 and F5 closure days, C13 to C22 pay items and E13 to E22 '
-             'quantities. Everything else calculates. Unit costs come from Pay_Items.')
+STEP_ALT = 'STEP 4 of 5'
+GUIDE_HMA = ('The quantities for this alternative. Grey cells are yours: C4 to C8 project data (filled from '
+             'General Information), F4 to F10 closure days, C13 to C22 pay items and E13 to E22 quantities. '
+             'Everything else calculates. Unit costs come from Pay_Items.')
+GUIDE_PCC = ('The quantities for this alternative. Grey cells are yours: C4 to C7 project data (filled from '
+             'General Information), F4 and F5 closure days, C13 to C22 pay items and E13 to E22 quantities. '
+             'Everything else calculates. Unit costs come from Pay_Items.')
 
 
 # ------------------------------------------------------------------ design pass (look and first-run UX)
@@ -393,6 +395,8 @@ def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs):
     s_band = add_style(work, font=FONT(10, b=True), fill=FILL(PALE), border=BORDER_BOTTOM,
                        alignment='horizontal="left" vertical="center"')
     s_note = add_style(work, font=FONT(9, i=True, color=GREY), alignment='horizontal="left" vertical="center"')
+    s_wrap = add_style(work, font=FONT(9, i=True, color=GREY),
+                       alignment='horizontal="left" vertical="center" wrapText="1"')
     d_ok = add_dxf(work, '<dxf><font><color rgb="FF186A3B"/></font><fill><patternFill><bgColor rgb="FFE8F6EC"/></patternFill></fill></dxf>')
     d_todo = add_dxf(work, '<dxf><font><color rgb="FF7F6000"/></font><fill><patternFill><bgColor rgb="FFFFF3CD"/></patternFill></fill></dxf>')
 
@@ -406,6 +410,9 @@ def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs):
             '4.   Alternative Setup: add each alternative, then enter its quantities on the sheet it creates.\n'
             '5.   Summary: read the comparison. It updates by itself.\n'
             'Grey cells are yours; white cells calculate. Typical Values has the usual ranges, Method every formula.')
+    x = ensure_row(x, 1)
+    x = put_cell(x, 'B1', '<c r="B1" s="%s" t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>'
+                 % (s_note, 'STEP 2 of 5: the project and the LCCA parameters. Fill in the grey cells below.'))
     x = put_cell(x, 'F2', '<c r="F2" s="%s" t="inlineStr"><is><t>HOW TO USE THIS WORKBOOK</t></is></c>' % s_title)
     x = put_cell(x, 'F3', '<c r="F3" s="%s" t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>' % (s_body, html.escape(card, quote=False)))
     missing = ('&'.join('IF(D%d="","%s, ","")' % (row, lab) for row, lab in
@@ -454,16 +461,35 @@ def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs):
         t = put_cell(t, 'A1', '<c r="A1" s="%s" t="str"><f>HYPERLINK("#\'General Information\'!D9","◄ General Information")</f><v>◄ General Information</v></c>' % btn_dark)
         t = put_cell(t, 'B1', '<c r="B1" s="%s"/>' % btn_dark)          # merged with A1: column A alone is too narrow
         t = put_cell(t, 'C1', '<c r="C1" s="%s" t="str"><f>HYPERLINK("#Summary!G1","Summary")</f><v>Summary</v></c>' % btn_blue)
-        t = put_cell(t, 'D1', '<c r="D1" s="%s" t="inlineStr"><is><t xml:space="preserve">  %s</t></is></c>' % (s_note, html.escape(note, quote=False)))
-        t = insert_before(t, '<mergeCells count="1"><mergeCell ref="A1:B1"/></mergeCells>',
+        t = put_cell(t, 'D1', '<c r="D1" s="%s" t="inlineStr"><is><t xml:space="preserve">  %s</t></is></c>' % (s_note, STEP_ALT))
+        t = ensure_row(t, 3)
+        t = put_cell(t, 'A3', '<c r="A3" s="%s" t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>' % (s_wrap, html.escape(note, quote=False)))
+        t = re.sub(r'<row r="3"([^>]*?)(/?)>', lambda m: '<row r="3"%s ht="26" customHeight="1"%s>' % (m.group(1), m.group(2)), t, count=1)
+        t = insert_before(t, '<mergeCells count="2"><mergeCell ref="A1:B1"/><mergeCell ref="A3:G3"/></mergeCells>',
                           ['phoneticPr', 'conditionalFormatting', 'dataValidations', 'hyperlinks', 'printOptions', 'pageMargins'])
-        t = re.sub(r'<row r="1"([^>]*?)(/?)>', lambda m: '<row r="1"%s ht="21" customHeight="1"%s>' % (m.group(1), m.group(2)), t, count=1)
         t = re.sub(r'(<sheetView[^>]*?) topLeftCell="[^"]*"', r'\1', t)
         t = tab_color(t, 'FF8EA9DB')
+        # an alternative worksheet used to print its chart-data columns across half a dozen pages. The
+        # cost table and the present-worth table are what anyone prints, so that is the print area, and
+        # it fits one page wide, which also keeps the band and the mark on the first page.
+        t = page_setup(t)
         wr(part, t)
+    w = rd('xl/workbook.xml')
+    for part, _ in template_parts:
+        idx = SHEET_INDEX.get(part)
+        if idx is None: continue
+        name = SHEET_NAME[part]
+        if '_xlnm.Print_Area" localSheetId="%d"' % idx in w: continue
+        pa = '<definedName name="_xlnm.Print_Area" localSheetId="%d">%s!$A$1:$G$56</definedName>' % (idx, name)
+        w = (w.replace('</definedNames>', pa + '</definedNames>') if '</definedNames>' in w
+             else w.replace('</sheets>', '</sheets><definedNames>' + pa + '</definedNames>', 1))
+    wr('xl/workbook.xml', w)
 
     # ---- the two reference sheets a user passes through while setting a project up
     reference_sheets(work, rd, wr, btn_dark, btn_blue)
+
+    # ---- the TDOT mark, one band in row 1 of every sheet
+    logo_band(work, rd, wr)
 
     # ---- tab colours elsewhere
     for part, rgb in tabs:
@@ -512,11 +538,12 @@ def sheet_view(x, freeze=None, gridlines=None):
     return x[:m.start()] + sv + x[m.end():]
 
 
-def page_setup(x, titles=None):
-    """Landscape, fit to one page wide, and repeat a header row on every printed page."""
+def page_setup(x, titles=None, portrait=False):
+    """Fit to one page wide, so nothing in row 1 falls off the right of the first printed page."""
     x = re.sub(r'<pageSetup\b[^>]*/>', '', x)
     x = re.sub(r'<pageMargins[^>]*/>', lambda m: m.group(0)
-               + '<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/>', x, count=1)
+               + '<pageSetup orientation="%s" fitToWidth="1" fitToHeight="0"/>'
+               % ('portrait' if portrait else 'landscape'), x, count=1)
     if '<pageSetUpPr' not in x:
         x = (x.replace('</sheetPr>', '<pageSetUpPr fitToPage="1"/></sheetPr>', 1) if '</sheetPr>' in x
              else x.replace('<dimension', '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><dimension', 1))
@@ -539,6 +566,8 @@ def reference_sheets(work, rd, wr, btn_dark, btn_blue):
                         alignment='horizontal="right" vertical="center"', numfmt='&quot;$&quot;#,##0.00')
     s_flag = add_style(work, font=FONT(9, color=AMBER), fill=FILL('FFFFF3CD'),
                        alignment='horizontal="left" vertical="center" wrapText="1"')
+    s_addr = add_style(work, font=FONT(9, color=GREY), alignment='horizontal="left" vertical="center"')
+    s_flat = add_style(work, font=FONT(9, i=True, color=GREY), alignment='horizontal="left" vertical="center"')
 
     def button(x, ref, text, target, style):
         return put_cell(x, ref, '<c r="%s" s="%s" t="str"><f>%s</f><v>%s</v></c>'
@@ -551,10 +580,10 @@ def reference_sheets(work, rd, wr, btn_dark, btn_blue):
     # ---------------------------------------------------------------- Overview and Instructions (step 1)
     # both sheets are a text box over an empty grid, every column 8.71 wide, so the buttons are merged runs
     for part, line in [('xl/worksheets/sheet2.xml',
-                        'STEP 1 of 5: what the framework does and the rules behind it. '
+                        'What the framework does and the rules behind it. '
                         'Read this and Instructions, then go to General Information.'),
                        ('xl/worksheets/sheet3.xml',
-                        'STEP 1 of 5: how to run an analysis, start to finish. '
+                        'How to run an analysis, start to finish. '
                         'When you are ready, go to General Information and fill in the grey cells.')]:
         x = rd(part)
         x = ensure_row(x, 1)
@@ -562,12 +591,27 @@ def reference_sheets(work, rd, wr, btn_dark, btn_blue):
         for ref in ('C1', 'D1'): x = put_cell(x, ref, '<c r="%s" s="%s"/>' % (ref, btn_dark))
         x = button(x, 'E1', 'Summary', 'Summary!G1', btn_blue)
         x = put_cell(x, 'F1', '<c r="F1" s="%s"/>' % btn_blue)
-        x = text(x, 'H1', line, s_note)
-        x = row_height(x, 1, 22)
+        x = text(x, 'G1', 'STEP 1 of 5', s_note)
+        # the sentence drops out of the band, and the address block moves under it so the left column is
+        # not left empty where the logo used to sit
+        x = text(x, 'B2', line, s_flat)
+        for r in range(7, 1, -1):
+            cur = cell_re('E%d' % r).search(x)
+            if not cur: continue
+            inner = cur.group(0).split('>', 1)[1].rsplit('</c>', 1)[0] if '</c>' in cur.group(0) else ''
+            t_attr = re.search(r' t="([^"]+)"', cur.group(0))
+            x = ensure_row(x, r + 1)
+            x = put_cell(x, 'B%d' % (r + 1), '<c r="B%d" s="%s"%s>%s</c>'
+                         % (r + 1, s_addr, ' t="%s"' % t_attr.group(1) if t_attr else '', inner))
+            x = remove_cell(x, 'E%d' % r)
+            x = x.replace('<hyperlink ref="E%d"' % r, '<hyperlink ref="B%d"' % (r + 1))
         x = re.sub(r'<mergeCells count="\d+">.*?</mergeCells>', '', x, flags=re.S)
         x = insert_before(x, '<mergeCells count="2"><mergeCell ref="B1:D1"/><mergeCell ref="E1:F1"/></mergeCells>',
                           ['phoneticPr', 'conditionalFormatting', 'dataValidations', 'hyperlinks',
                            'printOptions', 'pageMargins', 'drawing'])
+        # the text box is wider than a portrait page, so both sheets scale to one page wide: without it
+        # the mark at the right of the band falls off the first printed page
+        x = page_setup(x, portrait=True)
         wr(part, x)
 
     # ---------------------------------------------------------------- Pay_Items (step 3 of the flow)
@@ -581,8 +625,8 @@ def reference_sheets(work, rd, wr, btn_dark, btn_blue):
     x = ensure_row(x, 1)
     x = button(x, 'A1', '\u25c4 General Information', "'General Information'!D9", btn_dark)
     x = button(x, 'B1', 'Summary', 'Summary!G1', btn_blue)
-    x = text(x, 'D1', '  STEP 3 of 5: the unit costs every alternative is priced from. '
-                      'The grey column is the one to edit.', s_note)
+    x = text(x, 'C1', 'STEP 3 of 5', s_note)
+    x = text(x, 'D1', 'The unit costs every alternative is priced from. The grey column is the one to edit.', s_note)
     x = row_height(x, 1, 22)
     # the Unit Cost column is the only input on this sheet
     x = restyle(x, range(3, 60), 'F', s_input)
@@ -638,6 +682,166 @@ def reference_sheets(work, rd, wr, btn_dark, btn_blue):
     x = sheet_view(x, freeze='A8', gridlines=False)
     x = page_setup(x)
     wr('xl/worksheets/sheet7.xml', x)
+
+
+# ---------------------------------------------------------------------------------------------
+# The TDOT logo: one band in row 1 of every sheet, and row 1 repeats on every printed page.
+# Row 1 already exists everywhere and already carries the navigation buttons, so the band costs
+# only its extra height. The mark is anchored to the right-hand edge of each sheet's content, the
+# position a letterhead uses, where it cannot collide with the buttons or the step line.
+SHEET_INDEX = {'xl/worksheets/sheet1.xml': 0, 'xl/worksheets/sheet8.xml': 7, 'xl/worksheets/sheet10.xml': 9,
+               'xl/worksheets/sheet11.xml': 10, 'xl/worksheets/sheet12.xml': 11}
+SHEET_NAME = {'xl/worksheets/sheet1.xml': "'TMP(NewPCC)_IndirectCost'", 'xl/worksheets/sheet8.xml': "'TMP(NewHMA)_IndirectCost'",
+              'xl/worksheets/sheet10.xml': "'TMP(NewHMA)'", 'xl/worksheets/sheet11.xml': "'TMP(NewPCC)'",
+              'xl/worksheets/sheet12.xml': "'TMP(HMARehab)'"}
+LOGO_PART = 'xl/media/image4.png'
+LOGO_ROW_PT = 40                       # the band
+LOGO_H_EMU = 457200                    # 36pt tall, leaving 2pt of air above and below
+LOGO_ASPECT = 723 / 316.0              # the artwork's own aspect; anything else stretches the lettering
+LOGO_W_EMU = int(round(LOGO_H_EMU * LOGO_ASPECT))
+
+# (sheet part, the column the logo's right edge sits at, 0-based sheet index for Print_Titles,
+#  the sheet's name as the defined name has to spell it)
+LOGO_SHEETS = [
+    ('xl/worksheets/sheet2.xml', 10, 1, 'Overview'),
+    ('xl/worksheets/sheet3.xml', 10, 2, 'Instructions'),
+    ('xl/worksheets/sheet4.xml', 10, 3, "'General Information'"),
+    ('xl/worksheets/sheet5.xml', 12, 4, 'Pay_Items'),   # clear of the merged label over the division columns
+    ('xl/worksheets/sheet7.xml', 5, 6, "'Maintenance Policies'"),
+    ('xl/worksheets/sheet1.xml', 7, 0, "'TMP(NewPCC)_IndirectCost'"),
+    ('xl/worksheets/sheet8.xml', 7, 7, "'TMP(NewHMA)_IndirectCost'"),
+    ('xl/worksheets/sheet10.xml', 7, 9, "'TMP(NewHMA)'"),
+    ('xl/worksheets/sheet11.xml', 7, 10, "'TMP(NewPCC)'"),
+    ('xl/worksheets/sheet12.xml', 7, 11, "'TMP(HMARehab)'"),
+    ('xl/worksheets/sheet14.xml', 22, 13, 'Summary'),
+    ('xl/worksheets/sheet15.xml', 7, 14, "'Typical Values'"),
+    ('xl/worksheets/sheet16.xml', 5, 15, 'Method'),
+]
+
+A_NS = 'http://schemas.openxmlformats.org/drawingml/2006/main'
+XDR_NS = 'http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing'
+R_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
+
+
+def col_widths(x):
+    """{column index: width in characters} from <cols>, plus the sheet's default for everything else."""
+    m = re.search(r'<sheetFormatPr[^>]*defaultColWidth="([\d.]+)"', x)
+    default = float(m.group(1)) if m else 8.43
+    out = {}
+    for c in re.findall(r'<col\b[^>]*/>', x):
+        a = dict(re.findall(r'(\w+)="([^"]*)"', c))
+        if 'width' not in a: continue
+        lo, hi = int(a['min']), min(int(a['max']), 400)
+        w = 0.0 if a.get('hidden') == '1' else float(a['width'])
+        for i in range(lo, hi + 1): out[i] = w
+    return out, default
+
+
+def anchor_right(x, right_col, w_emu):
+    """The (0-based column, offset) whose logo of w_emu ends at the right edge of `right_col`."""
+    widths, default = col_widths(x)
+    emu = lambda i: int(round(widths.get(i, default) * 7 + 5)) * 9525
+    acc, c = 0, right_col
+    while c >= 1 and acc < w_emu:
+        acc += emu(c); c -= 1
+    start = max(c + 1, 1)
+    return start - 1, max(acc - w_emu, 0)
+
+
+def pic_anchor(col, off, rid, shape_id):
+    return ('<xdr:oneCellAnchor>'
+            '<xdr:from><xdr:col>%d</xdr:col><xdr:colOff>%d</xdr:colOff>'
+            '<xdr:row>0</xdr:row><xdr:rowOff>%d</xdr:rowOff></xdr:from>'
+            '<xdr:ext cx="%d" cy="%d"/>'
+            '<xdr:pic><xdr:nvPicPr><xdr:cNvPr id="%d" name="TDOT logo"/>'
+            '<xdr:cNvPicPr><a:picLocks xmlns:a="%s" noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr>'
+            '<xdr:blipFill><a:blip xmlns:a="%s" xmlns:r="%s" r:embed="%s"/>'
+            '<a:stretch xmlns:a="%s"><a:fillRect/></a:stretch></xdr:blipFill>'
+            '<xdr:spPr><a:xfrm xmlns:a="%s"><a:off x="0" y="0"/><a:ext cx="%d" cy="%d"/></a:xfrm>'
+            '<a:prstGeom xmlns:a="%s" prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic>'
+            '<xdr:clientData/></xdr:oneCellAnchor>'
+            % (col, off, int((LOGO_ROW_PT * 12700) - LOGO_H_EMU) // 2, LOGO_W_EMU, LOGO_H_EMU,
+               shape_id, A_NS, A_NS, R_NS, rid, A_NS, A_NS, LOGO_W_EMU, LOGO_H_EMU, A_NS))
+
+
+def logo_band(work, rd, wr):
+    """Put the mark in row 1 of every sheet at the artwork's own aspect, and repeat row 1 in print."""
+    P = lambda q: os.path.join(work, q)
+    ct = rd('[Content_Types].xml')
+    wbx = rd('xl/workbook.xml')
+    next_drawing = 1 + max(int(m) for m in re.findall(r'drawings/drawing(\d+)\.xml', ct))
+
+    for k, (part, right_col, sheet_id, sheet_name) in enumerate(LOGO_SHEETS):
+        if not os.path.exists(P(part)): continue
+        x = rd(part)
+        rels_part = 'xl/worksheets/_rels/%s.rels' % os.path.basename(part)
+
+        # --- the band itself
+        x = ensure_row(x, 1)
+        x = row_height(x, 1, LOGO_ROW_PT)
+
+        # --- the drawing part that will hold the picture
+        dm = re.search(r'<drawing r:id="(rId\d+)"/>', x)
+        if dm:
+            rels = rd(rels_part)
+            tgt = re.search(r'<Relationship Id="%s"[^>]*Target="\.\./drawings/(drawing\d+\.xml)"' % dm.group(1), rels)
+            dpart = 'xl/drawings/%s' % tgt.group(1)
+            d = rd(dpart)
+            # the four sheets that carried the mark at B2 lose that placement: one rule, one position
+            d = re.sub(r'<xdr:twoCellAnchor[^>]*>(?:(?!</xdr:twoCellAnchor>).)*?<xdr:pic>.*?</xdr:twoCellAnchor>',
+                       '', d, flags=re.S)
+        else:
+            dpart = 'xl/drawings/drawing%d.xml' % next_drawing; next_drawing += 1
+            d = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+                 '<xdr:wsDr xmlns:xdr="%s" xmlns:a="%s"></xdr:wsDr>' % (XDR_NS, A_NS))
+            ct = ct.replace('</Types>', '<Override PartName="/%s" ContentType="application/vnd.openxmlformats-'
+                            'officedocument.drawing+xml"/></Types>' % dpart)
+            rels = rd(rels_part) if os.path.exists(P(rels_part)) else (
+                '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+                '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                '</Relationships>')
+            ids = [int(i) for i in re.findall(r'Id="rId(\d+)"', rels)]
+            rid = 'rId%d' % ((max(ids) + 1) if ids else 1)
+            rels = rels.replace('</Relationships>', '<Relationship Id="%s" Type="%s/drawing" Target="../drawings/%s"/>'
+                                '</Relationships>' % (rid, R_NS, os.path.basename(dpart)))
+            os.makedirs(os.path.dirname(P(rels_part)), exist_ok=True)
+            wr(rels_part, rels)
+            x = insert_before(x, '<drawing r:id="%s"/>' % rid, ['tableParts', 'extLst'])
+            if 'xmlns:r=' not in x[:800]:
+                x = x.replace('<worksheet ', '<worksheet xmlns:r="%s" ' % R_NS, 1)
+
+        # --- the image relationship on that drawing
+        drels_part = 'xl/drawings/_rels/%s.rels' % os.path.basename(dpart)
+        drels = rd(drels_part) if os.path.exists(P(drels_part)) else (
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            '</Relationships>')
+        have = re.search(r'<Relationship Id="(rId\d+)"[^>]*Target="\.\./media/image4\.png"', drels)
+        if have:
+            irid = have.group(1)
+        else:
+            ids = [int(i) for i in re.findall(r'Id="rId(\d+)"', drels)]
+            irid = 'rId%d' % ((max(ids) + 1) if ids else 1)
+            drels = drels.replace('</Relationships>', '<Relationship Id="%s" Type="%s/image" '
+                                  'Target="../media/image4.png"/></Relationships>' % (irid, R_NS))
+        os.makedirs(os.path.dirname(P(drels_part)), exist_ok=True)
+        wr(drels_part, drels)
+
+        col, off = anchor_right(x, right_col, LOGO_W_EMU)
+        d = d.replace('</xdr:wsDr>', pic_anchor(col, off, irid, 900 + k) + '</xdr:wsDr>')
+        minidom.parseString(d)
+        wr(dpart, d)
+        wr(part, x)
+
+        # --- row 1 prints at the top of every page, so the mark is on every sheet of paper
+        pt = '<definedName name="_xlnm.Print_Titles" localSheetId="%d">%s!$1:$%d</definedName>' % (
+            sheet_id, sheet_name, 2 if part.endswith('sheet5.xml') else 1)
+        wbx = re.sub(r'<definedName name="_xlnm\.Print_Titles" localSheetId="%d">[^<]*</definedName>' % sheet_id, '', wbx)
+        wbx = (wbx.replace('</definedNames>', pt + '</definedNames>') if '</definedNames>' in wbx
+               else wbx.replace('</sheets>', '</sheets><definedNames>' + pt + '</definedNames>', 1))
+    wr('[Content_Types].xml', ct)
+    wr('xl/workbook.xml', wbx)
+
 
 SPELLING = [
     # the four misspellings that were in the issued v1.1.2 text, left in place through v1.1.x

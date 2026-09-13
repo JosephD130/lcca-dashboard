@@ -638,8 +638,8 @@
     "11\" P-501 mainline on 6\" P-209 on lime-treated subgrade"
    ]
   ],
-  "G9": "Lowest present worth: Alternative 2   |   margin to next: $527,651   |   3% over 30 years   |   lost revenue: Yes",
-  "G10": "Same lowest-cost alternative at 2% (OMB A-94 real rate, FAA PGL 22-01)   |   same at 7% (pre-2022 AIP rule)",
+  "verdict": "Lowest present worth: Alternative 2   |   margin to next: $527,651   |   3% over 30 years   |   lost revenue: Yes",
+  "verdict2": "Same lowest-cost alternative at 2% (OMB A-94 real rate, FAA PGL 22-01)   |   same at 7% (pre-2022 AIP rule)",
   "comparison": [
    {
     "G": "Alternative 1",
@@ -1463,12 +1463,6 @@
    ]
   },
   "chart_shoulder": {
-   "Layer": [
-    0.0,
-    0.0,
-    0.0,
-    0.0
-   ],
    "Subbase (P-154)": [
     6.00008992536195,
     6.00008992536195,
@@ -1512,7 +1506,7 @@
    "holds 2-8%",
    "of the lowest-cost alternative, including 10% mobilization and 5% engineering",
    "initial construction over the mainline area; see the benchmark under chart 5",
-   "the lowest-cost alternative is the same at every rate tested"
+   "the same alternative is lowest at all 25 rates tested, 2% to 8%"
   ],
   "benchmark": [
    123.62196843286739,

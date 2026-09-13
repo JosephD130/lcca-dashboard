@@ -106,7 +106,9 @@ in the sequence a user actually follows.
 
 - Six KPI tiles across rows 3 to 9: lowest present worth (with the section it buys), margin to the
   next alternative, equivalent annual cost, initial construction, unit cost per square yard, and
-  rate sensitivity. Every tile is a formula over cells that already existed; nothing new is
+  rate sensitivity. The rate tile tests the lowest-cost alternative at all 25 rates in the
+  sensitivity block, 2% to 8%, not just at the two ends, and it is green only while it actually
+  says the winner holds. Every tile is a formula over cells that already existed; nothing new is
   calculated. The margin tile turns amber when the two best alternatives are within five percent of
   each other, which is the point at which a reviewer should treat them as tied.
 - Data bars inside the net-present-worth column, so the results table reads without going to a chart.
@@ -120,6 +122,9 @@ in the sequence a user actually follows.
 - The chart the Alternative Setup form maintains is parked below the dashboard with a line saying what
   it is. It duplicates chart 1 with less detail, but the macro still updates it, so it is moved rather
   than removed.
+
+The project identity line moved from L1 to G2, a row of its own under the band, and the note about
+the hidden columns dropped to row 10 just above the results table.
 
 **The Summary row map moved.** Anything outside the workbook that reads Summary cells by address has
 to move with it: the results table is now rows 12 to 15 (was 4 to 7), the verdict lines are G17 and
@@ -157,6 +162,31 @@ updated; a private copy of the old macro would need the same edit.
   the schedules live in the hidden templates, which table drives which alternative type, what the
   Rate column means, and where closure days actually come from.
 - The four table headers sit on a navy band and stay visible as the sheet scrolls.
+
+
+## 3e. The TDOT mark
+
+The logo was on four of the nine sheets a user opens, each anchored and sized a little differently,
+and all four were drawn 8 to 11 percent taller than the artwork: the file is 723 by 316, an aspect of
+2.288, and the placements ran 2.06 to 2.12, so the lettering was stretched and the TN square was not
+square.
+
+- Row 1 is now a band on every sheet a user can reach, thirteen of them, 40 points tall. It already
+  existed everywhere and already carried the navigation buttons, so the band costs only its extra
+  height. Forty points is the floor at which "Department of Transportation" stays legible; the mark is
+  1.27 in wide there.
+- The mark sits at the right-hand edge of each sheet's content, at the artwork's own aspect, where it
+  cannot collide with the buttons or the step line.
+- Row 1 repeats at the top of every printed page (Print_Titles), so the mark prints on every sheet of
+  paper rather than only the first. Pay_Items repeats rows 1 and 2, the band and its table header.
+- Three sheets had no drawing part at all and now have one: Pay_Items, Typical Values and Method.
+- Two knock-on print fixes. Overview and Instructions now scale to one page wide; their text box is
+  wider than a portrait page and had been clipped on the right since v1.1.2. Each alternative worksheet
+  now prints its cost and present-worth tables (A1:G56) rather than spreading its chart-data columns
+  across half a dozen pages, which took the worked example from 41 printed pages to 30.
+- The step lines moved out of the band to make room: each sheet carries a short "STEP n of 5" chip
+  beside its buttons and the sentence sits on the row below. On Overview and Instructions the
+  Aeronautics address block moved to the left margin under the band, where the logo used to sit.
 
 
 ## 4. Housekeeping

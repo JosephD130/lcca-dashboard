@@ -141,7 +141,7 @@ T0, VER, VER2, CMP0, SEC_T, BM = 12, 17, 18, 22, 90, 89
 S = out['summary']
 S['results'] = [{c: (txt(sm, f'{c}{r}') if c in 'GHI' else num(sm, f'{c}{r}')) for c in 'GHIJKLMNOPQR'} for r in range(T0, T0 + N)]
 S['AtoE'] = [[txt(sm, f'{c}{r}') if c in 'ABE' else num(sm, f'{c}{r}') for c in 'ABCDE'] for r in range(4, 4 + N)]
-S['G9'], S['G10'] = txt(sm, f'G{VER}'), txt(sm, f'G{VER2}')
+S['verdict'], S['verdict2'] = txt(sm, f'G{VER}'), txt(sm, f'G{VER2}')
 S['comparison'] = [{c: (txt(sm, f'{c}{r}') if c == 'G' else num(sm, f'{c}{r}')) for c in 'GHIJKLMNO'} for r in range(CMP0, CMP0 + N)]
 S['sensitivity'] = {num(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(12, 37)}
 S['categories'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(5, 10)}
@@ -150,7 +150,7 @@ S['byyear'] = [[num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA', 'AB', 'AC', 'A
 S['section'] = [{c: (txt(sm, f'{c}{r}') if c in 'GKNPQ' else num(sm, f'{c}{r}')) for c in 'GHIJKLMNPQ'} for r in range(SEC_T + 3, SEC_T + 3 + N)]
 S['unit_weight'] = num(sm, f'J{SEC_T + 1}')
 S['chart_mainline'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(76, 80)}
-S['chart_shoulder'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(82, 87)}
+S['chart_shoulder'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(83, 87)}
 S['kpi'] = [txt(sm, f'{c}{r}') for r in (3, 4, 5, 7, 8, 9) for c in ('G', 'K', 'O')]
 S['benchmark'] = [num(sm, f'{c}{BM + 3}') for c in ['X', 'Y', 'Z', 'AA'][:N]] + [num(sm, f'AB{BM + 2}'), num(sm, f'AB{BM + 3}')]
 
@@ -193,7 +193,7 @@ check('chart 1 category block repeats the table, row for row',
           for lab, col in [('Initial construction', 'J'), ('Maintenance', 'K'), ('Rehabilitation', 'L'),
                            ('Lost revenue', 'M'), ('Salvage', 'N')]),
       {lab: S['categories'][lab] for lab in S['categories']})
-check('Verdict names the lowest-NPW alternative', f'Alternative {best+1}' in S['G9'], S['G9'])
+check('Verdict names the lowest-NPW alternative', f'Alternative {best+1}' in S['verdict'], S['verdict'])
 check('vs. lowest column: zero for the winner, positive elsewhere', all((abs(S['results'][k]['P']) < 1) == (k == best) for k in range(N)), [S['results'][k]['P'] for k in range(N)])
 check('EUAC = PW x CRF', all(abs(c['L'] * crf - c['M']) < 1 and abs(c['H'] + c['J'] - c['L']) < 1 for c in S['comparison']), [(round(c['L']), round(c['M'])) for c in S['comparison']])
 s3 = S['sensitivity'].get(3.0) or S['sensitivity'].get(3)
@@ -251,5 +251,5 @@ for k, pg in enumerate(pdf):
     if tag:
         f = f'{OUT}/{EX.upper()}_{tag}_p{k+1}.png'; pg.get_pixmap(dpi=110).save(f); made.append(f)
 print('rendered', made)
-print(json.dumps({'NPW': npws, 'verdict': S['G9'], 'G10': S['G10'], 'section': [(round(s['H'], 2), round(s['I'], 2), round(s['J'], 2), round(s['L'], 2), s['N'], s['P'], s['Q']) for s in S['section']],
+print(json.dumps({'NPW': npws, 'verdict': S['verdict'], 'verdict2': S['verdict2'], 'section': [(round(s['H'], 2), round(s['I'], 2), round(s['J'], 2), round(s['L'], 2), s['N'], s['P'], s['Q']) for s in S['section']],
                   'shoulder_chart': S['chart_shoulder'], 'fails': [c for c in out['checks'] if not c['ok']]}, indent=1, default=str))

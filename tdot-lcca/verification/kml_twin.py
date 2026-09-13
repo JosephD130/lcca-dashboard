@@ -19,9 +19,11 @@ FT_PER_DEG_LAT = 364000.0
 
 
 def num(v, places): return f'{v:.{places}f}'
-def money(v): return '' if not isinstance(v, (int, float)) else '$' + format(round(v), ',')
-def X(s): return str(s).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-def X2(s): return str(s).replace(']]>', ']] >')
+def half_up(v): return math.floor(v + 0.5) if v >= 0 else -math.floor(-v + 0.5)   # VBA Format$, not banker's
+def C(v): return '' if v is None else str(v)                                      # VBA CStr of an empty cell
+def money(v): return '' if not isinstance(v, (int, float)) else '$' + format(half_up(v), ',')
+def X(s): return C(s).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+def X2(s): return C(s).replace(']]>', ']] >')
 
 
 def corner3(lat, lon, bearing, along_ft, across_ft, alt_m=0.0):
@@ -46,7 +48,7 @@ def clean(s):
 
 def build(path_wb, path_out):
     wb = load_workbook(path_wb, data_only=True)
-    gi, sm, db = wb['General Information'], wb['Summary'], wb['Database']
+    gi, sm = wb['General Information'], wb['Summary']
     g = lambda ref: gi[ref].value
     lon, lat = sm.cell(A0, 30).value, sm.cell(A0, 31).value
     assert isinstance(lon, (int, float)) and isinstance(lat, (int, float)), 'no coordinates for this airport'
@@ -97,7 +99,7 @@ def build(path_wb, path_out):
                          sm.cell(r, 15).value, sm.cell(r, 17).value, sm.cell(SEC_OFF + r, 16).value, sm.cell(r, 7).value))
     for _, name, typ, init, npw, days, sec, _ws in rows:
         d += (f'<tr><td>{name}</td><td>{typ}</td><td align="right">{money(init)}</td>'
-              f'<td align="right">{money(npw)}</td><td align="right">{days}</td><td>{sec}</td></tr>')
+              f'<td align="right">{money(npw)}</td><td align="right">{C(days)}</td><td>{C(sec)}</td></tr>')
     d += '</table>'
     d += f'<p><b>{sm["G17"].value}</b><br/>{sm["G18"].value}</p>'
     w('  <Placemark>')
@@ -110,7 +112,7 @@ def build(path_wb, path_out):
     width_ft = sm['T27'].value if isinstance(sm['T27'].value, (int, float)) and sm['T27'].value > 0 else DEFAULT_WIDTH_FT
     length_ft = (g('D26') or 0) * 9.0 / width_ft
     yr0, period = int(g('D25')), int(g('D33'))
-    best = min(r[4] for r in rows)
+    best = min(r[4] for r in rows)          # seeded on the first alternative, as the macro now does
     worst = max(r[4] for r in rows)
     bar_scale = TALLEST_BAR_M / (worst / 1e6) if worst > 0 else 0
 
@@ -170,12 +172,12 @@ def build(path_wb, path_out):
                 days_ = nxt / daily
             pos = (n / 8.0 - 0.45) * length_ft
             year = yr0 + int(yoff)
-            short = name.replace('Alternative ', 'Alt ') if str(name).startswith('Alternative ') else name
+            short = 'Alt ' + C(name)[12:] if C(name).lower().startswith('alternative ') else C(name)
             w('    <Placemark>')
             w(f'      <name>{X(f"{short} {item} {year}")}</name>')
             w(f'      <description><![CDATA[<b>{X2(name)}</b><br/>{X2(item)}<br/>Year {year} ({int(yoff)} years after '
               f'construction)<br/>Cost in the year: {money(cv)}' +
-              (f'<br/>Runway closed about {days_:.0f} days' if days_ > 0 else '') + ']]></description>')
+              (f'<br/>Runway closed about {half_up(days_)} days' if days_ > 0 else '') + ']]></description>')
             w(f'      <TimeSpan><begin>{year}-01-01</begin><end>{year}-12-31</end></TimeSpan>')
             w('      <styleUrl>#event</styleUrl>')
             w(f'      <Point><coordinates>{corner3(lat, lon, bearing, pos, (k - 1.5) * 220.0, 0.0)}</coordinates></Point>')

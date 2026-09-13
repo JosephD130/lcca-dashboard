@@ -1,46 +1,207 @@
 {
  "pages": [
-  {"id": "page-1", "name": "Summary as a dashboard"},
-  {"id": "page-2", "name": "Setup flow and the reference sheets"},
-  {"id": "page-3", "name": "Where the map goes"}
+  {
+   "id": "page-4",
+   "name": "Where the logo goes"
+  },
+  {
+   "id": "page-1",
+   "name": "Summary as a dashboard"
+  },
+  {
+   "id": "page-2",
+   "name": "Setup flow and the reference sheets"
+  },
+  {
+   "id": "page-3",
+   "name": "Where the map goes"
+  }
  ],
  "artboards": [
-  {"file": "SummaryDashboard.dc.html", "page": "page-1", "x": 0, "y": 0, "w": 1440, "h": 2140,
-   "title": "The whole Summary sheet, read as a dashboard", "print": "flow"},
-
-  {"file": "SetupFlow.dc.html", "page": "page-2", "x": 0, "y": 0, "w": 1280, "h": 600,
-   "title": "The five steps, and what is only reference"},
-  {"file": "PayItems.dc.html", "page": "page-2", "x": 0, "y": 760, "w": 1300, "h": 1360,
-   "title": "Pay_Items, redesigned", "print": "flow"},
-  {"file": "MaintenancePolicies.dc.html", "page": "page-2", "x": 1420, "y": 760, "w": 1300, "h": 1580,
-   "title": "Maintenance Policies, redesigned", "print": "flow"},
-
-  {"file": "Main.dc.html", "page": "page-3", "x": 0, "y": 0, "w": 1180, "h": 700,
-   "title": "A. Header card (built)"},
-  {"file": "Dashboard.dc.html", "page": "page-3", "x": 0, "y": 880, "w": 1240, "h": 880,
-   "title": "A+. Dashboard treatment of the header"},
-  {"file": "OptionB.dc.html", "page": "page-3", "x": 1340, "y": 0, "w": 1180, "h": 760,
-   "title": "B. Full-width band"},
-  {"file": "MapDetail.dc.html", "page": "page-3", "x": 0, "y": 1900, "w": 1080, "h": 760,
-   "title": "The map itself"}
+  {
+   "file": "LogoAudit.dc.html",
+   "page": "page-4",
+   "x": 0,
+   "y": 0,
+   "w": 1220,
+   "h": 420,
+   "title": "What is there today",
+   "print": "flow"
+  },
+  {
+   "file": "LogoHeader.dc.html",
+   "page": "page-4",
+   "x": 0,
+   "y": 560,
+   "w": 1220,
+   "h": 440,
+   "title": "Option A: the page header",
+   "print": "flow"
+  },
+  {
+   "file": "LogoMasthead.dc.html",
+   "page": "page-4",
+   "x": 0,
+   "y": 1120,
+   "w": 1220,
+   "h": 470,
+   "title": "Option B: masthead where the sheet is read",
+   "print": "flow"
+  },
+  {
+   "file": "LogoBand.dc.html",
+   "page": "page-4",
+   "x": 0,
+   "y": 1710,
+   "w": 1220,
+   "h": 450,
+   "title": "Option C: a branded band in row 1 (built)",
+   "print": "flow"
+  },
+  {
+   "file": "SummaryDashboard.dc.html",
+   "page": "page-1",
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 2140,
+   "title": "The whole Summary sheet, read as a dashboard",
+   "print": "flow"
+  },
+  {
+   "file": "SetupFlow.dc.html",
+   "page": "page-2",
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 600,
+   "title": "The five steps, and what is only reference"
+  },
+  {
+   "file": "PayItems.dc.html",
+   "page": "page-2",
+   "x": 0,
+   "y": 760,
+   "w": 1300,
+   "h": 1360,
+   "title": "Pay_Items, redesigned",
+   "print": "flow"
+  },
+  {
+   "file": "MaintenancePolicies.dc.html",
+   "page": "page-2",
+   "x": 1420,
+   "y": 760,
+   "w": 1300,
+   "h": 1580,
+   "title": "Maintenance Policies, redesigned",
+   "print": "flow"
+  },
+  {
+   "file": "Main.dc.html",
+   "page": "page-3",
+   "x": 0,
+   "y": 0,
+   "w": 1180,
+   "h": 700,
+   "title": "A. Header card (built)"
+  },
+  {
+   "file": "Dashboard.dc.html",
+   "page": "page-3",
+   "x": 0,
+   "y": 880,
+   "w": 1240,
+   "h": 880,
+   "title": "A+. Dashboard treatment of the header"
+  },
+  {
+   "file": "OptionB.dc.html",
+   "page": "page-3",
+   "x": 1340,
+   "y": 0,
+   "w": 1180,
+   "h": 760,
+   "title": "B. Full-width band"
+  },
+  {
+   "file": "MapDetail.dc.html",
+   "page": "page-3",
+   "x": 0,
+   "y": 1900,
+   "w": 1080,
+   "h": 760,
+   "title": "The map itself"
+  }
  ],
  "annotations": [
-  {"id": "dash-brief", "page": "page-1", "x": 0, "y": -210, "w": 660,
-   "text": "Built and shipped in v1.2.0. Drawn from the McKellar-Sipes (MKL) example run, generated from the workbook itself, so the artboard cannot drift from what the sheet produces.\nSix KPI tiles, bars inside the present-worth column, the locator map and the Google Earth export in one card, the seven charts on a two-column grid and the unit-cost benchmark in the eighth cell."},
-  {"id": "dash-changes", "page": "page-1", "x": 720, "y": -210, "w": 660,
-   "text": "Two things on here were new, and both are now in the workbook:\n1. Chart 1's five categories use one light-to-dark ramp instead of the mixed greys, so the stack reads in order.\n2. The eighth panel puts all four unit costs on one scale against published Tennessee runway work, so a quantity that is out by an order of magnitude shows up.\nThe rest was already calculated and only needed showing."},
-  {"id": "rowmap", "page": "page-1", "x": 0, "y": 2200, "w": 800,
-   "text": "The one change that reaches outside the file: the Summary row map moved to make room for the strip. Results table rows 12-15, verdict G17 and G18, comparison row 22, pavement section row 90, map data row 130. The KML macro and every verification script moved with it; a private copy of the old macro would need the same edit."},
-
-  {"id": "flow-note", "page": "page-2", "x": 0, "y": -150, "w": 660,
-   "text": "The workbook never said what order to work in. It does now: the card on General Information lists these five steps and names the sheet for each, and every sheet in the sequence says which step it is."},
-  {"id": "sheets-note", "page": "page-2", "x": 0, "y": 640, "w": 900,
-   "text": "Pay_Items and Maintenance Policies were the two sheets that had never been designed. Pay_Items keeps Table2 and every unit cost untouched; what changed is that the Unit Cost column is marked as the input it is, the part headings band the left, and the notes under the table say what the sheet drives, that the division columns are empty, and that 29 of the 56 items carry no unit cost at all."},
-
-  {"id": "why-a", "page": "page-3", "x": 0, "y": -150, "w": 520,
-   "text": "Where the map should sit.\nA keeps every row where it is; B reads louder but pushes the charts and the section block down about ten rows. A was built."},
-  {"id": "pricing", "page": "page-3", "x": 1340, "y": -150, "w": 520,
-   "text": "Both options carry the same new content: divisions on the map, and a line saying the unit costs are statewide while the Middle/West/East columns in Pay_Items sit empty."}
+  {
+   "id": "logo-ask",
+   "page": "page-4",
+   "x": 1320,
+   "y": 0,
+   "w": 560,
+   "text": "Option C was chosen and built: row 1 is a 40pt band on all thirteen sheets a user can reach, with the mark at the right at the artwork's own aspect.\nRow 1 is also a print title now, so the mark prints at the top of every page rather than only the first, which was the other half of the ask. The stretch on the four placements that existed is gone with them."
+  },
+  {
+   "id": "dash-brief",
+   "page": "page-1",
+   "x": 0,
+   "y": -210,
+   "w": 660,
+   "text": "Built and shipped in v1.2.0. Drawn from the McKellar-Sipes (MKL) example run, generated from the workbook itself, so the artboard cannot drift from what the sheet produces.\nSix KPI tiles, bars inside the present-worth column, the locator map and the Google Earth export in one card, the seven charts on a two-column grid and the unit-cost benchmark in the eighth cell."
+  },
+  {
+   "id": "dash-changes",
+   "page": "page-1",
+   "x": 720,
+   "y": -210,
+   "w": 660,
+   "text": "Two things on here were new, and both are now in the workbook:\n1. Chart 1's five categories use one light-to-dark ramp instead of the mixed greys, so the stack reads in order.\n2. The eighth panel puts all four unit costs on one scale against published Tennessee runway work, so a quantity that is out by an order of magnitude shows up.\nThe rest was already calculated and only needed showing."
+  },
+  {
+   "id": "rowmap",
+   "page": "page-1",
+   "x": 0,
+   "y": 2200,
+   "w": 800,
+   "text": "The one change that reaches outside the file: the Summary row map moved to make room for the strip. Results table rows 12-15, verdict G17 and G18, comparison row 22, pavement section row 90, map data row 130. The KML macro and every verification script moved with it; a private copy of the old macro would need the same edit."
+  },
+  {
+   "id": "flow-note",
+   "page": "page-2",
+   "x": 0,
+   "y": -150,
+   "w": 660,
+   "text": "The workbook never said what order to work in. It does now: the card on General Information lists these five steps and names the sheet for each, and every sheet in the sequence says which step it is."
+  },
+  {
+   "id": "sheets-note",
+   "page": "page-2",
+   "x": 0,
+   "y": 640,
+   "w": 900,
+   "text": "Pay_Items and Maintenance Policies were the two sheets that had never been designed. Pay_Items keeps Table2 and every unit cost untouched; what changed is that the Unit Cost column is marked as the input it is, the part headings band the left, and the notes under the table say what the sheet drives, that the division columns are empty, and that 29 of the 56 items carry no unit cost at all."
+  },
+  {
+   "id": "why-a",
+   "page": "page-3",
+   "x": 0,
+   "y": -150,
+   "w": 520,
+   "text": "Where the map should sit.\nA keeps every row where it is; B reads louder but pushes the charts and the section block down about ten rows. A was built."
+  },
+  {
+   "id": "pricing",
+   "page": "page-3",
+   "x": 1340,
+   "y": -150,
+   "w": 520,
+   "text": "Both options carry the same new content: divisions on the map, and a line saying the unit costs are statewide while the Middle/West/East columns in Pay_Items sit empty."
+  }
  ],
- "launch": {"view": "canvas", "page": "page-2"}
+ "launch": {
+  "view": "canvas",
+  "page": "page-4"
+ }
 }
