@@ -313,6 +313,7 @@ def main(src, out, mbt_mode=False):
     for p in ['xl/calcChain.xml']:
         if os.path.exists(P(p)): os.remove(P(p))
     if os.path.isdir(P('xl/externalLinks')): shutil.rmtree(P('xl/externalLinks'))
+    spelling_fixes(rd, wr)
     package_hygiene(work, P, rd, wr)
     # --- repack
     if os.path.exists(out): os.remove(out)
@@ -447,6 +448,25 @@ def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs):
     # ---- tab colours elsewhere
     for part, rgb in tabs:
         x = rd(part); wr(part, tab_color(x, rgb))
+
+
+SPELLING = [
+    # the four misspellings that were in the issued v1.1.2 text, left in place through v1.1.x
+    ('xl/drawings/drawing2.xml', 'Federal Aviation Adminimstration', 'Federal Aviation Administration'),
+    ('xl/drawings/drawing2.xml', 'pavement clossures', 'pavement closures'),
+    ('xl/drawings/drawing2.xml', ' associeted with limited facility uses', ' associated with limited facility uses'),
+    ('xl/sharedStrings.xml', 'Intial Construction Year', 'Initial Construction Year'),
+]
+
+
+def spelling_fixes(rd, wr):
+    """Correct the misspellings carried in the issued text. Wording is otherwise untouched. Project copies
+    of v1.1.2 carry a shorter Overview, so each target is corrected where it is present."""
+    for part in sorted({p for p, _, _ in SPELLING}):
+        x = rd(part)
+        for pt, old, new in SPELLING:
+            if pt == part: x = x.replace(old, new)
+        wr(part, x)
 
 
 def package_hygiene(work, P, rd, wr):

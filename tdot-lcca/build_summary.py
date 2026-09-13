@@ -152,7 +152,7 @@ def build_scratch(path):
         ch.title = title; ch.width = w; ch.height = h; ch.legend.position = 'r'; ch.y_axis.numFmt = '$#,##0.0,,"M"'; ch.y_axis.majorGridlines = None
         ch.x_axis.delete = False; ch.y_axis.delete = False
         ch.x_axis.title = xt; ch.y_axis.title = yt
-    def colour(ch, line=False):
+    def color(ch, line=False):
         for s, rgb in zip(ch.series, ALT_COLORS):
             if line: s.graphicalProperties.line.solidFill = rgb; s.graphicalProperties.line.width = 22000; s.marker.symbol = 'none'; s.smooth = False
             else: s.graphicalProperties.solidFill = rgb; s.graphicalProperties.line.solidFill = rgb
@@ -187,16 +187,16 @@ def build_scratch(path):
     ch.x_axis.tickLblPos = 'low'; style(ch, '1. Present worth by category (salvage below zero)', xt='Alternative', yt='Present worth ($)'); ws.add_chart(ch, 'G22')
     ch = LineChart()
     ch.add_data(Reference(ws, min_col=DC + 1, max_col=DC + NALT, min_row=11, max_row=SENS1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC, min_row=SENS0, max_row=SENS1))
-    colour(ch, line=True); ch.x_axis.tickLblSkip = 4; ch.x_axis.numFmt = '0.00"%"'; style(ch, '2. Net present worth vs. discount rate (TDOT 3%, FAA 2%, pre-2022 rule 7%)', xt='Discount rate (%)', yt='Net present worth ($)'); ws.add_chart(ch, 'N22')
+    color(ch, line=True); ch.x_axis.tickLblSkip = 4; ch.x_axis.numFmt = '0.00"%"'; style(ch, '2. Net present worth vs. discount rate (TDOT 3%, FAA 2%, pre-2022 rule 7%)', xt='Discount rate (%)', yt='Net present worth ($)'); ws.add_chart(ch, 'N22')
     ch = BarChart(); ch.type = 'col'; ch.grouping = 'clustered'; ch.gapWidth = 40
     ch.add_data(Reference(ws, min_col=DC + 2, max_col=DC + 1 + NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
-    colour(ch); ch.x_axis.tickLblSkip = 5; ch.x_axis.tickLblPos = 'low'; style(ch, '3. Expenditure stream by calendar year (undiscounted)', xt='Calendar year', yt='Spend, undiscounted ($)'); ws.add_chart(ch, 'G40')
+    color(ch); ch.x_axis.tickLblSkip = 5; ch.x_axis.tickLblPos = 'low'; style(ch, '3. Expenditure stream by calendar year (undiscounted)', xt='Calendar year', yt='Spend, undiscounted ($)'); ws.add_chart(ch, 'G40')
     ch = LineChart()
     ch.add_data(Reference(ws, min_col=DC + 2 + NALT, max_col=DC + 1 + 2 * NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
-    colour(ch, line=True); ch.x_axis.tickLblSkip = 5; style(ch, '4. Cumulative discounted cost', xt='Calendar year', yt='Cumulative discounted cost ($)'); ws.add_chart(ch, 'N40')
+    color(ch, line=True); ch.x_axis.tickLblSkip = 5; style(ch, '4. Cumulative discounted cost', xt='Calendar year', yt='Cumulative discounted cost ($)'); ws.add_chart(ch, 'N40')
     ch = BarChart(); ch.type = 'col'; ch.grouping = 'clustered'; ch.gapWidth = 40
     ch.add_data(Reference(ws, min_col=DC + 2 + 2 * NALT, max_col=DC + 1 + 3 * NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
-    colour(ch); ch.x_axis.tickLblSkip = 5; style(ch, '5. Runway closure days by calendar year', xt='Calendar year', yt='Closure days'); ch.y_axis.numFmt = '0'; ws.add_chart(ch, 'G58')
+    color(ch); ch.x_axis.tickLblSkip = 5; style(ch, '5. Runway closure days by calendar year', xt='Calendar year', yt='Closure days'); ch.y_axis.numFmt = '0'; ws.add_chart(ch, 'G58')
     # ---- pavement section read back from the pay-item quantities (display only; no cost depends on it)
     PCF = '$J$81'
     AREA = f'{GI}!$D$26'; SHLD = f'{GI}!$D$27'

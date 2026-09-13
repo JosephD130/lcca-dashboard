@@ -1,62 +1,31 @@
 {
+ "pages": [
+  {"id": "page-1", "name": "Summary as a dashboard"},
+  {"id": "page-2", "name": "Where the map goes"}
+ ],
  "artboards": [
-  {
-   "file": "Main.dc.html",
-   "x": 0,
-   "y": 0,
-   "w": 1180,
-   "h": 700,
-   "title": "A. Header card (recommended)"
-  },
-  {
-   "file": "Dashboard.dc.html",
-   "x": 0,
-   "y": 880,
-   "w": 1240,
-   "h": 880,
-   "title": "A+. Dashboard treatment (proposed)"
-  },
-  {
-   "file": "OptionB.dc.html",
-   "x": 1300,
-   "y": 0,
-   "w": 1180,
-   "h": 760,
-   "title": "B. Full-width band"
-  },
-  {
-   "file": "MapDetail.dc.html",
-   "x": 0,
-   "y": 1900,
-   "w": 1080,
-   "h": 760,
-   "title": "The map itself"
-  }
+  {"file": "SummaryDashboard.dc.html", "page": "page-1", "x": 0, "y": 0, "w": 1440, "h": 2110,
+   "title": "The whole Summary sheet, read as a dashboard", "print": "flow"},
+  {"file": "Main.dc.html", "page": "page-2", "x": 0, "y": 0, "w": 1180, "h": 700,
+   "title": "A. Header card (built)"},
+  {"file": "Dashboard.dc.html", "page": "page-2", "x": 0, "y": 880, "w": 1240, "h": 880,
+   "title": "A+. Dashboard treatment of the header"},
+  {"file": "OptionB.dc.html", "page": "page-2", "x": 1340, "y": 0, "w": 1180, "h": 760,
+   "title": "B. Full-width band"},
+  {"file": "MapDetail.dc.html", "page": "page-2", "x": 0, "y": 1900, "w": 1080, "h": 760,
+   "title": "The map itself"}
  ],
  "annotations": [
-  {
-   "id": "why-a",
-   "x": 0,
-   "y": -150,
-   "w": 520,
-   "text": "Where the map should sit.\nA keeps every row where it is; B reads louder but pushes the charts and the section block down about ten rows."
-  },
-  {
-   "id": "pricing",
-   "x": 1300,
-   "y": -150,
-   "w": 520,
-   "text": "Both options carry the same new content: divisions on the map, and a line saying the unit costs are statewide while the Middle/West/East columns in Pay_Items sit empty."
-  },
-  {
-   "id": "dash",
-   "x": 0,
-   "y": 730,
-   "w": 560,
-   "text": "Proposed next step: same placement, read as a dashboard.\nSix KPI tiles, bars inside the present-worth column, and a unit-cost benchmark. Nothing moves rows; every value already exists in a cell."
-  }
+  {"id": "dash-brief", "page": "page-1", "x": 0, "y": -190, "w": 640,
+   "text": "The Summary sheet as one dashboard, drawn from the McKellar-Sipes (MKL) example run: every number and every chart on it is a value the sheet already produces.\nSix KPI tiles, bars inside the present-worth column, the locator map and the Google Earth export in one card, the seven charts on a two-column grid, and the unit-cost benchmark in the eighth cell."},
+  {"id": "dash-changes", "page": "page-1", "x": 700, "y": -190, "w": 640,
+   "text": "Two things here are proposals, not what the workbook does today:\n1. Chart 1's five categories use one light-to-dark ramp instead of the mixed greys, so the stack reads in order.\n2. The unit-cost benchmark is new; it puts all four alternatives on one scale against published Tennessee runway costs.\nEverything else is already calculated."},
+  {"id": "why-a", "page": "page-2", "x": 0, "y": -150, "w": 520,
+   "text": "Where the map should sit.\nA keeps every row where it is; B reads louder but pushes the charts and the section block down about ten rows."},
+  {"id": "pricing", "page": "page-2", "x": 1340, "y": -150, "w": 520,
+   "text": "Both options carry the same new content: divisions on the map, and a line saying the unit costs are statewide while the Middle/West/East columns in Pay_Items sit empty."},
+  {"id": "dash", "page": "page-2", "x": 0, "y": 730, "w": 560,
+   "text": "Same placement, read as a dashboard. Six KPI tiles, bars inside the present-worth column, and a unit-cost benchmark. Nothing moves rows; every value already exists in a cell."}
  ],
- "launch": {
-  "view": "canvas"
- }
+ "launch": {"view": "canvas", "page": "page-1"}
 }

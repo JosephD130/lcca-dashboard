@@ -5,7 +5,7 @@ Attribute VB_Name = "LCCA_KML_Export"
 ' Writes a .kml file beside the workbook holding, for the project on General Information:
 '   * the airport, with the whole LCCA result in its description bubble
 '   * a schematic runway footprint, oriented from the runway number and sized from the area
-'     entered, one per alternative, coloured green for the lowest net present worth
+'     entered, one per alternative, colored green for the lowest net present worth
 '   * one extruded bar per alternative whose height is its net present worth
 '   * every maintenance and rehabilitation event as a placemark stamped with the calendar year
 '     it happens, so the Google Earth time slider walks the analysis period
@@ -80,7 +80,7 @@ End Sub
 
 '---------------------------------------------------------------- document pieces
 
-' What the colours mean. Google Earth shows this when the reader clicks the document in Places.
+' What the colors mean. Google Earth shows this when the reader clicks the document in Places.
 Private Sub WriteLegend(ByVal f As Integer, gi As Worksheet)
     Dim d As String
     d = "<p>Life-cycle cost analysis, " & CStr(gi.Range("D33").Value) & " years at " & CStr(gi.Range("D34").Value) & _
@@ -208,7 +208,7 @@ Private Sub WriteAlternatives(ByVal f As Integer, gi As Worksheet, sm As Workshe
     Next r
 End Sub
 
-' Schematic runway footprint: a rectangle centred on the airport, turned to the runway heading.
+' Schematic runway footprint: a rectangle centered on the airport, turned to the runway heading.
 Private Sub WriteRunway(ByVal f As Integer, ByVal lat As Double, ByVal lon As Double, ByVal bearing As Double, _
                         ByVal lengthFt As Double, ByVal widthFt As Double, ByVal k As Long, ByVal style As String, _
                         ByVal nm As String, ByVal section As String)

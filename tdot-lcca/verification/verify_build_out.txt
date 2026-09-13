@@ -106,4 +106,12 @@ PASS  how-to card and live status line present
 PASS  input hints beside the parameters
 
 ==============================================================================
+SPELLING IN THE ISSUED TEXT
+==============================================================================
+PASS  Adminimstration corrected to Administration
+PASS  clossures corrected to closures
+PASS  associeted corrected to associated
+PASS  Intial Construction corrected to Initial Construction
+
+==============================================================================
 ALL PASS

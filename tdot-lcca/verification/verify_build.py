@@ -71,20 +71,20 @@ check('an alternative that does not exist gets no name', all('""' in str(ws.cell
       ws.cell(4, 24).value)
 wbx = rd('xl/workbook.xml')
 check('print areas defined for the Summary and General Information',
-      'Summary!$A$1:$U$112' in wbx and "'General Information'!$A$1:$J$48" in wbx,
+      'Summary!$A$1:$V$112' in wbx and "'General Information'!$A$1:$J$48" in wbx,
       re.findall(r'<definedName name="_xlnm.Print_Area"[^>]*>([^<]*)', wbx))
 
 print(); print('=' * 78); print('CHARTS'); print('=' * 78)
 charts = sorted((n for n in names if re.match(r'xl/charts/chart\d+\.xml$', n)), key=lambda n: int(re.search(r'\d+', n.split('/')[-1]).group()))
-check('thirteen charts: six original, seven new on the Summary', len(charts) == 13, len(charts))
+check('fourteen charts: six original, seven new on the Summary, one locator map', len(charts) == 14, len(charts))
 for n in charts:
     c = rd(n)
     ts = re.findall(r'<a:t>([^<]*)</a:t>', c)
-    has_x = any(t in ('Calendar year', 'Alternative', 'Discount rate (%)', 'Scenario') for t in ts)
+    has_x = any(t in ('Calendar year', 'Alternative', 'Discount rate (%)', 'Scenario', 'Longitude') for t in ts)
     has_y = any(t in ('Cost ($)', 'Present worth ($)', 'Net present worth ($)', 'Spend, undiscounted ($)',
-                      'Cumulative discounted cost ($)', 'Closure days', 'Thickness (inches)') for t in ts)
+                      'Cumulative discounted cost ($)', 'Closure days', 'Thickness (inches)', 'Latitude') for t in ts)
     check('%s names both axes' % n.split('/')[-1], has_x and has_y, ts[:4])
-summary_charts = charts[6:]
+summary_charts = charts[6:13]      # the seven cost and section charts; the locator map carries no legend
 check('the seven Summary charts put the legend beside the plot',
       all(re.search(r'<legendPos val="r"/>', rd(n)) for n in summary_charts),
       [re.findall(r'<legendPos val="(\w)"/>', rd(n)) for n in summary_charts])
@@ -94,6 +94,46 @@ c6 = rd([n for n in charts if n.endswith('chart6.xml')][0])
 check('the original Alternatives Comparison chart plots the hidden columns', 'plotVisOnly val="0"' in c6)
 check('the alternative-sheet charts keep calendar years on the category axis',
       all('Calendar year' in rd(n) for n in charts[:5]))
+
+print(); print('=' * 78); print('LOCATOR MAP AND PROJECT IDENTITY'); print('=' * 78)
+check('project identity line at the top of the Summary', 'D$9' in str(ws['L1'].value) and 'construction' in str(ws['L1'].value))
+check('map data block labelled and outside the print area', 'MAP DATA' in str(ws.cell(115, 23).value))
+coords = [(ws.cell(r, 25).value, ws.cell(r, 26).value) for r in range(117, 196)]
+check('79 airports in the map block, 74 with published coordinates',
+      len(coords) == 79 and sum(1 for a, b in coords if isinstance(a, (int, float)) and isinstance(b, (int, float))) == 74,
+      (len(coords), sum(1 for a, b in coords if isinstance(a, (int, float)))))
+check('coordinates fall inside Tennessee',
+      all(-90.5 < a < -81.5 and 34.9 < b < 36.8 for a, b in coords if isinstance(a, (int, float))))
+border = [(ws.cell(r, 34).value, ws.cell(r, 35).value) for r in range(117, 330)]
+bpts = [(a, b) for a, b in border if isinstance(a, (int, float))]
+check('state outline embedded with gaps between segments', len(bpts) == 192 and len(border) > len(bpts), (len(bpts), len(border)))
+check('the selected airport is looked up, not typed',
+      str(ws.cell(117, 30).value).startswith('=IFERROR(IF(INDEX(') and str(ws.cell(117, 31).value).startswith('=IFERROR(IF(INDEX('))
+mapch = [c for c in wb['Summary']._charts if c.tagname == 'scatterChart']
+check('locator map has the outline, the three Grand Divisions and this project', len(mapch) == 1 and len(mapch[0].series) == 5,
+      [(c.tagname, len(c.series)) for c in wb['Summary']._charts])
+check('airports grouped by division so each is its own series',
+      [ws.cell(r, 27).value for r in (117, 137, 160, 190)] == ['West', 'West', 'Middle', 'East'],
+      [ws.cell(r, 27).value for r in (117, 137, 160, 190)])
+check('legend in cells, one per division plus this project',
+      [ws.cell(17, c).value for c in range(19, 23)] == ['\u25a0 West', '\u25a0 Middle', '\u25a0 East', '\u25a0 This project'],
+      [ws.cell(17, c).value for c in range(19, 23)])
+check('card header band across S2:V2', ws['S2'].value == 'PROJECT LOCATION' and ws['S2'].fill.fgColor.rgb.endswith('1D2733'))
+check('pricing basis stated beside the map', 'Unit Cost' in str(ws['S28'].value) and 'empty' in str(ws['S28'].value))
+check('map axes are named and their degree labels suppressed',
+      mapch and mapch[0].x_axis.numFmt.formatCode == ';;;' and mapch[0].y_axis.numFmt.formatCode == ';;;')
+check('project block names airport, county, region, coordinates, elevation',
+      [ws.cell(20 + k, 19).value for k in range(7)] ==
+      ['Airport', 'City / county', 'TDOT region', 'Coordinates', 'Elevation', 'Branch / project', 'Mainline area'],
+      [ws.cell(20 + k, 19).value for k in range(7)])
+check('the sheet says where the coordinates come from and how to export KML',
+      'embedded' in str(ws['S29'].value) and 'ExportLCCAKML' in str(ws['S30'].value))
+check('runway width for the export footprint is an input cell', ws['S27'].value == 'Runway width, ft'
+      and ws['T27'].value == 100, (ws['S27'].value, ws['T27'].value))
+check('the three notes beside the map are merged so they do not run into the chart data',
+      all(str(rng) in [str(m) for m in ws.merged_cells.ranges] for rng in ('S28:V28', 'S29:V29', 'S30:V30')),
+      [str(m) for m in ws.merged_cells.ranges][-4:])
+check('print area widened to take the map', 'Summary!$A$1:$V$112' in rd('xl/workbook.xml'))
 
 print(); print('=' * 78); print('METHOD AND TYPICAL VALUES'); print('=' * 78)
 me = wb['Method']
@@ -131,6 +171,13 @@ check('three navigation buttons: Summary, Typical Values, Method',
       all('HYPERLINK' in str(gi[c].value) for c in ('D44', 'D46', 'D48')), [gi[c].value for c in ('D44', 'D46', 'D48')])
 check('how-to card and live status line present', str(gi['F2'].value or '').startswith('HOW TO USE') and 'Still needed' in str(gi['F9'].value))
 check('input hints beside the parameters', sum(1 for r in (25, 26, 27, 28, 33, 34, 36, 37, 38) if gi.cell(r, 6).value) == 9)
+
+print(); print('=' * 78); print('SPELLING IN THE ISSUED TEXT'); print('=' * 78)
+ov = rd('xl/drawings/drawing2.xml'); ss = rd('xl/sharedStrings.xml')
+for bad, good, part in [('Adminimstration', 'Administration', ov), ('clossures', 'closures', ov),
+                        ('associeted', 'associated', ov), ('Intial Construction', 'Initial Construction', ss)]:
+    check('%s corrected to %s' % (bad, good), bad not in part and good in part)
+
 
 print(); print('=' * 78)
 print('%d checks, %d failed' % (len(fails) + sum(1 for _ in []) + 0 if False else 0, len(fails)) if False else

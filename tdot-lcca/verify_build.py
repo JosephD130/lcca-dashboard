@@ -172,6 +172,13 @@ check('three navigation buttons: Summary, Typical Values, Method',
 check('how-to card and live status line present', str(gi['F2'].value or '').startswith('HOW TO USE') and 'Still needed' in str(gi['F9'].value))
 check('input hints beside the parameters', sum(1 for r in (25, 26, 27, 28, 33, 34, 36, 37, 38) if gi.cell(r, 6).value) == 9)
 
+print(); print('=' * 78); print('SPELLING IN THE ISSUED TEXT'); print('=' * 78)
+ov = rd('xl/drawings/drawing2.xml'); ss = rd('xl/sharedStrings.xml')
+for bad, good, part in [('Adminimstration', 'Administration', ov), ('clossures', 'closures', ov),
+                        ('associeted', 'associated', ov), ('Intial Construction', 'Initial Construction', ss)]:
+    check('%s corrected to %s' % (bad, good), bad not in part and good in part)
+
+
 print(); print('=' * 78)
 print('%d checks, %d failed' % (len(fails) + sum(1 for _ in []) + 0 if False else 0, len(fails)) if False else
       ('ALL PASS' if not fails else 'FAILED: ' + '; '.join(fails)))

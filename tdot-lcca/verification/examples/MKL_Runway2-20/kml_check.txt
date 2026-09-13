@@ -1,4 +1,4 @@
-file            examples/exdiv2/MKL_Runway_2_20_LCCA.kml  (19,667 bytes)
+file            ex_mkl/MKL_Runway_2_20_LCCA.kml  (19,667 bytes)
 root            {http://www.opengis.net/kml/2.2}kml
 styles          4 defined: airport, alt, altLow, event
 geometry        27 points, 8 rings, extent lon -88.92089..-88.90358 lat 35.59159..35.60872

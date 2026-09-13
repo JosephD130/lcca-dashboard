@@ -15,8 +15,8 @@
   PASS  button TMP(NewPCC)!C1 "Summary" -> Summary!G1  |  visible=True landed=Summary
   PASS  button TMP(HMARehab)!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
   PASS  button TMP(HMARehab)!C1 "Summary" -> Summary!G1  |  visible=True landed=Summary
-  PASS  button Summary!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
-  PASS  button Summary!B1 "Instructions" -> Instructions!B9  |  visible=True landed=Instructions
+  PASS  button Summary!G1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
+  PASS  button Summary!H1 "Instructions" -> Instructions!B9  |  visible=True landed=Instructions
   PASS  button Typical Values!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
   PASS  button Typical Values!B1 "Summary" -> Summary!G1  |  visible=True landed=Summary
   PASS  button Method!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
