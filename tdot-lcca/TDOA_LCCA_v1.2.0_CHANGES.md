@@ -66,6 +66,16 @@ populates it with no further steps:
   is entered and shows the same quantities spread over mainline plus shoulder; column Q then also writes that
   shoulder reading out as a second string.
 - Chart data lives in columns W onward, greyed and labelled "calculated automatically; do not edit".
+- Summary layout: columns A to F are hidden. The Alternative Setup form still writes its small table and
+  "Chart 1" there, and the results table from column G repeats all of it with more detail, so the table and the
+  charts now start at the left edge of the screen instead of sitting beside a duplicate. The two navigation
+  buttons moved to G1 and H1; unhide A:F if you want to type an alternative description. The original
+  "Alternatives Comparison" chart is set to plot hidden cells so it keeps working, and its axis now reads in
+  millions.
+- Chart legends moved to the right of each plot: with the legend underneath it collided with the category
+  labels and the axis title. The money axis reads to one decimal ($16.5M rather than five gridlines all
+  reading $17M), and an alternative slot that has not been created carries no name, so the axis and the legend
+  no longer invent "Alt 3" and "Alt 4".
 - Every chart in the workbook now carries an x and a y axis title, including the five original alternative-sheet
   charts and the original "Alternatives Comparison" chart (calendar year against cost, alternative against
   present worth, discount rate against net present worth, alternative against thickness, and so on). The

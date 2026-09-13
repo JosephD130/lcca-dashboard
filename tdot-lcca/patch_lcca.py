@@ -251,7 +251,7 @@ def main(src, out, mbt_mode=False):
     gi_part = 'xl/worksheets/sheet4.xml'
     x = rd(gi_part)
     lab = style_of(x, 'B41')                      # "Alternative Setup:" label style
-    btn = style_of(rd(summ_part), 'A1')           # dark button style appended by the transplant
+    btn = style_of(rd(summ_part), 'G1')           # dark button style appended by the transplant (Summary row 1)
     x = put_cell(x, 'B44', '<c r="B44"%s t="inlineStr"><is><t>LCCA Summary:</t></is></c>' % (' s="%s"' % lab if lab else ''))
     x = put_cell(x, 'D44', '<c r="D44"%s t="str"><f>HYPERLINK("#Summary!G1","View Summary  \u25ba")</f><v>View Summary  \u25ba</v></c>' % (' s="%s"' % btn if btn else ''))
     x = re.sub(r'<row r="44" ', '<row r="44" ht="21" customHeight="1" ', x, count=1)
@@ -290,7 +290,10 @@ def main(src, out, mbt_mode=False):
     # --- the original Alternatives Comparison chart kept on the Summary: give it axis titles too
     cmp_chart = 'xl/charts/chart6.xml' if not mbt_mode else None
     if cmp_chart and os.path.exists(P(cmp_chart)):
-        wr(cmp_chart, axis_titles(rd(cmp_chart), 'Alternative', 'Cost ($)'))
+        c = axis_titles(rd(cmp_chart), 'Alternative', 'Cost ($)')
+        c = re.sub(r'<c:plotVisOnly val="[01]"/>', '<c:plotVisOnly val="0"/>', c)   # its source columns A:E are hidden now
+        c = re.sub(r'(<c:valAx>.*?)<c:numFmt[^/]*/>', r'\1<c:numFmt formatCode="$#,##0.0,,&quot;M&quot;" sourceLinked="0"/>', c, count=1, flags=re.S)
+        wr(cmp_chart, c)
     design_pass(work, rd, wr, gi_part, summ_part, tpl, tabs)
 
     # --- workbook: drop broken external links, force full recalculation on open
@@ -380,7 +383,7 @@ def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs):
 
     # ---- General Information: quick-start card, live checklist, section bands
     x = rd(gi_part)
-    btn_dark = style_of(rd(summ_part), 'A1'); btn_blue = style_of(rd(summ_part), 'B1')
+    btn_dark = style_of(rd(summ_part), 'G1'); btn_blue = style_of(rd(summ_part), 'H1')
     for r in range(2, 8): x = ensure_row(x, r)
     card = ('1.   Fill in the grey cells below (D9 to D39).\n'
             '2.   Click Alternative Setup and add your alternatives.\n'

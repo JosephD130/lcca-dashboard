@@ -47,18 +47,22 @@ def build_scratch(path):
         c = ws[ref]; c.value = f'=HYPERLINK("#{target}","{text}")'; c.font = F_BTN; c.fill = fill; c.alignment = Alignment(horizontal='center', vertical='center'); c.border = BOX
 
     # ---- navigation buttons (macro-free hyperlinks) and the VBA-managed header, kept identical
-    button('A1', '◄ General Information', "'General Information'!D9")
-    button('B1', 'Instructions', 'Instructions!B9', FILL_BTN2)
+    button('G1', '◄ General Information', "'General Information'!D9")
+    button('H1', 'Instructions', 'Instructions!B9', FILL_BTN2)
     ws.row_dimensions[1].height = 22
     hdr(3, 1, ['Alternative', 'Name', 'Initial Construction', 'Present Worth', 'Alternative Description'])
     ws.column_dimensions['A'].width = 22; ws.column_dimensions['B'].width = 32; ws.column_dimensions['C'].width = 17; ws.column_dimensions['D'].width = 17; ws.column_dimensions['E'].width = 34
     ws.column_dimensions['F'].width = 3
+    # A:E is the block the Alternative Setup form writes; everything in it is repeated with more detail from
+    # column G onward, so it is hidden (not removed: the VBA still writes to it) and the charts line up with the table
+    for c in 'ABCDEF': ws.column_dimensions[c].hidden = True
     for c in 'GHIJKLMNOPQRSTUV': ws.column_dimensions[c].width = 14
     ws.column_dimensions['G'].width = 20; ws.column_dimensions['H'].width = 24; ws.column_dimensions['P'].width = 30; ws.column_dimensions['Q'].width = 30
 
     # ---- 1. results table
-    ws['G1'] = 'LCCA SUMMARY'; ws['G1'].font = F_T
-    ws['G2'] = 'Everything from this column onward calculates from the alternative worksheets and updates by itself. Columns A:E and "Chart 1" are written by the Alternative Setup form as before.'; ws['G2'].font = F_N
+    ws['J1'] = 'LCCA SUMMARY'; ws['J1'].font = F_T
+    ws['G2'] = ('Everything here calculates from the alternative worksheets and updates by itself. Columns A to F are hidden: the Alternative Setup form still writes '
+                'its own small table and "Chart 1" there, and this table repeats all of it with more detail. Unhide A:F if you want to type an alternative description.'); ws['G2'].font = F_N
     hdr(3, 7, ['Worksheet', 'Alternative', 'Type', 'Initial construction', 'Maintenance PW', 'Rehabilitation PW', 'Lost revenue PW', 'Salvage PW', 'Net present worth', 'vs. lowest NPW', 'Closure days in period', 'Runway availability'])
     for i in range(NALT):
         r = 4 + i; dbr = 4 + i; g = f'$G{r}'
@@ -103,7 +107,7 @@ def build_scratch(path):
     # category block rows 3-9
     ws.cell(3, DC, 'Present worth by category').font = F_H
     hdr(4, DC, ['Category'] + [None] * NALT)
-    for i in range(NALT): ws.cell(4, DC + 1 + i, f'=IF($H${4+i}="","Alt "&{i+1},$H${4+i})')
+    for i in range(NALT): ws.cell(4, DC + 1 + i, f'=IF($H${4+i}="","",$H${4+i})')
     cats = [('Initial construction', 10), ('Maintenance', 11), ('Rehabilitation', 12), ('Lost revenue', 13), ('Salvage', 14)]
     for k, (lab, col) in enumerate(cats):
         ws.cell(5 + k, DC, lab).font = F_DATA
@@ -111,7 +115,7 @@ def build_scratch(path):
     # sensitivity block rows 10-36 (row 12 = 2.00%, row 32 = 7.00%)
     ws.cell(10, DC, 'Net present worth vs. discount rate').font = F_H
     hdr(11, DC, ['Rate (%)'] + [None] * NALT)
-    for i in range(NALT): ws.cell(11, DC + 1 + i, f'={d(1+i)}$4')
+    for i in range(NALT): ws.cell(11, DC + 1 + i, f'=IF({d(1+i)}$4="","",{d(1+i)}$4)')
     for k in range(25):
         r = 12 + k; c = ws.cell(r, DC, 2 + 0.25 * k); c.number_format = '0.00"%"'; c.font = F_DATA
         for i in range(NALT):
@@ -123,7 +127,8 @@ def build_scratch(path):
     ws.cell(Y0, DC, 'By calendar year: spend (undiscounted), cumulative discounted cost, closure days').font = F_H
     hdr(Y0 + 1, DC, ['Year', 'Calendar year'] + [None] * (3 * NALT))
     for i in range(NALT):
-        ws.cell(Y0 + 1, DC + 2 + i, f'={d(1+i)}$4&" spend"'); ws.cell(Y0 + 1, DC + 2 + NALT + i, f'={d(1+i)}$4&" cumulative PW"'); ws.cell(Y0 + 1, DC + 2 + 2 * NALT + i, f'={d(1+i)}$4&" closure days"')
+        lab = lambda suffix: f'=IF({d(1+i)}$4="","",{d(1+i)}$4&"{suffix}")'
+        ws.cell(Y0 + 1, DC + 2 + i, lab(' spend')); ws.cell(Y0 + 1, DC + 2 + NALT + i, lab(' cumulative PW')); ws.cell(Y0 + 1, DC + 2 + 2 * NALT + i, lab(' closure days'))
     for k in range(31):
         r = Y0 + 2 + k
         ws.cell(r, DC, k).font = F_DATA; c = ws.cell(r, DC + 1, f'={GI}!$D$25+{d(0)}{r}'); c.font = F_DATA
@@ -139,8 +144,8 @@ def build_scratch(path):
     Y1 = Y0 + 2 + 30
 
     # ---- charts, two per row under the results table
-    def style(ch, title, h=8.0, w=15.5, xt='Alternative', yt='Present worth ($)'):
-        ch.title = title; ch.width = w; ch.height = h; ch.legend.position = 'b'; ch.y_axis.numFmt = '$#,##0,,"M"'; ch.y_axis.majorGridlines = None
+    def style(ch, title, h=8.0, w=16.5, xt='Alternative', yt='Present worth ($)'):
+        ch.title = title; ch.width = w; ch.height = h; ch.legend.position = 'r'; ch.y_axis.numFmt = '$#,##0.0,,"M"'; ch.y_axis.majorGridlines = None
         ch.x_axis.delete = False; ch.y_axis.delete = False
         ch.x_axis.title = xt; ch.y_axis.title = yt
     def colour(ch, line=False):
@@ -234,7 +239,7 @@ def build_scratch(path):
     SEC = 74
     ws.cell(SEC, DC, 'PAVEMENT SECTION (inches): mainline, then the reading if the quantities also cover the shoulder').font = F_H
     hdr(SEC + 1, DC, ['Layer'] + [None] * NALT)
-    for i in range(NALT): ws.cell(SEC + 1, DC + 1 + i, f'={d(1+i)}$4')
+    for i in range(NALT): ws.cell(SEC + 1, DC + 1 + i, f'=IF({d(1+i)}$4="","",{d(1+i)}$4)')
     layers = [('Subbase (P-154)', 'J'), ('Aggregate base', 'I'), ('Asphalt', 'H'), ('Concrete', 'H')]
     for k, (lab, col) in enumerate(layers):
         ws.cell(SEC + 2 + k, DC, lab).font = F_DATA
