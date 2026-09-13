@@ -1,0 +1,47 @@
+{
+ "artboards": [
+  {
+   "file": "Main.dc.html",
+   "x": 0,
+   "y": 0,
+   "w": 1180,
+   "h": 700,
+   "title": "A. Header card (recommended)"
+  },
+  {
+   "file": "OptionB.dc.html",
+   "x": 1300,
+   "y": 0,
+   "w": 1180,
+   "h": 760,
+   "title": "B. Full-width band"
+  },
+  {
+   "file": "MapDetail.dc.html",
+   "x": 0,
+   "y": 880,
+   "w": 1080,
+   "h": 760,
+   "title": "The map itself"
+  }
+ ],
+ "annotations": [
+  {
+   "id": "why-a",
+   "x": 0,
+   "y": -150,
+   "w": 520,
+   "text": "Where the map should sit.\nA keeps every row where it is; B reads louder but pushes the charts and the section block down about ten rows."
+  },
+  {
+   "id": "pricing",
+   "x": 1300,
+   "y": -150,
+   "w": 520,
+   "text": "Both options carry the same new content: divisions on the map, and a line saying the unit costs are statewide while the Middle/West/East columns in Pay_Items sit empty."
+  }
+ ],
+ "launch": {
+  "view": "canvas"
+ }
+}

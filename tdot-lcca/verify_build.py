@@ -110,8 +110,16 @@ check('state outline embedded with gaps between segments', len(bpts) == 192 and 
 check('the selected airport is looked up, not typed',
       str(ws.cell(117, 30).value).startswith('=IFERROR(IF(INDEX(') and str(ws.cell(117, 31).value).startswith('=IFERROR(IF(INDEX('))
 mapch = [c for c in wb['Summary']._charts if c.tagname == 'scatterChart']
-check('locator map is a scatter chart with outline, airports and this project', len(mapch) == 1 and len(mapch[0].series) == 3,
+check('locator map has the outline, the three Grand Divisions and this project', len(mapch) == 1 and len(mapch[0].series) == 5,
       [(c.tagname, len(c.series)) for c in wb['Summary']._charts])
+check('airports grouped by division so each is its own series',
+      [ws.cell(r, 27).value for r in (117, 137, 160, 190)] == ['West', 'West', 'Middle', 'East'],
+      [ws.cell(r, 27).value for r in (117, 137, 160, 190)])
+check('legend in cells, one per division plus this project',
+      [ws.cell(17, c).value for c in range(19, 23)] == ['\u25a0 West', '\u25a0 Middle', '\u25a0 East', '\u25a0 This project'],
+      [ws.cell(17, c).value for c in range(19, 23)])
+check('card header band across S2:V2', ws['S2'].value == 'PROJECT LOCATION' and ws['S2'].fill.fgColor.rgb.endswith('1D2733'))
+check('pricing basis stated beside the map', 'Unit Cost' in str(ws['S28'].value) and 'empty' in str(ws['S28'].value))
 check('map axes are named and their degree labels suppressed',
       mapch and mapch[0].x_axis.numFmt.formatCode == ';;;' and mapch[0].y_axis.numFmt.formatCode == ';;;')
 check('project block names airport, county, region, coordinates, elevation',
@@ -119,9 +127,12 @@ check('project block names airport, county, region, coordinates, elevation',
       ['Airport', 'City / county', 'TDOT region', 'Coordinates', 'Elevation', 'Branch / project', 'Mainline area'],
       [ws.cell(20 + k, 19).value for k in range(7)])
 check('the sheet says where the coordinates come from and how to export KML',
-      'embedded' in str(ws['S28'].value) and 'ExportLCCAKML' in str(ws['S29'].value))
-check('runway width for the export footprint is an input cell', ws['S27'].value == 'Runway width for the map export (ft)'
+      'embedded' in str(ws['S29'].value) and 'ExportLCCAKML' in str(ws['S30'].value))
+check('runway width for the export footprint is an input cell', ws['S27'].value == 'Runway width, ft'
       and ws['T27'].value == 100, (ws['S27'].value, ws['T27'].value))
+check('the three notes beside the map are merged so they do not run into the chart data',
+      all(str(rng) in [str(m) for m in ws.merged_cells.ranges] for rng in ('S28:V28', 'S29:V29', 'S30:V30')),
+      [str(m) for m in ws.merged_cells.ranges][-4:])
 check('print area widened to take the map', 'Summary!$A$1:$V$112' in rd('xl/workbook.xml'))
 
 print(); print('=' * 78); print('METHOD AND TYPICAL VALUES'); print('=' * 78)

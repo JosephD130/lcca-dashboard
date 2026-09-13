@@ -210,6 +210,11 @@ SECTIONS = [
   ['Asphalt unit weight for the section read-back', 'Summary J81', '',
    '145 pcf, the value that reproduces the Murfreesboro section exactly. It affects the displayed thickness only, '
    'never a cost.', 'Summary, v1.2.0'],
+  ['Unit costs are statewide, not regional', 'Pay_Items columns G, H, I', '',
+   'The sheet carries a header "Average Pay Item Unit Cost" spanning Middle, West and East columns, and all three are '
+   'empty. Every alternative prices off the single Unit Cost column, so a West-division project is estimated on the '
+   'same numbers as a Middle one. The locator map on the Summary colours the airports by division so the project\'s '
+   'region sits beside the pricing basis.', 'Pre-existing; worth a decision'],
   ['Unit costs date from the 2022 framework', 'Pay_Items column F', '',
    'The Typical Values sheet compares them with recent bid prices. The asphalt defaults look low against 2025 '
    'southeastern bids.', 'Typical Values, section 3'],

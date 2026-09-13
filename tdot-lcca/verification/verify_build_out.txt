@@ -70,11 +70,16 @@ PASS  79 airports in the map block, 74 with published coordinates   |   (79, 74)
 PASS  coordinates fall inside Tennessee
 PASS  state outline embedded with gaps between segments   |   (192, 213)
 PASS  the selected airport is looked up, not typed
-PASS  locator map is a scatter chart with outline, airports and this project   |   [('barChart', 5), ('lineChart', 4), ('barChart', 4), ('lineChart', 4), ('barChart', 4), ('barChart', 4), ('barChart', 4), ('scatterChart', 3), ('barChart', 2)]
+PASS  locator map has the outline, the three Grand Divisions and this project   |   [('barChart', 5), ('lineChart', 4), ('barChart', 4), ('lineChart', 4), ('barChart', 4), ('barChart', 4), ('barChart', 4), ('scatterChart', 5), ('barChart', 2)]
+PASS  airports grouped by division so each is its own series   |   ['West', 'West', 'Middle', 'East']
+PASS  legend in cells, one per division plus this project   |   ['■ West', '■ Middle', '■ East', '■ This project']
+PASS  card header band across S2:V2
+PASS  pricing basis stated beside the map
 PASS  map axes are named and their degree labels suppressed
 PASS  project block names airport, county, region, coordinates, elevation   |   ['Airport', 'City / county', 'TDOT region', 'Coordinates', 'Elevation', 'Branch / project', 'Mainline area']
 PASS  the sheet says where the coordinates come from and how to export KML
-PASS  runway width for the export footprint is an input cell   |   ('Runway width for the map export (ft)', 100)
+PASS  runway width for the export footprint is an input cell   |   ('Runway width, ft', 100)
+PASS  the three notes beside the map are merged so they do not run into the chart data   |   ['S28:V28', 'S29:V29', 'S30:V30']
 PASS  print area widened to take the map
 
 ==============================================================================

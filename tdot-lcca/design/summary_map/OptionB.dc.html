@@ -1,0 +1,195 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #8A8F98; font-family: Arial, Helvetica, sans-serif; color: #1D2733; }
+    a { color: #2A78D6; } a:hover { color: #1D5BA6; }
+    .sheet { background: #FFFFFF; min-height: 100%%; box-sizing: border-box; padding: 18px 20px 20px; }
+    .tag { display: inline-block; background: #1D2733; color: #FFFFFF; font-size: 10.5px; font-weight: bold;
+           letter-spacing: .06em; padding: 3px 8px; }
+    .ident { font-size: 12.5px; font-weight: bold; }
+    .note { font-size: 10.5px; color: #595959; font-style: italic; line-height: 1.45; }
+    table.grid { border-collapse: collapse; }
+    table.grid th { background: #D9D9D9; border: 1px solid #BFBFBF; font-size: 10.5px; padding: 4px 6px; text-align: left; }
+    table.grid td { border: 1px solid #D0D4D9; font-size: 11px; padding: 3px 6px; }
+    td.n { text-align: right; }
+    tr.low td { background: #DDEBF7; color: #1F3864; font-weight: bold; }
+    .card { border: 1px solid #D4D8DD; background: #FFFFFF; }
+    .cardhd { background: #1D2733; color: #FFFFFF; font-size: 10.5px; font-weight: bold; letter-spacing: .05em;
+              padding: 5px 9px; }
+    .kv { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 3px 10px; font-size: 11px; padding: 8px 9px; }
+    .kv div.k { color: #595959; }
+    .kv div.v { font-weight: bold; }
+    .legend { display: flex; gap: 14px; align-items: center; font-size: 10.5px; padding: 6px 9px 8px; flex-wrap: wrap; }
+    .legend span.s { display: inline-block; width: 10px; height: 10px; margin-right: 5px; vertical-align: -1px; }
+    .flag { background: #FFF3CD; color: #7F6000; font-size: 10.5px; line-height: 1.45; padding: 7px 9px; }
+    .input { background: #D9D9D9; border: 1px solid #BFBFBF; font-size: 11px; padding: 2px 6px; text-align: right;
+             min-width: 46px; display: inline-block; }
+  </style>
+</helmet>
+<div class="sheet">
+  <div style="display: flex; gap: 10px; align-items: baseline;">
+    <span class="tag">B &nbsp;FULL-WIDTH BAND UNDER THE VERDICT</span>
+    <span class="note">More presence, higher cost: the charts and the section block all move down about ten rows, and the map competes with the verdict for the eye.</span>
+  </div>
+
+  <div style="margin-top: 14px;">
+    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+      <span style="background: #1D2733; color: #FFFFFF; font-size: 11px; font-weight: bold; padding: 3px 9px;">&#9668; General Information</span>
+      <span style="background: #2A78D6; color: #FFFFFF; font-size: 11px; font-weight: bold; padding: 3px 9px;">Instructions</span>
+      <span style="font-size: 13px; font-weight: bold; margin-left: 6px;">LCCA SUMMARY</span>
+    </div>
+    <div class="ident" style="margin-bottom: 8px;">McKellar-Sipes Regional Airport (MKL) &nbsp;|&nbsp; Jackson, West region &nbsp;|&nbsp; Runway 2-20 (Reconstruction) &nbsp;|&nbsp; construction 2027 &nbsp;|&nbsp; 30 years at 3%</div>
+    
+      <table class="grid" style="width: 100%;">
+        <tr><th style="width: 128px;">Worksheet</th><th>Alternative</th><th>Type</th><th>Initial construction</th>
+            <th>Net present worth</th><th>vs. lowest</th><th>Closure days</th></tr>
+        <tr><td>Alt 1 (New HMA)</td><td>Alternative 1</td><td>HMA-New</td><td class="n">$12,372,457</td><td class="n">$16,528,084</td><td class="n">$2,461,515</td><td class="n">94</td></tr>
+        <tr class="low"><td>Alt 2 (New PCC)</td><td>Alternative 2</td><td>PCC-New</td><td class="n">$13,830,666</td><td class="n">$14,066,568</td><td class="n">&ndash;</td><td class="n">36</td></tr>
+        <tr><td>Alt 3 (New HMA)</td><td>Alternative 3</td><td>HMA-New</td><td class="n">$14,671,662</td><td class="n">$18,827,288</td><td class="n">$4,760,719</td><td class="n">94</td></tr>
+        <tr><td>Alt 4 (New PCC)</td><td>Alternative 4</td><td>PCC-New</td><td class="n">$14,418,903</td><td class="n">$14,594,219</td><td class="n">$527,651</td><td class="n">36</td></tr>
+      </table>
+      <div style="font-size: 11.5px; font-weight: bold; background: #EAF2FB; padding: 5px 7px; margin-top: 8px;">
+        Lowest present worth: Alternative 2 &nbsp;|&nbsp; margin to next: $527,651 &nbsp;|&nbsp; 3% over 30 years &nbsp;|&nbsp; lost revenue: Yes
+      </div>
+
+  </div>
+
+  <div class="card" style="margin-top: 12px;">
+    <div class="cardhd">PROJECT LOCATION &nbsp;&mdash;&nbsp; West division</div>
+    <div style="display: flex; gap: 14px; padding: 9px 10px 0; align-items: flex-start;">
+      <div style="flex: none;"><svg viewBox="0 0 940 205" width="940" height="205" role="img" aria-label="Tennessee, airports by TDOT Grand Division">
+<polyline points="108.3,28.1 254.2,28.2 254.5,19.7 250.8,6.7 273.7,8.5 275.7,12.5 344.3,10.5 408.8,10.8 409.6,12.3 414.7,9.5 474.3,12.7 521.8,14.1 559.3,12.9 711.6,18.8 714.9,16.3 897.5,17.1 900.6,14.8 928.7,15.5 929.4,17.4 933.6,17.7" fill="none" stroke="#9AA0A6" stroke-width="1.1"/>
+<polyline points="134.7,9.1 129.6,19.4 124.6,20.3 117.4,13.9 113.8,13.7 108.1,28.3 101.8,33.8 99.5,32.9 101.5,25.9 99.9,21.7 95.5,20.6 92.4,23.0 92.3,26.0 95.7,30.3 94.3,33.4 97.4,42.0 94.6,44.9 88.1,45.4 86.7,48.5 94.1,54.2 91.5,56.0 80.2,57.0 89.0,69.1 81.9,73.3 76.0,83.8 83.0,95.5 74.0,94.0 70.6,97.6 76.4,100.8 76.1,103.9 69.2,105.2 67.7,109.3 64.8,110.9 51.8,113.3 51.6,116.1 56.4,122.2 60.9,120.8 62.8,123.0 52.8,128.3 51.9,130.7 54.0,135.7 45.8,133.2 42.9,134.5 42.1,138.1 46.8,144.9 46.1,147.5 42.0,148.8 39.3,143.2 36.3,141.9 28.6,148.5 28.7,153.4 33.5,150.2 37.6,152.4 35.5,156.0 36.1,159.8 29.0,164.1 38.7,170.2 37.8,173.6 39.3,176.6 37.8,180.9 28.6,182.3 24.9,190.3 15.7,191.2 14.5,195.1 19.2,200.0" fill="none" stroke="#9AA0A6" stroke-width="1.1"/>
+<polyline points="928.8,15.6 922.5,24.0 924.8,28.9 919.3,38.8 922.9,45.4 912.6,43.5 902.3,49.5 889.1,69.8 886.5,69.8 884.6,72.5 879.4,72.0 877.0,67.9 870.8,66.0 865.0,69.0 861.5,68.6 852.1,72.3 841.8,84.1 833.4,88.4 829.7,86.2 830.2,80.3 825.9,77.0 811.1,84.0 807.5,91.5 801.1,88.9 797.0,89.6 795.5,92.9 796.9,97.0 788.2,108.5 778.9,107.4 769.7,110.7 760.8,115.8 755.9,121.5 751.2,121.2 747.3,124.7 739.7,127.5 734.9,132.1 726.4,133.4 722.7,130.9 719.6,132.7 708.6,132.7 693.2,138.3 689.2,143.8 683.4,145.4 680.0,148.4 675.9,164.0 672.9,166.4 660.8,167.8 656.1,165.8 650.5,170.3 647.0,197.6" fill="none" stroke="#9AA0A6" stroke-width="1.1"/>
+<polyline points="382.0,196.1 619.5,196.0" fill="none" stroke="#9AA0A6" stroke-width="1.1"/>
+<polyline points="15.8,195.9 238.6,195.8" fill="none" stroke="#9AA0A6" stroke-width="1.1"/>
+<polyline points="776.5,196.0 810.4,185.8 812.8,188.2 818.9,185.1 820.9,181.4 823.6,182.0 841.4,176.2 846.5,176.5 851.1,171.3 853.6,173.6 858.1,174.1 861.8,172.9 933.6,175.7" fill="none" stroke="#9AA0A6" stroke-width="1.1"/>
+<polyline points="776.5,196.0 810.4,185.8 812.8,188.2 818.9,185.1 820.9,181.4 823.6,182.0 841.4,176.2 846.5,176.5 851.1,171.3 853.6,173.6 858.1,174.1 862.7,172.9 934.4,175.8" fill="none" stroke="#9AA0A6" stroke-width="1.1"/>
+<polyline points="620.0,196.3 648.0,197.6 776.7,196.0" fill="none" stroke="#9AA0A6" stroke-width="1.1"/>
+<polyline points="382.1,195.8 238.0,193.4" fill="none" stroke="#9AA0A6" stroke-width="1.1"/>
+<polyline points="7.7,28.0 30.4,28.0 34.1,33.2 34.8,37.7 40.8,42.0 40.2,52.4 34.7,55.2 32.9,60.1 23.7,63.9 21.3,69.2 16.0,71.3 7.1,85.6 76.1,84.0" fill="none" stroke="#9AA0A6" stroke-width="1.1"/>
+<polyline points="749.2,4.9 743.3,8.5 733.1,9.1 721.6,12.3 715.8,16.5" fill="none" stroke="#9AA0A6" stroke-width="1.1"/>
+<polyline points="510.4,199.2 509.8,196.1" fill="none" stroke="#9AA0A6" stroke-width="1.1"/>
+<polyline points="93.6,27.9 101.2,27.8" fill="none" stroke="#9AA0A6" stroke-width="1.1"/>
+<circle cx="238.1" cy="122.5" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="245.6" cy="82.9" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="209.8" cy="74.0" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="54.6" cy="164.8" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="91.1" cy="130.7" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="110.2" cy="84.2" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="154.7" cy="41.5" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="111.5" cy="172.8" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="41.8" cy="173.6" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="169.1" cy="91.6" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="218.2" cy="46.4" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="166.4" cy="106.2" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="162.1" cy="128.8" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="50.0" cy="191.3" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="61.2" cy="156.1" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="116.6" cy="30.8" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="206.1" cy="173.3" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="235.9" cy="177.0" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="148.6" cy="171.9" r="3.1" fill="#7FA8CF" fill-opacity="0.85"/>
+<circle cx="358.4" cy="178.8" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="423.3" cy="133.4" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="317.3" cy="102.2" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="319.0" cy="69.7" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="385.1" cy="139.2" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="410.4" cy="189.4" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="480.8" cy="173.1" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="262.1" cy="153.1" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="267.6" cy="48.5" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="286.4" cy="71.0" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="507.9" cy="39.6" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="271.8" cy="129.4" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="581.3" cy="44.8" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="301.3" cy="134.9" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="376.4" cy="63.5" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="463.9" cy="25.8" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="337.1" cy="169.8" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="436.7" cy="62.7" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="542.8" cy="37.7" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="345.5" cy="133.9" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="430.1" cy="97.6" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="426.9" cy="42.0" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="398.4" cy="70.1" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="320.6" cy="14.4" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="419.6" cy="17.6" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="490.2" cy="85.6" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="415.1" cy="83.0" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="372.7" cy="23.9" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="443.9" cy="153.5" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="519.6" cy="77.7" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="486.5" cy="117.8" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="463.0" cy="176.2" r="3.1" fill="#2A78D6" fill-opacity="0.85"/>
+<circle cx="596.8" cy="172.3" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="573.5" cy="191.1" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="664.0" cy="46.6" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="566.6" cy="89.5" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="874.2" cy="42.4" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="731.0" cy="100.0" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="806.8" cy="62.1" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="799.0" cy="32.8" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="859.8" cy="43.3" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="910.9" cy="37.2" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="694.6" cy="88.1" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="554.1" cy="192.1" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="513.8" cy="189.2" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="582.9" cy="141.6" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="644.6" cy="194.3" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="681.9" cy="105.2" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="621.9" cy="151.3" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="641.1" cy="135.0" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="747.2" cy="63.9" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="728.0" cy="38.2" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="608.4" cy="92.7" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="619.4" cy="33.0" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="849.4" cy="30.8" r="3.1" fill="#1D3F6E" fill-opacity="0.85"/>
+<circle cx="162.1" cy="128.8" r="9" fill="#C1440E" fill-opacity="0.16"/>
+<circle cx="162.1" cy="128.8" r="5.4" fill="#C1440E" stroke="#FFFFFF" stroke-width="1.4"/>
+<text x="172.1" y="132.8" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="bold" fill="#1D2733">MKL</text>
+</svg></div>
+      <div style="flex: 1 1 0; min-width: 0;">
+      <div class="kv">
+        <div class="k">Airport</div><div class="v">McKellar-Sipes Regional (MKL)</div>
+        <div class="k">City / county</div><div class="v">Jackson / Madison County</div>
+        <div class="k">Division</div><div class="v">West</div>
+        <div class="k">Coordinates</div><div class="v">35.5999&deg; N, 88.9156&deg; W</div>
+        <div class="k">Elevation</div><div class="v">435 ft</div>
+        <div class="k">Branch / project</div><div class="v">Runway 2-20, Reconstruction</div>
+        <div class="k">Mainline area</div><div class="v">100,083 S.Y. + 33,361 S.Y. shoulder</div>
+        <div class="k">Runway width</div><div class="v"><span class="input">150</span> <span style="color: #595959; font-weight: normal;">ft, for the map export</span></div>
+      </div>
+</div>
+    </div>
+    
+      <div class="legend">
+        <span><span class="s" style="background: #7FA8CF;"></span>West</span>
+        <span><span class="s" style="background: #2A78D6;"></span>Middle</span>
+        <span><span class="s" style="background: #1D3F6E;"></span>East</span>
+        <span><span class="s" style="background: #C1440E; border-radius: 50%;"></span>This project</span>
+      </div>
+
+      <div class="flag">
+        <b>Pricing basis:</b> this project is in the <b>West</b> division, but every unit cost comes from the single
+        <i>Unit Cost</i> column on Pay_Items. The <i>Average Pay Item Unit Cost</i> columns for Middle, West and East
+        are empty, so the estimate is statewide, not regional.
+      </div>
+
+  </div>
+
+  <div class="note" style="margin-top: 12px;">
+    Everything below this band (CHARTS, the five cost charts, the pavement section block and its two charts) shifts down,
+    and every formula and anchor that names those rows moves with it.
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

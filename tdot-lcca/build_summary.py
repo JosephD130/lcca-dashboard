@@ -291,12 +291,19 @@ def build_scratch(path):
     ws.cell(MAP0, DC, 'MAP DATA (embedded coordinates and state outline; reference only, do not edit)').font = F_H
     hdr(MAP0 + 1, DC, ['Airport', 'FAA ID', 'Longitude', 'Latitude', 'Region', 'Elevation (ft)', None,
                        'This project: longitude', 'Latitude', 'Label', None, 'Outline longitude', 'Outline latitude'])
-    for i, (name, ident, region, lon, lat, elev) in enumerate(geo_data.AIRPORTS):
+    REGIONS = ['West', 'Middle', 'East']          # the TDOT Grand Divisions, the grouping Pay_Items is built around
+    ordered, bands = [], {}
+    for reg in REGIONS:
+        start = A0 + len(ordered)
+        ordered += [a for a in geo_data.AIRPORTS if a[2] == reg]
+        bands[reg] = (start, A0 + len(ordered) - 1)
+    ordered += [a for a in geo_data.AIRPORTS if a[2] not in REGIONS]
+    for i, (name, ident, region, lon, lat, elev) in enumerate(ordered):
         r = A0 + i
         for k, v in enumerate([name, ident, lon, lat, region, elev]):
             c = ws.cell(r, DC + k, v); c.font = F_DATA
             if k in (2, 3): c.number_format = '0.00000'
-    AN = len(geo_data.AIRPORTS)
+    AN = len(ordered)
     ID_ = f'${L(DC+1)}${A0}:${L(DC+1)}${A0+AN-1}'
     LON_ = f'${L(DC+2)}${A0}:${L(DC+2)}${A0+AN-1}'
     LAT_ = f'${L(DC+3)}${A0}:${L(DC+3)}${A0+AN-1}'
@@ -320,24 +327,35 @@ def build_scratch(path):
     outline = scatter(DC + 11, DC + 12, A0, BN)
     outline.marker.symbol = 'none'; outline.graphicalProperties.line.solidFill = '9AA0A6'; outline.graphicalProperties.line.width = 9525
     outline.tx = SeriesLabel(v='Tennessee')
-    dots = scatter(DC + 2, DC + 3, A0, A0 + AN - 1)
-    dots.marker.symbol = 'circle'; dots.marker.size = 4
-    dots.marker.graphicalProperties.solidFill = 'BFC5CC'; dots.marker.graphicalProperties.line.solidFill = 'BFC5CC'
-    dots.graphicalProperties.line.noFill = True; dots.tx = SeriesLabel(v='Airports in the dropdown')
+    DIV_RGB = {'West': '7FA8CF', 'Middle': '2A78D6', 'East': '1D3F6E'}
+    divisions = []
+    for reg in REGIONS:
+        r1, r2 = bands[reg]
+        d_ = scatter(DC + 2, DC + 3, r1, r2)
+        d_.marker.symbol = 'circle'; d_.marker.size = 4
+        d_.marker.graphicalProperties.solidFill = DIV_RGB[reg]; d_.marker.graphicalProperties.line.solidFill = DIV_RGB[reg]
+        d_.graphicalProperties.line.noFill = True; d_.tx = SeriesLabel(v=reg)
+        divisions.append(d_)
     here = scatter(DC + 7, DC + 8, A0, A0)
     here.marker.symbol = 'circle'; here.marker.size = 9
     here.marker.graphicalProperties.solidFill = 'C1440E'; here.marker.graphicalProperties.line.solidFill = '7F2D09'
     here.graphicalProperties.line.noFill = True
     here.tx = SeriesLabel(strRef=StrRef(f"Summary!${L(DC+9)}${A0}"))
     here.dLbls = DataLabelList(showSerName=True, showVal=False, showCatName=False, showLegendKey=False, dLblPos='r')
-    for sr in (outline, dots, here): mc.series.append(sr)
+    for sr in [outline] + divisions + [here]: mc.series.append(sr)
     mc.x_axis.scaling.min, mc.x_axis.scaling.max = -90.6, -81.4
     mc.y_axis.scaling.min, mc.y_axis.scaling.max = 34.8, 36.9
     for ax, t in ((mc.x_axis, 'Longitude'), (mc.y_axis, 'Latitude')):
         ax.delete = False; ax.title = t; ax.majorTickMark = 'none'; ax.minorTickMark = 'none'
         ax.majorGridlines = None; ax.numFmt = ';;;'      # the axes are named but degree values would only be noise
-    ws['S2'] = 'PROJECT LOCATION'; ws['S2'].font = F_H
+    for col in range(19, 23):                       # S:V band, the card header
+        c = ws.cell(2, col); c.fill = PatternFill('solid', fgColor='1D2733')
+        c.font = Font(name='Arial', size=10, bold=True, color='FFFFFF')
+    ws['S2'] = 'PROJECT LOCATION'
     ws.add_chart(mc, 'S3')
+    for k, (reg, rgb) in enumerate(list(DIV_RGB.items()) + [('This project', 'C1440E')]):
+        c = ws.cell(17, 19 + k, '\u25a0 ' + reg)     # legend in cells: the plot keeps its full height
+        c.font = Font(name='Arial', size=9, bold=True, color=rgb)
 
     ws['S19'] = 'PROJECT'; ws['S19'].font = F_H
     county = f'IFERROR(VLOOKUP({GI_}!$D$9,{GI_}!$L$10:$Q$88,4,FALSE),"")'
@@ -351,13 +369,23 @@ def build_scratch(path):
     for k, (lab, f) in enumerate(rowsS):
         ws.cell(20 + k, 19, lab).font = F_B
         ws.cell(20 + k, 20, f).font = F_B
-    ws['S27'] = 'Runway width for the map export (ft)'; ws['S27'].font = F_B
+    ws['S27'] = 'Runway width, ft'; ws['S27'].font = F_B
     c = ws['T27']; c.value = 100; c.number_format = '0'; c.font = F_B
     c.fill = PatternFill('solid', fgColor='D9D9D9'); c.border = BOX
-    ws['S28'] = 'Coordinates are embedded (Method sheet); nothing here goes online. Five private fields have none and plot no dot.'
-    ws['S29'] = 'Google Earth: import LCCA_KML_Export.bas once (Alt+F11, File, Import File), then Alt+F8 and run ExportLCCAKML.'
-    ws['S28'].font = F_N
+    ws['S28'] = (f'=IF({GI_}!$D$9="","","Pricing basis: every unit cost comes from the single Pay_Items \'Unit Cost\' column. '
+                 f'The Middle, West and East average-cost columns beside it are empty, so this '
+                 f'"&{GI_}!$D$13&" division project is priced on the same statewide numbers as any other.")')
+    ws['S28'].font = Font(name='Arial', size=9, color='7F6000')
+    ws['S28'].fill = PatternFill('solid', fgColor='FFF3CD')
+    ws['S29'] = 'Coordinates are embedded (Method sheet); nothing here goes online. Five private fields have none and plot no dot.'
+    ws['S30'] = 'Google Earth: import LCCA_KML_Export.bas once (Alt+F11, File, Import File), then Alt+F8 and run ExportLCCAKML.'
     ws['S29'].font = F_N
+    ws['S30'].font = F_N
+    # the chart-data block starts at column W, so these notes are merged and wrapped instead of spilling into it
+    for row, ht in ((28, 44), (29, 26), (30, 26)):
+        ws.merge_cells(start_row=row, start_column=19, end_row=row, end_column=22)
+        ws.cell(row, 19).alignment = Alignment(wrap_text=True, vertical='top')
+        ws.row_dimensions[row].height = ht
 
     dxf_low = DifferentialStyle(fill=PatternFill(bgColor='FFDDEBF7'), font=Font(bold=True, color='FF1F3864'))
     for sqref, f in [('G4:R7', 'AND($G4<>"",COUNT($O$4:$O$7)>0,$O4=MIN($O$4:$O$7))'),

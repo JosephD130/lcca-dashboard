@@ -105,6 +105,13 @@ and a PROJECT LOCATION block to the right of the table: a locator map of Tenness
 the dropdown as grey dots and this project as a labelled orange dot, and under it the airport, city and
 county, region, coordinates, elevation, branch and mainline area.
 
+The map colours the airports by TDOT Grand Division, light blue for West, blue for Middle and navy for East, with a
+legend beside it. That is the same grouping Pay_Items is built around, and it makes a gap visible: Pay_Items carries a
+header "Average Pay Item Unit Cost" spanning Middle, West and East columns, and all three are empty. Every alternative
+prices off the single Unit Cost column, so a West-division project is estimated on the same statewide numbers as a
+Middle one. A line under the project block says so and names the project's division. Nothing was changed about how
+costs are calculated; the Method sheet now lists it among the assumptions worth a decision.
+
 The map is an ordinary scatter chart. The state outline and the airport coordinates are embedded in the
 workbook (map-data block on the Summary at row 115, outside the print area, with the rest of the chart data),
 so it draws with no internet connection, no Bing map service and no add-in: the file stays self-contained.
