@@ -214,8 +214,11 @@ square.
 - Overview text: Neel-Schaffer's rewrite (2022 APTech / 2026 NS+ARA history, the four airport
   criteria) is in their review doc; paste it once Mat approves the wording.
 - Salvage asymmetry: PCC recovers 25% of total initial cost (incl. mobilization), HMA 12.5% of one
-  mill-and-overlay. In SRB that line alone decides the result. Left as policy; the new sensitivity
-  block makes it visible.
+  mill-and-overlay. At Murfreesboro that line alone decides the answer: PCC wins by $780,532 as the
+  workbook stands, and putting both alternatives on the HMA rule turns it into HMA by $63,633. At
+  Upper Cumberland HMA wins under every variant, so there the rule moves the margin (from $586K to
+  $2.1M on a common rule) but not the winner. Left as policy; the decision workbook's salvage
+  multiplier and the new sensitivity block make it visible.
 - Lost revenue counts gross fuel sales and tenant rent as lost during a runway closure. A per-category
   "% lost during closure" factor on RevenueData would be more defensible.
 - FAA AIP discount rate: PGL 22-01 (June 2022) replaced the fixed 7% with OMB A-94 real rates (2.0% for
