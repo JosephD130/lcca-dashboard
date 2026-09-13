@@ -1,0 +1,87 @@
+==============================================================================
+PACKAGE
+==============================================================================
+PASS  zip test: every part parses
+PASS  VBA project still present
+PASS  all 106 ActiveX controls kept   |   106
+PASS  every ActiveX binary keeps a content type
+PASS  printer settings removed
+PASS  no page setup still points at a printer part
+PASS  Power Query stub removed
+PASS  cached SharePoint path removed
+PASS  document properties carry no personal names   |   ['TDOT Aeronautics Division / Applied Research Associates', 'ARA']
+PASS  external links removed
+PASS  calculation chain dropped (full recalc on open)
+PASS  no cell carries an invalid style id
+
+==============================================================================
+SHEETS
+==============================================================================
+PASS  sheet order unchanged, Typical Values and Method appended last   |   ['TMP(NewPCC)_IndirectCost', 'Overview', 'Instructions', 'General Information', 'Pay_Items', 'Database', 'Maintenance Policies', 'TMP(NewHMA)_IndirectCost', 'Re
+PASS  the four templates stay hidden
+PASS  Database and RevenueData stay hidden
+
+==============================================================================
+SUMMARY LAYOUT
+==============================================================================
+PASS  columns A to F hidden (the block the form writes)   |   {'A': True, 'B': True, 'C': True, 'D': True, 'E': True, 'F': True, 'G': False}
+PASS  column G onward visible
+PASS  navigation buttons sit in the first visible column   |   ('=HYPERLINK("#\'General Information\'!D9","◄ General Information")', '=HYPERLINK("#Instructions!B9","Instructions")')
+PASS  title moved beside the buttons
+PASS  note explains the hidden block
+PASS  results table header intact   |   ['Worksheet', 'Alternative', 'Type', 'Initial construction', 'Maintenance PW', 'Rehabilitation PW', 'Lost revenue PW', 'Salvage PW', 'Net present worth', 'vs. l
+PASS  results table reads the Database sheet by INDEX (survives a row deletion)
+PASS  comparison block present (RealCost layout)
+PASS  section block present with both description strings
+PASS  asphalt unit weight is an input cell
+PASS  chart-data block labelled do not edit
+PASS  an alternative that does not exist gets no name   |   =IF($H$4="","",$H$4)
+PASS  print areas defined for the Summary and General Information   |   ['Summary!$A$1:$U$112', "'General Information'!$A$1:$J$48"]
+
+==============================================================================
+CHARTS
+==============================================================================
+PASS  thirteen charts: six original, seven new on the Summary   |   13
+PASS  chart1.xml names both axes   |   ['Alternative 2', 'Calendar year', 'Cost ($)']
+PASS  chart2.xml names both axes   |   ['Alternative 1', 'Calendar year', 'Cost ($)']
+PASS  chart3.xml names both axes   |   ['Alternative 1', 'Calendar year', 'Cost ($)']
+PASS  chart4.xml names both axes   |   ['Alternative 2', 'Calendar year', 'Cost ($)']
+PASS  chart5.xml names both axes   |   ['Alternative 3', 'Calendar year', 'Cost ($)']
+PASS  chart6.xml names both axes   |   ['Alternatives Comparison', 'Alternative', 'Cost ($)']
+PASS  chart7.xml names both axes   |   ['1. Present worth by category (salvage below zero)', 'Alternative', 'Present worth ($)']
+PASS  chart8.xml names both axes   |   ['2. Net present worth vs. discount rate (TDOT 3%, FAA 2%, pre-2022 rule 7%)', 'Discount rate (%)', 'Net present worth ($)']
+PASS  chart9.xml names both axes   |   ['3. Expenditure stream by calendar year (undiscounted)', 'Calendar year', 'Spend, undiscounted ($)']
+PASS  chart10.xml names both axes   |   ['4. Cumulative discounted cost', 'Calendar year', 'Cumulative discounted cost ($)']
+PASS  chart11.xml names both axes   |   ['5. Runway closure days by calendar year', 'Calendar year', 'Closure days']
+PASS  chart12.xml names both axes   |   ['6. Pavement section, mainline (inches, surface on top)', 'Alternative', 'Thickness (inches)']
+PASS  chart13.xml names both axes   |   ['7. Pavement section with the shoulder (empty unless a shoulder area is entered)', 'Alternative', 'Thickness (inches)']
+PASS  the seven Summary charts put the legend beside the plot   |   [['r'], ['r'], ['r'], ['r'], ['r'], ['r'], ['r']]
+PASS  money axes read to one decimal in millions
+PASS  the original Alternatives Comparison chart plots the hidden columns
+PASS  the alternative-sheet charts keep calendar years on the category axis
+
+==============================================================================
+METHOD AND TYPICAL VALUES
+==============================================================================
+PASS  Method sheet has its navigation buttons
+PASS  Method sheet states it feeds nothing
+PASS  eleven sections, in order   |   ['1. The answer the workbook produces', '2. Step 1: initial construction cost', '3. Step 2: when the later work happens', '4. Step 3: what each maintenance and 
+PASS  the live block reads the workbook (period, rate, CRF, discount factor, alternatives)   |   14
+PASS  documented formulas are stored as text, not evaluated   |   29
+PASS  assumptions section names the four open questions
+PASS  Typical Values sources are plain text, not hyperlinks   |   45
+PASS  only the original tn.gov hyperlink object remains
+
+==============================================================================
+GENERAL INFORMATION
+==============================================================================
+PASS  analysis period default 30 years
+PASS  discount rate default 3 percent
+PASS  airport dropdown covers all 79 airports (D9 list = L10:L88)   |   ['$S$9:$S$12', '$S$16:$S$18', '$L$10:$L$88', '"No, Yes"']
+PASS  79 airports and 17 with revenue data behind it   |   (79, 17)
+PASS  three navigation buttons: Summary, Typical Values, Method   |   ['=HYPERLINK("#Summary!G1","View Summary  ►")', '=HYPERLINK("#\'Typical Values\'!A1","Typical Values  ►")', '=HYPERLINK("#Method!A1","Method  ►")']
+PASS  how-to card and live status line present
+PASS  input hints beside the parameters
+
+==============================================================================
+ALL PASS

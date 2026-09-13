@@ -646,15 +646,15 @@
    "Alternative 1 spend",
    "Alternative 2 spend",
    "Alternative 3 spend",
-   "Alt 4 spend",
+   "",
    "Alternative 1 cumulative PW",
    "Alternative 2 cumulative PW",
    "Alternative 3 cumulative PW",
-   "Alt 4 cumulative PW",
+   "",
    "Alternative 1 closure days",
    "Alternative 2 closure days",
    "Alternative 3 closure days",
-   "Alt 4 closure days",
+   "",
    ""
   ],
   "byyear": [
