@@ -11,6 +11,9 @@ from openpyxl import load_workbook
 warnings.filterwarnings('ignore')
 
 DEFAULT_WIDTH_FT = 100.0
+ROW0, ROW1 = 12, 15          # the results table on the Summary (the dashboard strip sits above it)
+SEC_OFF = 81                 # section description row = SEC_OFF + results row
+A0 = 132                     # first airport row of the map-data block
 TALLEST_BAR_M = 700.0
 FT_PER_DEG_LAT = 364000.0
 
@@ -45,7 +48,7 @@ def build(path_wb, path_out):
     wb = load_workbook(path_wb, data_only=True)
     gi, sm, db = wb['General Information'], wb['Summary'], wb['Database']
     g = lambda ref: gi[ref].value
-    lon, lat = sm['AD117'].value, sm['AE117'].value
+    lon, lat = sm.cell(A0, 30).value, sm.cell(A0, 31).value
     assert isinstance(lon, (int, float)) and isinstance(lat, (int, float)), 'no coordinates for this airport'
 
     L = []
@@ -88,15 +91,15 @@ def build(path_wb, path_out):
     d += ('<table border="1" cellpadding="4" cellspacing="0"><tr><th>Alternative</th><th>Type</th><th>Initial</th>'
           '<th>Net present worth</th><th>Closure days</th><th>Section</th></tr>')
     rows = []
-    for r in range(4, 8):
+    for r in range(ROW0, ROW1 + 1):
         if sm.cell(r, 7).value:
             rows.append((r, sm.cell(r, 8).value, sm.cell(r, 9).value, sm.cell(r, 10).value,
-                         sm.cell(r, 15).value, sm.cell(r, 17).value, sm.cell(79 + r, 16).value, sm.cell(r, 7).value))
+                         sm.cell(r, 15).value, sm.cell(r, 17).value, sm.cell(SEC_OFF + r, 16).value, sm.cell(r, 7).value))
     for _, name, typ, init, npw, days, sec, _ws in rows:
         d += (f'<tr><td>{name}</td><td>{typ}</td><td align="right">{money(init)}</td>'
               f'<td align="right">{money(npw)}</td><td align="right">{days}</td><td>{sec}</td></tr>')
     d += '</table>'
-    d += f'<p><b>{sm["G9"].value}</b><br/>{sm["G10"].value}</p>'
+    d += f'<p><b>{sm["G17"].value}</b><br/>{sm["G18"].value}</p>'
     w('  <Placemark>')
     w('    <name>%s</name>' % X('%s (%s)' % (g('D9'), g('D10'))))
     w(f'    <description><![CDATA[{d}]]></description>')

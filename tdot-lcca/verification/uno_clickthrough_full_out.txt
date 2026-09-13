@@ -4,9 +4,19 @@
   PASS  template opens with no error cells  |  none
   PASS  button TMP(NewPCC)_IndirectCost!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
   PASS  button TMP(NewPCC)_IndirectCost!C1 "Summary" -> Summary!G1  |  visible=True landed=Summary
+  PASS  button Overview!B1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
+  PASS  button Overview!E1 "Summary" -> Summary!G1  |  visible=True landed=Summary
+  PASS  button Instructions!B1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
+  PASS  button Instructions!E1 "Summary" -> Summary!G1  |  visible=True landed=Summary
   PASS  button General Information!D44 "View Summary  ►" -> Summary!G1  |  visible=True landed=Summary
   PASS  button General Information!D46 "Typical Values  ►" -> 'Typical Values'!A1  |  visible=True landed=Typical Values
   PASS  button General Information!D48 "Method  ►" -> Method!A1  |  visible=True landed=Method
+  PASS  button General Information!D50 "Pay_Items  ►" -> Pay_Items!A1  |  visible=True landed=Pay_Items
+  PASS  button General Information!D52 "Maintenance Policies  ►" -> 'Maintenance Policies'!C2  |  visible=True landed=Maintenance Policies
+  PASS  button Pay_Items!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
+  PASS  button Pay_Items!B1 "Summary" -> Summary!G1  |  visible=True landed=Summary
+  PASS  button Maintenance Policies!B1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
+  PASS  button Maintenance Policies!C1 "Summary" -> Summary!G1  |  visible=True landed=Summary
   PASS  button TMP(NewHMA)_IndirectCost!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
   PASS  button TMP(NewHMA)_IndirectCost!C1 "Summary" -> Summary!G1  |  visible=True landed=Summary
   PASS  button TMP(NewHMA)!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
@@ -21,7 +31,7 @@
   PASS  button Typical Values!B1 "Summary" -> Summary!G1  |  visible=True landed=Summary
   PASS  button Method!A1 "◄ General Information" -> 'General Information'!D9  |  visible=True landed=General Information
   PASS  button Method!B1 "Summary" -> Summary!G1  |  visible=True landed=Summary
-  PASS  every sheet is reachable or deliberately hidden  |  19 hyperlink buttons
+  PASS  every sheet is reachable or deliberately hidden  |  29 hyperlink buttons
   PASS  blank template says so on the Summary  |  No alternatives yet. Go to General Information and click Alternative Setup.
   PASS  input checklist lists what is missing  |  Still needed: Airport Name, Construction Year, Mainline Area, Markings Area
   PASS  checklist clears when the required inputs are filled  |  All required inputs are filled. Next: click Alternative Setup.
@@ -35,9 +45,9 @@
 2. POPULATED WORKBOOK  MBT_check.xlsm  (scenarios and the section read-back)
 ==============================================================================
   PASS  only the pre-existing template errors are present  |  {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}
-  PASS  NPW unchanged by everything added  |  8,809,266.42 / 8,028,734.49
+  PASS  NPW unchanged by everything added  |  8809266.42 / 8028734.49
   PASS  agency + user = total in the comparison block
-  PASS  EUAC matches the closed form  |  449,442.25
+  PASS  EUAC matches the closed form  |  449442.25
   PASS  section read-back reproduces the typed description  |  5" P401 on 16" P209
   PASS  excavation check agrees for the asphalt alternative  |  agrees
   PASS  excavation check flags the 8 in / 9 in concrete mismatch  |  differs by -1.0 in
@@ -57,4 +67,4 @@
   PASS  restored to two alternatives
 
 ==============================================================================
-50 passed, 0 failed
+60 passed, 0 failed

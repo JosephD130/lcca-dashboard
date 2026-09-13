@@ -18,6 +18,11 @@ Attribute VB_Name = "LCCA_KML_Export"
 Option Explicit
 
 Private Const DEFAULT_WIDTH_FT As Double = 100#   ' used if Summary T27 is empty
+' Where the Summary keeps things. The dashboard strip sits above the results table, so these moved in
+' v1.2.0; they are the same numbers build_summary.py lays the sheet out with.
+Private Const ROW0 As Long = 12                   ' first alternative row of the results table
+Private Const ROW1 As Long = 15                   ' last
+Private Const SEC_OFF As Long = 81                ' section description row = SEC_OFF + results row
 Private Const TALLEST_BAR_M As Double = 700#      ' the largest present worth stands this high
 Private Const FT_PER_DEG_LAT As Double = 364000#
 
@@ -40,10 +45,10 @@ Public Sub ExportLCCAKML()
     End If
 
     ' the coordinates sit in the map-data block on the Summary (embedded reference values)
-    hasGeo = IsNumeric(sm.Range("AD117").Value) And IsNumeric(sm.Range("AE117").Value)
+    hasGeo = IsNumeric(sm.Range("AD132").Value) And IsNumeric(sm.Range("AE132").Value)
     If hasGeo Then
-        lon = CDbl(sm.Range("AD117").Value)
-        lat = CDbl(sm.Range("AE117").Value)
+        lon = CDbl(sm.Range("AD132").Value)
+        lat = CDbl(sm.Range("AE132").Value)
     Else
         MsgBox "This airport has no published coordinates in the reference list, so the export has no" & vbCrLf & _
                "place to put. Pick another airport or add its coordinates to the map-data block.", vbExclamation, "LCCA export"
@@ -132,17 +137,17 @@ Private Sub WriteAirport(ByVal f As Integer, gi As Worksheet, sm As Worksheet, B
 
     d = d & "<table border=""1"" cellpadding=""4"" cellspacing=""0"">"
     d = d & "<tr><th>Alternative</th><th>Type</th><th>Initial</th><th>Net present worth</th><th>Closure days</th><th>Section</th></tr>"
-    For r = 4 To 7
+    For r = ROW0 To ROW1
         If Len(CStr(sm.Cells(r, 7).Value)) > 0 Then
             d = d & "<tr><td>" & CStr(sm.Cells(r, 8).Value) & "</td><td>" & CStr(sm.Cells(r, 9).Value) & "</td>" & _
                 "<td align=""right"">" & Money(sm.Cells(r, 10).Value) & "</td>" & _
                 "<td align=""right"">" & Money(sm.Cells(r, 15).Value) & "</td>" & _
                 "<td align=""right"">" & CStr(sm.Cells(r, 17).Value) & "</td>" & _
-                "<td>" & CStr(sm.Cells(79 + r, 16).Value) & "</td></tr>"
+                "<td>" & CStr(sm.Cells(SEC_OFF + r, 16).Value) & "</td></tr>"
         End If
     Next r
     d = d & "</table>"
-    d = d & "<p><b>" & CStr(sm.Range("G9").Value) & "</b><br/>" & CStr(sm.Range("G10").Value) & "</p>"
+    d = d & "<p><b>" & CStr(sm.Range("G17").Value) & "</b><br/>" & CStr(sm.Range("G18").Value) & "</p>"
 
     Print #f, "  <Placemark>"
     Print #f, "    <name>" & X(CStr(gi.Range("D9").Value) & " (" & CStr(gi.Range("D10").Value) & ")") & "</name>"
@@ -173,7 +178,7 @@ Private Sub WriteAlternatives(ByVal f As Integer, gi As Worksheet, sm As Workshe
     period = CLng(gi.Range("D33").Value)
 
     best = 0: worst = 0
-    For r = 4 To 7
+    For r = ROW0 To ROW1
         If Len(CStr(sm.Cells(r, 7).Value)) > 0 Then
             npw = CDbl(sm.Cells(r, 15).Value)
             If best = 0 Then best = npw
@@ -185,7 +190,7 @@ Private Sub WriteAlternatives(ByVal f As Integer, gi As Worksheet, sm As Workshe
     If worst > 0 Then barScale = TALLEST_BAR_M / (worst / 1000000#)   ' the tallest bar is always the same height
 
     k = 0
-    For r = 4 To 7
+    For r = ROW0 To ROW1
         wsName = CStr(sm.Cells(r, 7).Value)
         If Len(wsName) > 0 Then
             altName = CStr(sm.Cells(r, 8).Value)
@@ -195,7 +200,7 @@ Private Sub WriteAlternatives(ByVal f As Integer, gi As Worksheet, sm As Workshe
             Print #f, "    <name>" & X(altName & " - " & Money(npw) & IIf(npw = best, " (lowest)", "")) & "</name>"
 
             If lengthFt > 0 Then WriteRunway f, lat, lon, bearing, lengthFt, widthFt, k, style, _
-                                              altName & " footprint", CStr(sm.Cells(79 + r, 16).Value)
+                                              altName & " footprint", CStr(sm.Cells(SEC_OFF + r, 16).Value)
             WriteBar f, lat, lon, k, style, altName, npw, barScale
             On Error Resume Next
             Set ws = ThisWorkbook.Worksheets(wsName)

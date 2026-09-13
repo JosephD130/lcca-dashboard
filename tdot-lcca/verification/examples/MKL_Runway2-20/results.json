@@ -1493,7 +1493,35 @@
     0.0,
     11.0
    ]
-  }
+  },
+  "kpi": [
+   "LOWEST PRESENT WORTH",
+   "MARGIN TO NEXT",
+   "EQUIVALENT ANNUAL COST",
+   "$14,066,568",
+   "$527,651",
+   "$717,666",
+   "Alternative 2 - 9\" P501 on 8\" P209 on 8\" P154",
+   "3.8% - under 5%, treat the two as tied",
+   "per year, 30 years at 3%",
+   "INITIAL CONSTRUCTION",
+   "UNIT COST",
+   "RATE SENSITIVITY",
+   "$13,830,666",
+   "$138 / S.Y.",
+   "holds 2-8%",
+   "of the lowest-cost alternative, including 10% mobilization and 5% engineering",
+   "initial construction over the mainline area; see the benchmark under chart 5",
+   "the lowest-cost alternative is the same at every rate tested"
+  ],
+  "benchmark": [
+   123.62196843286739,
+   138.1919558433167,
+   146.59494286408946,
+   144.0694540198302,
+   210.0,
+   70.0
+  ]
  },
  "checks": [
   {
@@ -1655,6 +1683,51 @@
    "check": "By-year cumulative PW for Alt 4 ends at its NPW",
    "ok": true,
    "detail": "(14594219.499294514, 14594219.499294514)"
+  },
+  {
+   "check": "six KPI tiles above the results table",
+   "ok": true,
+   "detail": "['LOWEST PRESENT WORTH', 'MARGIN TO NEXT', 'EQUIVALENT ANNUAL COST', 'INITIAL CONSTRUCTION', 'UNIT COST', 'RATE SENSITIVITY']"
+  },
+  {
+   "check": "lowest-present-worth tile equals the smallest NPW in the table",
+   "ok": true,
+   "detail": "('$14,066,568', '$14,066,568')"
+  },
+  {
+   "check": "margin tile equals the gap between the two best",
+   "ok": true,
+   "detail": "('$527,651', '$527,651')"
+  },
+  {
+   "check": "equivalent annual cost tile equals lowest NPW x CRF",
+   "ok": true,
+   "detail": "('$717,666', '$717,666')"
+  },
+  {
+   "check": "initial construction tile equals the winner initial cost",
+   "ok": true,
+   "detail": "('$13,830,666', 13830665.516666666)"
+  },
+  {
+   "check": "unit cost tile equals initial construction over the mainline area",
+   "ok": true,
+   "detail": "('$138 / S.Y.', 100083)"
+  },
+  {
+   "check": "rate sensitivity tile agrees with the sensitivity block",
+   "ok": true,
+   "detail": "('holds 2-8%', {1})"
+  },
+  {
+   "check": "benchmark plots each alternative unit cost and the published band",
+   "ok": true,
+   "detail": "[123.62196843286739, 138.1919558433167, 146.59494286408946, 144.0694540198302, 210.0, 70.0]"
+  },
+  {
+   "check": "chart 1 category block repeats the table, row for row",
+   "ok": true,
+   "detail": "{'Initial construction': [12372457.466666667, 13830665.516666666, 14671661.666666666, 14418903.166666666], 'Maintenance': [2379784.6486064806, 784497.3309251041, 2379784.6486064806, 784497.3309251041], 'Rehabilitation': [1410821.987527287, 724784.1908742345, 1410821.987527287, 724784.1908742345], 'Lost revenue': [496242.5292610352, 151134.10868066942, 496242.5292610352, 151134.10868066942], 'Salvage': [-131223.0069901947, -1424512.7670399721, -131223.0069901947, -1485099.2978521602]}"
   },
   {
    "check": "Verdict names the lowest-NPW alternative",

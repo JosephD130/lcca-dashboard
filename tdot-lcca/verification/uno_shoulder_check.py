@@ -32,6 +32,8 @@ for r,lab in zip(range(83,87), rows.values()):
         ok&=good
         if base: print(f'   {lab:16} {col}: {base:6.2f} -> {got:6.2f}  expected {want:6.2f}  {"ok" if good else "MISMATCH"}')
 print('\nsection table under the shoulder case (the table itself stays on mainline area):')
-for r in (83,84): print('   ', [round(v,2) if isinstance(v,float) else v for v in [sm.getCellRangeByName(f'{c}{r}').getValue() if c in 'HIJLM' else sm.getCellRangeByName(f'{c}{r}').getString() for c in 'GHIJKLMNP']])
+# the section block rows for the first two alternatives
+for r in (93, 94):
+    print('   ', [round(v,2) if isinstance(v,float) else v for v in [sm.getCellRangeByName(f'{c}{r}').getValue() if c in 'HIJLM' else sm.getCellRangeByName(f'{c}{r}').getString() for c in 'GHIJKLMNP']])
 print('\nRESULT:', 'shoulder scaling verified' if ok else 'FAILED')
 gi.getCellRangeByName('D27').setValue(0); doc.close(True); proc.terminate()

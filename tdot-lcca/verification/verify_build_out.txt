@@ -35,13 +35,13 @@ PASS  comparison block present (RealCost layout)
 PASS  section block present with both description strings
 PASS  asphalt unit weight is an input cell
 PASS  chart-data block labelled do not edit
-PASS  an alternative that does not exist gets no name   |   =IF($H$4="","",$H$4)
-PASS  print areas defined for the Summary and General Information   |   ['Summary!$A$1:$V$112', "'General Information'!$A$1:$J$48"]
+PASS  an alternative that does not exist gets no name   |   =IF($H$12="","",$H$12)
+PASS  print areas defined for the Summary and General Information   |   ['Summary!$A$1:$V$141', "'General Information'!$A$1:$J$52"]
 
 ==============================================================================
 CHARTS
 ==============================================================================
-PASS  fourteen charts: six original, seven new on the Summary, one locator map   |   14
+PASS  fifteen charts: six original, eight on the Summary, one locator map   |   15
 PASS  chart1.xml names both axes   |   ['Alternative 2', 'Calendar year', 'Cost ($)']
 PASS  chart2.xml names both axes   |   ['Alternative 1', 'Calendar year', 'Cost ($)']
 PASS  chart3.xml names both axes   |   ['Alternative 1', 'Calendar year', 'Cost ($)']
@@ -55,11 +55,26 @@ PASS  chart10.xml names both axes   |   ['4. Cumulative discounted cost', 'Calen
 PASS  chart11.xml names both axes   |   ['5. Runway closure days by calendar year', 'Calendar year', 'Closure days']
 PASS  chart12.xml names both axes   |   ['6. Pavement section, mainline (inches, surface on top)', 'Alternative', 'Thickness (inches)']
 PASS  chart13.xml names both axes   |   ['7. Pavement section with the shoulder (empty unless a shoulder area is entered)', 'Alternative', 'Thickness (inches)']
-PASS  chart14.xml names both axes   |   ['Longitude', 'Latitude']
+PASS  chart14.xml names both axes   |   ['8. Unit cost against published Tennessee runway work', 'Alternative', 'Initial construction / mainline S.Y.']
+PASS  chart15.xml names both axes   |   ['Longitude', 'Latitude']
 PASS  the seven Summary charts put the legend beside the plot   |   [['r'], ['r'], ['r'], ['r'], ['r'], ['r'], ['r']]
 PASS  money axes read to one decimal in millions
 PASS  the original Alternatives Comparison chart plots the hidden columns
 PASS  the alternative-sheet charts keep calendar years on the category axis
+
+==============================================================================
+DASHBOARD STRIP
+==============================================================================
+PASS  six KPI tiles above the results table   |   ['LOWEST PRESENT WORTH', 'MARGIN TO NEXT', 'EQUIVALENT ANNUAL COST', 'INITIAL CONSTRUCTION', 'UNIT COST', 'RATE SENSITIVITY']
+PASS  every tile is a formula over cells that already exist   |   ['=IF(COUNT($O$12:$O$15)=0,"-",TEXT(MIN($O$12:$O$15),"$#,##0"))', '=IF(COUNT($O$12:$O$15)<2,"-",TEXT(IF(COUNT($O$12:$O$15)<2,0,SMALL($O$12:$O$15,2)-MIN($O$12:$O
+PASS  the tiles are merged across four columns each   |   21
+PASS  bars inside the net present worth column   |   {'O12:O15': 'dataBar', 'K3:N5': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
+PASS  the margin tile turns amber only when the two best are within five percent   |   {'O12:O15': 'dataBar', 'K3:N5': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
+PASS  lowest-cost row still highlighted in both tables   |   {'O12:O15': 'dataBar', 'K3:N5': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
+PASS  chart 8 is the unit-cost benchmark: a stacked bar whose first series is invisible   |   (1, True, True)
+PASS  the published band is one grey point carrying its own value label   |   (1, 1)
+PASS  the band comes from cells, so it can be moved without touching the chart   |   (210, 70)
+PASS  chart 8 sits beside chart 5 and carries its own note   |   Chart 8 divides each alternative's initial construction by t
 
 ==============================================================================
 LOCATOR MAP AND PROJECT IDENTITY
@@ -70,16 +85,16 @@ PASS  79 airports in the map block, 74 with published coordinates   |   (79, 74)
 PASS  coordinates fall inside Tennessee
 PASS  state outline embedded with gaps between segments   |   (179, 213)
 PASS  the selected airport is looked up, not typed
-PASS  locator map has the outline, the three Grand Divisions and this project   |   [('barChart', 5), ('lineChart', 4), ('barChart', 4), ('lineChart', 4), ('barChart', 4), ('barChart', 4), ('barChart', 4), ('scatterChart', 5), ('barChart', 2)]
+PASS  locator map has the outline, the three Grand Divisions and this project   |   [('barChart', 5), ('lineChart', 4), ('barChart', 4), ('lineChart', 4), ('barChart', 4), ('barChart', 4), ('barChart', 4), ('barChart', 2), ('scatterChart', 5), 
 PASS  airports grouped by division so each is its own series   |   ['West', 'West', 'Middle', 'East']
 PASS  legend in cells, one per division plus this project   |   ['■ West', '■ Middle', '■ East', '■ This project']
 PASS  card header band across S2:V2
 PASS  pricing basis stated beside the map
 PASS  map axes are named and their degree labels suppressed
-PASS  project block names airport, county, region, coordinates, elevation   |   ['Airport', 'City / county', 'TDOT region', 'Coordinates', 'Elevation', 'Branch / project', 'Mainline area']
+PASS  project block names airport, county, region, coordinates, elevation   |   ['Airport', 'City / county', 'TDOT Grand Division', 'Coordinates', 'Elevation', 'Branch / project', 'Mainline area']
 PASS  the sheet says where the coordinates come from and how to export KML
 PASS  runway width for the export footprint is an input cell   |   ('Runway width, ft', 100)
-PASS  the three notes beside the map are merged so they do not run into the chart data   |   ['S28:V28', 'S29:V29', 'S30:V30']
+PASS  the three notes beside the map are merged so they do not run into the chart data   |   ['O4:R4', 'G3:J3', 'K8:N8', 'G5:J5']
 PASS  print area widened to take the map
 
 ==============================================================================
@@ -112,6 +127,25 @@ PASS  Adminimstration corrected to Administration
 PASS  clossures corrected to closures
 PASS  associeted corrected to associated
 PASS  Intial Construction corrected to Initial Construction
+
+==============================================================================
+SETUP FLOW AND THE REFERENCE SHEETS
+==============================================================================
+PASS  the how-to card names all five steps in order   |   1.   Overview and Instructions: what the framework does and the rules behind it.
+PASS  five navigation buttons on General Information, one per destination   |   ['=HYPERLINK("#Summary!G1","View Summary  ', '=HYPERLINK("#\'Typical Values\'!A1","Typic', '=HYPERLINK("#Method!A1","Method  ►")', '=HYPERLINK("#Pay_Items!A1","
+PASS  every sheet in the flow says which step it is   |   {'Overview': 'STEP 1 of 5: w', 'Instructions': 'STEP 1 of 5: h', 'Pay_Items': 'STEP 3 of 5: t', 'TMP(NewHMA)': 'STEP 4 of 5: t', 'Summary': 'STEP 5 of 5: t'}
+PASS  Overview carries the navigation row   |   [None, '=HYPERLINK("#\'General Information\'!D9","◄ General Information")']
+PASS  Instructions carries the navigation row   |   [None, '=HYPERLINK("#\'General Information\'!D9","◄ General Information")']
+PASS  Pay_Items carries the navigation row   |   ['=HYPERLINK("#\'General Information\'!D9","◄ General Information")', '=HYPERLINK("#Summary!G1","Summary")']
+PASS  Maintenance Policies carries the navigation row   |   [None, '=HYPERLINK("#\'General Information\'!D9","◄ General Information")']
+PASS  Pay_Items marks the unit-cost column as the input   |   ('FFD9D9D9', '"$"#,##0.00')
+PASS  Pay_Items keeps all 56 items, the 27 that carry a cost and the three that are formulas   |   (27, ['=7/9', '=10/2', '=6/9'])
+PASS  its Table2 is still declared over C2:I59
+PASS  Pay_Items says what the empty division columns mean and how many items carry no cost   |   29 of the 56 pay items carry no unit cost. An alte
+PASS  Pay_Items part headings band the left of the table
+PASS  Pay_Items freezes the header and repeats it in print   |   A3
+PASS  Maintenance Policies says it is reference and which table drives which alternative   |   Table 1 drives a New HMA alternative, Table 2 a New PCC alte
+PASS  the four maintenance tables carry a header band   |   ['Asphalt Maintenance', 'Concrete Maintenance', 'Asphalt Maintenance', 'Concrete Maintenance']
 
 ==============================================================================
 ALL PASS

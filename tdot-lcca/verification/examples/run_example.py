@@ -136,19 +136,23 @@ for i, (sh, kind, last) in enumerate(sheets):
     check(f'Alt {i+1} activity PW = cost / (1+r)^offset', pw_ok, [(a, yr, round(c), round(p)) for a, yr, c, p in acts][:12])
     check(f'Alt {i+1} NPW = sum of activity PW (initial included)', abs(sum(p for _, _, _, p in acts) - d['NPW']) < 1, (d['initial'], sum(p for *_, p in acts), d['NPW']))
 
+# the Summary row map: the dashboard strip sits above the results table (see build_summary.py)
+T0, VER, VER2, CMP0, SEC_T, BM = 12, 17, 18, 22, 90, 89
 S = out['summary']
-S['results'] = [{c: (txt(sm, f'{c}{r}') if c in 'GHI' else num(sm, f'{c}{r}')) for c in 'GHIJKLMNOPQR'} for r in range(4, 4 + N)]
+S['results'] = [{c: (txt(sm, f'{c}{r}') if c in 'GHI' else num(sm, f'{c}{r}')) for c in 'GHIJKLMNOPQR'} for r in range(T0, T0 + N)]
 S['AtoE'] = [[txt(sm, f'{c}{r}') if c in 'ABE' else num(sm, f'{c}{r}') for c in 'ABCDE'] for r in range(4, 4 + N)]
-S['G9'], S['G10'] = txt(sm, 'G9'), txt(sm, 'G10')
-S['comparison'] = [{c: (txt(sm, f'{c}{r}') if c == 'G' else num(sm, f'{c}{r}')) for c in 'GHIJKLMNO'} for r in range(14, 14 + N)]
+S['G9'], S['G10'] = txt(sm, f'G{VER}'), txt(sm, f'G{VER2}')
+S['comparison'] = [{c: (txt(sm, f'{c}{r}') if c == 'G' else num(sm, f'{c}{r}')) for c in 'GHIJKLMNO'} for r in range(CMP0, CMP0 + N)]
 S['sensitivity'] = {num(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(12, 37)}
 S['categories'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(5, 10)}
 S['byyear_hdr'] = [txt(sm, f'{c}40') for c in ['W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK']]
 S['byyear'] = [[num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK']] for r in range(41, 72)]
-S['section'] = [{c: (txt(sm, f'{c}{r}') if c in 'GKNPQ' else num(sm, f'{c}{r}')) for c in 'GHIJKLMNPQ'} for r in range(83, 83 + N)]
-S['unit_weight'] = num(sm, 'J81')
+S['section'] = [{c: (txt(sm, f'{c}{r}') if c in 'GKNPQ' else num(sm, f'{c}{r}')) for c in 'GHIJKLMNPQ'} for r in range(SEC_T + 3, SEC_T + 3 + N)]
+S['unit_weight'] = num(sm, f'J{SEC_T + 1}')
 S['chart_mainline'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(76, 80)}
 S['chart_shoulder'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(82, 87)}
+S['kpi'] = [txt(sm, f'{c}{r}') for r in (3, 4, 5, 7, 8, 9) for c in ('G', 'K', 'O')]
+S['benchmark'] = [num(sm, f'{c}{BM + 3}') for c in ['X', 'Y', 'Z', 'AA'][:N]] + [num(sm, f'AB{BM + 2}'), num(sm, f'AB{BM + 3}')]
 
 npws = [a['NPW'] for a in out['alternatives']]
 best = min(range(N), key=lambda k: npws[k])
@@ -161,9 +165,36 @@ for i, a in enumerate(out['alternatives']):
     closure = sum(row[9 + i] for row in S['byyear'])          # by-year closure-day column for this alternative
     check(f'Summary row {i+1} closure days = sum of the by-year closure column', abs(R['Q'] - closure) < 0.5 and closure > 0, (R['Q'], closure))
     check(f'By-year cumulative PW for Alt {i+1} ends at its NPW', abs(S['byyear'][-1][5 + i] - a['NPW']) < 1, (S['byyear'][-1][5 + i], a['NPW']))
+crf = r0 * (1 + r0) ** SC['period'] / ((1 + r0) ** SC['period'] - 1)
+
+# ---- the dashboard strip: every tile has to agree with the table under it
+money = lambda v: '$' + format(int(round(v)), ',')
+labels = S['kpi'][0:3] + S['kpi'][9:12]
+check('six KPI tiles above the results table',
+      labels == ['LOWEST PRESENT WORTH', 'MARGIN TO NEXT', 'EQUIVALENT ANNUAL COST',
+                 'INITIAL CONSTRUCTION', 'UNIT COST', 'RATE SENSITIVITY'], labels)
+vals = S['kpi'][3:6] + S['kpi'][12:15]
+check('lowest-present-worth tile equals the smallest NPW in the table', vals[0] == money(min(npws)), (vals[0], money(min(npws))))
+margin = sorted(npws)[1] - min(npws)
+check('margin tile equals the gap between the two best', vals[1] == money(margin), (vals[1], money(margin)))
+check('equivalent annual cost tile equals lowest NPW x CRF', vals[2] == money(min(npws) * crf), (vals[2], money(min(npws) * crf)))
+check('initial construction tile equals the winner initial cost', vals[3] == money(S['results'][best]['J']), (vals[3], S['results'][best]['J']))
+check('unit cost tile equals initial construction over the mainline area',
+      vals[4] == money(S['results'][best]['J'] / SC['area']) + ' / S.Y.', (vals[4], SC['area']))
+check('rate sensitivity tile agrees with the sensitivity block',
+      (vals[5] == 'holds 2-8%') == (len({min(range(N), key=lambda k: v[k]) for v in S['sensitivity'].values()}) == 1),
+      (vals[5], {min(range(N), key=lambda k: v[k]) for v in S['sensitivity'].values()}))
+check('benchmark plots each alternative unit cost and the published band',
+      all(abs(S['benchmark'][k] - S['results'][k]['J'] / SC['area']) < 0.01 for k in range(N))
+      and S['benchmark'][-2:] == [210, 70], S['benchmark'])
+check('chart 1 category block repeats the table, row for row',
+      all(abs(S['categories'][lab][k] - S['results'][k][col]) < 1
+          for k in range(N)
+          for lab, col in [('Initial construction', 'J'), ('Maintenance', 'K'), ('Rehabilitation', 'L'),
+                           ('Lost revenue', 'M'), ('Salvage', 'N')]),
+      {lab: S['categories'][lab] for lab in S['categories']})
 check('Verdict names the lowest-NPW alternative', f'Alternative {best+1}' in S['G9'], S['G9'])
 check('vs. lowest column: zero for the winner, positive elsewhere', all((abs(S['results'][k]['P']) < 1) == (k == best) for k in range(N)), [S['results'][k]['P'] for k in range(N)])
-crf = r0 * (1 + r0) ** SC['period'] / ((1 + r0) ** SC['period'] - 1)
 check('EUAC = PW x CRF', all(abs(c['L'] * crf - c['M']) < 1 and abs(c['H'] + c['J'] - c['L']) < 1 for c in S['comparison']), [(round(c['L']), round(c['M'])) for c in S['comparison']])
 s3 = S['sensitivity'].get(3.0) or S['sensitivity'].get(3)
 check('Sensitivity curve at 3% reproduces the NPWs', s3 is not None and all(abs(s3[k] - npws[k]) < 1 for k in range(N)), (s3, npws))

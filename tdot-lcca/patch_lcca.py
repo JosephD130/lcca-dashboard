@@ -4,7 +4,7 @@ Edits sheet XML in place inside the .xlsm zip so VBA, ActiveX comboboxes, charts
 tables and data validations are preserved (openpyxl would drop them).
 """
 import re, html, sys, os, zipfile, shutil
-from build_summary import transplant, add_plain_sheet, add_style, add_dxf, FONT, FILL, BORDER_BOTTOM
+from build_summary import transplant, add_plain_sheet, add_style, add_dxf, FONT, FILL, BORDER_BOTTOM, BORDER_BOX
 import build_helpers, helpers_content, build_method
 build_helpers.set_sections(helpers_content.sections()); build_helpers.HINTS.update(helpers_content.HINTS)
 
@@ -26,7 +26,8 @@ def get_row(x, r):
     return m
 
 def cell_re(ref):
-    return re.compile(r'<c r="%s"(?:\s[^>]*)?(?:/>|>.*?</c>)' % ref, re.S)
+    # the attribute run is lazy: a self-closing cell ends at its own "/>", not at the next cell's "</c>"
+    return re.compile(r'<c r="%s"(?:\s[^>]*?)?(?:/>|>.*?</c>)' % ref, re.S)
 
 def remove_cell(x, ref):
     m = get_row(x, split_ref(ref)[1]); assert m, ref
@@ -269,6 +270,17 @@ def main(src, out, mbt_mode=False):
         x = put_cell(x, 'B48', '<c r="B48"%s t="inlineStr"><is><t>How it is calculated:</t></is></c>' % (' s="%s"' % lab if lab else ''))
         x = put_cell(x, 'D48', '<c r="D48"%s t="str"><f>HYPERLINK("#Method!A1","Method  \u25ba")</f><v>Method  \u25ba</v></c>' % (' s="%s"' % btn if btn else ''))
         x = re.sub(r'<row r="48" ', '<row r="48" ht="21" customHeight="1" ', x, count=1)
+    # --- the two sheets a user passes through while setting a project up get their own buttons, so every
+    # step of the flow on the card above is one click from here
+    for row, label, target, text in [(50, 'Unit costs:', 'Pay_Items!A1', 'Pay_Items  \u25ba'),
+                                     (52, 'Maintenance policies:', "'Maintenance Policies'!C2", 'Maintenance Policies  \u25ba')]:
+        x = ensure_row(x, row)
+        x = put_cell(x, 'B%d' % row, '<c r="B%d"%s t="inlineStr"><is><t>%s</t></is></c>'
+                     % (row, ' s="%s"' % lab if lab else '', label))
+        x = put_cell(x, 'D%d' % row, '<c r="D%d"%s t="str"><f>%s</f><v>%s</v></c>'
+                     % (row, ' s="%s"' % btn if btn else '', esc('HYPERLINK("#%s","%s")' % (target, text)), text))
+        x = re.sub(r'<row r="%d"([^>]*?)(/?)>' % row,
+                   lambda m: '<row r="%d"%s ht="21" customHeight="1"%s>' % (row, m.group(1), m.group(2)), x, count=1)
     for row, hint in (build_helpers.HINTS.items() if helper_part else []):
         x = put_cell(x, 'F%d' % row, '<c r="F%d"%s t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>' % (row, ' s="%s"' % hint_style if hint_style else '', html.escape(hint, quote=False)))
     wr(gi_part, x)
@@ -329,10 +341,12 @@ def main(src, out, mbt_mode=False):
 
 
 
-GUIDE_HMA = ('Grey cells are yours: C4 to C8 project data (filled from General Information), '
-             'F4 to F10 closure days, C13 to C22 pay items and E13 to E22 quantities. Everything else calculates.')
-GUIDE_PCC = ('Grey cells are yours: C4 to C7 project data (filled from General Information), '
-             'F4 and F5 closure days, C13 to C22 pay items and E13 to E22 quantities. Everything else calculates.')
+GUIDE_HMA = ('STEP 4 of 5: the quantities for this alternative. Grey cells are yours: C4 to C8 project data '
+             '(filled from General Information), F4 to F10 closure days, C13 to C22 pay items and E13 to E22 '
+             'quantities. Everything else calculates. Unit costs come from Pay_Items.')
+GUIDE_PCC = ('STEP 4 of 5: the quantities for this alternative. Grey cells are yours: C4 to C7 project data '
+             '(filled from General Information), F4 and F5 closure days, C13 to C22 pay items and E13 to E22 '
+             'quantities. Everything else calculates. Unit costs come from Pay_Items.')
 
 
 # ------------------------------------------------------------------ design pass (look and first-run UX)
@@ -386,11 +400,12 @@ def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs):
     x = rd(gi_part)
     btn_dark = style_of(rd(summ_part), 'G1'); btn_blue = style_of(rd(summ_part), 'H1')
     for r in range(2, 8): x = ensure_row(x, r)
-    card = ('1.   Fill in the grey cells below (D9 to D39).\n'
-            '2.   Click Alternative Setup and add your alternatives.\n'
-            '3.   Click View Summary to compare them.\n'
-            'Grey cells are yours to fill in; white cells calculate themselves.\n'
-            'Typical Values lists the usual range for each input.')
+    card = ('1.   Overview and Instructions: what the framework does and the rules behind it.\n'
+            '2.   General Information (this sheet): fill in the grey cells, D9 to D39.\n'
+            '3.   Pay_Items: check the unit costs your alternatives will be priced from.\n'
+            '4.   Alternative Setup: add each alternative, then enter its quantities on the sheet it creates.\n'
+            '5.   Summary: read the comparison. It updates by itself.\n'
+            'Grey cells are yours; white cells calculate. Typical Values has the usual ranges, Method every formula.')
     x = put_cell(x, 'F2', '<c r="F2" s="%s" t="inlineStr"><is><t>HOW TO USE THIS WORKBOOK</t></is></c>' % s_title)
     x = put_cell(x, 'F3', '<c r="F3" s="%s" t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>' % (s_body, html.escape(card, quote=False)))
     missing = ('&'.join('IF(D%d="","%s, ","")' % (row, lab) for row, lab in
@@ -415,18 +430,20 @@ def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs):
           '<cfRule type="expression" dxfId="%d" priority="2"><formula>LEFT($F$9,3)&lt;&gt;"All"</formula></cfRule></conditionalFormatting>' % (d_ok, d_todo))
     x = re.sub(r'<mergeCells count="\d+">.*?</mergeCells>', '', x, flags=re.S)
     x = insert_before(x, merges + cf, ['dataValidations', 'hyperlinks', 'printOptions', 'pageMargins'])
-    x = re.sub(r'<row r="([3-7])"([^>]*?)(/?)>', lambda m: '<row r="%s"%s ht="15" customHeight="1"%s>' % (m.group(1), m.group(2), m.group(3)), x)
+    # the card now lists five steps, so its rows are taller
+    x = re.sub(r'<row r="([3-7])"([^>]*?)(/?)>', lambda m: '<row r="%s"%s ht="21" customHeight="1"%s>' % (m.group(1), m.group(2), m.group(3)), x)
     x = re.sub(r'<row r="9"([^>]*?)(/?)>', lambda m: '<row r="9"%s ht="28" customHeight="1"%s>' % (m.group(1), m.group(2)), x, count=1)
-    # print the sheet the way it reads on screen: one page wide, landscape
-    if '<pageSetup' not in x:
-        x = re.sub(r'(<pageMargins[^>]*/>)', r'\1<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/>', x, count=1)
+    # print the sheet the way it reads on screen: landscape, and still on ONE page now that the card is
+    # taller and two more buttons sit below it
+    x = re.sub(r'<pageSetup\b[^>]*/>', '', x)
+    x = re.sub(r'(<pageMargins[^>]*/>)', r'\1<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="1"/>', x, count=1)
     if '<pageSetUpPr' not in x:
         x = re.sub(r'(<sheetPr[^>]*>)', r'\1<pageSetUpPr fitToPage="1"/>', x, count=1) if re.search(r'<sheetPr[^>]*>(?!/)', x) else x
     x = tab_color(x, NAVY)
     wr(gi_part, x)
     w = rd('xl/workbook.xml')
     if '_xlnm.Print_Area" localSheetId="3"' not in w:
-        pa = '<definedName name="_xlnm.Print_Area" localSheetId="3">\'General Information\'!$A$1:$J$48</definedName>'
+        pa = '<definedName name="_xlnm.Print_Area" localSheetId="3">\'General Information\'!$A$1:$J$52</definedName>'
         w = w.replace('</definedNames>', pa + '</definedNames>') if '</definedNames>' in w else w.replace('</sheets>', '</sheets><definedNames>' + pa + '</definedNames>', 1)
         wr('xl/workbook.xml', w)
 
@@ -445,10 +462,182 @@ def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs):
         t = tab_color(t, 'FF8EA9DB')
         wr(part, t)
 
+    # ---- the two reference sheets a user passes through while setting a project up
+    reference_sheets(work, rd, wr, btn_dark, btn_blue)
+
     # ---- tab colours elsewhere
     for part, rgb in tabs:
         x = rd(part); wr(part, tab_color(x, rgb))
 
+
+
+def restyle(x, rows, cols, style):
+    """Point the given cells at an existing cellXfs entry, leaving their values and formulas alone."""
+    for r in rows:
+        m = get_row(x, r)
+        if not m: continue
+        row = m.group(0)
+        for col in cols:
+            cm = cell_re('%s%d' % (col, r)).search(row)
+            if not cm: continue
+            cell = cm.group(0)
+            cell = re.sub(r'\ss="\d+"', '', cell, count=1)
+            cell = cell.replace('<c r="%s%d"' % (col, r), '<c r="%s%d" s="%s"' % (col, r, style), 1)
+            row = row[:cm.start()] + cell + row[cm.end():]
+        x = x[:m.start()] + row + x[m.end():]
+    return x
+
+
+def row_height(x, r, ht):
+    m = get_row(x, r)
+    if not m: return x
+    row = re.sub(r'\sht="[^"]*"|\scustomHeight="[^"]*"', '', m.group(0), count=2)
+    row = row.replace('<row r="%d"' % r, '<row r="%d" ht="%s" customHeight="1"' % (r, ht), 1)
+    return x[:m.start()] + row + x[m.end():]
+
+
+def sheet_view(x, freeze=None, gridlines=None):
+    """Freeze panes below `freeze` (a cell ref) and optionally hide the gridlines."""
+    m = re.search(r'<sheetView\b[^>]*?(/>|>.*?</sheetView>)', x, re.S)
+    if not m: return x
+    sv = m.group(0)
+    if gridlines is False and 'showGridLines' not in sv:
+        sv = sv.replace('<sheetView', '<sheetView showGridLines="0"', 1)
+    if freeze:
+        col, r = split_ref(freeze)
+        pane = ('<pane xSplit="%d" ySplit="%d" topLeftCell="%s" activePane="bottomRight" state="frozen"/>'
+                % (colnum(col) - 1, r - 1, freeze))
+        sv = re.sub(r'<pane\b[^>]*/>', '', sv)
+        sv = sv[:-2] + '>' + pane + '</sheetView>' if sv.endswith('/>') else sv.replace('>', '>' + pane, 1)
+    return x[:m.start()] + sv + x[m.end():]
+
+
+def page_setup(x, titles=None):
+    """Landscape, fit to one page wide, and repeat a header row on every printed page."""
+    x = re.sub(r'<pageSetup\b[^>]*/>', '', x)
+    x = re.sub(r'<pageMargins[^>]*/>', lambda m: m.group(0)
+               + '<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/>', x, count=1)
+    if '<pageSetUpPr' not in x:
+        x = (x.replace('</sheetPr>', '<pageSetUpPr fitToPage="1"/></sheetPr>', 1) if '</sheetPr>' in x
+             else x.replace('<dimension', '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><dimension', 1))
+    return x
+
+
+def reference_sheets(work, rd, wr, btn_dark, btn_blue):
+    """Pay_Items and Maintenance Policies: navigation, a line saying where each sheet sits in the setup
+    flow, a marked input column and readable table bands. Nothing here changes a number: Pay_Items keeps
+    its Table2 (C2:I59) and every unit cost, and the maintenance schedules live in the hidden templates."""
+    NAVY, PALE, WHITE, GREY, AMBER = 'FF1D2733', 'FFEAF2FB', 'FFFFFFFF', 'FF595959', 'FF7F6000'
+    s_note = add_style(work, font=FONT(9, i=True, color=GREY),
+                       alignment='horizontal="left" vertical="center" wrapText="1"')
+    s_title = add_style(work, font=FONT(12, b=True))
+    s_band = add_style(work, font=FONT(10, b=True), fill=FILL(PALE),
+                       alignment='horizontal="left" vertical="center" wrapText="1"')
+    s_hdr = add_style(work, font=FONT(10, b=True, color=WHITE), fill=FILL(NAVY),
+                      alignment='horizontal="left" vertical="center" wrapText="1"')
+    s_input = add_style(work, font=FONT(10), fill=FILL('FFD9D9D9'), border=BORDER_BOX,
+                        alignment='horizontal="right" vertical="center"', numfmt='&quot;$&quot;#,##0.00')
+    s_flag = add_style(work, font=FONT(9, color=AMBER), fill=FILL('FFFFF3CD'),
+                       alignment='horizontal="left" vertical="center" wrapText="1"')
+
+    def button(x, ref, text, target, style):
+        return put_cell(x, ref, '<c r="%s" s="%s" t="str"><f>%s</f><v>%s</v></c>'
+                        % (ref, style, esc('HYPERLINK("#%s","%s")' % (target, text)), html.escape(text, quote=False)))
+
+    def text(x, ref, value, style):
+        return put_cell(x, ref, '<c r="%s" s="%s" t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>'
+                        % (ref, style, html.escape(value, quote=False)))
+
+    # ---------------------------------------------------------------- Overview and Instructions (step 1)
+    # both sheets are a text box over an empty grid, every column 8.71 wide, so the buttons are merged runs
+    for part, line in [('xl/worksheets/sheet2.xml',
+                        'STEP 1 of 5: what the framework does and the rules behind it. '
+                        'Read this and Instructions, then go to General Information.'),
+                       ('xl/worksheets/sheet3.xml',
+                        'STEP 1 of 5: how to run an analysis, start to finish. '
+                        'When you are ready, go to General Information and fill in the grey cells.')]:
+        x = rd(part)
+        x = ensure_row(x, 1)
+        x = button(x, 'B1', '\u25c4 General Information', "'General Information'!D9", btn_dark)
+        for ref in ('C1', 'D1'): x = put_cell(x, ref, '<c r="%s" s="%s"/>' % (ref, btn_dark))
+        x = button(x, 'E1', 'Summary', 'Summary!G1', btn_blue)
+        x = put_cell(x, 'F1', '<c r="F1" s="%s"/>' % btn_blue)
+        x = text(x, 'H1', line, s_note)
+        x = row_height(x, 1, 22)
+        x = re.sub(r'<mergeCells count="\d+">.*?</mergeCells>', '', x, flags=re.S)
+        x = insert_before(x, '<mergeCells count="2"><mergeCell ref="B1:D1"/><mergeCell ref="E1:F1"/></mergeCells>',
+                          ['phoneticPr', 'conditionalFormatting', 'dataValidations', 'hyperlinks',
+                           'printOptions', 'pageMargins', 'drawing'])
+        wr(part, x)
+
+    # ---------------------------------------------------------------- Pay_Items (step 3 of the flow)
+    x = rd('xl/worksheets/sheet5.xml')
+    def priced(r):
+        m = get_row(x, r)
+        cm = cell_re('F%d' % r).search(m.group(0)) if m else None
+        return bool(cm) and ('<v>' in cm.group(0) or '<f>' in cm.group(0))
+    items = [r for r in range(4, 60) if get_row(x, r) and cell_re('D%d' % r).search(get_row(x, r).group(0))]
+    blank = sum(1 for r in items if not priced(r))
+    x = ensure_row(x, 1)
+    x = button(x, 'A1', '\u25c4 General Information', "'General Information'!D9", btn_dark)
+    x = button(x, 'B1', 'Summary', 'Summary!G1', btn_blue)
+    x = text(x, 'D1', '  STEP 3 of 5: the unit costs every alternative is priced from. '
+                      'The grey column is the one to edit.', s_note)
+    x = row_height(x, 1, 22)
+    # the Unit Cost column is the only input on this sheet
+    x = restyle(x, range(3, 60), 'F', s_input)
+    # the part headings in column A read as bands down the left of the table
+    x = restyle(x, [4, 26, 34, 37, 44, 48, 54], 'A', s_band)
+    for r, t in [(61, 'Every alternative worksheet prices its quantities from the Unit Cost column above, by looking up the '
+                      'pay item description. Change a cost here and every alternative reprices when the workbook recalculates.'),
+                 (62, 'The Middle, West and East columns under "Average Pay Item Unit Cost" are empty in this release, so a '
+                      'West division project is priced on the same statewide numbers as a Middle one. The Summary states '
+                      'this beside the locator map and the Method sheet carries it as an open assumption.'),
+                 (63, '%d of the %d pay items carry no unit cost. An alternative that uses one of them prices it at $0, so '
+                      'check the Unit Cost column before entering quantities.' % (blank, len(items))),
+                 (64, 'Typical ranges and the published sources behind these costs are on the Typical Values sheet.')]:
+        x = ensure_row(x, r)
+        x = text(x, 'A%d' % r, t, s_flag if r == 63 else s_note)
+        for col in 'BCDEFGHIJ':
+            x = put_cell(x, '%s%d' % (col, r), '<c r="%s%d" s="%s"/>' % (col, r, s_flag if r == 63 else s_note))
+        x = row_height(x, r, 30)
+    x = re.sub(r'<mergeCells count="\d+">(.*?)</mergeCells>',
+               lambda m: '<mergeCells count="%d">%s%s</mergeCells>'
+               % (m.group(1).count('<mergeCell') + 4, m.group(1),
+                  ''.join('<mergeCell ref="A%d:J%d"/>' % (r, r) for r in (61, 62, 63, 64))), x, flags=re.S)
+    x = sheet_view(x, freeze='A3', gridlines=False)
+    x = page_setup(x)
+    wr('xl/worksheets/sheet5.xml', x)
+    w = rd('xl/workbook.xml')
+    if '_xlnm.Print_Titles" localSheetId="4"' not in w:
+        pt = '<definedName name="_xlnm.Print_Titles" localSheetId="4">Pay_Items!$2:$2</definedName>'
+        w = w.replace('</definedNames>', pt + '</definedNames>') if '</definedNames>' in w else \
+            w.replace('</sheets>', '</sheets><definedNames>' + pt + '</definedNames>', 1)
+        wr('xl/workbook.xml', w)
+
+    # ---------------------------------------------------------------- Maintenance Policies (reference)
+    # the TDOT logo sits over B2:B7, so everything here goes in row 1 and in column C beside it
+    x = rd('xl/worksheets/sheet7.xml')
+    for r in range(1, 8): x = ensure_row(x, r)
+    x = button(x, 'B1', '\u25c4 General Information', "'General Information'!D9", btn_dark)
+    x = button(x, 'C1', 'Summary', 'Summary!G1', btn_blue)
+    x = row_height(x, 1, 22)
+    x = text(x, 'C2', 'MAINTENANCE AND REHABILITATION POLICIES', s_title)
+    x = text(x, 'C3', 'Reference: what each alternative type does to the pavement and when. The schedules themselves live '
+                      'in the hidden alternative templates, so editing a number here changes nothing.', s_note)
+    x = text(x, 'C4', 'Table 1 drives a New HMA alternative, Table 2 a New PCC alternative, Table 3 an HMA overlay and '
+                      'Table 4 a PCC rehabilitation. Alternative Setup copies the matching template.', s_note)
+    x = text(x, 'C5', 'Rate is the share of the quantity the activity covers: 1 means the whole mainline area, the whole '
+                      'markings area or the whole joint length; 0.0075 means three quarters of one percent of it. '
+                      'Year Applied counts years after construction.', s_note)
+    x = text(x, 'C6', 'Closure days come from the production rates on Typical Values, not from this sheet.', s_note)
+    for r, h in ((2, 20), (3, 36), (4, 28), (5, 34), (6, 16)): x = row_height(x, r, h)
+    x = restyle(x, [8, 35, 49, 74], 'B', s_title)
+    x = restyle(x, [9, 36, 50, 75], 'BCDE', s_hdr)
+    for r in (9, 36, 50, 75): x = row_height(x, r, 20)
+    x = sheet_view(x, freeze='A8', gridlines=False)
+    x = page_setup(x)
+    wr('xl/worksheets/sheet7.xml', x)
 
 SPELLING = [
     # the four misspellings that were in the issued v1.1.2 text, left in place through v1.1.x

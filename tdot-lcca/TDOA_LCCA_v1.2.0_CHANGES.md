@@ -99,6 +99,66 @@ workbook still reads as the same tool.
 - Tab colors group the sheets: navy for General Information, blue for Summary, light blue for the
   alternative worksheets, grey for reference sheets.
 
+## 3d. Summary as a dashboard, and the setup flow
+
+The Summary now opens with the answer rather than with a table, and every sheet says where it sits
+in the sequence a user actually follows.
+
+- Six KPI tiles across rows 3 to 9: lowest present worth (with the section it buys), margin to the
+  next alternative, equivalent annual cost, initial construction, unit cost per square yard, and
+  rate sensitivity. Every tile is a formula over cells that already existed; nothing new is
+  calculated. The margin tile turns amber when the two best alternatives are within five percent of
+  each other, which is the point at which a reviewer should treat them as tied.
+- Data bars inside the net-present-worth column, so the results table reads without going to a chart.
+- Chart 8, new: each alternative's initial construction over the mainline area, against the $210 to
+  $280 per square yard all-in range for recent Tennessee runway work cited on Typical Values. The
+  band is drawn from two cells, so it can be updated without touching the chart. This workbook prices
+  the pavement contract and the published range covers pavement, lighting and grading, so every bar
+  should sit below the band; far below it, or above it, is worth a second look at the quantities.
+- Chart 1's five categories use one light-to-dark ramp instead of the mixed greys, so the stack reads
+  in the order the categories are listed.
+- The chart the Alternative Setup form maintains is parked below the dashboard with a line saying what
+  it is. It duplicates chart 1 with less detail, but the macro still updates it, so it is moved rather
+  than removed.
+
+**The Summary row map moved.** Anything outside the workbook that reads Summary cells by address has
+to move with it: the results table is now rows 12 to 15 (was 4 to 7), the verdict lines are G17 and
+G18 (were G9 and G10), the comparison block starts at row 22 (was 14), the pavement-section block at
+row 90 (was 80) and its asphalt unit weight at J91 (was J81), and the map-data block at row 130 (was
+115). The KML macro, the verification scripts and the worked examples in this delivery were all
+updated; a private copy of the old macro would need the same edit.
+
+### The setup flow
+
+- The "How to use this workbook" card on General Information now lists five steps and names the sheet
+  for each: Overview and Instructions, General Information, Pay_Items, Alternative Setup, Summary.
+- Every sheet in that sequence says which step it is, in the same place: Overview and Instructions
+  carry "STEP 1 of 5", Pay_Items "STEP 3 of 5", each alternative worksheet "STEP 4 of 5" and the
+  Summary "STEP 5 of 5".
+- Overview, Instructions, Pay_Items and Maintenance Policies gained the navigation row the alternative
+  worksheets and the reference sheets already had.
+- General Information gained two more buttons, Pay_Items and Maintenance Policies, so every sheet in
+  the flow is one click away. It still prints as one landscape page.
+
+### Pay_Items
+
+- Row 1 is now a navigation band with the step line. The header row stays frozen and repeats on every
+  printed page.
+- The Unit Cost column is marked as the input it is: grey fill, currency format, a box. Nothing about
+  the values changed, and Table2 (C2:I59) with all 56 pay items is untouched.
+- The part headings in column A read as bands down the left of the table.
+- Four notes under the table say what the sheet drives, that the Middle, West and East average-cost
+  columns are empty so a West division project is priced on statewide numbers, that 29 of the 56 pay
+  items carry no unit cost at all and will price at $0 if used, and where the sources are.
+
+### Maintenance Policies
+
+- Navigation band, a title, and four lines beside the logo: that the sheet is reference only because
+  the schedules live in the hidden templates, which table drives which alternative type, what the
+  Rate column means, and where closure days actually come from.
+- The four table headers sit on a navy band and stay visible as the sheet scrolls.
+
+
 ## 4. Housekeeping
 
 - Instructions text box: ActiveX "blocked content" steps added (Trust Center > ActiveX Settings,

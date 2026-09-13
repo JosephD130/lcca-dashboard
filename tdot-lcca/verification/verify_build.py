@@ -14,6 +14,12 @@ names = z.namelist()
 rd = lambda n: z.read(n).decode('utf-8', 'replace')
 wb = load_workbook(WB, keep_vba=True)
 ws = wb['Summary']
+# the Summary row map, the same constants build_summary.py lays the sheet out with
+KPI0, HDR, T0, T1 = 3, 11, 12, 15
+VER, VER2, CMP, CMPH, CMP0 = 17, 18, 20, 21, 22
+CHT, HOW, C1, C2, C3, BMN = 28, 29, 30, 48, 66, 87
+SEC_T, CH67, NOTE67, MAP0, A0 = 90, 100, 120, 130, 132
+BM = 89           # unit-cost benchmark data block, in the chart-data columns
 fails = []
 
 
@@ -56,35 +62,36 @@ check('navigation buttons sit in the first visible column', 'HYPERLINK' in str(w
       (ws['G1'].value, ws['H1'].value))
 check('title moved beside the buttons', ws['J1'].value == 'LCCA SUMMARY')
 check('note explains the hidden block', 'hidden' in str(ws['G2'].value) and 'Unhide' in str(ws['G2'].value))
-check('results table header intact', [ws.cell(3, c).value for c in range(7, 19)] ==
+check('results table header intact', [ws.cell(HDR, c).value for c in range(7, 19)] ==
       ['Worksheet', 'Alternative', 'Type', 'Initial construction', 'Maintenance PW', 'Rehabilitation PW', 'Lost revenue PW',
        'Salvage PW', 'Net present worth', 'vs. lowest NPW', 'Closure days in period', 'Runway availability'],
-      [ws.cell(3, c).value for c in range(7, 19)])
+      [ws.cell(HDR, c).value for c in range(7, 19)])
 check('results table reads the Database sheet by INDEX (survives a row deletion)',
-      all(str(ws.cell(r, 7).value).startswith('=IF(INDEX(Database!$D:$D') for r in range(4, 8)))
-check('comparison block present (RealCost layout)', str(ws['G12'].value).startswith('COMPARISON') and ws['G13'].value == 'Alternative')
-check('section block present with both description strings', ws['P82'].value == 'Section from the quantities'
-      and ws['Q82'].value == 'Same quantities over mainline + shoulder')
-check('asphalt unit weight is an input cell', ws['J81'].value == 145)
+      all(str(ws.cell(r, 7).value).startswith('=IF(INDEX(Database!$D:$D') for r in range(T0, T1 + 1)))
+check('comparison block present (RealCost layout)', str(ws.cell(CMP, 7).value).startswith('COMPARISON') and ws.cell(CMPH, 7).value == 'Alternative')
+check('section block present with both description strings', ws.cell(SEC_T + 2, 16).value == 'Section from the quantities'
+      and ws.cell(SEC_T + 2, 17).value == 'Same quantities over mainline + shoulder')
+check('asphalt unit weight is an input cell', ws.cell(SEC_T + 1, 10).value == 145)
 check('chart-data block labelled do not edit', 'do not edit' in str(ws.cell(1, 23).value))
 check('an alternative that does not exist gets no name', all('""' in str(ws.cell(4, c).value) for c in range(24, 28)),
       ws.cell(4, 24).value)
 wbx = rd('xl/workbook.xml')
 check('print areas defined for the Summary and General Information',
-      'Summary!$A$1:$V$112' in wbx and "'General Information'!$A$1:$J$48" in wbx,
+      'Summary!$A$1:$V$141' in wbx and "'General Information'!$A$1:$J$52" in wbx,
       re.findall(r'<definedName name="_xlnm.Print_Area"[^>]*>([^<]*)', wbx))
 
 print(); print('=' * 78); print('CHARTS'); print('=' * 78)
 charts = sorted((n for n in names if re.match(r'xl/charts/chart\d+\.xml$', n)), key=lambda n: int(re.search(r'\d+', n.split('/')[-1]).group()))
-check('fourteen charts: six original, seven new on the Summary, one locator map', len(charts) == 14, len(charts))
+check('fifteen charts: six original, eight on the Summary, one locator map', len(charts) == 15, len(charts))
 for n in charts:
     c = rd(n)
     ts = re.findall(r'<a:t>([^<]*)</a:t>', c)
     has_x = any(t in ('Calendar year', 'Alternative', 'Discount rate (%)', 'Scenario', 'Longitude') for t in ts)
     has_y = any(t in ('Cost ($)', 'Present worth ($)', 'Net present worth ($)', 'Spend, undiscounted ($)',
-                      'Cumulative discounted cost ($)', 'Closure days', 'Thickness (inches)', 'Latitude') for t in ts)
+                      'Cumulative discounted cost ($)', 'Closure days', 'Thickness (inches)', 'Latitude',
+                      'Initial construction / mainline S.Y.') for t in ts)
     check('%s names both axes' % n.split('/')[-1], has_x and has_y, ts[:4])
-summary_charts = charts[6:13]      # the seven cost and section charts; the locator map carries no legend
+summary_charts = charts[6:13]      # the seven cost and section charts; the benchmark and the map carry no legend
 check('the seven Summary charts put the legend beside the plot',
       all(re.search(r'<legendPos val="r"/>', rd(n)) for n in summary_charts),
       [re.findall(r'<legendPos val="(\w)"/>', rd(n)) for n in summary_charts])
@@ -95,26 +102,61 @@ check('the original Alternatives Comparison chart plots the hidden columns', 'pl
 check('the alternative-sheet charts keep calendar years on the category axis',
       all('Calendar year' in rd(n) for n in charts[:5]))
 
+print(); print('=' * 78); print('DASHBOARD STRIP'); print('=' * 78)
+labels = [ws.cell(KPI0 + 4 * (k // 3), 7 + 4 * (k % 3)).value for k in range(6)]
+check('six KPI tiles above the results table',
+      labels == ['LOWEST PRESENT WORTH', 'MARGIN TO NEXT', 'EQUIVALENT ANNUAL COST', 'INITIAL CONSTRUCTION',
+                 'UNIT COST', 'RATE SENSITIVITY'], labels)
+vals = [str(ws.cell(KPI0 + 1 + 4 * (k // 3), 7 + 4 * (k % 3)).value) for k in range(6)]
+check('every tile is a formula over cells that already exist', all(v.startswith('=') for v in vals), vals[:2])
+check('the tiles are merged across four columns each',
+      sum(1 for m in ws.merged_cells.ranges if m.min_row in (KPI0, KPI0 + 1, KPI0 + 2, KPI0 + 4, KPI0 + 5, KPI0 + 6)
+          and m.max_col - m.min_col == 3) == 18,
+      sum(1 for m in ws.merged_cells.ranges if m.max_col - m.min_col == 3))
+sx = rd('xl/worksheets/sheet14.xml')
+cfs = dict(re.findall(r'<conditionalFormatting sqref="([^"]+)"><cfRule type="(\w+)"', sx))
+check('bars inside the net present worth column', cfs.get('O%d:O%d' % (T0, T1)) == 'dataBar', cfs)
+check('the margin tile turns amber only when the two best are within five percent',
+      cfs.get('K%d:N%d' % (KPI0, KPI0 + 2)) == 'expression'
+      and '<0.05' in sx.replace('&lt;', '<'), cfs)
+check('lowest-cost row still highlighted in both tables',
+      cfs.get('G%d:R%d' % (T0, T1)) == 'expression' and cfs.get('G%d:P%d' % (CMP0, CMP0 + 3)) == 'expression', cfs)
+bm = [n for n in charts if 'Unit cost against published' in rd(n)]
+bx = rd(bm[0]) if bm else ''
+check('chart 8 is the unit-cost benchmark: a stacked bar whose first series is invisible',
+      len(bm) == 1 and 'stacked' in bx and 'a:noFill' in bx and '<legend>' not in bx,
+      (len(bm), 'stacked' in bx, 'a:noFill' in bx))
+check('the published band is one grey point carrying its own value label',
+      '<dPt>' in bx and '<dLbls>' in bx, (bx.count('<dPt>'), bx.count('<dLbls>')))
+check('the band comes from cells, so it can be moved without touching the chart',
+      ws.cell(BM + 3, 23).value == 'Unit cost / published range'
+      and ws.cell(BM + 2, 28).value == 210 and ws.cell(BM + 3, 28).value == 70,
+      (ws.cell(BM + 2, 28).value, ws.cell(BM + 3, 28).value))
+check('chart 8 sits beside chart 5 and carries its own note',
+      'per S.Y.' in str(ws.cell(BMN, 7).value) and 'Typical Values' in str(ws.cell(BMN, 7).value),
+      str(ws.cell(BMN, 7).value)[:60])
+
+
 print(); print('=' * 78); print('LOCATOR MAP AND PROJECT IDENTITY'); print('=' * 78)
 check('project identity line at the top of the Summary', 'D$9' in str(ws['L1'].value) and 'construction' in str(ws['L1'].value))
-check('map data block labelled and outside the print area', 'MAP DATA' in str(ws.cell(115, 23).value))
-coords = [(ws.cell(r, 25).value, ws.cell(r, 26).value) for r in range(117, 196)]
+check('map data block labelled and outside the print area', 'MAP DATA' in str(ws.cell(MAP0, 23).value))
+coords = [(ws.cell(r, 25).value, ws.cell(r, 26).value) for r in range(A0, A0 + 79)]
 check('79 airports in the map block, 74 with published coordinates',
       len(coords) == 79 and sum(1 for a, b in coords if isinstance(a, (int, float)) and isinstance(b, (int, float))) == 74,
       (len(coords), sum(1 for a, b in coords if isinstance(a, (int, float)))))
 check('coordinates fall inside Tennessee',
       all(-90.5 < a < -81.5 and 34.9 < b < 36.8 for a, b in coords if isinstance(a, (int, float))))
-border = [(ws.cell(r, 34).value, ws.cell(r, 35).value) for r in range(117, 330)]
+border = [(ws.cell(r, 34).value, ws.cell(r, 35).value) for r in range(A0, A0 + 213)]
 bpts = [(a, b) for a, b in border if isinstance(a, (int, float))]
 check('state outline embedded with gaps between segments', len(bpts) == 179 and len(border) > len(bpts), (len(bpts), len(border)))
 check('the selected airport is looked up, not typed',
-      str(ws.cell(117, 30).value).startswith('=IFERROR(IF(INDEX(') and str(ws.cell(117, 31).value).startswith('=IFERROR(IF(INDEX('))
+      str(ws.cell(A0, 30).value).startswith('=IFERROR(IF(INDEX(') and str(ws.cell(A0, 31).value).startswith('=IFERROR(IF(INDEX('))
 mapch = [c for c in wb['Summary']._charts if c.tagname == 'scatterChart']
 check('locator map has the outline, the three Grand Divisions and this project', len(mapch) == 1 and len(mapch[0].series) == 5,
       [(c.tagname, len(c.series)) for c in wb['Summary']._charts])
 check('airports grouped by division so each is its own series',
-      [ws.cell(r, 27).value for r in (117, 137, 160, 190)] == ['West', 'West', 'Middle', 'East'],
-      [ws.cell(r, 27).value for r in (117, 137, 160, 190)])
+      [ws.cell(r, 27).value for r in (A0, A0 + 20, A0 + 43, A0 + 73)] == ['West', 'West', 'Middle', 'East'],
+      [ws.cell(r, 27).value for r in (A0, A0 + 20, A0 + 43, A0 + 73)])
 check('legend in cells, one per division plus this project',
       [ws.cell(17, c).value for c in range(19, 23)] == ['\u25a0 West', '\u25a0 Middle', '\u25a0 East', '\u25a0 This project'],
       [ws.cell(17, c).value for c in range(19, 23)])
@@ -124,7 +166,7 @@ check('map axes are named and their degree labels suppressed',
       mapch and mapch[0].x_axis.numFmt.formatCode == ';;;' and mapch[0].y_axis.numFmt.formatCode == ';;;')
 check('project block names airport, county, region, coordinates, elevation',
       [ws.cell(20 + k, 19).value for k in range(7)] ==
-      ['Airport', 'City / county', 'TDOT region', 'Coordinates', 'Elevation', 'Branch / project', 'Mainline area'],
+      ['Airport', 'City / county', 'TDOT Grand Division', 'Coordinates', 'Elevation', 'Branch / project', 'Mainline area'],
       [ws.cell(20 + k, 19).value for k in range(7)])
 check('the sheet says where the coordinates come from and how to export KML',
       'embedded' in str(ws['S29'].value) and 'ExportLCCAKML' in str(ws['S30'].value))
@@ -133,7 +175,7 @@ check('runway width for the export footprint is an input cell', ws['S27'].value 
 check('the three notes beside the map are merged so they do not run into the chart data',
       all(str(rng) in [str(m) for m in ws.merged_cells.ranges] for rng in ('S28:V28', 'S29:V29', 'S30:V30')),
       [str(m) for m in ws.merged_cells.ranges][-4:])
-check('print area widened to take the map', 'Summary!$A$1:$V$112' in rd('xl/workbook.xml'))
+check('print area widened to take the map', 'Summary!$A$1:$V$141' in rd('xl/workbook.xml'))
 
 print(); print('=' * 78); print('METHOD AND TYPICAL VALUES'); print('=' * 78)
 me = wb['Method']
@@ -177,6 +219,50 @@ ov = rd('xl/drawings/drawing2.xml'); ss = rd('xl/sharedStrings.xml')
 for bad, good, part in [('Adminimstration', 'Administration', ov), ('clossures', 'closures', ov),
                         ('associeted', 'associated', ov), ('Intial Construction', 'Initial Construction', ss)]:
     check('%s corrected to %s' % (bad, good), bad not in part and good in part)
+
+
+print(); print('=' * 78); print('SETUP FLOW AND THE REFERENCE SHEETS'); print('=' * 78)
+card = str(wb['General Information']['F3'].value)
+check('the how-to card names all five steps in order',
+      [card.find(t) for t in ('1.', '2.', '3.', '4.', '5.')] == sorted(card.find(t) for t in ('1.', '2.', '3.', '4.', '5.'))
+      and all(t in card for t in ('Overview', 'General Information', 'Pay_Items', 'Alternative Setup', 'Summary')),
+      card[:80])
+check('five navigation buttons on General Information, one per destination',
+      all('HYPERLINK' in str(gi[c].value) for c in ('D44', 'D46', 'D48', 'D50', 'D52')),
+      [str(gi[c].value)[:40] for c in ('D44', 'D46', 'D48', 'D50', 'D52')])
+steps = {'Overview': wb['Overview']['H1'].value, 'Instructions': wb['Instructions']['H1'].value,
+         'Pay_Items': wb['Pay_Items']['D1'].value, 'TMP(NewHMA)': wb['TMP(NewHMA)']['D1'].value,
+         'Summary': ws['G2'].value}
+check('every sheet in the flow says which step it is',
+      [str(v).strip()[:11] for v in steps.values()] == ['STEP 1 of 5', 'STEP 1 of 5', 'STEP 3 of 5', 'STEP 4 of 5', 'STEP 5 of 5'],
+      {k: str(v).strip()[:14] for k, v in steps.items()})
+for name in ('Overview', 'Instructions', 'Pay_Items', 'Maintenance Policies'):
+    sh = wb[name]
+    b = [c for c in ('A1', 'B1') if 'HYPERLINK' in str(sh[c].value)]
+    check('%s carries the navigation row' % name, len(b) >= 1, [sh['A1'].value, sh['B1'].value])
+pi = wb['Pay_Items']
+check('Pay_Items marks the unit-cost column as the input',
+      pi['F4'].fill.fgColor.rgb.endswith('D9D9D9') and pi['F4'].number_format.startswith('"$"'),
+      (pi['F4'].fill.fgColor.rgb, pi['F4'].number_format))
+priced = [r for r in range(4, 60) if pi.cell(r, 6).value not in (None, '')]
+check('Pay_Items keeps all 56 items, the 27 that carry a cost and the three that are formulas',
+      sum(1 for r in range(4, 60) if pi.cell(r, 4).value) == 56 and len(priced) == 27
+      and [pi.cell(r, 6).value for r in (10, 16, 56)] == ['=7/9', '=10/2', '=6/9'],
+      (len(priced), [pi.cell(r, 6).value for r in (10, 16, 56)]))
+check('its Table2 is still declared over C2:I59', 'ref="C2:I59"' in rd('xl/tables/table5.xml'))
+check('Pay_Items says what the empty division columns mean and how many items carry no cost',
+      'West' in str(pi['A62'].value) and 'no unit cost' in str(pi['A63'].value), str(pi['A63'].value)[:50])
+check('Pay_Items part headings band the left of the table',
+      all(pi.cell(r, 1).font.bold for r in (4, 26, 34, 37, 44, 48, 54)))
+check('Pay_Items freezes the header and repeats it in print',
+      pi.freeze_panes == 'A3' and 'Pay_Items!$2:$2' in rd('xl/workbook.xml'), pi.freeze_panes)
+mp = wb['Maintenance Policies']
+check('Maintenance Policies says it is reference and which table drives which alternative',
+      'Reference' in str(mp['C3'].value) and 'Table 1' in str(mp['C4'].value) and 'Rate' in str(mp['C5'].value),
+      str(mp['C4'].value)[:60])
+check('the four maintenance tables carry a header band',
+      all(mp.cell(r, 2).font.color and mp.cell(r, 2).font.color.rgb.endswith('FFFFFF') for r in (9, 36, 50, 75)),
+      [mp.cell(r, 2).value for r in (9, 36, 50, 75)])
 
 
 print(); print('=' * 78)
