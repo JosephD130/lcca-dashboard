@@ -19,6 +19,8 @@ FF = 'Arial, Helvetica, sans-serif'
 wb = load_workbook(RUN, data_only=True)
 sm = wb['Summary']
 cell = lambda r, c: sm.cell(r, c).value
+# the Summary row map, the same constants build_summary.py lays the sheet out with
+T0, T1, VER, CMP0, SEC_T = 12, 15, 17, 22, 90
 
 
 def money(v, dp=0):
@@ -31,28 +33,28 @@ def m1(v):
 
 
 # ---------------------------------------------------------------- data off the sheet
-names = [cell(r, 8) for r in range(4, 8)]
-sheets = [cell(r, 7) for r in range(4, 8)]
-init = [cell(r, 10) for r in range(4, 8)]
-npw = [cell(r, 15) for r in range(4, 8)]
-vs = [cell(r, 16) for r in range(4, 8)]
-days = [cell(r, 17) for r in range(4, 8)]
-avail = [cell(r, 18) for r in range(4, 8)]
-euac = [cell(r, 13) for r in range(14, 18)]
-agency = [cell(r, 8) for r in range(14, 18)]
-agencyE = [cell(r, 9) for r in range(14, 18)]
-user = [cell(r, 10) for r in range(14, 18)]
-userE = [cell(r, 11) for r in range(14, 18)]
-pct = [cell(r, 15) for r in range(14, 18)]
+names = [cell(r, 8) for r in range(T0, T1 + 1)]
+sheets = [cell(r, 7) for r in range(T0, T1 + 1)]
+init = [cell(r, 10) for r in range(T0, T1 + 1)]
+npw = [cell(r, 15) for r in range(T0, T1 + 1)]
+vs = [cell(r, 16) for r in range(T0, T1 + 1)]
+days = [cell(r, 17) for r in range(T0, T1 + 1)]
+avail = [cell(r, 18) for r in range(T0, T1 + 1)]
+euac = [cell(r, 13) for r in range(CMP0, CMP0 + 4)]
+agency = [cell(r, 8) for r in range(CMP0, CMP0 + 4)]
+agencyE = [cell(r, 9) for r in range(CMP0, CMP0 + 4)]
+user = [cell(r, 10) for r in range(CMP0, CMP0 + 4)]
+userE = [cell(r, 11) for r in range(CMP0, CMP0 + 4)]
+pct = [cell(r, 15) for r in range(CMP0, CMP0 + 4)]
 cats = [(cell(r, 23), [cell(r, 24 + i) for i in range(4)]) for r in range(5, 10)]
 sens = [(cell(r, 23), [cell(r, 24 + i) for i in range(4)]) for r in range(12, 37)]
 years = [(cell(r, 24), [cell(r, 25 + i) for i in range(4)], [cell(r, 29 + i) for i in range(4)],
           [cell(r, 33 + i) for i in range(4)]) for r in range(41, 72)]
 sec_m = [(cell(r, 23), [cell(r, 24 + i) for i in range(4)]) for r in range(76, 80)]
 sec_s = [(cell(r, 23), [cell(r, 24 + i) for i in range(4)]) for r in range(83, 87)]
-secrow = [[cell(r, c) for c in range(7, 18)] for r in range(83, 87)]
-desc = [cell(r, 16) for r in range(83, 87)]
-desc_s = [cell(r, 17) for r in range(83, 87)]
+secrow = [[cell(r, c) for c in range(7, 18)] for r in range(SEC_T + 3, SEC_T + 7)]
+desc = [cell(r, 16) for r in range(SEC_T + 3, SEC_T + 7)]
+desc_s = [cell(r, 17) for r in range(SEC_T + 3, SEC_T + 7)]
 low = npw.index(min(npw))
 gi = wb['General Information']
 PERIOD, RATE = int(gi['D33'].value), gi['D34'].value
