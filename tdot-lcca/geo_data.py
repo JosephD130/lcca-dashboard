@@ -5,6 +5,8 @@ AIRPORTS: the 79 airports in the General Information dropdown, matched to publis
           fields are not in the source and carry None; they plot as no point and the map says so.
 BORDER:   the Tennessee state boundary as a list of open segments of (longitude, latitude), simplified
           with Douglas-Peucker at 0.01 degrees, drawn on the chart with a blank row between segments.
+          The source carries the Tennessee/North Carolina boundary twice, two tracings within 0.01 degrees
+          of each other; the second copy is dropped so the line is not drawn doubled.
 
 Sources, retrieved 2026-09-13:
   airports: airportsdata 20260905 (PyPI, MIT), which publishes the FAA NASR / OurAirports coordinates
@@ -101,7 +103,6 @@ BORDER = [
     [(-86.83361, 34.99944), (-84.58417, 35.0)],
     [(-90.30083, 35.00166), (-88.19083, 35.0025)],
     [(-83.09778, 35.00027), (-82.7775, 35.09138), (-82.75444, 35.07028), (-82.69667, 35.0975), (-82.67722, 35.13083), (-82.65222, 35.125), (-82.48389, 35.17667), (-82.43555, 35.17472), (-82.39139, 35.22083), (-82.36806, 35.20056), (-82.325, 35.19611), (-82.29056, 35.20694), (-81.61104, 35.18138)],
-    [(-83.09778, 35.00027), (-82.77722, 35.09138), (-82.75444, 35.07028), (-82.69667, 35.0975), (-82.67722, 35.13083), (-82.65222, 35.125), (-82.48389, 35.17667), (-82.43555, 35.17472), (-82.39139, 35.22083), (-82.36777, 35.20056), (-82.325, 35.19611), (-82.28222, 35.20639), (-81.60269, 35.181)],
     [(-84.57972, 34.99722), (-84.315, 34.98611), (-83.09639, 35.0)],
     [(-86.8325, 35.00222), (-88.19639, 35.02361)],
     [(-90.3775, 36.49976), (-90.16222, 36.49973), (-90.12695, 36.45361), (-90.12028, 36.41361), (-90.06416, 36.37473), (-90.06944, 36.28194), (-90.12139, 36.25694), (-90.13805, 36.21389), (-90.22583, 36.17944), (-90.24834, 36.13194), (-90.29861, 36.11361), (-90.38277, 35.98556), (-89.72916, 36.0)],

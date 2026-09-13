@@ -68,7 +68,7 @@ PASS  project identity line at the top of the Summary
 PASS  map data block labelled and outside the print area
 PASS  79 airports in the map block, 74 with published coordinates   |   (79, 74)
 PASS  coordinates fall inside Tennessee
-PASS  state outline embedded with gaps between segments   |   (192, 213)
+PASS  state outline embedded with gaps between segments   |   (179, 213)
 PASS  the selected airport is looked up, not typed
 PASS  locator map has the outline, the three Grand Divisions and this project   |   [('barChart', 5), ('lineChart', 4), ('barChart', 4), ('lineChart', 4), ('barChart', 4), ('barChart', 4), ('barChart', 4), ('scatterChart', 5), ('barChart', 2)]
 PASS  airports grouped by division so each is its own series   |   ['West', 'West', 'Middle', 'East']

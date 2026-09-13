@@ -54,6 +54,10 @@ secrow = [[cell(r, c) for c in range(7, 18)] for r in range(83, 87)]
 desc = [cell(r, 16) for r in range(83, 87)]
 desc_s = [cell(r, 17) for r in range(83, 87)]
 low = npw.index(min(npw))
+gi = wb['General Information']
+PERIOD, RATE = int(gi['D33'].value), gi['D34'].value
+AREA, SHOULDER = gi['D26'].value, gi['D27'].value
+YEAR0 = int(gi['D25'].value)
 short = ['Alt 1', 'Alt 2', 'Alt 3', 'Alt 4']
 
 
@@ -89,9 +93,9 @@ def legend(x, y, labels, colors, size=9, gap=13):
     return o
 
 
-def svg(W, H, body):
-    return ('<svg viewBox="0 0 %d %d" width="100%%" height="%d" role="img" '
-            'style="display: block;">%s</svg>' % (W, H, H, ''.join(body)))
+def svg(W, H, body, label=''):
+    return ('<svg viewBox="0 0 %d %d" width="100%%" height="%d" role="img" aria-label="%s" '
+            'style="display: block;">%s</svg>' % (W, H, H, label, ''.join(body)))
 
 
 # ---------------------------------------------------------------- the seven charts
@@ -117,7 +121,7 @@ def chart1():
         o.append(t(x + w / 2, H - 16, short[i], 9, INK if i == low else MUTE, 'middle',
                    'bold' if i == low else 'normal'))
     o += legend(W - R + 8, 22, [c[0] for c in cats], CAT)
-    return svg(W, H, o)
+    return svg(W, H, o, 'Present worth of each alternative broken into cost categories')
 
 
 def chart2():
@@ -128,14 +132,14 @@ def chart2():
     for mark, lab in [(2.0, 'FAA 2%'), (3.0, 'TDOT 3%'), (7.0, 'pre-2022 7%')]:
         o.append('<line x1="%.1f" y1="%d" x2="%.1f" y2="%.1f" stroke="#C6CBD0" stroke-width="1" '
                  'stroke-dasharray="3 3"/>' % (px(mark), T, px(mark), H - B))
-        o.append(t(px(mark) + 3, T + 9, lab, 8.5, '#8A8F98'))
+        o.append(t(px(mark) + 3, T + 9, lab, 9, '#8A8F98'))
     for i, c in enumerate(ALT):
         pts = ' '.join('%.1f,%.1f' % (px(r), py(v[i])) for r, v in sens)
         o.append('<polyline points="%s" fill="none" stroke="%s" stroke-width="2"/>' % (pts, c))
     for r in [2, 3, 4, 5, 6, 7, 8]:
         o.append(t(px(r), H - 16, '%d%%' % r, 9, MUTE, 'middle'))
     o += legend(W - R + 8, 22, names, ALT)
-    return svg(W, H, o)
+    return svg(W, H, o, 'Net present worth of each alternative against the discount rate')
 
 
 def chart3():
@@ -153,7 +157,7 @@ def chart3():
         if k % 5 == 0:
             o.append(t(L + k * span + span / 2, H - 16, str(yr), 9, MUTE, 'middle'))
     o += legend(W - R + 8, 22, names, ALT)
-    return svg(W, H, o)
+    return svg(W, H, o, 'Undiscounted spend by calendar year for each alternative')
 
 
 def chart4():
@@ -166,7 +170,7 @@ def chart4():
     for k, row in enumerate(years):
         if k % 5 == 0: o.append(t(L + k * span, H - 16, str(row[0]), 9, MUTE, 'middle'))
     o += legend(W - R + 8, 22, names, ALT)
-    return svg(W, H, o)
+    return svg(W, H, o, 'Cumulative discounted cost by calendar year for each alternative')
 
 
 def chart5():
@@ -182,7 +186,7 @@ def chart5():
                      % (x, py(v), span * 0.19, zero - py(v), c))
         if k % 5 == 0: o.append(t(L + k * span + span / 2, H - 16, str(yr), 9, MUTE, 'middle'))
     o += legend(W - R + 8, 22, names, ALT)
-    return svg(W, H, o)
+    return svg(W, H, o, 'Runway closure days by calendar year for each alternative')
 
 
 def section_chart(rows):
@@ -202,7 +206,7 @@ def section_chart(rows):
         o.append(t(x + w / 2, py(up) - 5, '%.0f"' % up, 9, INK, 'middle', 'bold'))
         o.append(t(x + w / 2, H - 16, short[i], 9, MUTE, 'middle'))
     o += legend(W - R + 8, 22, [r[0] for r in rows], LAYER)
-    return svg(W, H, o)
+    return svg(W, H, o, 'Pavement section of each alternative, stacked by layer')
 
 
 def benchmark():
@@ -225,8 +229,9 @@ def benchmark():
         o.append('<line x1="%.1f" y1="166" x2="%.1f" y2="171" stroke="#9AA0A6" stroke-width="1"/>' % (px(v), px(v)))
         o.append(t(px(v), 182, '$%d' % v, 9, MUTE, 'middle'))
     o.append('<line x1="%d" y1="166" x2="%d" y2="166" stroke="#9AA0A6" stroke-width="1"/>' % (X0, X1))
-    o.append(t((X0 + X1) / 2, 199, 'Initial construction / mainline S.Y.', 9, MUTE, 'middle'))
-    return svg(W, H, o)
+    o.append(t((X0 + X1) / 2, 199, 'Initial construction (with mobilization and engineering) / mainline S.Y.',
+               9, MUTE, 'middle'))
+    return svg(W, H, o, 'Unit cost of each alternative against published Tennessee runway costs')
 
 
 # ---------------------------------------------------------------- the map, lifted from the Dashboard artboard
@@ -253,6 +258,14 @@ def kpi(label, value, sub, tone=''):
             '<div style="font-size: 10px; color: #595959; margin-top: 1px;">%s</div></div>'
             % (box, label, vc, value, sub))
 
+
+SENS_LOW = {r: min(range(4), key=lambda i: v[i]) for r, v in sens}
+SENS_NOTE = ('%s stays lowest from %g to %g percent, so the recommendation does not turn on the rate.'
+             % (names[low], sens[0][0], sens[-1][0])) if set(SENS_LOW.values()) == {low} else \
+            ('The lowest-cost alternative changes within the range: %s.'
+             % ', '.join('%g%% %s' % (r, names[i]) for r, i in sorted(SENS_LOW.items())))
+SHLD_NOTE = ('The same quantities spread over mainline plus shoulder, which is the lower bound on each thickness.'
+             if SHOULDER else 'Empty until a shoulder area is entered on General Information.')
 
 maxn = max(npw)
 rows = []
@@ -285,17 +298,16 @@ for i, row in enumerate(secrow):
 
 CHARTS = [
     ('1. Present worth by category (salvage below zero)', chart1(), ''),
-    ('2. Net present worth vs. discount rate', chart2(),
-     'Alternative 2 stays lowest from 2 to 8 percent, so the recommendation does not turn on the rate.'),
+    ('2. Net present worth vs. discount rate', chart2(), SENS_NOTE),
     ('3. Expenditure stream by calendar year (undiscounted)', chart3(), ''),
     ('4. Cumulative discounted cost', chart4(),
      'Where the lines cross is the year the higher first cost is paid back.'),
     ('5. Runway closure days by calendar year', chart5(), ''),
-    ('Unit cost against recent Tennessee work', benchmark(),
-     'The published range covers pavement, lighting and grading; this workbook prices pavement pay items only, so every marker should sit below the band. Far below it, or above it, is worth a second look at the quantities.'),
     ('6. Pavement section, mainline (inches, surface on top)', section_chart(sec_m), ''),
-    ('7. Pavement section over mainline plus shoulder', section_chart(sec_s),
-     'Empty unless a shoulder area is entered on General Information.'),
+    ('7. Pavement section over mainline plus shoulder', section_chart(sec_s), SHLD_NOTE),
+    ('Unit cost against recent Tennessee work', benchmark(),
+     'The published range is all-in: pavement, lighting and grading. This workbook covers the pavement contract, '
+     'so every marker should sit below the band. Far below it, or above it, is worth a second look at the quantities.'),
 ]
 
 chart_cells = ''.join(card(ti, s, n) for ti, s, n in CHARTS)
@@ -379,11 +391,11 @@ HTML = '''<!doctype html>
       <div class="kv">
         <div class="k">Airport</div><div class="v">McKellar-Sipes Regional (MKL)</div>
         <div class="k">City / county</div><div class="v">Jackson / Madison County</div>
-        <div class="k">Division</div><div class="v">West</div>
+        <div class="k">Grand Division</div><div class="v">West</div>
         <div class="k">Coordinates</div><div class="v">35.5999&deg; N, 88.9156&deg; W</div>
         <div class="k">Elevation</div><div class="v">435 ft</div>
         <div class="k">Branch / project</div><div class="v">Runway 2-20, Reconstruction</div>
-        <div class="k">Mainline area</div><div class="v">100,083 S.Y. + 33,361 shoulder</div>
+        <div class="k">Mainline area</div><div class="v">{area} S.Y. &nbsp;+&nbsp; {shoulder} S.Y. shoulder</div>
         <div class="k">Runway width</div><div class="v">150 ft <span style="font-weight: normal; color: #595959;">(input, used by the Google Earth export)</span></div>
       </div>
       <div class="flag">
@@ -438,23 +450,31 @@ HTML = '''<!doctype html>
 </html>
 '''
 
-unit = init[low] / 100083.0
+unit = init[low] / AREA
 margin = sorted(npw)[1] - npw[low]
+close = margin / npw[low] * 100
+mob = gi['D36'].value or 0
+eng = gi['D37'].value or 0
 kpis = ''.join([
     kpi('Lowest present worth', money(npw[low]), '%s, %s' % (names[low], desc[low])),
-    kpi('Margin to next', money(margin), '%.1f%% &mdash; under 5%%, a close call' % (margin / npw[low] * 100), 'warn'),
-    kpi('Equivalent annual cost', money(euac[low]), 'per year, 30 years at 3%'),
-    kpi('Initial construction', money(init[low]), 'including 10% mobilization and 5% engineering'),
-    kpi('Unit cost', '$%d / S.Y.' % round(unit), 'pavement pay items only'),
-    kpi('Break-even rate', 'holds 2&ndash;8%', 'the lowest-cost alternative does not change', 'good'),
+    kpi('Margin to next', money(margin),
+        '%.1f%% %s' % (close, '&mdash; under 5%, treat the two as tied' if close < 5 else 'of the lowest present worth'),
+        'warn' if close < 5 else ''),
+    kpi('Equivalent annual cost', money(euac[low]), 'per year, %d years at %g%%' % (PERIOD, RATE)),
+    kpi('Initial construction', money(init[low]), 'including %g%% mobilization and %g%% engineering' % (mob, eng)),
+    kpi('Unit cost', '$%d / S.Y.' % round(unit), 'initial construction over the mainline area'),
+    kpi('Rate sensitivity', 'holds %g&ndash;%g%%' % (sens[0][0], sens[-1][0]),
+        'the lowest-cost alternative does not change', 'good') if set(SENS_LOW.values()) == {low} else
+    kpi('Rate sensitivity', 'the winner changes', 'the lowest-cost alternative is not the same at every rate', 'warn'),
 ])
 
 out = HTML.format(
     ident='McKellar-Sipes Regional Airport (MKL) &nbsp;|&nbsp; Jackson, West region &nbsp;|&nbsp; Runway 2-20 '
-          '(Reconstruction) &nbsp;|&nbsp; construction 2027 &nbsp;|&nbsp; 30 years at 3%',
+          '(Reconstruction) &nbsp;|&nbsp; construction %d &nbsp;|&nbsp; %d years at %g%%' % (YEAR0, PERIOD, RATE),
+    area=format(round(AREA), ','), shoulder=format(round(SHOULDER or 0), ','),
     kpis=kpis, rows=''.join(rows), map=MAP, comp=''.join(comp), secr=''.join(secr), charts=chart_cells,
-    verdict='Lowest present worth: %s &nbsp;|&nbsp; margin to next: %s &nbsp;|&nbsp; 3%% over 30 years '
-            '&nbsp;|&nbsp; lost revenue: Yes' % (names[low], money(margin)),
+    verdict='Lowest present worth: %s &nbsp;|&nbsp; margin to next: %s &nbsp;|&nbsp; %g%% over %d years '
+            '&nbsp;|&nbsp; lost revenue: %s' % (names[low], money(margin), RATE, PERIOD, gi['D38'].value or 'No'),
     verdict2='Same lowest-cost alternative at 2% (OMB A-94 real rate, FAA PGL 22-01) &nbsp;|&nbsp; same at 7% '
              '(the pre-2022 AIP rule).',
     compnote='Agency cost = initial construction + maintenance + rehabilitation + salvage. User cost = lost airport '
@@ -463,7 +483,9 @@ out = HTML.format(
              'the discount rate and analysis period on General Information.',
     charthow='How to read: 1 shows where each alternative&rsquo;s cost sits; 2 whether the lowest-cost alternative '
              'holds at other discount rates; 3 and 4 when the money is spent and when the higher first cost is paid '
-             'back; 5 how often and how long the runway closes; 6 and 7 the section the quantities describe.',
+             'back; 5 how often and how long the runway closes; 6 and 7 the section the quantities describe. The last '
+             'panel is not on the sheet today: it puts all four unit costs on one scale against published Tennessee '
+             'runway work, so a quantity that is out by an order of magnitude shows up here.',
     secnote='Thickness is not an input. Volume items give inches = 36 &times; C.Y. / mainline S.Y.; asphalt gives '
             'inches = 2,666.67 &times; tons / (pcf &times; mainline S.Y.). The last column is the section as the '
             'quantities describe it: paste it into the alternative description so the two can never disagree.',

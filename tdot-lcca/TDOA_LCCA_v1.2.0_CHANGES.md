@@ -112,6 +112,9 @@ workbook still reads as the same tool.
   text box, and the General Information label "Intial Construction Year". Every visible string in the
   workbook, the KML macro, these notes and the two reports was run through a spell check against a
   domain word list; the run is clean.
+- Locator map: the boundary source carries the Tennessee/North Carolina line twice, two tracings within
+  0.01 degrees of each other, which drew that stretch doubled. The second copy is dropped; the outline is
+  now 12 segments and 179 points.
 - Cell notes on D26 and D39 no longer carry a person's name.
 - Two broken external links to files on a C: drive (v1.1.004 and a Savannah copy) removed.
 - Workbook set to fully recalculate on open.

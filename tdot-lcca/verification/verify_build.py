@@ -106,7 +106,7 @@ check('coordinates fall inside Tennessee',
       all(-90.5 < a < -81.5 and 34.9 < b < 36.8 for a, b in coords if isinstance(a, (int, float))))
 border = [(ws.cell(r, 34).value, ws.cell(r, 35).value) for r in range(117, 330)]
 bpts = [(a, b) for a, b in border if isinstance(a, (int, float))]
-check('state outline embedded with gaps between segments', len(bpts) == 192 and len(border) > len(bpts), (len(bpts), len(border)))
+check('state outline embedded with gaps between segments', len(bpts) == 179 and len(border) > len(bpts), (len(bpts), len(border)))
 check('the selected airport is looked up, not typed',
       str(ws.cell(117, 30).value).startswith('=IFERROR(IF(INDEX(') and str(ws.cell(117, 31).value).startswith('=IFERROR(IF(INDEX('))
 mapch = [c for c in wb['Summary']._charts if c.tagname == 'scatterChart']
