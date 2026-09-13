@@ -139,9 +139,10 @@ def build_scratch(path):
     Y1 = Y0 + 2 + 30
 
     # ---- charts, two per row under the results table
-    def style(ch, title, h=8.0, w=15.5):
+    def style(ch, title, h=8.0, w=15.5, xt='Alternative', yt='Present worth ($)'):
         ch.title = title; ch.width = w; ch.height = h; ch.legend.position = 'b'; ch.y_axis.numFmt = '$#,##0,,"M"'; ch.y_axis.majorGridlines = None
         ch.x_axis.delete = False; ch.y_axis.delete = False
+        ch.x_axis.title = xt; ch.y_axis.title = yt
     def colour(ch, line=False):
         for s, rgb in zip(ch.series, ALT_COLORS):
             if line: s.graphicalProperties.line.solidFill = rgb; s.graphicalProperties.line.width = 22000; s.marker.symbol = 'none'; s.smooth = False
@@ -174,19 +175,19 @@ def build_scratch(path):
     ch.add_data(Reference(ws, min_col=DC, max_col=DC + NALT, min_row=5, max_row=9), titles_from_data=True, from_rows=True)
     ch.set_categories(Reference(ws, min_col=DC + 1, max_col=DC + NALT, min_row=4, max_row=4))
     for s, rgb in zip(ch.series, ['4A4A4A', '8C8C8C', '646464', 'B8B6AE', 'DCDCDC']): s.graphicalProperties.solidFill = rgb; s.graphicalProperties.line.solidFill = rgb
-    ch.x_axis.tickLblPos = 'low'; style(ch, '1. Present worth by category (salvage below zero)'); ws.add_chart(ch, 'G22')
+    ch.x_axis.tickLblPos = 'low'; style(ch, '1. Present worth by category (salvage below zero)', xt='Alternative', yt='Present worth ($)'); ws.add_chart(ch, 'G22')
     ch = LineChart()
     ch.add_data(Reference(ws, min_col=DC + 1, max_col=DC + NALT, min_row=11, max_row=SENS1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC, min_row=SENS0, max_row=SENS1))
-    colour(ch, line=True); ch.x_axis.tickLblSkip = 4; ch.x_axis.numFmt = '0.00"%"'; style(ch, '2. Net present worth vs. discount rate (TDOT 3%, FAA 2%, pre-2022 rule 7%)'); ws.add_chart(ch, 'N22')
+    colour(ch, line=True); ch.x_axis.tickLblSkip = 4; ch.x_axis.numFmt = '0.00"%"'; style(ch, '2. Net present worth vs. discount rate (TDOT 3%, FAA 2%, pre-2022 rule 7%)', xt='Discount rate (%)', yt='Net present worth ($)'); ws.add_chart(ch, 'N22')
     ch = BarChart(); ch.type = 'col'; ch.grouping = 'clustered'; ch.gapWidth = 40
     ch.add_data(Reference(ws, min_col=DC + 2, max_col=DC + 1 + NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
-    colour(ch); ch.x_axis.tickLblSkip = 5; ch.x_axis.tickLblPos = 'low'; style(ch, '3. Expenditure stream by calendar year (undiscounted)'); ws.add_chart(ch, 'G40')
+    colour(ch); ch.x_axis.tickLblSkip = 5; ch.x_axis.tickLblPos = 'low'; style(ch, '3. Expenditure stream by calendar year (undiscounted)', xt='Calendar year', yt='Spend, undiscounted ($)'); ws.add_chart(ch, 'G40')
     ch = LineChart()
     ch.add_data(Reference(ws, min_col=DC + 2 + NALT, max_col=DC + 1 + 2 * NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
-    colour(ch, line=True); ch.x_axis.tickLblSkip = 5; style(ch, '4. Cumulative discounted cost'); ws.add_chart(ch, 'N40')
+    colour(ch, line=True); ch.x_axis.tickLblSkip = 5; style(ch, '4. Cumulative discounted cost', xt='Calendar year', yt='Cumulative discounted cost ($)'); ws.add_chart(ch, 'N40')
     ch = BarChart(); ch.type = 'col'; ch.grouping = 'clustered'; ch.gapWidth = 40
     ch.add_data(Reference(ws, min_col=DC + 2 + 2 * NALT, max_col=DC + 1 + 3 * NALT, min_row=Y0 + 1, max_row=Y1), titles_from_data=True); ch.set_categories(Reference(ws, min_col=DC + 1, min_row=Y0 + 2, max_row=Y1))
-    colour(ch); ch.x_axis.tickLblSkip = 5; style(ch, '5. Runway closure days by calendar year'); ch.y_axis.numFmt = '0'; ws.add_chart(ch, 'G58')
+    colour(ch); ch.x_axis.tickLblSkip = 5; style(ch, '5. Runway closure days by calendar year', xt='Calendar year', yt='Closure days'); ch.y_axis.numFmt = '0'; ws.add_chart(ch, 'G58')
     # ---- pavement section read back from the pay-item quantities (display only; no cost depends on it)
     PCF = '$J$81'
     AREA = f'{GI}!$D$26'; SHLD = f'{GI}!$D$27'
@@ -261,7 +262,7 @@ def build_scratch(path):
         ch.add_data(Reference(ws, min_col=DC, max_col=DC + NALT, min_row=r0, max_row=r0 + 3), titles_from_data=True, from_rows=True)
         ch.set_categories(Reference(ws, min_col=DC + 1, max_col=DC + NALT, min_row=r0 - 1, max_row=r0 - 1))
         for s2, rgb in zip(ch.series, LAYER_RGB): s2.graphicalProperties.solidFill = rgb; s2.graphicalProperties.line.solidFill = rgb
-        style(ch, title); ch.y_axis.numFmt = '0'; ch.y_axis.title = 'inches'; ch.x_axis.tickLblPos = 'low'
+        style(ch, title, xt='Alternative', yt='Thickness (inches)'); ch.y_axis.numFmt = '0'; ch.x_axis.tickLblPos = 'low'
         ws.add_chart(ch, anch)
     ws['G108'] = ('Charts 6 and 7 stack the layers as they sit in the ground, surface on top. Chart 7 stays empty unless a shoulder area is entered on General Information, '
                   'and then shows the same quantities spread over mainline plus shoulder, which is the lower bound on each thickness.')

@@ -120,6 +120,25 @@ def patch_template(x, *, init, fa, la, kstart, kend, indirect, pcc_guard=False, 
     return x
 
 # ------------------------------------------------------------------ chart patch
+AX_TITLE = ('<c:title><c:tx><c:rich><a:bodyPr%s/><a:lstStyle/><a:p><a:pPr><a:defRPr sz="900" b="0"/></a:pPr>'
+            '<a:r><a:rPr lang="en-US" sz="900" b="0"/><a:t>%s</a:t></a:r></a:p></c:rich></c:tx>'
+            '<c:overlay val="0"/></c:title>')
+
+
+def axis_titles(c, xt, yt):
+    """Give a chart an x and a y axis title. Inserted before <c:numFmt> so the element order the schema
+    requires (axId, scaling, delete, axPos, gridlines, title, numFmt, ...) is kept."""
+    for tag, text, body in (('c:catAx', xt, ''), ('c:dateAx', xt, ''), ('c:valAx', yt, ' rot="-5400000" vert="horz"')):
+        m = re.search(r'<%s>.*?</%s>' % (tag, tag), c, re.S)
+        if not m or '<c:title>' in m.group(0): continue
+        ax = m.group(0)
+        anchor = ax.find('<c:numFmt')
+        if anchor < 0: anchor = ax.find('<c:majorTickMark')
+        if anchor < 0: continue
+        ax = ax[:anchor] + (AX_TITLE % (body, html.escape(text, quote=False))) + ax[anchor:]
+        c = c[:m.start()] + ax + c[m.end():]
+    return c
+
 def patch_chart(c, sheet, kstart, kend, keep_series):
     sers = re.findall(r'<c:ser>.*?</c:ser>', c, re.S)
     assert sers, 'no series'
@@ -140,7 +159,7 @@ def patch_chart(c, sheet, kstart, kend, keep_series):
         c = re.sub(r'<c:overlap val="-?\d+"/>', '<c:overlap val="100"/>', c)
     # category axis: show every 5th year, no decimals
     c = re.sub(r'(<c:catAx>.*?)<c:numFmt formatCode="General" sourceLinked="1"/>', r'\1<c:numFmt formatCode="0" sourceLinked="0"/>', c, count=1, flags=re.S)
-    return c
+    return axis_titles(c, 'Calendar year', 'Cost ($)')
 
 # ------------------------------------------------------------------ main
 def main(src, out, mbt_mode=False):
@@ -268,6 +287,10 @@ def main(src, out, mbt_mode=False):
                 ('xl/worksheets/sheet5.xml', 'FFBFBFBF'),    # Pay_Items
                 ('xl/worksheets/sheet7.xml', 'FFBFBFBF')]    # Maintenance Policies
         if method_part: tabs.append((method_part, 'FFBFBFBF'))
+    # --- the original Alternatives Comparison chart kept on the Summary: give it axis titles too
+    cmp_chart = 'xl/charts/chart6.xml' if not mbt_mode else None
+    if cmp_chart and os.path.exists(P(cmp_chart)):
+        wr(cmp_chart, axis_titles(rd(cmp_chart), 'Alternative', 'Cost ($)'))
     design_pass(work, rd, wr, gi_part, summ_part, tpl, tabs)
 
     # --- workbook: drop broken external links, force full recalculation on open

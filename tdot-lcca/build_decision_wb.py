@@ -339,7 +339,7 @@ def build_project(wb, key, pr):
     data=Reference(ws,min_col=2,max_col=6,min_row=K0+1,max_row=K0+3); cats=Reference(ws,min_col=1,min_row=K0+2,max_row=K0+3)
     ch.add_data(data,titles_from_data=True); ch.set_categories(cats)
     for s,rgb in zip(ch.series,['4A4A4A','8C8C8C','646464',GRAY,'DCDCDC']): color_series(s,rgb)
-    style_chart(ch,'Present worth by category (salvage shown below zero)'); place(ch,0)
+    style_chart(ch,'Present worth by category (salvage shown below zero)',xtitle='Alternative',ytitle='Present worth ($)'); place(ch,0)
 
     # 2 expenditure stream by year (direct + lost revenue, per alt) -> clustered columns of totals
     ch=BarChart(); ch.type='col'; ch.grouping='clustered'; ch.gapWidth=40
@@ -350,7 +350,7 @@ def build_project(wb, key, pr):
     ch.add_data(data,titles_from_data=True); ch.set_categories(cats)
     color_series(ch.series[0],HMA_RGB); color_series(ch.series[1],PCC_RGB)
     ch.x_axis.tickLblSkip=5; ch.x_axis.tickMarkSkip=5
-    style_chart(ch,'Expenditure stream by calendar year (undiscounted, incl. lost revenue)'); place(ch,1)
+    style_chart(ch,'Expenditure stream by calendar year (undiscounted, incl. lost revenue)',xtitle='Calendar year',ytitle='Spend, undiscounted ($)'); place(ch,1)
 
     # 3 cumulative discounted cost
     ch=LineChart()
@@ -358,7 +358,7 @@ def build_project(wb, key, pr):
     ch.add_data(data,titles_from_data=True); ch.set_categories(cats)
     color_series(ch.series[0],HMA_RGB,line=True); color_series(ch.series[1],PCC_RGB,line=True)
     ch.x_axis.tickLblSkip=5
-    style_chart(ch,'Cumulative discounted cost (crossover = payback year of the higher first cost)'); place(ch,2)
+    style_chart(ch,'Cumulative discounted cost (crossover = payback year of the higher first cost)',xtitle='Calendar year',ytitle='Cumulative discounted cost ($)'); place(ch,2)
 
     # 4 discount-rate sensitivity (scatter with lines)
     ch=ScatterChart(); ch.style=13
@@ -366,7 +366,7 @@ def build_project(wb, key, pr):
     for col,rgb in [(2,HMA_RGB),(3,PCC_RGB)]:
         ys=Reference(ws,min_col=col,min_row=S0+1,max_row=S1); s=Series(ys,xs,title_from_data=True); color_series(s,rgb,line=True); ch.series.append(s)
     ch.x_axis.numFmt='0"%"'; ch.x_axis.scaling.min=2; ch.x_axis.scaling.max=8
-    style_chart(ch,'Net present worth vs. discount rate (TDOT 3%, FAA AIP 7%)',xtitle='Discount rate'); place(ch,3)
+    style_chart(ch,'Net present worth vs. discount rate (TDOT 3%, FAA AIP 7%)',xtitle='Discount rate (%)',ytitle='Net present worth ($)'); place(ch,3)
 
     # 5 tornado (horizontal bars, low and high cases)
     ch=BarChart(); ch.type='bar'; ch.grouping='clustered'; ch.gapWidth=50
@@ -374,7 +374,7 @@ def build_project(wb, key, pr):
     ch.add_data(data,titles_from_data=True); ch.set_categories(cats)
     color_series(ch.series[0],'9E9E9E'); color_series(ch.series[1],'4A4A4A')
     ch.x_axis.tickLblPos='low'; ch.x_axis.scaling.orientation='maxMin'
-    style_chart(ch,'PCC minus HMA present worth when one input moves (bars crossing zero flip the winner)'); ch.y_axis.numFmt='$#,##0,,"M"'; place(ch,4)
+    style_chart(ch,'PCC minus HMA present worth when one input moves (bars crossing zero flip the winner)',xtitle='PCC minus HMA present worth ($)',ytitle='Input moved'); ch.y_axis.numFmt='$#,##0,,"M"'; place(ch,4)
 
     # 6 closure timeline bubble
     ch=BubbleChart(); ch.style=18
@@ -384,14 +384,14 @@ def build_project(wb, key, pr):
         s=Series(values=ys,xvalues=xs,zvalues=zs,title='HMA closures' if lane==1 else 'PCC closures'); s.graphicalProperties.solidFill=rgb; ch.series.append(s)
     ch.y_axis.scaling.min=0; ch.y_axis.scaling.max=3; ch.y_axis.numFmt='0'; ch.x_axis.numFmt='0'
     ch.x_axis.scaling.min=pr['year0']; ch.x_axis.scaling.max=pr['year0']+30
-    style_chart(ch,'Runway closure timeline (bubble size = days closed; lane 1 HMA, lane 2 PCC)',xtitle='Calendar year'); ch.y_axis.numFmt='0'; place(ch,5)
+    style_chart(ch,'Runway closure timeline (bubble size = days closed; lane 1 HMA, lane 2 PCC)',xtitle='Calendar year',ytitle='Lane (1 HMA, 2 PCC)'); ch.y_axis.numFmt='0'; place(ch,5)
 
     # 7 closure days per year stacked-by-alt? use clustered columns of closure days
     ch=BarChart(); ch.type='col'; ch.grouping='clustered'; ch.gapWidth=40
     data=Reference(ws,min_col=9,max_col=10,min_row=Y0+1,max_row=Y1); cats=Reference(ws,min_col=2,min_row=Y0+2,max_row=Y1)
     ch.add_data(data,titles_from_data=True); ch.set_categories(cats)
     color_series(ch.series[0],HMA_RGB); color_series(ch.series[1],PCC_RGB); ch.x_axis.tickLblSkip=5
-    style_chart(ch,'Runway closure days by calendar year'); ch.y_axis.numFmt='0'; place(ch,6)
+    style_chart(ch,'Runway closure days by calendar year',xtitle='Calendar year',ytitle='Closure days'); ch.y_axis.numFmt='0'; place(ch,6)
 
     # 8 scenario scorecard chart
     ch=BarChart(); ch.type='bar'; ch.grouping='clustered'; ch.gapWidth=40
@@ -399,7 +399,7 @@ def build_project(wb, key, pr):
     ch.add_data(data,titles_from_data=True); ch.set_categories(cats)
     color_series(ch.series[0],HMA_RGB); color_series(ch.series[1],PCC_RGB)
     ch.x_axis.scaling.orientation='maxMin'
-    style_chart(ch,'Net present worth by scenario',h=12); place(ch,7)
+    style_chart(ch,'Net present worth by scenario',xtitle='Scenario',ytitle='Net present worth ($)',h=12); place(ch,7)
 
     # ================================================================= live Monte Carlo (columns AK onward)
     N_MC=1000; mc0=37  # column AK
@@ -447,7 +447,7 @@ def build_project(wb, key, pr):
     ch=BarChart(); ch.type='col'; ch.grouping='clustered'; ch.gapWidth=10
     data=Reference(ws,min_col=sc+1,max_col=sc+1,min_row=14,max_row=14+nb); cats=Reference(ws,min_col=sc,min_row=15,max_row=14+nb)
     ch.add_data(data,titles_from_data=True); ch.set_categories(cats); color_series(ch.series[0],'4A4A4A'); ch.legend=None
-    ch.title='Monte Carlo: PCC minus HMA present worth (left of zero = PCC cheaper)'; ch.width=18; ch.height=9; ch.y_axis.title='Draws'; ch.y_axis.numFmt='0'; ch.x_axis.numFmt='$#,##0,"k"'; ch.x_axis.tickLblSkip=2; ch.x_axis.delete=False; ch.y_axis.delete=False; ch.y_axis.majorGridlines=None
+    ch.title='Monte Carlo: PCC minus HMA present worth (left of zero = PCC cheaper)'; ch.width=18; ch.height=9; ch.y_axis.title='Draws'; ch.x_axis.title='PCC minus HMA present worth ($)'; ch.y_axis.numFmt='0'; ch.x_axis.numFmt='$#,##0,"k"'; ch.x_axis.tickLblSkip=2; ch.x_axis.delete=False; ch.y_axis.delete=False; ch.y_axis.majorGridlines=None
     place(ch,8)
     ws.freeze_panes='A4'
     return dict(rNPW=rNPW, R=R)
@@ -494,13 +494,13 @@ def build_mc(wb):
     ch=BarChart(); ch.type='col'; ch.grouping='clustered'; ch.gapWidth=10
     data=Reference(ws,min_col=2,max_col=3,min_row=H0+1,max_row=H1); cats=Reference(ws,min_col=1,min_row=H0+2,max_row=H1)
     ch.add_data(data,titles_from_data=True); ch.set_categories(cats); color_series(ch.series[0],'4A4A4A'); color_series(ch.series[1],'B8B6AE')
-    ch.title='PCC - HMA present worth: 5,000 joint-uncertainty draws (left of zero = PCC cheaper)'; ch.width=22; ch.height=10; ch.y_axis.title='Draws'; ch.x_axis.numFmt='$#,##0,"k"'; ch.x_axis.tickLblSkip=3; ch.legend.position='b'
+    ch.title='PCC - HMA present worth: 5,000 joint-uncertainty draws (left of zero = PCC cheaper)'; ch.width=22; ch.height=10; ch.y_axis.title='Draws'; ch.x_axis.title='PCC minus HMA present worth ($)'; ch.x_axis.numFmt='$#,##0,"k"'; ch.x_axis.tickLblSkip=3; ch.legend.position='b'
     ch.x_axis.delete=False; ch.y_axis.delete=False
     ws.add_chart(ch,'H5')
     ch=LineChart()
     data=Reference(ws,min_col=4,max_col=5,min_row=H0+1,max_row=H1); ch.add_data(data,titles_from_data=True); ch.set_categories(cats)
     color_series(ch.series[0],'4A4A4A',line=True); color_series(ch.series[1],'B8B6AE',line=True)
-    ch.title='Cumulative probability that PCC - HMA is below the value'; ch.width=22; ch.height=10; ch.y_axis.numFmt='0%'; ch.x_axis.numFmt='$#,##0,"k"'; ch.x_axis.tickLblSkip=3; ch.legend.position='b'
+    ch.title='Cumulative probability that PCC - HMA is below the value'; ch.width=22; ch.height=10; ch.y_axis.title='Cumulative probability'; ch.x_axis.title='PCC minus HMA present worth ($)'; ch.y_axis.numFmt='0%'; ch.x_axis.numFmt='$#,##0,"k"'; ch.x_axis.tickLblSkip=3; ch.legend.position='b'
     ch.x_axis.delete=False; ch.y_axis.delete=False
     ws.add_chart(ch,'H26')
     return out

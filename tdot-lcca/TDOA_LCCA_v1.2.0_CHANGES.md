@@ -66,6 +66,10 @@ populates it with no further steps:
   is entered and shows the same quantities spread over mainline plus shoulder; column Q then also writes that
   shoulder reading out as a second string.
 - Chart data lives in columns W onward, greyed and labelled "calculated automatically; do not edit".
+- Every chart in the workbook now carries an x and a y axis title, including the five original alternative-sheet
+  charts and the original "Alternatives Comparison" chart (calendar year against cost, alternative against
+  present worth, discount rate against net present worth, alternative against thickness, and so on). The
+  companion decision workbook got the same treatment.
 - Navigation: dark HYPERLINK button cells "General Information" and "Instructions" at the top of
   Summary, and a "View Summary" button under Alternative Setup on General Information (row 44).
   They need no macro, so they work when ActiveX is blocked.
