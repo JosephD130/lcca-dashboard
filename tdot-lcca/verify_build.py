@@ -4,8 +4,9 @@ pavement-section block. Reads the file as a zip and with openpyxl; no Excel or L
 
 usage: python3 verify_build.py <workbook.xlsm>
 """
-import sys, re, zipfile, warnings
+import sys, re, html, zipfile, warnings
 from openpyxl import load_workbook
+from openpyxl.utils import column_index_from_string
 warnings.filterwarnings('ignore')
 
 WB = sys.argv[1] if len(sys.argv) > 1 else 'TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm'
@@ -65,7 +66,7 @@ check('columns A to F hidden (the block the form writes)', all(ws.column_dimensi
 check('column G onward visible', not ws.column_dimensions['G'].hidden)
 check('navigation buttons sit in the first visible column', 'HYPERLINK' in str(ws['G1'].value) and 'HYPERLINK' in str(ws['H1'].value),
       (ws['G1'].value, ws['H1'].value))
-check('title moved beside the buttons', ws['J1'].value == 'LCCA SUMMARY')
+check('title moved beside the buttons', ws['I1'].value == 'LCCA SUMMARY')
 check('note explains the hidden block', 'hidden' in str(ws.cell(HOW, 7).value) and 'unhide' in str(ws.cell(HOW, 7).value).lower())
 check('the verdict banner leads with the winner', str(ws.cell(HDR - 1, 7).value).startswith('=IF(COUNT($O$12:$O$15)=0') and 'Lowest present worth' in str(ws.cell(HDR - 1, 7).value))
 check('results table header intact', [ws.cell(HDR, c).value for c in range(7, 19)] ==
@@ -111,7 +112,7 @@ check('the sensitivity block names the lowest alternative at each of its rates',
       and str(ws.cell(SENS0, 28).value).startswith('=IF(COUNTIF(')
       and str(ws.cell(SENS1, 28).value).startswith('=IF(COUNTIF('),
       ws.cell(SENS0 - 1, 28).value)
-TILE_C = [7, 10, 14]        # G:I, J:M, N:Q - even widths over the table's own column widths
+TILE_C = [7, 11, 15]        # G:J, K:N, O:R - three even cards that fill the band exactly
 check('the rate-sensitivity tile tests every rate in that block, not just its ends',
       'COUNTIF($AB$%d:$AB$%d' % (SENS0, SENS1) in str(ws.cell(KPI0 + 5, TILE_C[2]).value),
       str(ws.cell(KPI0 + 5, TILE_C[2]).value)[:90])
@@ -119,7 +120,7 @@ check('an alternative that does not exist gets no name', all('""' in str(ws.cell
       ws.cell(4, 24).value)
 wbx = rd('xl/workbook.xml')
 check('print areas defined for the Summary and General Information',
-      'Summary!$A$1:$V$141' in wbx and "'General Information'!$A$1:$J$52" in wbx,
+      'Summary!$A$1:$R$' in wbx and "'General Information'!$A$1:$J$52" in wbx,
       re.findall(r'<definedName name="_xlnm.Print_Area"[^>]*>([^<]*)', wbx))
 
 print(); print('=' * 78); print('CHARTS'); print('=' * 78)
@@ -168,8 +169,8 @@ vals = [str(ws.cell(KPI0 + 1 + 4 * (k // 3), TILE_C[k % 3]).value) for k in rang
 check('every tile is a formula over cells that already exist', all(v.startswith('=') for v in vals), vals[:2])
 tile_rows = (KPI0, KPI0 + 1, KPI0 + 2, KPI0 + 4, KPI0 + 5, KPI0 + 6)
 spans = sorted({(m.min_col, m.max_col) for m in ws.merged_cells.ranges if m.min_row in tile_rows})
-check('the six tiles are even: three columns then four then four, not four each',
-      spans == [(7, 9), (10, 13), (14, 17)]
+check('the six tiles are even: four columns each, so the strip fills the band',
+      spans == [(7, 10), (11, 14), (15, 18)]
       and sum(1 for m in ws.merged_cells.ranges if m.min_row in tile_rows) == 18, spans)
 sx = rd('xl/worksheets/sheet14.xml')
 cfs = dict(re.findall(r'<conditionalFormatting sqref="([^"]+)"><cfRule type="(\w+)"', sx))
@@ -216,25 +217,41 @@ check('locator map has the outline, the three Grand Divisions and this project',
 check('airports grouped by division so each is its own series',
       [ws.cell(r, 27).value for r in (A0, A0 + 20, A0 + 43, A0 + 73)] == ['West', 'West', 'Middle', 'East'],
       [ws.cell(r, 27).value for r in (A0, A0 + 20, A0 + 43, A0 + 73)])
+# the locator map and the project facts moved out of columns S:V and into the foot of the band,
+# so the whole sheet fits a laptop screen without scrolling sideways
+LOC = 98
+check('nothing is left in columns S:V, which sat beyond the band',
+      not [c.coordinate for r in ws.iter_rows(min_row=1, max_row=40, min_col=19, max_col=22)
+           for c in r if c.value is not None],
+      [c.coordinate for r in ws.iter_rows(min_row=1, max_row=40, min_col=19, max_col=22)
+       for c in r if c.value is not None][:6])
 check('legend in cells, one per division plus this project',
-      [ws.cell(17, c).value for c in range(19, 23)] == ['\u25a0 West', '\u25a0 Middle', '\u25a0 East', '\u25a0 This project'],
-      [ws.cell(17, c).value for c in range(19, 23)])
-check('card header band across S2:V2', ws['S2'].value == 'PROJECT LOCATION' and ws['S2'].fill.fgColor.rgb.endswith('1D2733'))
-check('pricing basis stated beside the map', 'Unit Cost' in str(ws['S28'].value) and 'empty' in str(ws['S28'].value))
+      [ws.cell(LOC + 14, c).value for c in range(7, 11)] == ['\u25a0 West', '\u25a0 Middle', '\u25a0 East', '\u25a0 This project'],
+      [ws.cell(LOC + 14, c).value for c in range(7, 11)])
+check('the block leads with its own section rule and two card headers',
+      ws.cell(LOC, 7).value == 'PROJECT AND LOCATION'
+      and ws.cell(LOC + 1, 7).value == 'PROJECT LOCATION' and ws.cell(LOC + 1, 13).value == 'PROJECT'
+      and ws.cell(LOC + 1, 7).fill.fgColor.rgb.endswith('1D2733'),
+      [ws.cell(LOC, 7).value, ws.cell(LOC + 1, 7).value, ws.cell(LOC + 1, 13).value])
+check('pricing basis stated under the map',
+      'Unit Cost' in str(ws.cell(LOC + 16, 7).value) and 'empty' in str(ws.cell(LOC + 16, 7).value))
 check('map axes are named and their degree labels suppressed',
       mapch and mapch[0].x_axis.numFmt.formatCode == ';;;' and mapch[0].y_axis.numFmt.formatCode == ';;;')
 check('project block names airport, county, region, coordinates, elevation',
-      [ws.cell(20 + k, 19).value for k in range(7)] ==
+      [ws.cell(LOC + 2 + k, 13).value for k in range(7)] ==
       ['Airport', 'City / county', 'TDOT Grand Division', 'Coordinates', 'Elevation', 'Branch / project', 'Mainline area'],
-      [ws.cell(20 + k, 19).value for k in range(7)])
+      [ws.cell(LOC + 2 + k, 13).value for k in range(7)])
 check('the sheet says where the coordinates come from and how to export KML',
-      'embedded' in str(ws['S29'].value) and 'ExportLCCAKML' in str(ws['S30'].value))
-check('runway width for the export footprint is an input cell', ws['S27'].value == 'Runway width, ft'
-      and ws['T27'].value == 100, (ws['S27'].value, ws['T27'].value))
-check('the three notes beside the map are merged so they do not run into the chart data',
-      all(str(rng) in [str(m) for m in ws.merged_cells.ranges] for rng in ('S28:V28', 'S29:V29', 'S30:V30')),
+      'embedded' in str(ws.cell(LOC + 17, 7).value) and 'ExportLCCAKML' in str(ws.cell(LOC + 18, 7).value))
+check('runway width for the export footprint is an input cell, and the macro reads that cell',
+      ws.cell(LOC + 9, 13).value == 'Runway width, ft' and ws.cell(LOC + 9, 15).value == 100
+      and '"O%d"' % (LOC + 9) in open('LCCA_KML_Export.bas', encoding='utf-8').read(),
+      (ws.cell(LOC + 9, 13).value, ws.cell(LOC + 9, 15).value))
+check('the three notes under the map are merged so they do not run into the chart data',
+      all('G%d:R%d' % (LOC + k, LOC + k) in [str(m) for m in ws.merged_cells.ranges] for k in (16, 17, 18)),
       [str(m) for m in ws.merged_cells.ranges][-4:])
-check('print area widened to take the map', 'Summary!$A$1:$V$141' in rd('xl/workbook.xml'))
+check('print area no longer has to reach past the band', 'Summary!$A$1:$R$' in rd('xl/workbook.xml'),
+      re.findall(r'<definedName name="_xlnm.Print_Area" localSheetId="13">([^<]*)', rd('xl/workbook.xml')))
 
 print(); print('=' * 78); print('METHOD AND TYPICAL VALUES'); print('=' * 78)
 me = wb['Method']
@@ -295,8 +312,8 @@ check('General Information shows the five-step flow',
       '1 Overview' in str(gi['B4'].value) and '5 Summary' in str(gi['B4'].value), str(gi['B4'].value)[:60])
 # the step marker leads the sheet's one-line summary, so the band itself can carry the sheet's name
 steps = {'Overview': wb['Overview']['B2'].value, 'Instructions': wb['Instructions']['B2'].value,
-         'Pay_Items': wb['Pay_Items']['E1'].value, 'TMP(NewHMA)': wb['TMP(NewHMA)']['A3'].value,
-         'Summary': ws['M1'].value}
+         'Pay_Items': wb['Pay_Items']['F1'].value, 'TMP(NewHMA)': wb['TMP(NewHMA)']['A3'].value,
+         'Summary': ws['K1'].value}
 check('every sheet in the flow says which step it is',
       [str(v).strip()[:11] for v in steps.values()] == ['STEP 1 of 5', 'STEP 1 of 5', 'STEP 3 of 5', 'STEP 4 of 5', 'STEP 5 of 5'],
       {k: str(v).strip()[:14] for k, v in steps.items()})
@@ -455,6 +472,62 @@ check('the alternative templates still multiply that fraction by the salvaged co
       all("-'Maintenance Policies'!D32*AV22" in rd(p_) for p_ in
           ('xl/worksheets/sheet8.xml', 'xl/worksheets/sheet10.xml')))
 
+print(); print('=' * 78); print('WHAT EXCEL VALIDATES WHEN IT OPENS THE FILE'); print('=' * 78)
+# A table column carries the header text as its name. Change the header cell and leave the name,
+# and Excel reports "Repaired Records: Table from /xl/tables/tableN.xml" on open.
+_tbl_sheet = {}
+for _n in names:
+    m = re.match(r'xl/worksheets/_rels/(sheet\d+)\.xml\.rels$', _n)
+    if not m: continue
+    for t in re.findall(r'Target="\.\./(tables/table\d+\.xml)"', rd(_n)):
+        _tbl_sheet['xl/' + t] = 'xl/worksheets/%s.xml' % m.group(1)
+_wbrels = {m.group(1): m.group(2) for m in re.finditer(r'Id="([^"]+)"[^>]*Target="([^"]+)"', rd('xl/_rels/workbook.xml.rels'))}
+_sheet_name = {'xl/' + _wbrels[m.group(2)]: m.group(1)
+               for m in re.finditer(r'<sheet name="([^"]+)"[^>]*r:id="([^"]+)"', rd('xl/workbook.xml'))}
+_mismatch = []
+for _t, _sh in sorted(_tbl_sheet.items()):
+    _x = rd(_t)
+    _ref = re.search(r' ref="([A-Z]+)(\d+):', _x)
+    _c0, _r0 = column_index_from_string(_ref.group(1)), int(_ref.group(2))
+    _cols = [html.unescape(c) for c in re.findall(r'<tableColumn [^>]*name="([^"]*)"', _x)]
+    _sheetw = wb[_sheet_name[_sh]]
+    _hdr = [str(_sheetw.cell(_r0, _c0 + i).value) for i in range(len(_cols))]
+    if _hdr != _cols: _mismatch.append((_t, [p for p in zip(_cols, _hdr) if p[0] != p[1]]))
+check('every table column name still matches the header cell it sits over',
+      not _mismatch, _mismatch)
+
+# The other things Excel validates on open: a mergeCells count that disagrees with its children,
+# two merges over the same cell, and cells or rows out of order inside sheetData.
+_sheets = [n for n in names if re.match(r'xl/worksheets/sheet\d+\.xml$', n)]
+def _box(ref):
+    a, b = ref.split(':')
+    (c1, r1), (c2, r2) = re.match(r'([A-Z]+)(\d+)', a).groups(), re.match(r'([A-Z]+)(\d+)', b).groups()
+    return (column_index_from_string(c1), int(r1), column_index_from_string(c2), int(r2))
+_merge_bad, _order_bad = [], []
+for _n in _sheets:
+    _x = rd(_n)
+    _m = re.search(r'<mergeCells count="(\d+)">(.*?)</mergeCells>', _x, re.S)
+    if _m:
+        _refs = re.findall(r'<mergeCell ref="([^"]+)"/>', _m.group(2))
+        if int(_m.group(1)) != len(_refs): _merge_bad.append((_n, 'count', int(_m.group(1)), len(_refs)))
+        _boxes = [_box(r) for r in _refs]
+        for _i in range(len(_boxes)):
+            for _j in range(_i + 1, len(_boxes)):
+                _a, _b = _boxes[_i], _boxes[_j]
+                if not (_a[2] < _b[0] or _b[2] < _a[0] or _a[3] < _b[1] or _b[3] < _a[1]):
+                    _merge_bad.append((_n, 'overlap', _refs[_i], _refs[_j]))
+    _rows = [int(r) for r in re.findall(r'<row r="(\d+)"', _x)]
+    if _rows != sorted(_rows) or len(_rows) != len(set(_rows)): _order_bad.append((_n, 'rows'))
+    for _rm in re.finditer(r'<row r="(\d+)"(?=[ />])[^>]*?(?:/>|>(.*?)</row>)', _x, re.S):
+        _refs = re.findall(r'<c r="([A-Z]+)\d+"', _rm.group(2) or '')
+        _cols = [column_index_from_string(c) for c in _refs]
+        if _cols != sorted(_cols) or len(_cols) != len(set(_cols)):
+            _order_bad.append((_n, 'row %s' % _rm.group(1)))
+check('no sheet declares a merge count it does not have, and no two merges overlap',
+      not _merge_bad, _merge_bad[:4])
+check('rows and cells are in order inside sheetData, with none repeated',
+      not _order_bad, _order_bad[:4])
+
 print(); print('=' * 78); print('THE FIRST SHEET, AND WHAT OPENS WHERE'); print('=' * 78)
 gi = wb['General Information']
 check('no sheet opens scrolled away from its own top-left',
@@ -469,8 +542,9 @@ check('the how-to card and the status line have room to render',
       all(round(gi.column_dimensions[c].width, 1) == 13.0 for c in 'FGHIJ')
       and all(gi.row_dimensions[r].height == 22 for r in range(3, 8)),
       {c: gi.column_dimensions[c].width for c in 'FGHIJ'})
-check('the step line moved off row 1 to make room for the button',
-      gi['B1'].value is None and str(gi['C1'].value).startswith('STEP 2 of 5'))
+check('the band carries the sheet name and its step, and row 1 leaves room for the button',
+      gi['B1'].value is None and gi['C1'].value == 'General Information'
+      and str(gi['D1'].value).startswith('STEP 2 of 5'), [gi['C1'].value, gi['D1'].value])
 check('the New Study button is on the sheet and wired to the macro',
       'macro="NewStudy"' in rd('xl/drawings/drawing4.xml') and 'btnNewStudy' in rd('xl/drawings/drawing4.xml'))
 check('the New Study caption is short and says nothing about importing',

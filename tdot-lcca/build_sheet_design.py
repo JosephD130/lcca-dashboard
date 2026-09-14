@@ -340,16 +340,11 @@ def pay_items(rd, wr, st):
                   'flagged amber below.")'
                   % (PAY_FIRST, PAY_LAST, PAY_FIRST, PAY_LAST, PAY_FIRST, PAY_LAST),
                   s_stat, t='str', v='')
-    x = D.text(x, 'E1', 'STEP 3 of 5   \u00b7   the unit costs every alternative is priced from. '
-                        'The grey Unit Cost column is the one to edit.', s_step)
-    for c in 'FGHI': x = D.blank(x, '%s1' % c, s_step)
-    # the merged "Average Pay Item Unit Cost" label gave up row 1 to the status line; the three
-    # division columns say it themselves instead
-    x = re.sub(r'<mergeCell ref="G1:I1"/>', '', x)
-    x = D.remove_cell(x, 'G1')
-    for col, name in (('G', 'Middle avg'), ('H', 'West avg'), ('I', 'East avg')):
-        x = D.text(x, '%s2' % col, name, s_hdrc)
-    x = D.merges(x, ['E1:I1'])
+    x = D.blank(x, 'E1', s_stat)
+    x = D.text(x, 'F1', 'STEP 3 of 5', s_step)
+    # G1:I1 keeps its "Average Pay Item Unit Cost" label and G2:I2 keep the header text Table2 names
+    # its columns by: rename either and Excel repairs the table when the file is opened.
+    x = D.merges(x, ['D1:E1'])
     x = D.row_height(x, 1, 40)
 
     # the header reads as the band the other sheets use
@@ -417,14 +412,18 @@ def policies(rd, wr, st):
         year_mid[key] = st.add(fill=FILL(fill), border=BORDER(left=True, right=True, color=ink))
         year_mid_last[key] = st.add(fill=FILL(fill),
                                     border=BORDER(left=True, right=True, bottom=True, color=ink))
-    chips = {}
-    for key, fill, ink in (('rehab', RED_SOFT, RED), ('green', GREEN_SOFT, GREEN), ('amber', AMBER_SOFT, AMBER)):
-        chips[key] = (
-            st.add(font=FONT(10, b=True, color=ink), fill=FILL(fill), alignment=ALIGN(v='center')),
-            st.add(font=FONT(10, color=ink), fill=FILL(fill), alignment=ALIGN(v='center')),
-            st.add(font=FONT(10, b=True, color=ink), fill=FILL(fill),
-                   border=BORDER(True, True, True, True, color=ink), alignment=ALIGN(h='center', v='center')),
-        )
+    TINTS = {'rehab': (RED_SOFT, RED), 'green': (GREEN_SOFT, GREEN), 'amber': (AMBER_SOFT, AMBER)}
+    legend = {k: st.add(font=FONT(10, b=True, color=ink), fill=FILL(fl),
+                        border=BORDER(True, True, True, True, color=ink),
+                        alignment=ALIGN(v='center', indent=1))
+              for k, (fl, ink) in TINTS.items()}
+
+    def tinted(key, col, first, last, bold=False):
+        """A cell on a tinted activity block, carrying that block's own edge of the outline."""
+        fl, ink = TINTS[key]
+        return st.add(font=FONT(10, b=bold, color=ink), fill=FILL(fl),
+                      border=BORDER(left=True, right=True, top=first, bottom=last, color=ink),
+                      alignment=ALIGN(v='center', indent=1 if col == 'B' else 0))
 
     x = D.text(x, 'B2', 'Maintenance & Rehabilitation Policies', s_title)
     x = D.remove_cell(x, 'C2')
@@ -443,9 +442,9 @@ def policies(rd, wr, st):
     x = D.remove_cell(x, 'C5')
     x = D.remove_cell(x, 'C6')
     # the legend, in the same colours the rows below carry
-    x = D.text(x, 'B6', 'Rehabilitation', chips['rehab'][0])
-    x = D.text(x, 'C6', 'Salvage credit', chips['green'][0])
-    x = D.text(x, 'D6', 'No salvage', chips['amber'][0])
+    x = D.text(x, 'B6', 'Rehabilitation', legend['rehab'])
+    x = D.text(x, 'C6', 'Salvage credit', legend['green'])
+    x = D.text(x, 'D6', 'No salvage', legend['amber'])
     x = D.text(x, 'E6', 'Closure days come from Typical Values, not this sheet.', s_note)
     for r, h in ((2, 22), (3, 40), (4, 28), (5, 16), (6, 18), (7, 6)): x = D.row_height(x, r, h)
 
@@ -469,10 +468,14 @@ def policies(rd, wr, st):
             r1 = (starts[i + 1] - 1) if i + 1 < len(starts) else t['last']
             tint = 'rehab' if r0 in t['rehab'] else (kind if r0 == sr else None)
             if tint:
-                x = D.restyle(x, range(r0, r1 + 1), cols_, chips[tint][1])
-                x = D.restyle(x, [r0], ['B'], chips[tint][0])
+                for r in range(r0, r1 + 1):
+                    first, last = r == r0, r == r1
+                    x = D.restyle(x, [r], ['B'], tinted(tint, 'B', first, last, bold=(r == r0)))
+                    for c in ('C', 'F'):
+                        x = D.restyle(x, [r], [c], tinted(tint, c, first, last))
             for r in range(r0, r1 + 1):
-                # the grey Rate column is the input; the salvage fraction is calculated, so it is not
+                # the grey Rate column is the input wherever it appears; the salvage fraction is
+                # calculated, so it is left as a result
                 if has_value('D%d' % r) and not formula_at(x, 'D%d' % r) and r != sr:
                     x = D.restyle(x, [r], ['D'], s_rate)
             x = D.restyle(x, [r0], ['E'], year_top[tint or 'plain'])
@@ -726,10 +729,293 @@ def reference_sheets(rd, wr, st):
         wr(cfg['part'], x)
         relogo(cfg['part'], rd, wr, cfg['widths'], D.colnum(last))
 
+
+# ---------------------------------------------------------------------------- Summary
+# The band is G:R, 1,260 px. Two things pushed the sheet off a laptop screen: the locator map and
+# the project facts sat in columns S:V, a second column of content 392 px beyond the band, and the
+# supporting charts were anchored at column offsets that overlapped each other. Both are fixed
+# here: the block moves to the foot of the band, and every chart is re-anchored to an even grid.
+SUM_PART = 'xl/worksheets/sheet14.xml'
+SUM_WIDTHS = {7: 16, 8: 20, 9: 12, 10: 13, 11: 13, 12: 13, 13: 13, 14: 13, 15: 13,
+              16: 21, 17: 21, 18: 12}
+BAND_PX = 1260
+KEY_ROW, SUP_ROW, SEC_ROW = 30, 48, 59     # the three chart rows, 1-based
+LOC_ROW = 98                               # where the locator block starts
+# where each cell of the old right-hand block lands in the band
+LOC_MOVE = [('S2', 'G%d' % (LOC_ROW + 1))] + \
+           [('%s17' % c, '%s%d' % (t, LOC_ROW + 14)) for c, t in zip('STUV', 'GHIJ')] + \
+           [('S19', 'M%d' % (LOC_ROW + 1))] + \
+           [('S%d' % r, 'M%d' % (LOC_ROW + 2 + r - 20)) for r in range(20, 28)] + \
+           [('T%d' % r, 'O%d' % (LOC_ROW + 2 + r - 20)) for r in range(20, 28)] + \
+           [('S28', 'G%d' % (LOC_ROW + 16)), ('S29', 'G%d' % (LOC_ROW + 17)),
+            ('S30', 'G%d' % (LOC_ROW + 18))]
+WIDTH_ROW = LOC_ROW + 2 + 27 - 20                # the row the runway-width input sits on
+WIDTH_CELL = 'O%d' % WIDTH_ROW                   # LCCA_KML_Export.bas reads this cell
+
+
+def col_offsets(widths, first=7, last=18):
+    """{column index: pixel x of its left edge, measured from the first column of the band}."""
+    def px(w): return int(((256 * w + int(128 / 7)) / 256) * 7)
+    out, acc = {}, 0
+    for c in range(first, last + 2):
+        out[c] = acc
+        acc += px(widths.get(c, 8.7109375))
+    return out
+
+
+def at_px(offs, x):
+    """(col, colOff EMU) for a pixel position measured from the left of the band."""
+    c = max(k for k in offs if offs[k] <= x)
+    return c - 1, int(round((x - offs[c]) * D.EMU_PX))
+
+
+def summary(rd, wr, st):
+    x = rd(SUM_PART)
+    offs = col_offsets(SUM_WIDTHS)
+
+    s_title = st.add(font=FONT(13, b=True), alignment=ALIGN(v='center'))
+    s_step = st.add(font=FONT(9, i=True, color=GREY), alignment=ALIGN(v='center'))
+    s_sec = st.add(font=FONT(11, b=True), border=BORDER(bottom=True, color=BLUE),
+                   alignment=ALIGN(v='center'))
+    s_secb = st.add(border=BORDER(bottom=True, color=BLUE))
+    s_kick = st.add(font=FONT(8, b=True, color=MUTED), fill=FILL(WHITE),
+                    border=BORDER(left=True, right=True, top=True), alignment=ALIGN(v='center', indent=1))
+    s_val = st.add(font=FONT(18, b=True), fill=FILL(WHITE),
+                   border=BORDER(left=True, right=True), alignment=ALIGN(v='center', indent=1))
+    s_cap = st.add(font=FONT(8, color=MUTED), fill=FILL(WHITE),
+                   border=BORDER(left=True, right=True, bottom=True),
+                   alignment=ALIGN(v='top', wrap=True, indent=1))
+    s_note = st.add(font=FONT(9, i=True, color=GREY), alignment=ALIGN(v='center', wrap=True))
+
+    # ---- row 1: buttons, then the sheet's name and its step, as on every other sheet
+    x = D.remove_cell(x, 'J1')
+    x = D.remove_cell(x, 'M1')
+    x = D.text(x, 'I1', 'LCCA SUMMARY', s_title)
+    x = D.text(x, 'K1', 'STEP 5 of 5', s_step)
+
+    # ---- the six tiles become three cards of four columns, twice, filling the band exactly.
+    # Nothing on any sheet references G3:R9, so the second and third tiles move a column to make
+    # the three cards even: the old merges were G:I, J:M and N:Q, leaving column R outside them.
+    for r in (3, 4, 5, 7, 8, 9):
+        for src, dst in (('N', 'O'), ('J', 'K')):
+            m = D.CELL_RE('%s%d' % (src, r)).search(x)
+            if not m: continue
+            cell = m.group(0).replace('<c r="%s%d"' % (src, r), '<c r="%s%d"' % (dst, r), 1)
+            x = x[:m.start()] + x[m.end():]
+            x = D.put_cell(x, '%s%d' % (dst, r), cell)
+    old_merges = ['%s%d:%s%d' % (a, r, b, r)
+                  for a, b in (('G', 'I'), ('J', 'M'), ('N', 'Q')) for r in (3, 4, 5, 7, 8, 9)]
+    for ref in old_merges:
+        x = x.replace('<mergeCell ref="%s"/>' % ref, '')
+    x = re.sub(r'<mergeCells count="\d+">',
+               lambda m: '<mergeCells count="%d">' % len(re.findall(r'<mergeCell ', x)), x, count=1)
+
+    for band_row in (3, 7):
+        for i, c0 in enumerate((7, 11, 15)):
+            for r, style in ((band_row, s_kick), (band_row + 1, s_val), (band_row + 2, s_cap)):
+                for c in range(c0, c0 + 4):
+                    ref = '%s%d' % (D.colname(c), r)
+                    keep = D.CELL_RE(ref).search(x)
+                    body = keep.group(0) if keep else ''
+                    if '<f>' in body or '<is>' in body or '<v>' in body:
+                        x = D.restyle(x, [r], [D.colname(c)], style)
+                    else:
+                        x = D.blank(x, ref, style)
+    merges = []
+    for band_row in (3, 7):
+        for c0 in (7, 11, 15):
+            for r in range(band_row, band_row + 3):
+                merges.append('%s%d:%s%d' % (D.colname(c0), r, D.colname(c0 + 3), r))
+    x = D.merges(x, merges)
+    for r, h in ((3, 14), (4, 26), (5, 20), (6, 7), (7, 14), (8, 26), (9, 20)):
+        x = D.row_height(x, r, h)
+
+    # ---- the locator map and the project facts move out of S:V and into the foot of the band
+    moved = {}
+    for src, dst in LOC_MOVE:
+        m = D.CELL_RE(src).search(x)
+        if not m: continue
+        moved[dst] = m.group(0).replace('<c r="%s"' % src, '<c r="%s"' % dst, 1)
+        x = x[:m.start()] + x[m.end():]
+    for dst in sorted(moved, key=lambda r: (D.split_ref(r)[1], D.colnum(D.split_ref(r)[0]))):
+        x = D.put_cell(x, dst, moved[dst])
+    x = re.sub(r'<mergeCell ref="[STUV]\d+:[STUV]\d+"/>', '', x)
+    # whatever the block left behind in S:V would still paint its fill, so the cells go too
+    for r in range(1, 31):
+        for c in 'STUV':
+            x = D.remove_cell(x, '%s%d' % (c, r))
+
+    x = D.text(x, 'G%d' % LOC_ROW, 'PROJECT AND LOCATION', s_sec)
+    x = D.restyle(x, [LOC_ROW], [D.colname(c) for c in range(8, 19)], s_secb)
+    s_blockh = st.add(font=FONT(9, b=True, color=WHITE), fill=FILL(NAVY), alignment=ALIGN(indent=1))
+    for c0, c1 in ((7, 12), (13, 18)):
+        x = D.restyle(x, [LOC_ROW + 1], [D.colname(c) for c in range(c0, c1 + 1)], s_blockh)
+    x = D.text(x, 'G%d' % (LOC_ROW + 1), 'PROJECT LOCATION', s_blockh)
+    x = D.text(x, 'M%d' % (LOC_ROW + 1), 'PROJECT', s_blockh)
+    # the label column, the value column, and the one editable cell in the block
+    s_lbl = st.add(font=FONT(9, color=MUTED), alignment=ALIGN(v='center', indent=1))
+    s_valx = st.add(font=FONT(9), alignment=ALIGN(v='center', indent=1))
+    s_in = st.add(font=FONT(9), fill=FILL(INPUT), border=BORDER(True, True, True, True, color='FFBFBFBF'),
+                  alignment=ALIGN(h='right', v='center'))
+    for i in range(8):
+        r = LOC_ROW + 2 + i
+        x = D.restyle(x, [r], ['M', 'N'], s_lbl)
+        x = D.restyle(x, [r], ['O', 'P', 'Q', 'R'], s_valx)
+    x = D.restyle(x, [WIDTH_ROW], ['O'], s_in)
+    x = D.restyle(x, [WIDTH_ROW], ['P', 'Q', 'R'], st.add(font=FONT(8, i=True, color=MUTED),
+                                                          alignment=ALIGN(v='center', indent=1)))
+    x = D.text(x, 'P%d' % WIDTH_ROW, 'used only by the Google Earth footprint', st.add(
+        font=FONT(8, i=True, color=MUTED), alignment=ALIGN(v='center', indent=1)))
+    for r, h in [(LOC_ROW, 22), (LOC_ROW + 1, 18)]:
+        x = D.row_height(x, r, h)
+    for r in range(LOC_ROW + 2, LOC_ROW + 14):
+        x = D.row_height(x, r, 17)
+    for r in range(LOC_ROW + 14, LOC_ROW + 19):
+        x = D.row_height(x, r, 18)
+    for r in (LOC_ROW + 16, LOC_ROW + 17, LOC_ROW + 18):
+        x = D.restyle(x, [r], [D.colname(c) for c in range(7, 19)], s_note)
+    x = D.merges(x, ['G%d:R%d' % (LOC_ROW, LOC_ROW)] +
+                 ['G%d:L%d' % (LOC_ROW + 1, LOC_ROW + 1), 'M%d:R%d' % (LOC_ROW + 1, LOC_ROW + 1)] +
+                 ['M%d:N%d' % (r, r) for r in range(LOC_ROW + 2, LOC_ROW + 10)] +
+                 ['O%d:R%d' % (r, r) for r in range(LOC_ROW + 2, LOC_ROW + 9)] +
+                 ['P%d:R%d' % (WIDTH_ROW, WIDTH_ROW)] +
+                 ['G%d:R%d' % (r, r) for r in (LOC_ROW + 16, LOC_ROW + 17, LOC_ROW + 18)])
+    for c in 'STUV':
+        x = re.sub(r'<col min="%d" max="%d"[^>]*/>' % (D.colnum(c), D.colnum(c)), '', x)
+
+    x = D.sheet_view(x, gridlines=False)
+    wr(SUM_PART, x)
+    # the print area reached out to column V for the map; the band ends at R now
+    w = rd('xl/workbook.xml')
+    w = re.sub(r'(<definedName name="_xlnm.Print_Area" localSheetId="13">)Summary!\$A\$1:\$V\$\d+',
+               r'\g<1>Summary!$A$1:$R$%d' % (LOC_ROW + 20), w)
+    wr('xl/workbook.xml', w)
+    summary_charts(rd, wr, offs)
+
+
+# Chart 1 and 2 are the two that decide it, so they take half the band each. The four supporting
+# charts and the two section charts sit on the same quarter grid, which is what they overlapped
+# before: three of them were anchored to a column whose left edge is not a quarter of the band.
+def summary_charts(rd, wr, offs):
+    half, quarter = BAND_PX / 2, BAND_PX / 4
+    plan = {
+        'Summary Chart 1': (0, KEY_ROW, half - 10),
+        'Summary Chart 2': (half, KEY_ROW, half - 10),
+        'Summary Chart 3': (0, SUP_ROW, quarter - 10),
+        'Summary Chart 4': (quarter, SUP_ROW, quarter - 10),
+        'Summary Chart 5': (2 * quarter, SUP_ROW, quarter - 10),
+        'Summary Chart 8': (3 * quarter, SUP_ROW, quarter - 10),
+        'Summary Chart 6': (0, SEC_ROW, quarter - 10),
+        'Summary Chart 7': (quarter, SEC_ROW, quarter - 10),
+    }
+    drawing = drawing_of(SUM_PART, rd)
+    d = rd(drawing)
+
+    def place(m):
+        body = m.group(0)
+        nm = re.search(r'name="([^"]*)"', body)
+        if not nm or nm.group(1) not in plan:
+            if nm and nm.group(1) == 'Summary Chart 9':      # the locator map follows the block
+                c, off = at_px(offs, 0)
+                body = re.sub(r'<xdr:from><xdr:col>\d+</xdr:col><xdr:colOff>\d+</xdr:colOff>'
+                              r'<xdr:row>\d+</xdr:row>',
+                              '<xdr:from><xdr:col>%d</xdr:col><xdr:colOff>%d</xdr:colOff>'
+                              '<xdr:row>%d</xdr:row>' % (c, off, LOC_ROW + 1), body)
+            return body
+        px_x, row, w = plan[nm.group(1)]
+        c, off = at_px(offs, px_x)
+        body = re.sub(r'<xdr:from><xdr:col>\d+</xdr:col><xdr:colOff>\d+</xdr:colOff>'
+                      r'<xdr:row>\d+</xdr:row>',
+                      '<xdr:from><xdr:col>%d</xdr:col><xdr:colOff>%d</xdr:colOff><xdr:row>%d</xdr:row>'
+                      % (c, off, row - 1), body)
+        cy = re.search(r'<xdr:ext cx="\d+" cy="(\d+)"', body).group(1)
+        body = re.sub(r'<xdr:ext cx="\d+" cy="\d+"',
+                      '<xdr:ext cx="%d" cy="%s"' % (int(round(w * D.EMU_PX)), cy), body)
+        return body
+
+    d = re.sub(r'<xdr:oneCellAnchor>.*?</xdr:oneCellAnchor>', place, d, flags=re.S)
+    wr(drawing, d)
+
+
+# ---------------------------------------------------------------------------- General Information
+# The sheet already carried the how-to card, the live checklist and the section bands. What it did
+# not carry was the rest of the workbook's language: its own name in the band, a rule around each
+# block of inputs, and a footer card instead of a bare list of links.
+GI_PART = 'xl/worksheets/sheet4.xml'
+GI_SECTIONS = [(8, 17, 'Airport information'), (20, 29, 'Project and pavement'),
+               (32, 39, 'LCCA parameters')]
+GI_LINKS = 44, 48
+
+
+def general_information(rd, wr, st):
+    x = rd(GI_PART)
+    s_title = st.add(font=FONT(13, b=True), alignment=ALIGN(v='center'))
+    s_step = st.add(font=FONT(9, i=True, color=GREY), alignment=ALIGN(v='center'))
+    s_band = st.add(font=FONT(10, b=True, color=WHITE), fill=FILL(NAVY), alignment=ALIGN(indent=1))
+    s_hint = st.add(font=FONT(8, i=True, color=MUTED),
+                    border=BORDER(left=True, color=LINE),
+                    alignment=ALIGN(v='center', wrap=True, indent=1))
+    s_linkh = st.add(font=FONT(10, b=True, color=WHITE), fill=FILL(NAVY), alignment=ALIGN(indent=1))
+    s_lbl = st.add(font=FONT(9, color=MUTED), fill=FILL(WHITE),
+                   border=BORDER(left=True), alignment=ALIGN(v='center', indent=1))
+    s_link = st.add(font=FONT(10, b=True, color=BLUE), fill=FILL(WHITE),
+                    border=BORDER(right=True), alignment=ALIGN(v='center'))
+
+    x = D.text(x, 'C1', 'General Information', s_title)
+    x = D.text(x, 'D1', 'STEP 2 of 5   ·   fill in the grey cells, D9 to D39.', s_step)
+
+    # each block of inputs gets a rule down its left and right edges, so it reads as one card
+    s_gutter = st.add(fill=FILL(WHITE))
+    for r0, r1, title in GI_SECTIONS:
+        x = D.restyle(x, [r0], ['B', 'C', 'D'], s_band)
+        x = D.text(x, 'B%d' % r0, title, s_band)
+        x = D.remove_cell(x, 'C%d' % r0)
+        x = D.restyle(x, [r0], ['E'], s_gutter)      # the 2.4-wide gutter is not part of the band
+        x = D.row_height(x, r0, 20)
+        for r in range(r0 + 1, r1 + 1):
+            x = D.restyle(x, [r], ['B'], st.add(
+                fill=FILL(WHITE), border=BORDER(left=True, bottom=(r == r1))))
+            m = D.CELL_RE('C%d' % r).search(x)
+            if m:
+                x = D.restyle(x, [r], ['C'], st.add(
+                    font=FONT(10, color=MUTED), fill=FILL(WHITE),
+                    border=BORDER(bottom=(r == r1)), alignment=ALIGN(v='center')))
+        # the hints in column F are annotations, not values
+        for r in range(r0, r1 + 1):
+            m = D.CELL_RE('F%d' % r).search(x)
+            if m and '<is>' not in m.group(0) and '<f>' not in m.group(0) and '<v>' in m.group(0):
+                x = D.restyle(x, [r], ['F'], s_hint)
+                for c in 'GHIJ':
+                    x = D.restyle(x, [r], [c], st.add(font=FONT(8, i=True, color=MUTED),
+                                                      alignment=ALIGN(v='center', wrap=True)))
+
+    # the Alternative Setup button gets a header band of its own, so the label reads as one
+    x = D.restyle(x, [41], ['B', 'C'], s_band)
+    x = D.text(x, 'B41', 'Alternative Setup', s_band)
+    x = D.restyle(x, [41], ['E'], s_gutter)
+    x = D.row_height(x, 41, 20)
+
+    # the run of links at the foot becomes a card, the way every other sheet ends
+    r0, r1 = GI_LINKS
+    x = D.ensure_row(x, r0 - 1)
+    x = D.restyle(x, [r0 - 1], ['B', 'C', 'D'], s_linkh)
+    x = D.text(x, 'B%d' % (r0 - 1), 'Where to go next', s_linkh)
+    x = D.row_height(x, r0 - 1, 20)
+    for r in range(r0, r1 + 1):
+        x = D.restyle(x, [r], ['B', 'C'], s_lbl)
+        x = D.restyle(x, [r], ['D'], s_link)
+        x = D.row_height(x, r, 19)
+    x = D.merges(x, ['B%d:D%d' % (r0 - 1, r0 - 1), 'B41:C41'] +
+                 ['B%d:C%d' % (r, r) for r in range(r0, r1 + 1)] +
+                 ['B%d:D%d' % (r, r) for r0_, r1_, _t in GI_SECTIONS for r in (r0_,)])
+    wr(GI_PART, x)
+
 # ---------------------------------------------------------------------------- driver
 PASSES = [('text_sheets', text_sheets), ('pay_items', pay_items), ('policies', policies),
           ('alternatives', alternatives),
-          ('reference_sheets', reference_sheets)]
+          ('reference_sheets', reference_sheets),
+          ('summary', summary),
+          ('general_information', general_information)]
 
 
 def main(path):

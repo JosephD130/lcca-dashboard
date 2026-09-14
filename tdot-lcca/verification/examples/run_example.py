@@ -97,7 +97,7 @@ for r in range(3, 80):
 
 # what the Alternative Setup form does
 db = doc.Sheets.getByName('Database'); sm = doc.Sheets.getByName('Summary')
-setv(sm, 'T27', SC['rw_width'])          # runway width for the Google Earth footprint
+setv(sm, 'O107', SC['rw_width'])         # runway width for the Google Earth footprint
 sheets, n0 = [], doc.Sheets.getCount()
 for i, (kind, desc, items) in enumerate(ALTS):
     name = f'Alt {i+1} (New {kind})'
@@ -151,7 +151,8 @@ S['section'] = [{c: (txt(sm, f'{c}{r}') if c in 'GKNPQ' else num(sm, f'{c}{r}'))
 S['unit_weight'] = num(sm, f'J{SEC_T + 1}')
 S['chart_mainline'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(76, 80)}
 S['chart_shoulder'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(83, 87)}
-S['kpi'] = [txt(sm, f'{c}{r}') for r in (3, 4, 5, 7, 8, 9) for c in ('G', 'J', 'N')]
+# three tiles of four columns each, so the strip fills the band exactly
+S['kpi'] = [txt(sm, f'{c}{r}') for r in (3, 4, 5, 7, 8, 9) for c in ('G', 'K', 'O')]
 S['benchmark'] = [num(sm, f'{c}{BM + 3}') for c in ['X', 'Y', 'Z', 'AA'][:N]] + [num(sm, f'AB{BM + 2}'), num(sm, f'AB{BM + 3}')]
 
 npws = [a['NPW'] for a in out['alternatives']]

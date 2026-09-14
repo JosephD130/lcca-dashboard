@@ -109,7 +109,8 @@ def build(path_wb, path_out):
     w(f'    <Point><coordinates>{num(lon, 6)},{num(lat, 6)},0</coordinates></Point>')
     w('  </Placemark>')
 
-    width_ft = sm['T27'].value if isinstance(sm['T27'].value, (int, float)) and sm['T27'].value > 0 else DEFAULT_WIDTH_FT
+    _w = sm['O107'].value if sm['O107'].value is not None else sm['T27'].value
+    width_ft = _w if isinstance(_w, (int, float)) and _w > 0 else DEFAULT_WIDTH_FT
     length_ft = (g('D26') or 0) * 9.0 / width_ft
     yr0, period = int(g('D25')), int(g('D33'))
     best = min(r[4] for r in rows)          # seeded on the first alternative, as the macro now does

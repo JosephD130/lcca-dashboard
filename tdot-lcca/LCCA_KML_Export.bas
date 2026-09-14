@@ -17,7 +17,9 @@ Attribute VB_Name = "LCCA_KML_Export"
 '==============================================================================================
 Option Explicit
 
-Private Const DEFAULT_WIDTH_FT As Double = 100#   ' used if Summary T27 is empty
+Private Const DEFAULT_WIDTH_FT As Double = 100#   ' used if the runway-width cell is empty
+' The project facts moved out of columns S:V and into the foot of the band, so the runway
+' width now sits at O107. Older copies of the workbook still keep it at T27.
 ' Where the Summary keeps things. The dashboard strip sits above the results table, so these moved in
 ' v1.2.0; they are the same numbers build_summary.py lays the sheet out with.
 Private Const ROW0 As Long = 12                   ' first alternative row of the results table
@@ -163,13 +165,19 @@ Private Sub WriteAlternatives(ByVal f As Integer, gi As Worksheet, sm As Workshe
     Dim wsName As String, altName As String, ws As Worksheet
     Dim bearing As Double, lengthFt As Double, npw As Double, best As Double
     Dim widthFt As Double, worst As Double, barScale As Double
+    Dim wcell As Variant
     Dim yr0 As Long, period As Long, style As String
 
     bearing = RunwayBearing(CStr(gi.Range("D22").Value))
     widthFt = DEFAULT_WIDTH_FT
-    If IsNumeric(sm.Range("T27").Value) Then
-        If CDbl(sm.Range("T27").Value) > 0 Then widthFt = CDbl(sm.Range("T27").Value)
-    End If
+    For Each wcell In Array("O107", "T27")
+        If IsNumeric(sm.Range(CStr(wcell)).Value) Then
+            If CDbl(sm.Range(CStr(wcell)).Value) > 0 Then
+                widthFt = CDbl(sm.Range(CStr(wcell)).Value)
+                Exit For
+            End If
+        End If
+    Next wcell
     lengthFt = 0
     If IsNumeric(gi.Range("D26").Value) Then
         If CDbl(gi.Range("D26").Value) > 0 Then lengthFt = CDbl(gi.Range("D26").Value) * 9# / widthFt
