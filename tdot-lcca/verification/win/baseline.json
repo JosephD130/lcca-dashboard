@@ -1,0 +1,369 @@
+{
+ "example": "gkt",
+ "scenario": {
+  "airport": "Gatlinburg-Pigeon Forge Airport",
+  "consultant": "ARA",
+  "projno": "6101",
+  "projname": "Runway 10-28 Reconstruction",
+  "branch_type": "Runway",
+  "branch": "Runway 10-28",
+  "ptype": "Reconstruction",
+  "desc": "Full-depth reconstruction, 5,506 x 75 ft, no paved shoulders",
+  "year": 2028,
+  "area": 45883,
+  "shoulder": 0,
+  "markings": 12000,
+  "mark_type": "Reflective",
+  "period": 30,
+  "rate": 3,
+  "mob": 10,
+  "eng": 5,
+  "indirect": "Yes",
+  "rw_width": 75
+ },
+ "workbook": "GKT_LCCA_run.xlsx",
+ "cells": [
+  {
+   "sheet": "Summary",
+   "cell": "J12",
+   "expect": 4285511.8,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "K12",
+   "expect": 1094529.4855591794,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "L12",
+   "expect": 647019.3129267008,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "M12",
+   "expect": 189697.8453359855,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "N12",
+   "expect": -180541.17508853175,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "O12",
+   "expect": 6036217.268733334,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "P12",
+   "expect": 183970.05575486645,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "Q12",
+   "expect": 56.0,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "R12",
+   "expect": 0.9948858447488584,
+   "tol": 1e-06
+  },
+  {
+   "sheet": "Summary",
+   "cell": "J13",
+   "expect": 5918906.25,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "K13",
+   "expect": 359652.39885731396,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "L13",
+   "expect": 332276.94043826126,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "M13",
+   "expect": 64017.068717022266,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "N13",
+   "expect": -609627.7514539863,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "O13",
+   "expect": 6065224.906558611,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "P13",
+   "expect": 212977.69358014408,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "Q13",
+   "expect": 24.0,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "R13",
+   "expect": 0.9978082191780822,
+   "tol": 1e-06
+  },
+  {
+   "sheet": "Summary",
+   "cell": "J14",
+   "expect": 5681473.8,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "K14",
+   "expect": 359652.39885731396,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "L14",
+   "expect": 332276.94043826126,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "M14",
+   "expect": 64017.068717022266,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "N14",
+   "expect": -585172.9950341306,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "O14",
+   "expect": 5852247.212978467,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "P14",
+   "expect": 0.0,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "Q14",
+   "expect": 24.0,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "R14",
+   "expect": 0.9978082191780822,
+   "tol": 1e-06
+  },
+  {
+   "sheet": "Summary",
+   "cell": "G4",
+   "expect": "$5,852,247",
+   "tol": null
+  },
+  {
+   "sheet": "Summary",
+   "cell": "K4",
+   "expect": "$183,970",
+   "tol": null
+  },
+  {
+   "sheet": "Summary",
+   "cell": "O4",
+   "expect": "$298,577",
+   "tol": null
+  },
+  {
+   "sheet": "Summary",
+   "cell": "G8",
+   "expect": "$5,681,474",
+   "tol": null
+  },
+  {
+   "sheet": "Summary",
+   "cell": "K8",
+   "expect": "$124 / S.Y.",
+   "tol": null
+  },
+  {
+   "sheet": "Summary",
+   "cell": "O8",
+   "expect": "the winner changes",
+   "tol": null
+  },
+  {
+   "sheet": "Summary",
+   "cell": "H22",
+   "expect": 5846519.423397348,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "I22",
+   "expect": 298285.0905832028,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "J22",
+   "expect": 189697.8453359855,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "K22",
+   "expect": 9678.243563689806,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "L22",
+   "expect": 6036217.268733334,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "M22",
+   "expect": 307963.3341468926,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "H23",
+   "expect": 6001207.837841589,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "I23",
+   "expect": 306177.17891357216,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "J23",
+   "expect": 64017.068717022266,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "K23",
+   "expect": 3266.103429796187,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "L23",
+   "expect": 6065224.906558611,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "M23",
+   "expect": 309443.2823433684,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "H24",
+   "expect": 5788230.144261445,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "I24",
+   "expect": 295311.2147353775,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "J24",
+   "expect": 64017.068717022266,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "K24",
+   "expect": 3266.103429796187,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "L24",
+   "expect": 5852247.212978467,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Summary",
+   "cell": "M24",
+   "expect": 298577.31816517375,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Alt 1 (New HMA)",
+   "cell": "TOTAL",
+   "expect": 4285511.8,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Alt 1 (New HMA)",
+   "cell": "NPW",
+   "expect": 6036217.268733334,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Alt 2 (New PCC)",
+   "cell": "TOTAL",
+   "expect": 5918906.25,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Alt 2 (New PCC)",
+   "cell": "NPW",
+   "expect": 6065224.906558611,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Alt 3 (New PCC)",
+   "cell": "TOTAL",
+   "expect": 5681473.8,
+   "tol": 0.5
+  },
+  {
+   "sheet": "Alt 3 (New PCC)",
+   "cell": "NPW",
+   "expect": 5852247.212978467,
+   "tol": 0.5
+  }
+ ]
+}
