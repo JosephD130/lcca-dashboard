@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{--navy:#1c2634;--blue:#3e7cc0;--blue-dk:#1f4e79;--blue-soft:#dce7f3;--green:#0f7b4f;
+          --green-soft:#e4f2ea;--amber:#d98a2b;--ink:#1c2634;--muted:#5b6675;--line:#dfe4ea;
+          --paper:#eef1f4;--card:#ffffff;--red:#c8102e;}
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:"Segoe UI",Calibri,system-ui,sans-serif;color:var(--ink);background:var(--paper);}
+    a{color:var(--blue);} a:hover{color:#2c5f9c;}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:8px;}
+    .kicker{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+    .num{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;
+         background:var(--navy);color:#fff;font-size:12px;font-weight:800;flex-shrink:0;}
+    .step{display:flex;gap:11px;align-items:flex-start;}
+    .st{font-size:13px;font-weight:700;}
+    .sd{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:2px;}
+  </style>
+</helmet>
+
+<div style="width:1280px;background:var(--paper);padding-bottom:22px;">
+  <div style="display:flex;align-items:center;gap:12px;background:var(--navy);padding:10px 20px;">
+    <div style="display:flex;gap:6px;">
+      <div style="color:#cdd6e2;font-size:11.5px;border:1px solid #3a4757;border-radius:4px;padding:5px 9px;">&#9664; General Information</div>
+      <div style="color:#cdd6e2;font-size:11.5px;border:1px solid #3a4757;border-radius:4px;padding:5px 9px;">Summary</div>
+    </div>
+    <div style="flex-grow:1;display:flex;align-items:baseline;gap:11px;">
+      <div style="color:#fff;font-size:17px;font-weight:800;">Instructions</div>
+      <div style="color:#9fb0c4;font-size:11.5px;">STEP 1 OF 5 &#183; how to run an analysis, start to finish</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;">
+      <div style="background:var(--red);color:#fff;font-weight:800;font-size:13px;padding:4px 6px;border-radius:3px;">TN</div>
+      <div style="line-height:1.05;"><div style="color:#fff;font-weight:700;font-size:12px;">TDOT</div>
+        <div style="color:#9fb0c4;font-size:8.5px;">Department of Transportation</div></div>
+    </div>
+  </div>
+
+  <div style="padding:12px 20px 0;display:flex;flex-direction:column;gap:11px;">
+
+    <div class="card" style="padding:11px 15px;background:#fff8e6;border-color:#e6cf76;display:flex;gap:10px;align-items:center;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b8860b" stroke-width="2" style="flex-shrink:0;">
+        <circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <div style="font-size:12px;color:#7a5c00;">
+        <strong>First, enable content.</strong> Macros and ActiveX must be on, or the Alternative Setup form and the
+        pay-item pickers will not run. Trust Center &#8250; ActiveX Settings, then restart Excel.
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;">
+
+      <div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:13px;">
+        <div class="kicker">Set the study up</div>
+        <div class="step"><div class="num">1</div><div>
+          <div class="st">Fill in General Information</div>
+          <div class="sd">Pick the airport from the dropdown; the ID, city, county and region fill themselves.
+            Then the runway areas and the LCCA parameters, cells D9 to D39. The amber banner lists whatever is still missing.</div></div></div>
+        <div class="step"><div class="num">2</div><div>
+          <div class="st">Check the unit costs on Pay_Items</div>
+          <div class="sd">Every alternative is priced from that sheet. The grey Unit Cost column is the one to edit.
+            Twenty-nine of the fifty-six items ship with no cost, so an alternative that uses one prices it at zero.</div></div></div>
+        <div class="step"><div class="num">3</div><div>
+          <div class="st">Review the maintenance policies</div>
+          <div class="sd">Four tables set what each pavement type gets done to it and in which year.
+            They are live: a rate or a year changed there moves every alternative of that type.</div></div></div>
+      </div>
+
+      <div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:13px;">
+        <div class="kicker">Run it</div>
+        <div class="step"><div class="num">4</div><div>
+          <div class="st">Add each alternative</div>
+          <div class="sd">Back on General Information, click <strong>Alternative Setup</strong>. Name it, choose the
+            pavement type, and the form builds a worksheet for it. Enter quantities against the pay items on that sheet.</div></div></div>
+        <div class="step"><div class="num">5</div><div>
+          <div class="st">Read the Summary</div>
+          <div class="sd">It updates by itself. The banner names the lowest present worth; the two key plots show
+            why it wins and whether it still wins at other discount rates.</div></div></div>
+        <div class="step"><div class="num">6</div><div>
+          <div class="st">Start the next study</div>
+          <div class="sd">The <strong>+ New Study</strong> button saves a cleared copy wherever you choose,
+            with every input blank and every alternative removed. The study you have open is untouched.</div></div></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;">
+      <div class="card" style="padding:12px 15px;">
+        <div class="kicker" style="margin-bottom:5px;">Grey means yours</div>
+        <div style="display:flex;align-items:center;gap:8px;margin:6px 0;">
+          <div style="width:58px;height:22px;background:#e4e7eb;border:1px solid #b9c1cb;border-radius:4px;"></div>
+          <span style="font-size:11.5px;color:var(--muted);">you type here</span></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:58px;height:22px;background:#fff;border:1px dashed var(--line);border-radius:4px;"></div>
+          <span style="font-size:11.5px;color:var(--muted);">calculated, leave alone</span></div>
+      </div>
+      <div class="card" style="padding:12px 15px;">
+        <div class="kicker" style="margin-bottom:5px;">Where to look things up</div>
+        <div style="font-size:11.5px;color:var(--muted);line-height:1.7;">
+          <strong style="color:var(--ink);">Typical Values</strong> &#8212; the usual ranges, with sources.<br>
+          <strong style="color:var(--ink);">Method</strong> &#8212; every formula as it stands in the sheet.</div>
+      </div>
+      <div class="card" style="padding:12px 15px;">
+        <div class="kicker" style="margin-bottom:5px;">If a number looks wrong</div>
+        <div style="font-size:11.5px;color:var(--muted);line-height:1.7;">
+          Check the Unit Cost column first, then the year a policy is applied. Both feed every alternative
+          of that pavement type at once.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

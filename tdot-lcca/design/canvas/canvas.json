@@ -1,16 +1,39 @@
 {
   "artboards": [
-    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1280, "h": 1060, "title": "Summary dashboard — fits a laptop" },
-    { "file": "GeneralInformation.dc.html", "x": 1400, "y": 0, "w": 1280, "h": 700, "title": "General Information" },
-    { "file": "DesignSystem.dc.html", "x": 1400, "y": 820, "w": 1280, "h": 700, "title": "Design system & Excel spec" }
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1280, "h": 1020, "title": "Summary — the dashboard" },
+    { "file": "DesignSystem.dc.html", "x": 1400, "y": 0, "w": 1280, "h": 891, "title": "Design system & Excel spec" },
+
+    { "file": "Overview.dc.html", "x": 0, "y": 1180, "w": 1280, "h": 637, "title": "1 · Overview" },
+    { "file": "Instructions.dc.html", "x": 1400, "y": 1180, "w": 1280, "h": 517, "title": "1 · Instructions" },
+    { "file": "GeneralInformation.dc.html", "x": 2800, "y": 1180, "w": 1280, "h": 622, "title": "2 · General Information" },
+
+    { "file": "PayItems.dc.html", "x": 0, "y": 1950, "w": 1280, "h": 732, "title": "3 · Pay Items" },
+    { "file": "MaintenancePolicies.dc.html", "x": 1400, "y": 1950, "w": 1280, "h": 800, "title": "3 · Maintenance Policies" },
+    { "file": "Alternative.dc.html", "x": 2800, "y": 1950, "w": 1280, "h": 605, "title": "4 · An alternative worksheet" },
+
+    { "file": "TypicalValues.dc.html", "x": 0, "y": 2890, "w": 1280, "h": 708, "title": "Reference · Typical Values" },
+    { "file": "Method.dc.html", "x": 1400, "y": 2890, "w": 1280, "h": 939, "title": "Reference · Method" }
   ],
   "annotations": [
-    { "id": "note-width", "x": 0, "y": -170, "w": 660,
-      "text": "THE CONSTRAINT\nEvery artboard is 1280 px wide with a 1240 px content band — the width that still fits a 1366-wide laptop after Excel's row headers and scrollbar. Nothing sits to the right of the band, so the sheet scrolls vertically only." },
-    { "id": "note-summary", "x": 700, "y": -170, "w": 540,
-      "text": "SUMMARY\nVerdict, six tiles, full-width table, the two key plots side by side, then four supporting plots in one row. The locator map and at-a-glance facts move below the charts — they are what pushes the sheet off-screen today." },
-    { "id": "note-system", "x": 1400, "y": 760, "w": 620,
-      "text": "The shared rules, plus the table at the bottom giving the exact Excel chart widths this implies." }
+    { "id": "t-deliver", "x": 0, "y": -200, "w": 700, "kind": "title1",
+      "text": "The two sheets people look at" },
+    { "id": "note-width", "x": 0, "y": -140, "w": 700,
+      "text": "THE CONSTRAINT\nEvery artboard is 1280 px wide with a 1240 px content band — the width that still fits a 1366-wide laptop after Excel's row headers and scrollbar. Nothing sits to the right of the band, so every sheet scrolls vertically only.\n\nSUMMARY\nVerdict, six tiles, full-width table, the two key plots side by side, then four supporting plots in one row. The locator map and at-a-glance facts sit below the charts." },
+    { "id": "note-system", "x": 1400, "y": -140, "w": 620,
+      "text": "THE SHARED LANGUAGE\nNavy header band with the breadcrumb and the TN mark, white cards on a light ground, grey means you type here, blue means calculated, green means the good outcome, amber means something needs attention. The table at the bottom of this artboard gives the exact Excel chart widths and column pixel widths the band implies." },
+
+    { "id": "t-flow", "x": 0, "y": 1080, "w": 900, "kind": "title1",
+      "text": "The five-step flow, sheet by sheet" },
+    { "id": "note-flow", "x": 2800, "y": 1080, "w": 620,
+      "text": "Each sheet opens with the same header band, its step number, and one sentence saying what it is for. Overview and Instructions carry no inputs; General Information is where the study is defined and where the Alternative Setup and New Study buttons live." },
+
+    { "id": "note-mid", "x": 4200, "y": 1950, "w": 560,
+      "text": "Pay Items and Maintenance Policies are the two live reference sheets: a unit cost or a policy year changed on either reprices every alternative at once. The alternative worksheet is a mini-dashboard of its own — context strip, pay-item table, cost rollup, then the discounted schedule ending in one large net present worth." },
+
+    { "id": "t-ref", "x": 0, "y": 2790, "w": 900, "kind": "title1",
+      "text": "The two reference sheets" },
+    { "id": "note-ref", "x": 2800, "y": 2890, "w": 560,
+      "text": "Both open with the same banner: reference only, nothing here feeds the calculation. Typical Values pulls the workbook's own settings into blue live cells so the sheet compares itself against what has been entered; Method walks the chain from a typed quantity to the reported present worth, naming the cell each formula lives in." }
   ],
   "launch": { "view": "canvas" }
 }

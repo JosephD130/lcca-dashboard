@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{--navy:#1c2634;--blue:#3e7cc0;--blue-dk:#1f4e79;--blue-soft:#dce7f3;--green:#0f7b4f;
+          --green-soft:#e4f2ea;--amber:#d98a2b;--ink:#1c2634;--muted:#5b6675;--line:#dfe4ea;
+          --paper:#eef1f4;--card:#ffffff;--red:#c8102e;}
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:"Segoe UI",Calibri,system-ui,sans-serif;color:var(--ink);background:var(--paper);}
+    a{color:var(--blue);}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:8px;}
+    .kicker{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+    table{width:100%;border-collapse:collapse;}
+    th{background:var(--navy);color:#c9d4e2;font-size:9.5px;font-weight:600;text-transform:uppercase;
+       letter-spacing:.03em;padding:6px 10px;text-align:left;}
+    td{font-size:11px;padding:4.5px 10px;border-bottom:1px solid var(--line);}
+    .num{text-align:right;}
+    .live{background:var(--blue-soft);text-align:right;font-weight:700;color:var(--blue-dk);}
+    .sec{display:flex;align-items:baseline;gap:9px;padding:0 2px 1px;}
+    .secn{width:19px;height:19px;border-radius:4px;background:var(--navy);color:#fff;font-size:10.5px;
+          font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .sect{font-size:12.5px;font-weight:700;}
+    .secd{font-size:11px;color:var(--muted);}
+    .flag{font-size:10px;font-weight:700;border-radius:3px;padding:1px 6px;}
+  </style>
+</helmet>
+
+<div style="width:1280px;background:var(--paper);padding-bottom:22px;">
+  <div style="display:flex;align-items:center;gap:12px;background:var(--navy);padding:10px 20px;">
+    <div style="display:flex;gap:6px;">
+      <div style="color:#cdd6e2;font-size:11.5px;border:1px solid #3a4757;border-radius:4px;padding:5px 9px;">&#9664; General Information</div>
+      <div style="color:#cdd6e2;font-size:11.5px;border:1px solid #3a4757;border-radius:4px;padding:5px 9px;">Summary</div>
+    </div>
+    <div style="flex-grow:1;display:flex;align-items:baseline;gap:11px;">
+      <div style="color:#fff;font-size:17px;font-weight:800;">Typical Values</div>
+      <div style="color:#9fb0c4;font-size:11.5px;">reference &#183; what a reasonable number looks like, with its source</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;">
+      <div style="background:var(--red);color:#fff;font-weight:800;font-size:13px;padding:4px 6px;border-radius:3px;">TN</div>
+      <div style="line-height:1.05;"><div style="color:#fff;font-weight:700;font-size:12px;">TDOT</div>
+        <div style="color:#9fb0c4;font-size:8.5px;">Department of Transportation</div></div>
+    </div>
+  </div>
+
+  <div style="padding:12px 20px 0;display:flex;flex-direction:column;gap:11px;">
+
+    <div class="card" style="padding:11px 15px;border-left:3px solid var(--blue);display:flex;gap:16px;align-items:center;">
+      <div style="font-size:11.5px;color:var(--muted);flex-grow:1;">
+        <strong style="color:var(--ink);">Reference only: nothing on this sheet feeds the calculation.</strong>
+        Use it to sanity-check an input before you type it. Blue cells are live &#8212; they read the workbook's own
+        settings, so this sheet compares itself against what you have entered. Every row carries its source link.
+      </div>
+      <div style="display:flex;gap:16px;flex-shrink:0;">
+        <div><div class="kicker">Sections</div><div style="font-size:16px;font-weight:800;">6</div></div>
+        <div><div class="kicker">Sourced rows</div><div style="font-size:16px;font-weight:800;">60+</div></div>
+        <div><div class="kicker">Live lookups</div><div style="font-size:16px;font-weight:800;color:var(--blue-dk);">14</div></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;">
+      <div class="card" style="padding:12px 14px;">
+        <div class="sec"><div class="secn">1</div><div><div class="sect">The system</div>
+          <div class="secd">what TDOT Aeronautics manages</div></div></div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:11px;margin-top:9px;">
+          <strong style="font-size:15px;">78</strong><span style="color:var(--muted);align-self:center;">public-use airports, TASP 2040</span>
+          <strong style="font-size:15px;">69</strong><span style="color:var(--muted);align-self:center;">in the FAA NPIAS</span>
+          <strong style="font-size:15px;">78 / 75</strong><span style="color:var(--muted);align-self:center;">PCI objective, runway / taxiway</span>
+          <strong style="font-size:15px;">$244M</strong><span style="color:var(--muted);align-self:center;">TASP system-wide pavement need</span>
+        </div>
+      </div>
+      <div class="card" style="padding:12px 14px;">
+        <div class="sec"><div class="secn">2</div><div><div class="sect">Runway geometry</div>
+          <div class="secd">for the mainline area in D26</div></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:9px;line-height:1.7;">
+          A typical TN GA runway is <strong style="color:var(--ink);">4,000 to 6,000 ft by 75 or 100 ft</strong>,
+          which is 33,000 to 67,000 S.Y.<br>
+          <span style="color:var(--ink);font-weight:600;">area = length &#215; width &#247; 9</span><br>
+          Markings run 2,000 to 3,000 S.F. per 1,000 ft of runway.
+        </div>
+      </div>
+      <div class="card" style="padding:12px 14px;">
+        <div class="sec"><div class="secn">4</div><div><div class="sect">Closure days</div>
+          <div class="secd">the built-in production rates</div></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:9px;line-height:1.7;">
+          Surface treatment 15,000 S.Y./day &#183; mill and overlay 3,800 S.Y./day &#183; slab replacement
+          1,000 S.Y./day plus 7 days cure.<br>
+          Over 30 years: <strong style="color:var(--ink);">HMA 57 to 67 days in 7 closures</strong>,
+          PCC 27 to 29 days in 2.
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:11px;align-items:start;">
+
+      <div class="card" style="overflow:hidden;">
+        <div style="padding:11px 13px 8px;" class="sec"><div class="secn">3</div><div>
+          <div class="sect">Unit costs, workbook default against recent bids</div>
+          <div class="secd">the default column is live from Pay_Items</div></div></div>
+        <table>
+          <thead><tr><th>Pay item</th><th style="width:52px;">Unit</th>
+            <th style="width:82px;" class="num">Default</th><th style="width:200px;">Recent bid range</th>
+            <th style="width:74px;">Reading</th></tr></thead>
+          <tbody>
+            <tr><td>P-401 Asphalt Surface Course</td><td style="color:var(--muted);">$/ton</td><td class="live">$130.00</td>
+                <td style="color:var(--muted);">185 low bid to 232 EE, 2025</td>
+                <td><span class="flag" style="background:#fdf1e0;color:#b8860b;">low</span></td></tr>
+            <tr><td>P-401 Asphalt Base Course</td><td style="color:var(--muted);">$/ton</td><td class="live">$120.00</td>
+                <td style="color:var(--muted);">5 to 10% below surface course</td>
+                <td><span class="flag" style="background:var(--green-soft);color:var(--green);">ok</span></td></tr>
+            <tr><td>P-501 Concrete Pavement, 9-inch</td><td style="color:var(--muted);">$/SY</td><td class="live">$85.00</td>
+                <td style="color:var(--muted);">165 planning value, 2023</td>
+                <td><span class="flag" style="background:#fdf1e0;color:#b8860b;">low</span></td></tr>
+            <tr><td>P-209 Crushed Aggregate Base</td><td style="color:var(--muted);">$/CY</td><td class="live">$65.00</td>
+                <td style="color:var(--muted);">not in open sources; see SC bid tabs</td><td></td></tr>
+            <tr><td>P-154 Subbase Course</td><td style="color:var(--muted);">$/CY</td><td class="live">$55.00</td>
+                <td style="color:var(--muted);">not in open sources</td><td></td></tr>
+            <tr><td>P-101 Cold Milling</td><td style="color:var(--muted);">$/SY</td><td class="live">$4.20</td>
+                <td style="color:var(--muted);">4.70 to 10.00, 2025</td>
+                <td><span class="flag" style="background:#fdf1e0;color:#b8860b;">low</span></td></tr>
+            <tr><td>P-620 Markings, reflective</td><td style="color:var(--muted);">$/SF</td><td class="live">$0.67</td>
+                <td style="color:var(--muted);">TDOT APMM 2022 bid summary</td>
+                <td><span class="flag" style="background:var(--green-soft);color:var(--green);">ok</span></td></tr>
+            <tr><td>All-in runway reconstruction, TN</td><td style="color:var(--muted);">$/SY</td><td class="num" style="color:var(--muted);">&#8212;</td>
+                <td style="color:var(--muted);">210 Smyrna to 280 MKL, 2025</td>
+                <td style="color:var(--muted);font-size:10px;">project level</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:11px;">
+        <div class="card" style="overflow:hidden;">
+          <div style="padding:11px 13px 8px;" class="sec"><div class="secn">5</div><div>
+            <div class="sect">Economic parameters</div>
+            <div class="secd">what other agencies use, against this file</div></div></div>
+          <table>
+            <thead><tr><th>Basis</th><th style="width:130px;">Rate and period</th><th style="width:52px;">Year</th></tr></thead>
+            <tbody>
+              <tr style="background:#f4f8fc;"><td><strong>This workbook</strong> <span style="color:var(--muted);">live from D33, D34</span></td>
+                  <td class="live">3% &#183; 30 yr</td><td style="color:var(--muted);">now</td></tr>
+              <tr><td>FAA AIP, PGL 22-01</td><td style="color:var(--muted);">OMB A-94 real rate</td><td style="color:var(--muted);">2022</td></tr>
+              <tr><td>OMB A-94 App. C, 20 and 30 yr</td><td style="color:var(--muted);">2.0%</td><td style="color:var(--muted);">2026</td></tr>
+              <tr><td>Legacy FAA AIP rule</td><td style="color:var(--muted);">7% &#183; 20 yr</td><td style="color:var(--muted);">2014</td></tr>
+              <tr><td>AAPTP 06-06 airport LCCA</td><td style="color:var(--muted);">4% &#183; 20 yr, NPW</td><td style="color:var(--muted);">2011</td></tr>
+              <tr><td>Caltrans LCCA / RealCost</td><td style="color:var(--muted);">4% &#183; 20/35/55 yr</td><td style="color:var(--muted);">2013</td></tr>
+            </tbody>
+          </table>
+          <div style="padding:8px 13px;font-size:10.5px;color:var(--muted);">
+            The Summary sensitivity chart runs 2% to 8%, so the current FAA rate and the legacy 7% both appear on it.
+          </div>
+        </div>
+
+        <div class="card" style="padding:12px 14px;">
+          <div class="sec"><div class="secn">6</div><div><div class="sect">Timing and service life</div>
+            <div class="secd">policy years against published ranges</div></div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:9px;line-height:1.75;">
+            <strong style="color:var(--ink);">HMA mill and overlay, year 20.</strong> Published: asphalt runways reach
+            PCI 70 in 12 to 15 years, so year 20 sits at the optimistic end.<br>
+            <strong style="color:var(--ink);">PCC joint resealing, year 19.</strong> Assumes silicone-class sealant life.<br>
+            <strong style="color:var(--ink);">PCC slab replacement, year 27.</strong> PCC reaches PCI 70 at about 40 years.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

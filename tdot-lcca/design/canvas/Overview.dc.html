@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{--navy:#1c2634;--blue:#3e7cc0;--blue-dk:#1f4e79;--blue-soft:#dce7f3;--green:#0f7b4f;
+          --green-soft:#e4f2ea;--amber:#d98a2b;--ink:#1c2634;--muted:#5b6675;--line:#dfe4ea;
+          --paper:#eef1f4;--card:#ffffff;--red:#c8102e;}
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:"Segoe UI",Calibri,system-ui,sans-serif;color:var(--ink);background:var(--paper);}
+    a{color:var(--blue);} a:hover{color:#2c5f9c;}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:8px;}
+    .kicker{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+    .h{font-size:13px;font-weight:700;color:var(--navy);}
+  </style>
+</helmet>
+
+<div style="width:1280px;background:var(--paper);padding-bottom:22px;">
+  <div style="display:flex;align-items:center;gap:12px;background:var(--navy);padding:10px 20px;">
+    <div style="display:flex;gap:6px;">
+      <div style="color:#cdd6e2;font-size:11.5px;border:1px solid #3a4757;border-radius:4px;padding:5px 9px;">&#9664; General Information</div>
+      <div style="color:#cdd6e2;font-size:11.5px;border:1px solid #3a4757;border-radius:4px;padding:5px 9px;">Summary</div>
+    </div>
+    <div style="flex-grow:1;display:flex;align-items:baseline;gap:11px;">
+      <div style="color:#fff;font-size:17px;font-weight:800;">Overview</div>
+      <div style="color:#9fb0c4;font-size:11.5px;">STEP 1 OF 5 &#183; what the framework does and the rules behind it</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;">
+      <div style="background:var(--red);color:#fff;font-weight:800;font-size:13px;padding:4px 6px;border-radius:3px;">TN</div>
+      <div style="line-height:1.05;"><div style="color:#fff;font-weight:700;font-size:12px;">TDOT</div>
+        <div style="color:#9fb0c4;font-size:8.5px;">Department of Transportation</div></div>
+    </div>
+  </div>
+
+  <div style="padding:12px 20px 0;display:flex;flex-direction:column;gap:11px;">
+
+    <div class="card" style="padding:16px 18px;border-left:3px solid var(--green);">
+      <div style="font-size:19px;font-weight:800;">A life-cycle cost analysis compares pavement alternatives over their whole life, not their first bill.</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-top:6px;max-width:940px;line-height:1.5;">
+        You describe two or more ways to build the same runway. The workbook prices each one from the TDOT pay-item
+        list, adds the maintenance and rehabilitation each will need over the analysis period, discounts it all to
+        today's money, and reports which costs least in present worth.
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;">
+      <div class="card" style="padding:13px 15px;">
+        <div class="kicker" style="color:var(--blue-dk);">What you provide</div>
+        <ul style="margin:7px 0 0 16px;padding:0;font-size:12px;color:var(--muted);line-height:1.75;">
+          <li>The airport and the runway</li>
+          <li>Pavement areas and markings</li>
+          <li>Two or more alternatives</li>
+          <li>Quantities per pay item</li>
+        </ul>
+      </div>
+      <div class="card" style="padding:13px 15px;">
+        <div class="kicker" style="color:var(--blue-dk);">What the workbook adds</div>
+        <ul style="margin:7px 0 0 16px;padding:0;font-size:12px;color:var(--muted);line-height:1.75;">
+          <li>Unit costs by division</li>
+          <li>Maintenance and rehab timing</li>
+          <li>Salvage on remaining life</li>
+          <li>Lost revenue during closures</li>
+        </ul>
+      </div>
+      <div class="card" style="padding:13px 15px;">
+        <div class="kicker" style="color:var(--green);">What you get</div>
+        <ul style="margin:7px 0 0 16px;padding:0;font-size:12px;color:var(--muted);line-height:1.75;">
+          <li>Net present worth per option</li>
+          <li>Equivalent annual cost</li>
+          <li>Sensitivity to the discount rate</li>
+          <li>Eight charts and a comparison</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="padding:13px 16px;">
+      <div class="kicker" style="margin-bottom:9px;">The rules behind it</div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;">
+        <div><div style="font-size:19px;font-weight:800;">30 <span style="font-size:11px;font-weight:600;color:var(--muted);">years</span></div>
+          <div style="font-size:11px;color:var(--muted);">analysis period, TDOT policy</div></div>
+        <div><div style="font-size:19px;font-weight:800;">3 <span style="font-size:11px;font-weight:600;color:var(--muted);">%</span></div>
+          <div style="font-size:11px;color:var(--muted);">discount rate; FAA uses OMB A-94</div></div>
+        <div><div style="font-size:19px;font-weight:800;">10 / 5 <span style="font-size:11px;font-weight:600;color:var(--muted);">%</span></div>
+          <div style="font-size:11px;color:var(--muted);">mobilization and engineering</div></div>
+        <div><div style="font-size:19px;font-weight:800;">Remaining life</div>
+          <div style="font-size:11px;color:var(--muted);">salvage basis (AAPTP / FAA)</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:13px 16px;">
+      <div class="kicker" style="margin-bottom:9px;">How a study runs</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;">
+        <span style="background:var(--green-soft);color:var(--green);font-weight:700;border-radius:20px;padding:5px 12px;">1 &nbsp;Overview &amp; Instructions</span>
+        <span style="color:var(--line);">&#8250;</span>
+        <span style="background:#eef2f6;border:1px solid var(--line);border-radius:20px;padding:5px 12px;">2 &nbsp;General Information</span>
+        <span style="color:var(--line);">&#8250;</span>
+        <span style="background:#eef2f6;border:1px solid var(--line);border-radius:20px;padding:5px 12px;">3 &nbsp;Pay Items</span>
+        <span style="color:var(--line);">&#8250;</span>
+        <span style="background:#eef2f6;border:1px solid var(--line);border-radius:20px;padding:5px 12px;">4 &nbsp;Alternatives</span>
+        <span style="color:var(--line);">&#8250;</span>
+        <span style="background:#eef2f6;border:1px solid var(--line);border-radius:20px;padding:5px 12px;">5 &nbsp;Summary</span>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;">
+      <div class="card" style="padding:13px 16px;">
+        <div class="kicker" style="margin-bottom:6px;">TDOT Aeronautics Division</div>
+        <div style="font-size:12px;line-height:1.7;color:var(--muted);">
+          7335 Centennial Boulevard<br>Nashville, Tennessee 37209<br>615-741-3208<br>
+          <a href="#">tn.gov/tdot/aeronautics.html</a>
+        </div>
+      </div>
+      <div class="card" style="padding:13px 16px;background:#fff8e6;border-color:#e6cf76;">
+        <div class="kicker" style="color:#7a5c00;margin-bottom:6px;">Before you start</div>
+        <div style="font-size:12px;color:#7a5c00;line-height:1.6;">
+          Enable macros and ActiveX when Excel asks. The Alternative Setup form and the pay-item pickers
+          need them. If the yellow bar does not appear, check Trust Center &#8250; ActiveX Settings and restart Excel.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

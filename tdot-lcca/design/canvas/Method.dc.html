@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{--navy:#1c2634;--blue:#3e7cc0;--blue-dk:#1f4e79;--blue-soft:#dce7f3;--green:#0f7b4f;
+          --green-soft:#e4f2ea;--amber:#d98a2b;--ink:#1c2634;--muted:#5b6675;--line:#dfe4ea;
+          --paper:#eef1f4;--card:#ffffff;--red:#c8102e;}
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:"Segoe UI",Calibri,system-ui,sans-serif;color:var(--ink);background:var(--paper);}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:8px;}
+    .kicker{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+    table{width:100%;border-collapse:collapse;}
+    th{background:var(--navy);color:#c9d4e2;font-size:9.5px;font-weight:600;text-transform:uppercase;
+       letter-spacing:.03em;padding:6px 10px;text-align:left;}
+    td{font-size:11px;padding:5px 10px;border-bottom:1px solid var(--line);vertical-align:top;}
+    code{font-family:Consolas,monospace;font-size:10.5px;color:var(--blue-dk);background:#f2f6fa;
+         border-radius:3px;padding:1px 4px;display:inline-block;}
+    .cell{font-family:Consolas,monospace;font-size:10px;color:var(--muted);}
+    .sec{display:flex;align-items:baseline;gap:9px;}
+    .secn{width:19px;height:19px;border-radius:4px;background:var(--navy);color:#fff;font-size:10.5px;
+          font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .sect{font-size:12.5px;font-weight:700;}
+    .secd{font-size:11px;color:var(--muted);}
+  </style>
+</helmet>
+
+<div style="width:1280px;background:var(--paper);padding-bottom:22px;">
+  <div style="display:flex;align-items:center;gap:12px;background:var(--navy);padding:10px 20px;">
+    <div style="display:flex;gap:6px;">
+      <div style="color:#cdd6e2;font-size:11.5px;border:1px solid #3a4757;border-radius:4px;padding:5px 9px;">&#9664; General Information</div>
+      <div style="color:#cdd6e2;font-size:11.5px;border:1px solid #3a4757;border-radius:4px;padding:5px 9px;">Summary</div>
+    </div>
+    <div style="flex-grow:1;display:flex;align-items:baseline;gap:11px;">
+      <div style="color:#fff;font-size:17px;font-weight:800;">Method</div>
+      <div style="color:#9fb0c4;font-size:11.5px;">reference &#183; every formula as it stands in the sheet, and why</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;">
+      <div style="background:var(--red);color:#fff;font-weight:800;font-size:13px;padding:4px 6px;border-radius:3px;">TN</div>
+      <div style="line-height:1.05;"><div style="color:#fff;font-weight:700;font-size:12px;">TDOT</div>
+        <div style="color:#9fb0c4;font-size:8.5px;">Department of Transportation</div></div>
+    </div>
+  </div>
+
+  <div style="padding:12px 20px 0;display:flex;flex-direction:column;gap:11px;">
+
+    <div class="card" style="padding:11px 15px;border-left:3px solid var(--blue);">
+      <div style="font-size:11.5px;color:var(--muted);">
+        <strong style="color:var(--ink);">Reference only: nothing on this sheet feeds the calculation.</strong>
+        Eleven sections follow the money from the quantities you type to the number the Summary reports, each row giving
+        the cell the formula lives in, the formula itself, what it means, and the rule it comes from.
+      </div>
+    </div>
+
+    <div class="card" style="padding:12px 16px;">
+      <div class="kicker" style="margin-bottom:9px;">The chain, in one line</div>
+      <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:11.5px;">
+        <span style="background:#eef2f6;border:1px solid var(--line);border-radius:20px;padding:5px 11px;">Quantity &#215; unit cost</span>
+        <span style="color:#c4ccd5;">&#8250;</span>
+        <span style="background:#eef2f6;border:1px solid var(--line);border-radius:20px;padding:5px 11px;">+ mobilization &amp; engineering</span>
+        <span style="color:#c4ccd5;">&#8250;</span>
+        <span style="background:#eef2f6;border:1px solid var(--line);border-radius:20px;padding:5px 11px;">policy year for each event</span>
+        <span style="color:#c4ccd5;">&#8250;</span>
+        <span style="background:#eef2f6;border:1px solid var(--line);border-radius:20px;padding:5px 11px;">+ closure days &#215; daily revenue</span>
+        <span style="color:#c4ccd5;">&#8250;</span>
+        <span style="background:var(--green-soft);border:1px solid #bcdfcd;border-radius:20px;padding:5px 11px;">&#8722; salvage</span>
+        <span style="color:#c4ccd5;">&#8250;</span>
+        <span style="background:var(--navy);color:#fff;font-weight:700;border-radius:20px;padding:5px 12px;">discount to today &#61; NPW</span>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:11px;align-items:start;">
+
+      <div class="card" style="overflow:hidden;">
+        <div style="padding:11px 13px 8px;" class="sec"><div class="secn">2</div><div>
+          <div class="sect">Initial construction cost</div><div class="secd">alternative sheet, rows 13 to 27</div></div></div>
+        <table>
+          <thead><tr><th style="width:150px;">Quantity</th><th style="width:74px;">Cell</th><th>Formula as it stands</th></tr></thead>
+          <tbody>
+            <tr><td>Item cost</td><td class="cell">G13:G22</td><td><code>=IF(C13="",0,F13*E13)</code></td></tr>
+            <tr><td>Unit cost lookup</td><td class="cell">F13</td><td><code>INDEX(UnitCostGrid,MATCH(C13,PayItemKeys,0),$I$11)</code></td></tr>
+            <tr><td>Division to price from</td><td class="cell">I11</td><td><code>=IFERROR(MATCH($C$11,PriceSources,0),1)</code></td></tr>
+            <tr><td>Subtotal</td><td class="cell">G24</td><td><code>=SUM(G13:G22)</code> <span style="color:var(--amber);font-size:10px;">v1.2.0 fix 1</span></td></tr>
+            <tr><td>Mobilization</td><td class="cell">G25</td><td><code>=('General Information'!$D$36/100)*G24</code></td></tr>
+            <tr><td>Engineering</td><td class="cell">G26</td><td><code>=('General Information'!$D$37/100)*G24</code> <span style="color:var(--amber);font-size:10px;">fix 2</span></td></tr>
+            <tr><td><strong>Initial construction total</strong></td><td class="cell">G27</td><td><code>=SUM(G24:G26)</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" style="overflow:hidden;">
+        <div style="padding:11px 13px 8px;" class="sec"><div class="secn">3</div><div>
+          <div class="sect">When the later work happens</div><div class="secd">years come from policy, not from the project</div></div></div>
+        <table>
+          <thead><tr><th style="width:150px;">Quantity</th><th style="width:74px;">Cell</th><th>Formula as it stands</th></tr></thead>
+          <tbody>
+            <tr><td>Year of each event</td><td class="cell">C37:C51</td><td><code>='Maintenance Policies'!E10</code></td></tr>
+            <tr><td>The year is an offset</td><td class="cell">column C</td><td style="color:var(--muted);">years after construction, not calendar years</td></tr>
+            <tr><td>Beyond the analysis period</td><td class="cell">column E</td><td><code>=IF(C37&gt;'General Information'!$D$33,0,&#8230;)</code> <span style="color:var(--amber);font-size:10px;">fix 3</span></td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 13px 12px;font-size:10.5px;color:var(--muted);">
+          A 20-year run therefore drops the year-27 PCC rehabilitation rather than counting it.
+        </div>
+      </div>
+
+      <div class="card" style="overflow:hidden;">
+        <div style="padding:11px 13px 8px;" class="sec"><div class="secn">5</div><div>
+          <div class="sect">How long the runway closes</div><div class="secd">grey cells: a project can override them</div></div></div>
+        <table>
+          <thead><tr><th style="width:150px;">Operation</th><th style="width:74px;">Cell</th><th>Formula as it stands</th></tr></thead>
+          <tbody>
+            <tr><td>HMA surface treatment</td><td class="cell">F4, F5, F9</td>
+                <td><code>=ROUNDUP(C5/15000,0)+ROUNDUP(C8/20000,0)+ROUNDUP(C8/50000,0)</code></td></tr>
+            <tr><td>HMA mill and overlay</td><td class="cell">F8</td>
+                <td><code>=ROUNDUP(C5/3800,0)+ROUNDUP(C8/50000,0)</code></td></tr>
+            <tr><td>PCC slab replacement</td><td class="cell">F5</td>
+                <td><code>&#8230;+7</code> <span style="color:var(--muted);">1,000 SY/day plus 7 days cure</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" style="overflow:hidden;">
+        <div style="padding:11px 13px 8px;" class="sec"><div class="secn">6</div><div>
+          <div class="sect">Lost airport revenue</div><div class="secd">the indirect cost, off by default</div></div></div>
+        <table>
+          <thead><tr><th style="width:150px;">Quantity</th><th style="width:74px;">Cell</th><th>Formula as it stands</th></tr></thead>
+          <tbody>
+            <tr><td>Switch</td><td class="cell">GI D38</td><td style="color:var(--muted);">Yes adds a lost-revenue row to every event</td></tr>
+            <tr><td>Daily revenue</td><td class="cell">F2</td><td><code>SUMIF(RevenueData!$A:$A,&#8230;)</code> <span style="color:var(--amber);font-size:10px;">fix 5</span></td></tr>
+            <tr><td>Warning when there is none</td><td class="cell">G2</td><td style="color:var(--muted);">an airport outside the 17 returns $0 with a visible warning</td></tr>
+            <tr><td>Cost of one closure</td><td class="cell">D38, D40&#8230;</td><td><code>=F2*F4</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:11px;align-items:start;">
+      <div class="card" style="padding:13px 16px;border-left:3px solid var(--green);">
+        <div class="sec"><div class="secn" style="background:var(--green);">7</div><div>
+          <div class="sect">Salvage value</div><div class="secd">Maintenance Policies D32 and D46</div></div></div>
+        <div style="background:#f5f7f9;border:1px solid var(--line);border-radius:5px;padding:10px 12px;margin-top:10px;
+                    font-family:Consolas,monospace;font-size:10.5px;color:var(--blue-dk);">
+          =MAX(0,MIN(1,(placed+life&#8722;'General Information'!$D$33)/life))
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6;">
+          Remaining life over expected life, times the cost of the asset being salvaged. AAPTP 06-06 and FAA
+          remaining-life basis. From v1.2.0 the workbook computes it rather than carrying a typed fraction.
+        </div>
+      </div>
+
+      <div class="card" style="overflow:hidden;">
+        <div style="padding:11px 13px 8px;" class="sec"><div class="secn">8</div><div>
+          <div class="sect">Discounting, and what the Summary adds</div>
+          <div class="secd">the answer, and the presentation on top of it</div></div></div>
+        <table>
+          <thead><tr><th style="width:170px;">Quantity</th><th style="width:96px;">Where</th><th>Formula as it stands</th></tr></thead>
+          <tbody>
+            <tr><td>Discounted cost of an event</td><td class="cell">alt sheet col E</td>
+                <td><code>=D37/(1+rate)^C37</code></td></tr>
+            <tr><td><strong>Net present worth</strong></td><td class="cell">E52 / E43</td><td><code>=SUM(E36:E51)</code></td></tr>
+            <tr><td>Read into the Summary</td><td class="cell">Summary O4:O7</td>
+                <td><code>INDEX(INDIRECT(&#8230;),MATCH("Net Present Worth",&#8230;))</code></td></tr>
+            <tr><td>Everything else</td><td class="cell">G3:R7, charts</td>
+                <td style="color:var(--muted);">presentation: the results table, the comparison block and the eight charts</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 13px 12px;font-size:10.5px;color:var(--muted);">
+          Sections 10 and 11 close the sheet with the settings live in this file and the assumptions worth knowing.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
