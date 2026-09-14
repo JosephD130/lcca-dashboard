@@ -743,6 +743,7 @@ SUM_PART = 'xl/worksheets/sheet14.xml'
 SUM_WIDTHS = {7: 18, 8: 19, 9: 12, 10: 13, 11: 13, 12: 13, 13: 13, 14: 13, 15: 13,
               16: 19, 17: 19, 18: 12}
 BAND_PX = sum(int(((256 * w + int(128 / 7)) / 256) * 7) for w in SUM_WIDTHS.values())
+BAND_FIRST, BAND_LAST = 7, 18              # G .. R
 KEY_ROW, SUP_ROW, SEC_ROW = 30, 48, 59     # the three chart rows, 1-based
 LOC_ROW = 98                               # where the locator block starts
 # where each cell of the old right-hand block lands in the band
@@ -775,7 +776,15 @@ def at_px(offs, x):
 
 def summary(rd, wr, st):
     x = rd(SUM_PART)
-    offs = col_offsets(SUM_WIDTHS)
+    # write the widths, do not just model them: the chart grid is computed from the sheet's own
+    # <cols> afterwards, so the two can never drift apart
+    x = D.set_widths(x, SUM_WIDTHS)
+    px = D.col_px_of(x)
+    offs, acc = {}, 0
+    for c in range(7, 19):
+        offs[c] = acc
+        acc += px.get(c, 0)
+    offs[19] = acc
 
     s_title = st.add(font=FONT(13, b=True), alignment=ALIGN(v='center'))
     s_step = st.add(font=FONT(9, i=True, color=GREY), alignment=ALIGN(v='center'))
@@ -894,14 +903,14 @@ def summary(rd, wr, st):
     w = re.sub(r'(<definedName name="_xlnm.Print_Area" localSheetId="13">)Summary!\$A\$1:\$V\$\d+',
                r'\g<1>Summary!$A$1:$R$%d' % (LOC_ROW + 20), w)
     wr('xl/workbook.xml', w)
-    summary_charts(rd, wr, offs)
+    summary_charts(rd, wr, offs, acc)
 
 
 # Chart 1 and 2 are the two that decide it, so they take half the band each. The four supporting
 # charts and the two section charts sit on the same quarter grid, which is what they overlapped
 # before: three of them were anchored to a column whose left edge is not a quarter of the band.
-def summary_charts(rd, wr, offs):
-    half, quarter = BAND_PX / 2, BAND_PX / 4
+def summary_charts(rd, wr, offs, band_px):
+    half, quarter = band_px / 2.0, band_px / 4.0
     plan = {
         'Summary Chart 1': (0, KEY_ROW, half - 10),
         'Summary Chart 2': (half, KEY_ROW, half - 10),

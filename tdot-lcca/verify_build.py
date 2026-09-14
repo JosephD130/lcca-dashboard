@@ -472,6 +472,48 @@ check('the alternative templates still multiply that fraction by the salvaged co
       all("-'Maintenance Policies'!D32*AV22" in rd(p_) for p_ in
           ('xl/worksheets/sheet8.xml', 'xl/worksheets/sheet10.xml')))
 
+print(); print('=' * 78); print('THE CHART GRID, AGAINST THE SHEET\'S OWN COLUMN WIDTHS'); print('=' * 78)
+# The chart anchors are (column, offset) pairs, so they only land on an even grid if the widths
+# they were computed from are the widths the sheet actually has. Recompute the grid from <cols>
+# here rather than trusting the build script's copy of them.
+_sx = rd('xl/worksheets/sheet14.xml')
+_cols = re.search(r'<cols>(.*?)</cols>', _sx, re.S).group(1)
+_wpx = {}
+for _cm in re.finditer(r'<col\b[^>]*/>', _cols):
+    _lo = int(re.search(r'min="(\d+)"', _cm.group(0)).group(1))
+    _hi = int(re.search(r'max="(\d+)"', _cm.group(0)).group(1))
+    _w = re.search(r'width="([\d.]+)"', _cm.group(0))
+    _px = 0 if 'hidden="1"' in _cm.group(0) else int(((256 * float(_w.group(1)) + int(128 / 7)) / 256) * 7)
+    for _i in range(_lo, _hi + 1): _wpx[_i] = _px
+_off, _acc = {}, 0
+for _c in range(7, 19):
+    _off[_c] = _acc; _acc += _wpx.get(_c, 0)
+_band = _acc
+_dpart = 'xl/' + re.search(r'Target="\.\./(drawings/drawing\d+\.xml)"',
+                           rd('xl/worksheets/_rels/sheet14.xml.rels')).group(1)
+_d = rd(_dpart)
+_at = {}
+for _m in re.finditer(r'<xdr:oneCellAnchor>.*?</xdr:oneCellAnchor>', _d, re.S):
+    _nm = re.search(r'name="([^"]*)"', _m.group(0))
+    _f = re.search(r'<xdr:col>(\d+)</xdr:col><xdr:colOff>(\d+)</xdr:colOff><xdr:row>(\d+)</xdr:row>', _m.group(0))
+    _e = re.search(r'<xdr:ext cx="(\d+)"', _m.group(0))
+    if not (_nm and _f): continue
+    _at[_nm.group(1)] = (_off.get(int(_f.group(1)) + 1, 0) + int(_f.group(2)) / 9525.0,
+                         int(_f.group(3)) + 1, int(_e.group(1)) / 9525.0 if _e else 0)
+_want = {'Summary Chart 1': 0.0, 'Summary Chart 2': _band / 2.0,
+         'Summary Chart 3': 0.0, 'Summary Chart 4': _band / 4.0,
+         'Summary Chart 5': _band / 2.0, 'Summary Chart 8': 3 * _band / 4.0,
+         'Summary Chart 6': 0.0, 'Summary Chart 7': _band / 4.0}
+_bad = [(k, round(_at[k][0], 1), round(v, 1)) for k, v in _want.items()
+        if k in _at and abs(_at[k][0] - v) > 2]
+check('every chart sits on the grid the sheet\'s own widths define',
+      not _bad and len(_at) >= 8, {'band px': _band, 'off by more than 2 px': _bad})
+_rows = sorted({_at[k][1] for k in _want if k in _at})
+check('and the eight of them sit on three rows, two then four then two',
+      len(_rows) == 3, _rows)
+_over = [(k, round(_at[k][0] + _at[k][2], 1)) for k in _want if k in _at and _at[k][0] + _at[k][2] > _band + 2]
+check('no chart runs past the right edge of the band', not _over, _over)
+
 print(); print('=' * 78); print('WHAT EXCEL VALIDATES WHEN IT OPENS THE FILE'); print('=' * 78)
 # A table column carries the header text as its name. Change the header cell and leave the name,
 # and Excel reports "Repaired Records: Table from /xl/tables/tableN.xml" on open.

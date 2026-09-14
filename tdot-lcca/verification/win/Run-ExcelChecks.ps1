@@ -240,8 +240,17 @@ try {
                      'HKCU:\Software\Microsoft\Office\16.0\Excel\Security')) {
       try { $trust = (Get-ItemProperty -Path $k -Name AccessVBOM -ErrorAction Stop).AccessVBOM; break } catch { }
     }
-    Check 'Trust access to the VBA project object model is on' ($trust -eq 1) `
-      ("AccessVBOM=$trust (Excel > File > Options > Trust Center > Trust Center Settings > Macro Settings)")
+    $how = 'Excel > File > Options > Trust Center > Trust Center Settings > Macro Settings > tick ' +
+           '"Trust access to the VBA project object model", then run this again. Nothing else needs it.'
+    if ($trust -eq 1) {
+      Check 'Trust access to the VBA project object model is on' $true ''
+    } else {
+      $state = if ($null -eq $trust) { 'the setting has never been turned on' } else { "it is set to $trust" }
+      Check 'Trust access to the VBA project object model is on' $false "$state. $how"
+      Write-Host ''
+      Write-Host '      The macro checks are the only ones that need this. Everything else still ran.'
+      Write-Host "      $how"
+    }
 
     $proj = $null
     try { $proj = $script:wb.VBProject } catch { }

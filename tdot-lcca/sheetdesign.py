@@ -275,6 +275,52 @@ def cols(x, widths, default_style=None):
         insert_before(x, block, ['sheetData'])
 
 
+def set_widths(x, overrides):
+    """Change the width of individual columns, keeping every other attribute (hidden, style, the
+    columns outside the overrides) exactly as it was. Rebuilding <cols> wholesale would drop the
+    hidden flags and the chart-data columns, so each entry is edited in place instead."""
+    m = re.search(r'<cols>(.*?)</cols>', x, re.S)
+    if not m: return x
+    per = {}
+    order = []
+    for cm in re.finditer(r'<col\b[^>]*/>', m.group(1)):
+        tag = cm.group(0)
+        lo = int(re.search(r'min="(\d+)"', tag).group(1))
+        hi = int(re.search(r'max="(\d+)"', tag).group(1))
+        for i in range(lo, hi + 1):
+            if i not in per: order.append(i)
+            per[i] = tag
+    out = []
+    for i in order:
+        tag = per[i]
+        tag = re.sub(r'min="\d+"', 'min="%d"' % i, tag)
+        tag = re.sub(r'max="\d+"', 'max="%d"' % i, tag)
+        if i in overrides:
+            w = overrides[i]
+            tag = re.sub(r'width="[^"]*"', 'width="%s"' % w, tag) if 'width="' in tag \
+                else tag[:-2] + ' width="%s"/>' % w
+            if 'customWidth' not in tag: tag = tag[:-2] + ' customWidth="1"/>'
+        out.append(tag)
+    return x[:m.start()] + '<cols>%s</cols>' % ''.join(out) + x[m.end():]
+
+
+def col_px_of(x, default=8.7109375):
+    """{column index: pixel width} read back out of the sheet's own <cols>."""
+    def px(w): return int(((256 * w + int(128 / 7)) / 256) * 7)
+    m = re.search(r'<cols>(.*?)</cols>', x, re.S)
+    out = {}
+    if not m: return out
+    for cm in re.finditer(r'<col\b[^>]*/>', m.group(1)):
+        tag = cm.group(0)
+        lo = int(re.search(r'min="(\d+)"', tag).group(1))
+        hi = int(re.search(r'max="(\d+)"', tag).group(1))
+        w = re.search(r'width="([\d.]+)"', tag)
+        hidden = 'hidden="1"' in tag
+        for i in range(lo, hi + 1):
+            out[i] = 0 if hidden else px(float(w.group(1)) if w else default)
+    return out
+
+
 def sheet_view(x, freeze=None, gridlines=None, headings=None):
     """Set the frozen pane and the gridline/heading switches on the sheet's first view."""
     m = re.search(r'<sheetView(?=[ />])[^>]*>.*?</sheetView>|<sheetView(?=[ />])[^>]*/>', x, re.S)
