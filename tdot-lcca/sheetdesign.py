@@ -217,6 +217,19 @@ def row_height(x, r, ht):
     return x[:m.start()] + new + row[len(head):] + x[m.end():]
 
 
+def hide_row(x, r):
+    """Collapse a row to nothing. A chart whose data shares the row needs plotVisOnly off, or
+    Excel drops the series with the row."""
+    x = ensure_row(x, r)
+    m = get_row(x, r)
+    row = m.group(0)
+    head = row[:row.index('>') + 1] if not row.endswith('/>') else row
+    new = re.sub(r' (?:ht|customHeight|hidden)="[^"]*"', '', head)
+    ins = ' ht="0" customHeight="1" hidden="1"'
+    new = new[:-2] + ins + '/>' if new.endswith('/>') else new[:-1] + ins + '>'
+    return x[:m.start()] + new + row[len(head):] + x[m.end():]
+
+
 def restyle(x, rows, cols, style):
     for r in rows:
         for c in cols:

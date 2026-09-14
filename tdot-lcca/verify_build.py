@@ -6,7 +6,7 @@ usage: python3 verify_build.py <workbook.xlsm>
 """
 import sys, re, html, zipfile, warnings
 from openpyxl import load_workbook
-from openpyxl.utils import column_index_from_string
+from openpyxl.utils import column_index_from_string, get_column_letter
 warnings.filterwarnings('ignore')
 
 WB = sys.argv[1] if len(sys.argv) > 1 else 'TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm'
@@ -16,9 +16,11 @@ rd = lambda n: z.read(n).decode('utf-8', 'replace')
 wb = load_workbook(WB, keep_vba=True)
 ws = wb['Summary']
 # the Summary row map, the same constants build_summary.py lays the sheet out with
-KPI0, HDR, T0, T1 = 3, 11, 12, 15
-VER, VER2, CMP, CMPH, CMP0 = 17, 18, 20, 21, 22
-CHT, HOW, C1, C2, C3, BMN = 28, 29, 30, 48, 59, 87
+# The dashboard order is the answer, then the picture, then the numbers: the tiles and the verdict
+# banner, then the three chart rows, then the results table and the comparison block below them.
+KPI0, BANNER, HDR, T0, T1 = 3, 10, 55, 56, 59   # the banner stays under the tiles
+VER, VER2, CMP, CMPH, CMP0 = 61, 62, 64, 65, 66
+CHT, HOW, C1, C2, C3, BMN = 11, 12, 13, 31, 42, 52
 SEC_T, CH67, NOTE67, MAP0, A0 = 90, 100, 120, 130, 132
 VBACH = 123       # where the chart the Alternative Setup form maintains is parked
 SENS0, SENS1 = 12, 36
@@ -68,7 +70,9 @@ check('navigation buttons sit in the first visible column', 'HYPERLINK' in str(w
       (ws['G1'].value, ws['H1'].value))
 check('title moved beside the buttons', ws['I1'].value == 'LCCA SUMMARY')
 check('note explains the hidden block', 'hidden' in str(ws.cell(HOW, 7).value) and 'unhide' in str(ws.cell(HOW, 7).value).lower())
-check('the verdict banner leads with the winner', str(ws.cell(HDR - 1, 7).value).startswith('=IF(COUNT($O$12:$O$15)=0') and 'Lowest present worth' in str(ws.cell(HDR - 1, 7).value))
+check('the verdict banner stays under the tiles and leads with the winner',
+      str(ws.cell(BANNER, 7).value).startswith('=IF(COUNT($O$%d:$O$%d)=0' % (T0, T1))
+      and 'Lowest present worth' in str(ws.cell(BANNER, 7).value), str(ws.cell(BANNER, 7).value)[:60])
 check('results table header intact', [ws.cell(HDR, c).value for c in range(7, 19)] ==
       ['Worksheet', 'Alternative', 'Type', 'Initial construction', 'Maintenance PW', 'Rehabilitation PW', 'Lost revenue PW',
        'Salvage PW', 'Net present worth', 'vs. lowest NPW', 'Closure days in period', 'Runway availability'],
@@ -104,14 +108,42 @@ check('the eight Summary charts are anchored where the row map says',
 check('no chart starts beyond the dashboard band (column R)',
       all(c <= 15 for c, r in anchors if r in (C1 - 1, C2 - 1, C3 - 1)),
       sorted(c for c, r in anchors if r in (C1 - 1, C2 - 1, C3 - 1)))
+# Each band of charts has to cover exactly the rows it is drawn over. The rows the key charts now
+# sit on used to carry the results table, and its 27- and 44-point rows left a dead strip under
+# them until the heights were put back to the sheet's own 15.
+def band_px(lo, hi):
+    return sum((ws.row_dimensions[r].height or 15.0) for r in range(lo, hi + 1)) * 4 / 3
+
+# Pair each chart with the row it starts on, so the dashboard's own eight can be checked apart
+# from the locator map and the chart the setup form maintains.
+_drawn = []
+for _a in re.findall(r'<xdr:oneCellAnchor>.*?</xdr:oneCellAnchor>', draw, re.S):
+    _r = re.search(r'<xdr:row>(\d+)</xdr:row>', _a)
+    _e = re.search(r'<xdr:ext cx="\d+" cy="(\d+)"', _a)
+    if _r and _e: _drawn.append((int(_r.group(1)), int(_e.group(1)) / 9525.0))
+_want = {C1 - 1: 320, C2 - 1: 200, C3 - 1: 200}
+check('and every chart drawn on them is exactly that tall',
+      all(abs(cy - _want[r]) < 1 for r, cy in _drawn if r in _want)
+      and len([1 for r, _ in _drawn if r in _want]) == 8,
+      [(r + 1, round(cy)) for r, cy in _drawn if r in _want])
 check('the chart the form maintains is parked below the dashboard', (6, VBACH - 1) in anchors,
       [a for a in anchors if a[0] == 6])
 check('chart-data block labelled do not edit', 'do not edit' in str(ws.cell(1, 23).value))
 check('the sensitivity block names the lowest alternative at each of its rates',
       ws.cell(SENS0 - 1, 23 + 1 + 4).value == 'Lowest at this rate'
-      and str(ws.cell(SENS0, 28).value).startswith('=IF(COUNTIF(')
-      and str(ws.cell(SENS1, 28).value).startswith('=IF(COUNTIF('),
+      and str(ws.cell(SENS0, 28).value).startswith('=IF(COUNT($X')
+      and str(ws.cell(SENS1, 28).value).startswith('=IF(COUNT($X'),
       ws.cell(SENS0 - 1, 28).value)
+# An empty alternative slot used to return 0, which drew a flat line at zero across both line
+# charts and pinned their axes there. It has to plot as nothing instead.
+_absent = [ws.cell(r, c).value for r in (SENS0, SENS1) for c in range(24, 28)]
+_absent += [ws.cell(r, c).value for r in (41, 71) for c in range(29, 33)]
+check('an alternative that does not exist plots nothing on the two line charts',
+      all(str(v).startswith('=IF($G$') and ',NA(),' in str(v) for v in _absent),
+      next((str(v)[:70] for v in _absent if ',NA(),' not in str(v)), 'ok'))
+check('the line-chart series names are blank rather than the column letter',
+      all('$4=\"\",\" \",' in str(ws.cell(SENS0 - 1, c).value) for c in range(24, 28)),
+      ws.cell(SENS0 - 1, 24).value)
 TILE_C = [7, 11, 15]        # G:J, K:N, O:R - three even cards that fill the band exactly
 check('the rate-sensitivity tile tests every rate in that block, not just its ends',
       'COUNTIF($AB$%d:$AB$%d' % (SENS0, SENS1) in str(ws.cell(KPI0 + 5, TILE_C[2]).value),
@@ -176,7 +208,8 @@ sx = rd('xl/worksheets/sheet14.xml')
 cfs = dict(re.findall(r'<conditionalFormatting sqref="([^"]+)"><cfRule type="(\w+)"', sx))
 check('bars inside the net present worth column', cfs.get('O%d:O%d' % (T0, T1)) == 'dataBar', cfs)
 check('the margin tile turns amber only when the two best are within five percent',
-      cfs.get('J%d:M%d' % (KPI0, KPI0 + 2)) == 'expression'
+      cfs.get('%s%d:%s%d' % (get_column_letter(TILE_C[1]), KPI0,
+                             get_column_letter(TILE_C[1] + 3), KPI0 + 2)) == 'expression'
       and '<0.05' in sx.replace('&lt;', '<'), cfs)
 check('lowest-cost row still highlighted in both tables',
       cfs.get('G%d:R%d' % (T0, T1)) == 'expression' and cfs.get('G%d:P%d' % (CMP0, CMP0 + 3)) == 'expression', cfs)

@@ -744,7 +744,79 @@ SUM_WIDTHS = {7: 18, 8: 19, 9: 12, 10: 13, 11: 13, 12: 13, 13: 13, 14: 13, 15: 1
               16: 19, 17: 19, 18: 12}
 BAND_PX = sum(int(((256 * w + int(128 / 7)) / 256) * 7) for w in SUM_WIDTHS.values())
 BAND_FIRST, BAND_LAST = 7, 18              # G .. R
-KEY_ROW, SUP_ROW, SEC_ROW = 30, 48, 59     # the three chart rows, 1-based
+NALT = 4                                   # the four alternative slots the Summary carries
+
+# The sheet read as a report: the results table and the comparison block sat between the tiles and
+# the first chart, so you scrolled past thirty columns of figures before reaching a plot. The
+# dashboard order is the answer, then the picture, then the numbers, so the two tables move below
+# the charts and the charts move up behind the verdict banner. Only columns G:R move; the chart
+# data in W and beyond shares those row numbers and stays where it is.
+# Rows on this sheet are 15 pt, which is 20 px, so every chart is sized to a whole number of them
+# and each block starts exactly where the one above it ends. Getting that wrong is what left a
+# four-row hole under the key charts the first time.
+ROW_PX = 20
+ROW_PT = 15                                # the sheet's own row height, which is what 20 px is
+SPACER_PT = 10                             # the breathing room between one band of charts and the next
+TABLE_SRC = list(range(11, 27))            # results header, its rows, the verdict lines, comparison
+TABLE_DST = 55                             # where the results header lands
+TABLE_SHIFT = TABLE_DST - TABLE_SRC[0]     # +44
+NOTE_MOVES = {28: 11, 29: 12, 46: 30, 87: 52}   # the section titles and the chart-8 note
+RESULTS_TITLE = 54
+KEY_ROW, KEY_ROWS = 13, 16                 # 13..28
+SUP_ROW, SUP_ROWS = 31, 10                 # 31..40
+SEC_ROW, SEC_ROWS = 42, 10                 # 42..51
+SENS_ROW, SENS_ROWS = 12, 25               # the discount-rate sweep, 2% to 8% in quarter points
+SLOT_BIG = '9E+99'                         # stands in for a slot nobody filled, when taking a MIN
+DEAD_ROWS = range(71, 90)                  # what the old chart area leaves behind
+
+
+def remap_row(col, row):
+    """Where a G:R cell goes. Anything outside the moved blocks stays put."""
+    if col < BAND_FIRST or col > BAND_LAST: return row
+    if row in NOTE_MOVES: return NOTE_MOVES[row]
+    if row in TABLE_SRC: return row + TABLE_SHIFT
+    return row
+
+
+# A cell or a range, with an optional sheet qualifier in front. Matching the whole range in one
+# go keeps both ends of "$O$12:$O$15" together; a qualifier means the reference belongs to another
+# sheet and is left alone. The lookbehind stops it biting into an identifier like LOG10.
+REF_RE = re.compile(r"""(?<![A-Za-z0-9_$.!])
+    (?P<sheet>(?:'[^']+'|[A-Za-z_][A-Za-z0-9_.]*)!)?
+    (?P<a>\$?[A-Z]{1,2}\$?\d{1,3})
+    (?::(?P<b>\$?[A-Z]{1,2}\$?\d{1,3}))?
+    (?![0-9A-Za-z_(])""", re.X)
+
+
+def remap_formula(f):
+    """Rewrite the references a formula makes to the cells that moved, leaving quoted text alone:
+    a literal like the section description contains P501, which looks like a reference."""
+    out, i = [], 0
+    for m in re.finditer(r'"(?:[^"]|"")*"', f):
+        out.append(_remap_span(f[i:m.start()])); out.append(m.group(0)); i = m.end()
+    out.append(_remap_span(f[i:]))
+    return ''.join(out)
+
+
+def _one_ref(a):
+    m = re.match(r'(\$?)([A-Z]{1,2})(\$?)(\d{1,3})$', a)
+    if not m: return a
+    return '%s%s%s%d' % (m.group(1), m.group(2), m.group(3),
+                         remap_row(D.colnum(m.group(2)), int(m.group(4))))
+
+
+def _remap_span(t):
+    def sub(m):
+        if m.group('sheet'): return m.group(0)          # another sheet's cells do not move
+        out = _one_ref(m.group('a'))
+        if m.group('b'): out += ':' + _one_ref(m.group('b'))
+        return out
+    return REF_RE.sub(sub, t)
+
+
+def remap_sqref(ref):
+    """Same for a conditional-formatting or merge range."""
+    return ' '.join(':'.join(_one_ref(a) for a in part.split(':')) for part in ref.split())
 LOC_ROW = 98                               # where the locator block starts
 # where each cell of the old right-hand block lands in the band
 LOC_MOVE = [('S2', 'G%d' % (LOC_ROW + 1))] + \
@@ -772,6 +844,122 @@ def at_px(offs, x):
     """(col, colOff EMU) for a pixel position measured from the left of the band."""
     c = max(k for k in offs if offs[k] <= x)
     return c - 1, int(round((x - offs[c]) * D.EMU_PX))
+
+
+def plot_nothing_for_absent(x, st):
+    """An alternative that does not exist used to contribute a flat line at zero to the two line
+    charts, which pinned their axes to zero and squashed the range that matters. It plots as
+    nothing now: the empty slot returns NA(), and its legend entry is a space rather than the
+    empty string Excel falls back on by naming the column."""
+    lines = [('%s%d' % (c, r)) for c in ('X', 'Y', 'Z', 'AA') for r in range(12, 37)]        # chart 2
+    lines += [('%s%d' % (c, r)) for c in ('AC', 'AD', 'AE', 'AF') for r in range(41, 72)]    # chart 4
+    for ref in lines:
+        m = D.CELL_RE(ref).search(x)
+        if not m: continue
+        cell = m.group(0)
+        new = re.sub(r'(<f>IF\(\$G\$\d+="",)0,', r'\g<1>NA(),', cell)
+        if new == cell: continue
+        x = x[:m.start()] + new + x[m.end():]
+
+    # The lowest alternative at each rate counted the zeros and stepped past them, which an empty
+    # slot no longer produces. AGGREGATE would ignore the #N/A in one call but LibreOffice does not
+    # carry it, and the verification harness runs there, so the smallest number that is actually
+    # present is worked out in AC and read off it. SLOT_BIG is larger than any present worth.
+    cols = [D.colname(24 + i) for i in range(NALT)]                   # X, Y, Z, AA
+    s_help = st.add(font=FONT(9, color=MUTED))
+    x = D.text(x, 'AC%d' % (SENS_ROW - 1), 'lowest value at this rate', s_help)
+    for r in range(SENS_ROW, SENS_ROW + SENS_ROWS):
+        present = ','.join('IFERROR($%s%d,%s)' % (c, r, SLOT_BIG) for c in cols)
+        x = D.formula(x, 'AC%d' % r, 'MIN(%s)' % present, s_help)
+        pick = '$H$%d' % (TABLE_DST + NALT)
+        for i in reversed(range(NALT - 1)):
+            pick = ('IF($AC%d=IFERROR($%s%d,%s),$H$%d,%s)'
+                    % (r, cols[i], r, SLOT_BIG, TABLE_DST + 1 + i, pick))
+        f = 'IF(COUNT($X%d:$AA%d)=0,"",%s)' % (r, r, pick)
+        m = D.CELL_RE('AB%d' % r).search(x)
+        style = re.search(r' s="(\d+)"', m.group(0)) if m else None
+        cell = ('<c r="AB%d"%s><f>%s</f><v></v></c>'
+                % (r, ' s="%s"' % style.group(1) if style else '', D.esc(f)))
+        x = (x[:m.start()] + cell + x[m.end():]) if m else D.put_cell(x, 'AB%d' % r, cell)
+
+    # The verdict line worked out the lowest alternative at 2 and at 7 percent the same way the AB
+    # column used to, by counting the zeros and stepping past them. It reads the answer off AB now,
+    # which is the only place that logic needs to live.
+    x = re.sub(r'INDEX\(\$H\$\d+:\$H\$\d+,MATCH\(SMALL\(\$X\$(\d+):\$AA\$\d+,'
+               r'COUNTIF\(\$X\$\d+:\$AA\$\d+,0\)\+1\),\$X\$\d+:\$AA\$\d+,0\)\)',
+               r'$AB$\g<1>', x)
+
+    # and the series names the two line charts read
+    for ref in ['%s11' % c for c in ('X', 'Y', 'Z', 'AA')]:
+        m = D.CELL_RE(ref).search(x)
+        if not m: continue
+        cell = re.sub(r'(<f>IF\([A-Z]{1,2}\$4="",)""', r'\g<1>" "', m.group(0))
+        x = x[:m.start()] + cell + x[m.end():]
+    return x
+
+
+def relocate_tables(x, st):
+    """Move the results table and the comparison block below the charts, and bring the three
+    section titles up with the charts. Columns G:R only: the chart data in W and beyond shares
+    these row numbers and must not move."""
+    band = [D.colname(c) for c in range(BAND_FIRST, BAND_LAST + 1)]
+    pairs = list(NOTE_MOVES.items()) + [(r, r + TABLE_SHIFT) for r in TABLE_SRC]
+
+    heights, moved = {}, {}
+    for src, dst in pairs:
+        m = D.get_row(x, src)
+        if m:
+            h = re.search(r' ht="([^"]+)"', m.group(0))
+            if h: heights[dst] = h.group(1)
+        for col in band:
+            ref = '%s%d' % (col, src)
+            cm = D.CELL_RE(ref).search(x)
+            if not cm: continue
+            moved['%s%d' % (col, dst)] = cm.group(0).replace(
+                '<c r="%s"' % ref, '<c r="%s%d"' % (col, dst), 1)
+            x = x[:cm.start()] + x[cm.end():]
+    for dst in sorted(moved, key=lambda r: (D.split_ref(r)[1], D.colnum(D.split_ref(r)[0]))):
+        x = D.put_cell(x, dst, moved[dst])
+    for dst, h in heights.items():
+        x = D.row_height(x, dst, h)
+
+    # The rows the charts now sit on used to carry the results table, and they kept its heights:
+    # 27 points for a wrapped header, 44 for the verdict. That left the key charts ending 55 px
+    # short of their own band and a dead strip under them. Every chart row goes back to the
+    # sheet's own 15 points so a chart drawn n rows tall covers exactly n rows.
+    for r in list(range(KEY_ROW, KEY_ROW + KEY_ROWS)) + [SUP_ROW - 2]:
+        x = D.row_height(x, r, ROW_PT)
+    for r in (KEY_ROW + KEY_ROWS, SEC_ROW - 1):        # the spacers between the three chart bands
+        x = D.row_height(x, r, SPACER_PT)
+
+    # every reference to a cell that moved, anywhere on the sheet
+    x = re.sub(r'<f>(.*?)</f>',
+               lambda m: '<f>' + D.esc(remap_formula(html.unescape(m.group(1)))) + '</f>', x, flags=re.S)
+    x = re.sub(r'(<conditionalFormatting sqref=")([^"]+)(")',
+               lambda m: m.group(1) + remap_sqref(m.group(2)) + m.group(3), x)
+    # the tile rules were left pointing at the old columns when the six tiles were made even
+    x = x.replace('<conditionalFormatting sqref="J3:M5">', '<conditionalFormatting sqref="K3:N5">')
+    x = x.replace('<conditionalFormatting sqref="N8">', '<conditionalFormatting sqref="O8">')
+
+    s_sec = st.add(font=FONT(11, b=True), border=BORDER(bottom=True, color=BLUE),
+                   alignment=ALIGN(v='center'))
+    s_secb = st.add(border=BORDER(bottom=True, color=BLUE))
+    for r, title in ((11, 'KEY RESULTS \u2014 the two plots that decide it'),
+                     (NOTE_MOVES[46], 'SUPPORTING DETAIL'),
+                     (RESULTS_TITLE, 'THE NUMBERS \u2014 every alternative, in full')):
+        x = D.text(x, 'G%d' % r, title, s_sec)
+        x = D.restyle(x, [r], band[1:], s_secb)
+        x = D.row_height(x, r, 22)
+    x = D.merges(x, ['G%d:R%d' % (r, r) for r in (11, NOTE_MOVES[46], RESULTS_TITLE)])
+    # The old chart area is empty now. At six points a row it still left an inch and a half of
+    # nothing between the comparison block and the pavement section, so it is hidden outright,
+    # with a short row either side for air. The chart data in W and beyond shares these rows, so
+    # the charts are told to plot hidden cells before any of them disappears.
+    for r in DEAD_ROWS:
+        if r == DEAD_ROWS[0]: x = D.row_height(x, r, 6)
+        elif r == DEAD_ROWS[-1]: x = D.row_height(x, r, 14)
+        else: x = D.hide_row(x, r)
+    return x
 
 
 def summary(rd, wr, st):
@@ -843,6 +1031,15 @@ def summary(rd, wr, st):
     for r, h in ((3, 14), (4, 26), (5, 20), (6, 7), (7, 14), (8, 26), (9, 20)):
         x = D.row_height(x, r, h)
 
+    # ---- the tables go below the charts, and the section titles come up with them
+    x = relocate_tables(x, st)
+
+    # ---- an alternative that does not exist used to contribute a flat line at zero to the two
+    # line charts, which pinned their axes to zero and squashed the range that matters. It plots as
+    # nothing now. The "lowest at this rate" column counted those zeros to know how many
+    # alternatives there were, so it counts real numbers instead and ignores the gaps.
+    x = plot_nothing_for_absent(x, st)
+
     # ---- the locator map and the project facts move out of S:V and into the foot of the band
     moved = {}
     for src, dst in LOC_MOVE:
@@ -896,7 +1093,8 @@ def summary(rd, wr, st):
     for c in 'STUV':
         x = re.sub(r'<col min="%d" max="%d"[^>]*/>' % (D.colnum(c), D.colnum(c)), '', x)
 
-    x = D.sheet_view(x, gridlines=False)
+    # the tiles and the verdict stay in view; the charts scroll under them
+    x = D.sheet_view(x, freeze='A11', gridlines=False)
     wr(SUM_PART, x)
     # the print area reached out to column V for the map; the band ends at R now
     w = rd('xl/workbook.xml')
@@ -909,17 +1107,25 @@ def summary(rd, wr, st):
 # Chart 1 and 2 are the two that decide it, so they take half the band each. The four supporting
 # charts and the two section charts sit on the same quarter grid, which is what they overlapped
 # before: three of them were anchored to a column whose left edge is not a quarter of the band.
+def chart_parts(drawing, rd):
+    """Every chart part a drawing points at, through its relationships."""
+    rels = drawing.replace('drawings/', 'drawings/_rels/') + '.rels'
+    ids = re.findall(r'Target="([^"]*charts/chart\d+\.xml)"', rd(rels))
+    return ['xl/charts/' + t.rsplit('/', 1)[-1] for t in ids]
+
+
 def summary_charts(rd, wr, offs, band_px):
     half, quarter = band_px / 2.0, band_px / 4.0
+    key_h, sup_h = KEY_ROWS * ROW_PX, SUP_ROWS * ROW_PX
     plan = {
-        'Summary Chart 1': (0, KEY_ROW, half - 10),
-        'Summary Chart 2': (half, KEY_ROW, half - 10),
-        'Summary Chart 3': (0, SUP_ROW, quarter - 10),
-        'Summary Chart 4': (quarter, SUP_ROW, quarter - 10),
-        'Summary Chart 5': (2 * quarter, SUP_ROW, quarter - 10),
-        'Summary Chart 8': (3 * quarter, SUP_ROW, quarter - 10),
-        'Summary Chart 6': (0, SEC_ROW, quarter - 10),
-        'Summary Chart 7': (quarter, SEC_ROW, quarter - 10),
+        'Summary Chart 1': (0, KEY_ROW, half - 10, key_h),
+        'Summary Chart 2': (half, KEY_ROW, half - 10, key_h),
+        'Summary Chart 3': (0, SUP_ROW, quarter - 10, sup_h),
+        'Summary Chart 4': (quarter, SUP_ROW, quarter - 10, sup_h),
+        'Summary Chart 5': (2 * quarter, SUP_ROW, quarter - 10, sup_h),
+        'Summary Chart 8': (3 * quarter, SUP_ROW, quarter - 10, sup_h),
+        'Summary Chart 6': (0, SEC_ROW, quarter - 10, sup_h),
+        'Summary Chart 7': (quarter, SEC_ROW, quarter - 10, sup_h),
     }
     drawing = drawing_of(SUM_PART, rd)
     d = rd(drawing)
@@ -935,19 +1141,24 @@ def summary_charts(rd, wr, offs, band_px):
                               '<xdr:from><xdr:col>%d</xdr:col><xdr:colOff>%d</xdr:colOff>'
                               '<xdr:row>%d</xdr:row>' % (c, off, LOC_ROW + 1), body)
             return body
-        px_x, row, w = plan[nm.group(1)]
+        px_x, row, w, h = plan[nm.group(1)]
         c, off = at_px(offs, px_x)
         body = re.sub(r'<xdr:from><xdr:col>\d+</xdr:col><xdr:colOff>\d+</xdr:colOff>'
                       r'<xdr:row>\d+</xdr:row>',
                       '<xdr:from><xdr:col>%d</xdr:col><xdr:colOff>%d</xdr:colOff><xdr:row>%d</xdr:row>'
                       % (c, off, row - 1), body)
-        cy = re.search(r'<xdr:ext cx="\d+" cy="(\d+)"', body).group(1)
         body = re.sub(r'<xdr:ext cx="\d+" cy="\d+"',
-                      '<xdr:ext cx="%d" cy="%s"' % (int(round(w * D.EMU_PX)), cy), body)
+                      '<xdr:ext cx="%d" cy="%d"'
+                      % (int(round(w * D.EMU_PX)), int(round(h * D.EMU_PX))), body)
         return body
 
     d = re.sub(r'<xdr:oneCellAnchor>.*?</xdr:oneCellAnchor>', place, d, flags=re.S)
     wr(drawing, d)
+
+    # The chart data sits in the same rows as the old chart area, which is hidden now. Excel
+    # leaves a hidden cell out of its series unless the chart says otherwise.
+    for part in chart_parts(drawing, rd):
+        wr(part, rd(part).replace('<plotVisOnly val="1"/>', '<plotVisOnly val="0"/>'))
 
 
 # ---------------------------------------------------------------------------- General Information
@@ -1031,7 +1242,23 @@ PASSES = [('text_sheets', text_sheets), ('pay_items', pay_items), ('policies', p
           ('general_information', general_information)]
 
 
+BASE_COMMIT = '7215b22'      # the last workbook before any of these passes ran
+
+
+def assert_base(x):
+    """Several passes move cells rather than set them: the tiles slide a column to make the three
+    cards even, and the results table drops below the charts. Run them twice and the second run
+    shifts an already-shifted sheet, quietly emptying the tiles. The input has to be the workbook
+    as it stood before any of this, so check two things that only the base still has."""
+    if '<c r="G55"' in x or 'MARGIN TO NEXT' not in x.split('<row r="4"')[0].split('<c r="J3"')[-1][:200]:
+        raise SystemExit(
+            'this workbook has already been designed; these passes are not repeatable.\n'
+            'restore the base first:  git show %s:tdot-lcca/<workbook> > <workbook>' % BASE_COMMIT)
+
+
 def main(path):
+    with zipfile.ZipFile(path) as z:
+        assert_base(z.read('xl/worksheets/sheet14.xml').decode('utf-8'))
     work = path + '.design'
     if os.path.isdir(work): shutil.rmtree(work)
     with zipfile.ZipFile(path) as z: z.extractall(work)

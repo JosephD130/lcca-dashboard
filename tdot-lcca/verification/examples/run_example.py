@@ -137,7 +137,7 @@ for i, (sh, kind, last) in enumerate(sheets):
     check(f'Alt {i+1} NPW = sum of activity PW (initial included)', abs(sum(p for _, _, _, p in acts) - d['NPW']) < 1, (d['initial'], sum(p for *_, p in acts), d['NPW']))
 
 # the Summary row map: the dashboard strip sits above the results table (see build_summary.py)
-T0, VER, VER2, CMP0, SEC_T, BM = 12, 17, 18, 22, 90, 89
+T0, VER, VER2, CMP0, SEC_T, BM = 56, 61, 62, 66, 90, 89   # the tables sit below the charts now
 S = out['summary']
 S['results'] = [{c: (txt(sm, f'{c}{r}') if c in 'GHI' else num(sm, f'{c}{r}')) for c in 'GHIJKLMNOPQR'} for r in range(T0, T0 + N)]
 S['AtoE'] = [[txt(sm, f'{c}{r}') if c in 'ABE' else num(sm, f'{c}{r}') for c in 'ABCDE'] for r in range(4, 4 + N)]
@@ -225,17 +225,30 @@ else:
     check('Shoulder description column stays blank without a shoulder area', all(s['Q'] == '' for s in S['section']), [s['Q'] for s in S['section']])
     check('Shoulder chart rows stay at zero without a shoulder area', all(v == 0 for vals in S['chart_shoulder'].values() for v in vals), S['chart_shoulder'])
 
-errs = {}
+# An alternative slot nobody filled returns NA() in the chart-data block so the line charts plot
+# nothing for it rather than a flat line at zero. That is the one error this workbook means to
+# produce, so it is counted apart rather than waved through sheet-wide.
+errs, deliberate, bad = {}, {}, {}
 for sh in doc.Sheets:
     cur = sh.createCursor(); cur.gotoEndOfUsedArea(False); ra = cur.getRangeAddress(); n = 0
     rng = sh.getCellRangeByPosition(0, 0, ra.EndColumn, ra.EndRow)
     for rr in range(ra.EndRow + 1):
         for cc in range(ra.EndColumn + 1):
             cell = rng.getCellByPosition(cc, rr)
-            if cell.getType().value == 'FORMULA' and cell.getError(): n += 1
+            if cell.getType().value != 'FORMULA' or not cell.getError(): continue
+            if 'NA()' in cell.getFormula():      # LibreOffice reports its own argument separator
+                deliberate[sh.Name] = deliberate.get(sh.Name, 0) + 1
+            else:
+                n += 1
+                bad.setdefault(sh.Name, []).append(cell.AbsoluteName.split('.')[-1])
     if n: errs[sh.Name] = n
 out['errors'] = errs
+out['error_cells'] = bad
+out['empty_slot_na'] = deliberate
 check('No formula errors on any visible sheet', not any(k for k in errs if not k.startswith('TMP(')), errs)
+check('Every #N/A on the Summary is an empty alternative slot, not a broken formula',
+      'Summary' not in errs and deliberate.get('Summary', 0) == (4 - len(out['alternatives'])) * 56,
+      (deliberate.get('Summary'), bad.get('Summary', [])[:8]))
 
 json.dump(out, open(f'{OUT}/results.json', 'w'), indent=1, default=str)
 doc.storeToURL(uno.systemPathToFileUrl(f'{OUT}/{EX.upper()}_LCCA_run.xlsx'), (pv('FilterName', 'Calc MS Excel 2007 XML'),))
