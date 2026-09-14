@@ -18,13 +18,13 @@ Attribute VB_Name = "LCCA_KML_Export"
 Option Explicit
 
 Private Const DEFAULT_WIDTH_FT As Double = 100#   ' used if the runway-width cell is empty
-' The project facts moved out of columns S:V and into the foot of the band, so the runway
-' width now sits at O107. Older copies of the workbook still keep it at T27.
-' Where the Summary keeps things. The dashboard strip sits above the results table, so these moved in
-' v1.2.0; they are the same numbers build_summary.py lays the sheet out with.
-Private Const ROW0 As Long = 12                   ' first alternative row of the results table
-Private Const ROW1 As Long = 15                   ' last
-Private Const SEC_OFF As Long = 81                ' section description row = SEC_OFF + results row
+' The Summary was rearranged twice as it became a dashboard, and every hard-coded row in here
+' went stale with it. Nothing below assumes a row number any more: the results table and the
+' pavement section are found by their own headings, so this keeps working when the sheet moves
+' again. The runway width sits beside the plots now; the older addresses are still tried.
+Private Const WIDTH_CELLS As String = "Q18,O107,T27"
+Private Const FALLBACK_ROW0 As Long = 39          ' the v1.2.0 layout, if a heading is renamed
+Private Const FALLBACK_SEC As Long = 58
 Private Const TALLEST_BAR_M As Double = 700#      ' the largest present worth stands this high
 Private Const FT_PER_DEG_LAT As Double = 364000#
 
@@ -139,17 +139,17 @@ Private Sub WriteAirport(ByVal f As Integer, gi As Worksheet, sm As Worksheet, B
 
     d = d & "<table border=""1"" cellpadding=""4"" cellspacing=""0"">"
     d = d & "<tr><th>Alternative</th><th>Type</th><th>Initial</th><th>Net present worth</th><th>Closure days</th><th>Section</th></tr>"
-    For r = ROW0 To ROW1
+    For r = ResultsRow(sm) To ResultsRow(sm) + 3
         If Len(CStr(sm.Cells(r, 7).Value)) > 0 Then
             d = d & "<tr><td>" & CStr(sm.Cells(r, 8).Value) & "</td><td>" & CStr(sm.Cells(r, 9).Value) & "</td>" & _
                 "<td align=""right"">" & Money(sm.Cells(r, 10).Value) & "</td>" & _
                 "<td align=""right"">" & Money(sm.Cells(r, 15).Value) & "</td>" & _
                 "<td align=""right"">" & CStr(sm.Cells(r, 17).Value) & "</td>" & _
-                "<td>" & CStr(sm.Cells(SEC_OFF + r, 16).Value) & "</td></tr>"
+                "<td>" & CStr(sm.Cells(SectionRow(sm) + r - ResultsRow(sm), 16).Value) & "</td></tr>"
         End If
     Next r
     d = d & "</table>"
-    d = d & "<p><b>" & CStr(sm.Range("G17").Value) & "</b><br/>" & CStr(sm.Range("G18").Value) & "</p>"
+    d = d & "<p><b>" & CStr(sm.Cells(ResultsRow(sm) + 5, 7).Value) & "</b><br/>" & CStr(sm.Cells(ResultsRow(sm) + 6, 7).Value) & "</p>"
 
     Print #f, "  <Placemark>"
     Print #f, "    <name>" & X(CStr(gi.Range("D9").Value) & " (" & CStr(gi.Range("D10").Value) & ")") & "</name>"
@@ -170,7 +170,7 @@ Private Sub WriteAlternatives(ByVal f As Integer, gi As Worksheet, sm As Workshe
 
     bearing = RunwayBearing(CStr(gi.Range("D22").Value))
     widthFt = DEFAULT_WIDTH_FT
-    For Each wcell In Array("O107", "T27")
+    For Each wcell In Split(WIDTH_CELLS, ",")
         If IsNumeric(sm.Range(CStr(wcell)).Value) Then
             If CDbl(sm.Range(CStr(wcell)).Value) > 0 Then
                 widthFt = CDbl(sm.Range(CStr(wcell)).Value)
@@ -189,7 +189,7 @@ Private Sub WriteAlternatives(ByVal f As Integer, gi As Worksheet, sm As Workshe
     ' not an empty slot, and seeding on zero would hand the "lowest" style to the wrong alternative
     Dim seeded As Boolean
     seeded = False: best = 0: worst = 0
-    For r = ROW0 To ROW1
+    For r = ResultsRow(sm) To ResultsRow(sm) + 3
         If Len(CStr(sm.Cells(r, 7).Value)) > 0 Then
             npw = CDbl(sm.Cells(r, 15).Value)
             If Not seeded Then
@@ -204,7 +204,7 @@ Private Sub WriteAlternatives(ByVal f As Integer, gi As Worksheet, sm As Workshe
     If worst > 0 Then barScale = TALLEST_BAR_M / (worst / 1000000#)   ' the tallest bar is always the same height
 
     k = 0
-    For r = ROW0 To ROW1
+    For r = ResultsRow(sm) To ResultsRow(sm) + 3
         wsName = CStr(sm.Cells(r, 7).Value)
         If Len(wsName) > 0 Then
             altName = CStr(sm.Cells(r, 8).Value)
@@ -214,7 +214,7 @@ Private Sub WriteAlternatives(ByVal f As Integer, gi As Worksheet, sm As Workshe
             Print #f, "    <name>" & X(altName & " - " & Money(npw) & IIf(npw = best, " (lowest)", "")) & "</name>"
 
             If lengthFt > 0 Then WriteRunway f, lat, lon, bearing, lengthFt, widthFt, k, style, _
-                                              altName & " footprint", CStr(sm.Cells(SEC_OFF + r, 16).Value)
+                                              altName & " footprint", CStr(sm.Cells(SectionRow(sm) + r - ResultsRow(sm), 16).Value)
             WriteBar f, lat, lon, k, style, altName, npw, barScale
             On Error Resume Next
             Set ws = ThisWorkbook.Worksheets(wsName)
@@ -350,6 +350,35 @@ Private Function Corner3(ByVal lat As Double, ByVal lon As Double, ByVal bearing
 End Function
 
 ' "Runway 2-20" -> 20 degrees. Anything unparseable points the footprint north-south.
+' ---------------------------------------------------------------------------- finding the blocks
+Private Function HeadingRow(sm As Worksheet, ByVal text As String, ByVal offset As Long, _
+                            ByVal fallback As Long) As Long
+    ' The first row whose column G starts with `text`, plus `offset`. Column G is the band's
+    ' left edge on the Summary, which is where every heading on the sheet begins.
+    Dim r As Long, v As String
+    For r = 1 To 140
+        v = Trim$(CStr(sm.Cells(r, 7).Value))
+        If Len(v) >= Len(text) Then
+            If StrComp(Left$(v, Len(text)), text, vbTextCompare) = 0 Then
+                HeadingRow = r + offset
+                Exit Function
+            End If
+        End If
+    Next r
+    HeadingRow = fallback
+End Function
+
+Private Function ResultsRow(sm As Worksheet) As Long
+    ' First alternative row of the results table: the header cell reads "Worksheet".
+    ResultsRow = HeadingRow(sm, "Worksheet", 1, FALLBACK_ROW0)
+End Function
+
+Private Function SectionRow(sm As Worksheet) As Long
+    ' First alternative row of the pavement-section block, three under its own title.
+    SectionRow = HeadingRow(sm, "PAVEMENT SECTION", 3, FALLBACK_SEC)
+End Function
+
+
 Private Function RunwayBearing(ByVal branch As String) As Double
     Dim i As Long, ch As String, digits As String
     For i = 1 To Len(branch)

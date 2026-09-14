@@ -97,7 +97,7 @@ for r in range(3, 80):
 
 # what the Alternative Setup form does
 db = doc.Sheets.getByName('Database'); sm = doc.Sheets.getByName('Summary')
-setv(sm, 'O107', SC['rw_width'])         # runway width for the Google Earth footprint
+setv(sm, 'Q18', SC['rw_width'])          # runway width, on the project-location rail
 sheets, n0 = [], doc.Sheets.getCount()
 for i, (kind, desc, items) in enumerate(ALTS):
     name = f'Alt {i+1} (New {kind})'
@@ -136,8 +136,11 @@ for i, (sh, kind, last) in enumerate(sheets):
     check(f'Alt {i+1} activity PW = cost / (1+r)^offset', pw_ok, [(a, yr, round(c), round(p)) for a, yr, c, p in acts][:12])
     check(f'Alt {i+1} NPW = sum of activity PW (initial included)', abs(sum(p for _, _, _, p in acts) - d['NPW']) < 1, (d['initial'], sum(p for *_, p in acts), d['NPW']))
 
-# the Summary row map: the dashboard strip sits above the results table (see build_summary.py)
-T0, VER, VER2, CMP0, SEC_T, BM = 56, 61, 62, 66, 90, 89   # the tables sit below the charts now
+# The Summary row map, Option A: the whole decision on one 15-inch screen. Frozen band of header,
+# project context, one row of six tiles and the verdict; then the key plots with the project
+# location beside them; then the supporting plots; then the tables.
+T0, VER, VER2, CMP0, SEC_T, BM = 39, 44, 45, 49, 55, 89
+RAIL0 = 13        # the project-location facts, in columns P to R beside the key plots
 S = out['summary']
 S['results'] = [{c: (txt(sm, f'{c}{r}') if c in 'GHI' else num(sm, f'{c}{r}')) for c in 'GHIJKLMNOPQR'} for r in range(T0, T0 + N)]
 S['AtoE'] = [[txt(sm, f'{c}{r}') if c in 'ABE' else num(sm, f'{c}{r}') for c in 'ABCDE'] for r in range(4, 4 + N)]
@@ -151,8 +154,9 @@ S['section'] = [{c: (txt(sm, f'{c}{r}') if c in 'GKNPQ' else num(sm, f'{c}{r}'))
 S['unit_weight'] = num(sm, f'J{SEC_T + 1}')
 S['chart_mainline'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(76, 80)}
 S['chart_shoulder'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(83, 87)}
-# three tiles of four columns each, so the strip fills the band exactly
-S['kpi'] = [txt(sm, f'{c}{r}') for r in (3, 4, 5, 7, 8, 9) for c in ('G', 'K', 'O')]
+# one row of six tiles, two columns each, so the strip fills the band exactly
+S['kpi'] = [txt(sm, f'{c}{r}') for r in (3, 4, 5) for c in ('G', 'I', 'K', 'M', 'O', 'Q')]
+S['rail'] = [(txt(sm, f'P{r}'), txt(sm, f'Q{r}')) for r in range(RAIL0, RAIL0 + 6)]
 S['benchmark'] = [num(sm, f'{c}{BM + 3}') for c in ['X', 'Y', 'Z', 'AA'][:N]] + [num(sm, f'AB{BM + 2}'), num(sm, f'AB{BM + 3}')]
 
 npws = [a['NPW'] for a in out['alternatives']]
@@ -170,16 +174,25 @@ crf = r0 * (1 + r0) ** SC['period'] / ((1 + r0) ** SC['period'] - 1)
 
 # ---- the dashboard strip: every tile has to agree with the table under it
 money = lambda v: '$' + format(int(round(v)), ',')
-labels = S['kpi'][0:3] + S['kpi'][9:12]
+labels = S['kpi'][0:6]
 check('six KPI tiles above the results table',
       labels == ['LOWEST PRESENT WORTH', 'MARGIN TO NEXT', 'EQUIVALENT ANNUAL COST',
                  'INITIAL CONSTRUCTION', 'UNIT COST', 'RATE SENSITIVITY'], labels)
-vals = S['kpi'][3:6] + S['kpi'][12:15]
+vals = S['kpi'][6:12]
 check('lowest-present-worth tile equals the smallest NPW in the table', vals[0] == money(min(npws)), (vals[0], money(min(npws))))
 margin = sorted(npws)[1] - min(npws)
 check('margin tile equals the gap between the two best', vals[1] == money(margin), (vals[1], money(margin)))
 check('equivalent annual cost tile equals lowest NPW x CRF', vals[2] == money(min(npws) * crf), (vals[2], money(min(npws) * crf)))
 check('initial construction tile equals the winner initial cost', vals[3] == money(S['results'][best]['J']), (vals[3], S['results'][best]['J']))
+# it is the winner's initial cost, which is often not the lowest: on this example the cheapest
+# alternative to build loses on whole-life cost, so the caption must not claim otherwise
+check('and its caption does not claim the winner is the cheapest to build',
+      'lowest initial' not in S['kpi'][15].lower() or
+      S['results'][best]['J'] == min(r['J'] for r in S['results']), S['kpi'][15])
+check('the project location reads live beside the plots, runway width included',
+      [k for k, v in S['rail']] == ['City / county', 'TDOT Grand Division', 'Coordinates',
+                                    'Elevation', 'Mainline area', 'Runway width, ft']
+      and all(v.strip() for k, v in S['rail']), S['rail'])
 check('unit cost tile equals initial construction over the mainline area',
       vals[4] == money(S['results'][best]['J'] / SC['area']) + ' / S.Y.', (vals[4], SC['area']))
 check('rate sensitivity tile agrees with the sensitivity block',

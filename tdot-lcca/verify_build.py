@@ -15,15 +15,21 @@ names = z.namelist()
 rd = lambda n: z.read(n).decode('utf-8', 'replace')
 wb = load_workbook(WB, keep_vba=True)
 ws = wb['Summary']
-# the Summary row map, the same constants build_summary.py lays the sheet out with
-# The dashboard order is the answer, then the picture, then the numbers: the tiles and the verdict
-# banner, then the three chart rows, then the results table and the comparison block below them.
-KPI0, BANNER, HDR, T0, T1 = 3, 10, 55, 56, 59   # the banner stays under the tiles
-VER, VER2, CMP, CMPH, CMP0 = 61, 62, 64, 65, 66
-CHT, HOW, C1, C2, C3, BMN = 11, 12, 13, 31, 42, 52
-SEC_T, CH67, NOTE67, MAP0, A0 = 90, 100, 120, 130, 132
-VBACH = 123       # where the chart the Alternative Setup form maintains is parked
+# the Summary row map, the same constants build_sheet_design.py lays the sheet out with.
+# Option A: the whole decision on one 15-inch screen. A 15.6 in FHD laptop at Windows' default
+# 125% scaling gives Excel 1,488 x 624 px of grid, so the frozen band is 160 px (header, project
+# context, one row of six tiles, verdict), then 240 px of key plots with the project location
+# beside them, then 180 px of supporting plots. 580 px in all. The tables sit below the fold.
+KPI0, BANNER = 3, 6                             # tile kicker row, verdict banner
+HDR, T0, T1 = 38, 39, 42                        # results header and its first and last alternative
+VER, VER2, CMP, CMPH, CMP0 = 44, 45, 47, 48, 49
+C1, C2, C3, BMN = 7, 19, 28, 36                 # the three chart rows, and the chart-8 note
+TITLE = 37                                      # THE NUMBERS
+SEC_T, CH67, NOTE67, MAP0, A0 = 55, 65, 70, 130, 132
+VBACH = 74        # the chart the Alternative Setup form maintains, under its own note
 SENS0, SENS1 = 12, 36
+RAIL_C = 16       # column P: the project-location rail, beside the two key plots
+RAIL0 = 13        # its first fact row
 BM = 89           # unit-cost benchmark data block, in the chart-data columns
 fails = []
 checks = 0
@@ -69,6 +75,7 @@ check('column G onward visible', not ws.column_dimensions['G'].hidden)
 check('navigation buttons sit in the first visible column', 'HYPERLINK' in str(ws['G1'].value) and 'HYPERLINK' in str(ws['H1'].value),
       (ws['G1'].value, ws['H1'].value))
 check('title moved beside the buttons', ws['I1'].value == 'LCCA SUMMARY')
+HOW = 69          # the how-to line sits with the closing notes, not above the first plot
 check('note explains the hidden block', 'hidden' in str(ws.cell(HOW, 7).value) and 'unhide' in str(ws.cell(HOW, 7).value).lower())
 check('the verdict banner stays under the tiles and leads with the winner',
       str(ws.cell(BANNER, 7).value).startswith('=IF(COUNT($O$%d:$O$%d)=0' % (T0, T1))
@@ -87,32 +94,36 @@ check('the two verdict lines sit under the results table',
       str(ws.cell(VER, 7).value).startswith('=IF(COUNT($O$%d:$O$%d)=0' % (T0, T1))
       and 'lowest-cost alternative' in str(ws.cell(VER2, 7).value),
       (str(ws.cell(VER, 7).value)[:40], str(ws.cell(VER2, 7).value)[:40]))
-check('the charts block is labelled and carries its how-to-read line',
-      str(ws.cell(CHT, 7).value).startswith('KEY RESULTS') and str(ws.cell(HOW, 7).value).startswith('How to read'),
-      (ws.cell(CHT, 7).value, str(ws.cell(HOW, 7).value)[:30]))
+check('nothing stands between the verdict and the first plot, and the how-to line survives',
+      ws.cell(C1, 7).value is None and str(ws.cell(HOW, 7).value).startswith('How to read'),
+      (ws.cell(C1, 7).value, str(ws.cell(HOW, 7).value)[:30]))
 check('the notes under the chart rows are where the row map says',
       'per S.Y.' in str(ws.cell(BMN, 7).value) and 'Charts 6 and 7' in str(ws.cell(NOTE67, 7).value)
-      and 'Alternative Setup form draws' in str(ws.cell(VBACH - 1, 7).value),
-      (str(ws.cell(NOTE67, 7).value)[:30], str(ws.cell(VBACH - 1, 7).value)[:30]))
+      and 'Alternative Setup form draws' in str(ws.cell(VBACH - 2, 7).value),
+      (str(ws.cell(NOTE67, 7).value)[:30], str(ws.cell(VBACH - 2, 7).value)[:30]))
 draw = rd('xl/drawings/drawing10.xml')
 anchors = [(int(c), int(r)) for c, r in
            re.findall(r'<xdr:from><xdr:col>(\d+)</xdr:col><xdr:colOff>\d+</xdr:colOff>'
                       r'<xdr:row>(\d+)</xdr:row>', draw)]
-# the laptop band: two key charts side by side, then four supporting, then the
-# two section charts - all inside the 1,218 px the narrowed columns G:R now span
-want = [(6, C1 - 1), (12, C1 - 1),                                  # key pair
-        (6, C2 - 1), (8, C2 - 1), (12, C2 - 1), (15, C2 - 1),       # four supporting
-        (6, C3 - 1), (8, C3 - 1)]                                   # the two section charts
-check('the eight Summary charts are anchored where the row map says',
-      all(a in anchors for a in want), sorted(set(anchors)))
+# Three bands of plots that touch. The plots are pixel-anchored rather than snapped to columns,
+# so what matters is the count on each row and that none of them runs past the band.
+_rows = [r for c, r in anchors]
+check('the eight Summary charts stand two, four and two across the three chart rows',
+      [_rows.count(C1 - 1), _rows.count(C2 - 1), _rows.count(C3 - 1)] == [2, 4, 2],
+      sorted(set(anchors)))
+check('the project location shares the key-chart rows, to the right of both plots',
+      (RAIL_C - 1, C1) in anchors and str(ws.cell(C1, RAIL_C).value) == 'PROJECT LOCATION',
+      (ws.cell(C1, RAIL_C).value, [a for a in anchors if a[0] == RAIL_C - 1]))
 check('no chart starts beyond the dashboard band (column R)',
-      all(c <= 15 for c, r in anchors if r in (C1 - 1, C2 - 1, C3 - 1)),
+      all(c <= 17 for c, r in anchors if r in (C1 - 1, C2 - 1, C3 - 1)),
       sorted(c for c, r in anchors if r in (C1 - 1, C2 - 1, C3 - 1)))
 # Each band of charts has to cover exactly the rows it is drawn over. The rows the key charts now
 # sit on used to carry the results table, and its 27- and 44-point rows left a dead strip under
 # them until the heights were put back to the sheet's own 15.
 def band_px(lo, hi):
     return sum((ws.row_dimensions[r].height or 15.0) for r in range(lo, hi + 1)) * 4 / 3
+
+A_KEY_H = 240     # the key plots and the project-location rail share these twelve rows
 
 # Pair each chart with the row it starts on, so the dashboard's own eight can be checked apart
 # from the locator map and the chart the setup form maintains.
@@ -121,13 +132,13 @@ for _a in re.findall(r'<xdr:oneCellAnchor>.*?</xdr:oneCellAnchor>', draw, re.S):
     _r = re.search(r'<xdr:row>(\d+)</xdr:row>', _a)
     _e = re.search(r'<xdr:ext cx="\d+" cy="(\d+)"', _a)
     if _r and _e: _drawn.append((int(_r.group(1)), int(_e.group(1)) / 9525.0))
-_want = {C1 - 1: 320, C2 - 1: 200, C3 - 1: 200}
+_want = {C1 - 1: A_KEY_H, C2 - 1: 180, C3 - 1: 160}
 check('and every chart drawn on them is exactly that tall',
       all(abs(cy - _want[r]) < 1 for r, cy in _drawn if r in _want)
       and len([1 for r, _ in _drawn if r in _want]) == 8,
       [(r + 1, round(cy)) for r, cy in _drawn if r in _want])
-check('the chart the form maintains is parked below the dashboard', (6, VBACH - 1) in anchors,
-      [a for a in anchors if a[0] == 6])
+check('the chart the form maintains follows its own note below the dashboard',
+      (6, VBACH - 1) in anchors, [a for a in anchors if a[0] == 6])
 check('chart-data block labelled do not edit', 'do not edit' in str(ws.cell(1, 23).value))
 check('the sensitivity block names the lowest alternative at each of its rates',
       ws.cell(SENS0 - 1, 23 + 1 + 4).value == 'Lowest at this rate'
@@ -144,10 +155,10 @@ check('an alternative that does not exist plots nothing on the two line charts',
 check('the line-chart series names are blank rather than the column letter',
       all('$4=\"\",\" \",' in str(ws.cell(SENS0 - 1, c).value) for c in range(24, 28)),
       ws.cell(SENS0 - 1, 24).value)
-TILE_C = [7, 11, 15]        # G:J, K:N, O:R - three even cards that fill the band exactly
+TILE_C = [7, 9, 11, 13, 15, 17]   # G:H .. Q:R - six even cards of 247 px each
 check('the rate-sensitivity tile tests every rate in that block, not just its ends',
-      'COUNTIF($AB$%d:$AB$%d' % (SENS0, SENS1) in str(ws.cell(KPI0 + 5, TILE_C[2]).value),
-      str(ws.cell(KPI0 + 5, TILE_C[2]).value)[:90])
+      'COUNTIF($AB$%d:$AB$%d' % (SENS0, SENS1) in str(ws.cell(KPI0 + 1, TILE_C[5]).value),
+      str(ws.cell(KPI0 + 1, TILE_C[5]).value)[:90])
 check('an alternative that does not exist gets no name', all('""' in str(ws.cell(4, c).value) for c in range(24, 28)),
       ws.cell(4, 24).value)
 wbx = rd('xl/workbook.xml')
@@ -193,23 +204,30 @@ check('the alternative-sheet charts keep calendar years on the category axis',
       all('Calendar year' in rd(n) for n in charts[:5]))
 
 print(); print('=' * 78); print('DASHBOARD STRIP'); print('=' * 78)
-labels = [ws.cell(KPI0 + 4 * (k // 3), TILE_C[k % 3]).value for k in range(6)]
+labels = [ws.cell(KPI0, c).value for c in TILE_C]
 check('six KPI tiles above the results table',
       labels == ['LOWEST PRESENT WORTH', 'MARGIN TO NEXT', 'EQUIVALENT ANNUAL COST', 'INITIAL CONSTRUCTION',
                  'UNIT COST', 'RATE SENSITIVITY'], labels)
-vals = [str(ws.cell(KPI0 + 1 + 4 * (k // 3), TILE_C[k % 3]).value) for k in range(6)]
+vals = [str(ws.cell(KPI0 + 1, c).value) for c in TILE_C]
 check('every tile is a formula over cells that already exist', all(v.startswith('=') for v in vals), vals[:2])
-tile_rows = (KPI0, KPI0 + 1, KPI0 + 2, KPI0 + 4, KPI0 + 5, KPI0 + 6)
+# Two rows of three tiles cost 169 px of the first screen for six numbers. One row of six costs
+# 60, and six even pairs of columns is what makes the strip fill the band without a ragged edge.
+tile_rows = (KPI0, KPI0 + 1, KPI0 + 2)
 spans = sorted({(m.min_col, m.max_col) for m in ws.merged_cells.ranges if m.min_row in tile_rows})
-check('the six tiles are even: four columns each, so the strip fills the band',
-      spans == [(7, 10), (11, 14), (15, 18)]
+check('the six tiles stand in one row of even pairs, so the strip fills the band',
+      spans == [(c, c + 1) for c in TILE_C]
       and sum(1 for m in ws.merged_cells.ranges if m.min_row in tile_rows) == 18, spans)
+px = {i: int(((256 * (ws.column_dimensions[get_column_letter(i)].width or 8.43) + 18) / 256) * 7)
+      for i in range(7, 19)}
+check('and each of the six is the same width',
+      len({px[c] + px[c + 1] for c in TILE_C}) == 1 and sum(px.values()) == 6 * 247,
+      (sorted({px[c] + px[c + 1] for c in TILE_C}), sum(px.values())))
 sx = rd('xl/worksheets/sheet14.xml')
 cfs = dict(re.findall(r'<conditionalFormatting sqref="([^"]+)"><cfRule type="(\w+)"', sx))
 check('bars inside the net present worth column', cfs.get('O%d:O%d' % (T0, T1)) == 'dataBar', cfs)
 check('the margin tile turns amber only when the two best are within five percent',
       cfs.get('%s%d:%s%d' % (get_column_letter(TILE_C[1]), KPI0,
-                             get_column_letter(TILE_C[1] + 3), KPI0 + 2)) == 'expression'
+                             get_column_letter(TILE_C[1] + 1), KPI0 + 2)) == 'expression'
       and '<0.05' in sx.replace('&lt;', '<'), cfs)
 check('lowest-cost row still highlighted in both tables',
       cfs.get('G%d:R%d' % (T0, T1)) == 'expression' and cfs.get('G%d:P%d' % (CMP0, CMP0 + 3)) == 'expression', cfs)
@@ -252,36 +270,49 @@ check('airports grouped by division so each is its own series',
       [ws.cell(r, 27).value for r in (A0, A0 + 20, A0 + 43, A0 + 73)])
 # the locator map and the project facts moved out of columns S:V and into the foot of the band,
 # so the whole sheet fits a laptop screen without scrolling sideways
-LOC = 98
+LOC = 7           # the project location shares the key-chart rows now
 check('nothing is left in columns S:V, which sat beyond the band',
       not [c.coordinate for r in ws.iter_rows(min_row=1, max_row=40, min_col=19, max_col=22)
            for c in r if c.value is not None],
       [c.coordinate for r in ws.iter_rows(min_row=1, max_row=40, min_col=19, max_col=22)
        for c in r if c.value is not None][:6])
-check('legend in cells, one per division plus this project',
-      [ws.cell(LOC + 14, c).value for c in range(7, 11)] == ['\u25a0 West', '\u25a0 Middle', '\u25a0 East', '\u25a0 This project'],
-      [ws.cell(LOC + 14, c).value for c in range(7, 11)])
-check('the block leads with its own section rule and two card headers',
-      ws.cell(LOC, 7).value == 'PROJECT AND LOCATION'
-      and ws.cell(LOC + 1, 7).value == 'PROJECT LOCATION' and ws.cell(LOC + 1, 13).value == 'PROJECT'
-      and ws.cell(LOC + 1, 7).fill.fgColor.rgb.endswith('1D2733'),
-      [ws.cell(LOC, 7).value, ws.cell(LOC + 1, 7).value, ws.cell(LOC + 1, 13).value])
-check('pricing basis stated under the map',
-      'Unit Cost' in str(ws.cell(LOC + 16, 7).value) and 'empty' in str(ws.cell(LOC + 16, 7).value))
-check('map axes are named and their degree labels suppressed',
-      mapch and mapch[0].x_axis.numFmt.formatCode == ';;;' and mapch[0].y_axis.numFmt.formatCode == ';;;')
-check('project block names airport, county, region, coordinates, elevation',
-      [ws.cell(LOC + 2 + k, 13).value for k in range(7)] ==
-      ['Airport', 'City / county', 'TDOT Grand Division', 'Coordinates', 'Elevation', 'Branch / project', 'Mainline area'],
-      [ws.cell(LOC + 2 + k, 13).value for k in range(7)])
-check('the sheet says where the coordinates come from and how to export KML',
-      'embedded' in str(ws.cell(LOC + 17, 7).value) and 'ExportLCCAKML' in str(ws.cell(LOC + 18, 7).value))
+# The project location used to sit two screens below the plots, at the foot of the band. It is
+# the right-hand panel of the key-chart row now: the map over six facts, in columns P to R.
+check('the rail leads with its own header, in the band but clear of both plots',
+      ws.cell(C1, RAIL_C).value == 'PROJECT LOCATION'
+      and ws.cell(C1, RAIL_C).fill.fgColor.rgb.endswith('1D2733'),
+      (ws.cell(C1, RAIL_C).value, ws.cell(C1, RAIL_C).fill.fgColor.rgb))
+check('the rail names county, division, coordinates, elevation, area and runway width',
+      [ws.cell(RAIL0 + k, RAIL_C).value for k in range(6)] ==
+      ['City / county', 'TDOT Grand Division', 'Coordinates', 'Elevation', 'Mainline area',
+       'Runway width, ft'],
+      [ws.cell(RAIL0 + k, RAIL_C).value for k in range(6)])
+check('every fact on the rail carries a live value, not a typed one',
+      all(str(ws.cell(RAIL0 + k, RAIL_C + 1).value).startswith('=') for k in range(5)),
+      [str(ws.cell(RAIL0 + k, RAIL_C + 1).value)[:24] for k in range(5)])
+# the runway width is the one cell in the block anyone types in, and the only one a macro reads
 check('runway width for the export footprint is an input cell, and the macro reads that cell',
-      ws.cell(LOC + 9, 13).value == 'Runway width, ft' and ws.cell(LOC + 9, 15).value == 100
-      and '"O%d"' % (LOC + 9) in open('LCCA_KML_Export.bas', encoding='utf-8').read(),
-      (ws.cell(LOC + 9, 13).value, ws.cell(LOC + 9, 15).value))
-check('the three notes under the map are merged so they do not run into the chart data',
-      all('G%d:R%d' % (LOC + k, LOC + k) in [str(m) for m in ws.merged_cells.ranges] for k in (16, 17, 18)),
+      ws.cell(RAIL0 + 5, RAIL_C + 1).value == 100
+      and '"%s%d' % (get_column_letter(RAIL_C + 1), RAIL0 + 5) in open(
+          'LCCA_KML_Export.bas', encoding='utf-8').read(),
+      (ws.cell(RAIL0 + 5, RAIL_C).value, ws.cell(RAIL0 + 5, RAIL_C + 1).value))
+check('and the macro finds the tables by their headings rather than by row number',
+      all(t in open('LCCA_KML_Export.bas', encoding='utf-8').read()
+          for t in ('Private Function ResultsRow', 'Private Function SectionRow', 'HeadingRow')))
+check('the map sits between the rail header and its facts',
+      (RAIL_C - 1, C1) in anchors, [a for a in anchors if a[0] == RAIL_C - 1])
+check('legend in cells, one per division plus this project',
+      [ws.cell(CH67 - 1, c).value for c in range(7, 11)] ==
+      ['\u25a0 West', '\u25a0 Middle', '\u25a0 East', '\u25a0 This project'],
+      [ws.cell(CH67 - 1, c).value for c in range(7, 11)])
+check('pricing basis, coordinate source and the KML recipe close the sheet',
+      'Unit Cost' in str(ws.cell(CH67 + 1, 7).value)
+      and 'embedded' in str(ws.cell(CH67 + 2, 7).value)
+      and 'ExportLCCAKML' in str(ws.cell(CH67 + 3, 7).value),
+      [str(ws.cell(CH67 + k, 7).value)[:26] for k in (1, 2, 3)])
+check('those closing notes are merged so they do not run into the chart data',
+      all('G%d:R%d' % (CH67 + k, CH67 + k) in [str(m) for m in ws.merged_cells.ranges]
+          for k in (1, 2, 3)),
       [str(m) for m in ws.merged_cells.ranges][-4:])
 check('print area no longer has to reach past the band', 'Summary!$A$1:$R$' in rd('xl/workbook.xml'),
       re.findall(r'<definedName name="_xlnm.Print_Area" localSheetId="13">([^<]*)', rd('xl/workbook.xml')))
@@ -533,15 +564,28 @@ for _m in re.finditer(r'<xdr:oneCellAnchor>.*?</xdr:oneCellAnchor>', _d, re.S):
     if not (_nm and _f): continue
     _at[_nm.group(1)] = (_off.get(int(_f.group(1)) + 1, 0) + int(_f.group(2)) / 9525.0,
                          int(_f.group(3)) + 1, int(_e.group(1)) / 9525.0 if _e else 0)
-_want = {'Summary Chart 1': 0.0, 'Summary Chart 2': _band / 2.0,
-         'Summary Chart 3': 0.0, 'Summary Chart 4': _band / 4.0,
-         'Summary Chart 5': _band / 2.0, 'Summary Chart 8': 3 * _band / 4.0,
-         'Summary Chart 6': 0.0, 'Summary Chart 7': _band / 4.0}
-_bad = [(k, round(_at[k][0], 1), round(v, 1)) for k, v in _want.items()
-        if k in _at and abs(_at[k][0] - v) > 2]
-check('every chart sits on the grid the sheet\'s own widths define',
-      not _bad and len(_at) >= 8, {'band px': _band, 'off by more than 2 px': _bad})
-_rows = sorted({_at[k][1] for k in _want if k in _at})
+# The plots touch: no gutter, and each band divides its own width evenly. They are pixel-anchored
+# rather than snapped to columns, so the test is that the edges add up, not that they land on a
+# column boundary. The two key plots share everything left of the project-location rail.
+_rail = sum(_wpx.get(_c, 0) for _c in range(RAIL_C, 19))
+_keyw = (_band - _rail) / 2.0
+_want = {'Summary Chart 1': (0.0, _keyw), 'Summary Chart 2': (_keyw, _keyw),
+         'Summary Chart 3': (0.0, _band / 4.0), 'Summary Chart 4': (_band / 4.0, _band / 4.0),
+         'Summary Chart 5': (_band / 2.0, _band / 4.0), 'Summary Chart 8': (3 * _band / 4.0, _band / 4.0),
+         'Summary Chart 6': (0.0, _band / 2.0), 'Summary Chart 7': (_band / 2.0, _band / 2.0),
+         'Summary Chart 9': (_band - _rail, _rail)}
+_bad = [(k, round(_at[k][0], 1), round(v[0], 1)) for k, v in _want.items()
+        if k in _at and abs(_at[k][0] - v[0]) > 2]
+check('every chart starts where the sheet\'s own widths say it should',
+      not _bad and len(_at) >= 9, {'band px': _band, 'off by more than 2 px': _bad})
+# a gutter anywhere would show up as a plot that stops short of its neighbour's left edge
+_gap = [(k, round(_at[k][0] + _at[k][2], 1), round(v[0] + v[1], 1)) for k, v in _want.items()
+        if k in _at and abs(_at[k][0] + _at[k][2] - v[0] - v[1]) > 2]
+check('and ends flush against the next one, with no gutter between plots',
+      not _gap, _gap)
+# the locator map is not one of the eight: it shares the key row but starts a row lower, under
+# the rail's own header
+_rows = sorted({_at[k][1] for k in _want if k in _at and k != 'Summary Chart 9'})
 check('and the eight of them sit on three rows, two then four then two',
       len(_rows) == 3, _rows)
 _over = [(k, round(_at[k][0] + _at[k][2], 1)) for k in _want if k in _at and _at[k][0] + _at[k][2] > _band + 2]

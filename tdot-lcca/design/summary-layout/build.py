@@ -43,20 +43,22 @@ CONTEXT = '''
   </div>'''
 
 TILE = ('<div class="p"%s><div class="kicker">%s</div>'
-        '<div style="font-size:16px;font-weight:800;margin-top:2px;%s">%s</div>'
+        '<div style="%s">%s</div>'
         '<div class="sub">%s</div></div>')
 TILES = [('Lowest present worth', '$5,852,247', 'Alternative 3', '', ''),
          ('Margin to next', '$183,970', '3.1% &#183; under 5%, treat as tied', '', ''),
          ('Equivalent annual', '$298,577', 'per year, 30 yr at 3%', '', ''),
-         ('Initial construction', '$5,681,474', 'lowest initial cost', '', ''),
+         ('Initial construction', '$5,681,474', 'winner, mobilisation and engineering in', '', ''),
          ('Unit cost', '$124<span style="font-size:9.5px;font-weight:600;color:var(--muted);"> /S.Y.</span>',
           'over mainline area', '', ''),
          ('Rate sensitivity', 'Winner changes', 'not lowest at every rate',
-          ' style="border-left:3px solid var(--amber);"', 'font-size:13px;color:var(--amber);')]
+          ' style="border-left:3px solid var(--amber);"',
+          'font-size:13px;font-weight:800;margin-top:4px;color:var(--amber);')]
 
 
 def tiles(n=6):
-    cells = ''.join(TILE % (t[3], t[0], t[4], t[1], t[2]) for t in TILES[:n])
+    cells = ''.join(TILE % (t[3], t[0], t[4] or 'font-size:16px;font-weight:800;margin-top:2px;',
+                        t[1], t[2]) for t in TILES[:n])
     return ('\n  <div class="flush" style="grid-template-columns:repeat(%d,minmax(0,1fr));'
             'height:60px;border-top:none;">%s</div>' % (n, cells))
 
@@ -84,72 +86,115 @@ def svg(vb_w, vb_h, body, grow=True):
             'style="%sdisplay:block;">%s</svg>' % (vb_w, vb_h, 'flex-grow:1;' if grow else '', body))
 
 
+PER_M = 18.33      # px per $1M, from the axis: 0 at y=150, $6M at y=40
+
+
 def chart_category(h=176):
-    """1. Present worth by category, stacked, salvage below zero."""
-    bars, x = [], 86
-    stacks = [[(84, '#1f4e79'), (21, '#3e7cc0'), (14, '#6aa9df'), (8, '#d98a2b')],
-              [(115, '#1f4e79'), (8, '#3e7cc0'), (7, '#6aa9df'), (4, '#d98a2b')],
-              [(110, '#1f4e79'), (8, '#3e7cc0'), (7, '#6aa9df'), (4, '#d98a2b')]]
-    salv, labels = [9, 19, 18], ['Alternative 1', 'Alternative 2', 'Alternative 3']
-    base = 150
-    for i, st in enumerate(stacks):
+    """1. Present worth by category. Drawn to the same numbers the table carries: gross stack up,
+    salvage down, so the net is what the callout says."""
+    # initial, maintenance, rehabilitation, lost revenue, salvage - $M, from the worked example
+    alts = [(4.286, 1.095, 0.647, 0.190, 0.181, 'Alternative 1'),
+            (5.919, 0.360, 0.332, 0.064, 0.610, 'Alternative 2'),
+            (5.681, 0.360, 0.332, 0.064, 0.585, 'Alternative 3')]
+    cols = ('#1f4e79', '#3e7cc0', '#6aa9df', '#d98a2b')
+    out, x, base = [], 86, 150
+    for i, (a, b, c, d, sal, label) in enumerate(alts):
         y = base
-        for hh, c in st:
+        for v, col in zip((a, b, c, d), cols):
+            hh = max(round(v * PER_M), 2)
             y -= hh
-            bars.append('<rect x="%d" y="%d" width="86" height="%d" fill="%s"/>' % (x, y, hh, c))
-        bars.append('<rect x="%d" y="%d" width="86" height="%d" fill="#9aa7b4"/>' % (x, base, salv[i]))
-        w = 700 if i == 2 else 400
-        bars.append('<text x="%d" y="182" font-size="11" font-weight="%d" fill="%s" text-anchor="middle">%s</text>'
-                    % (x + 43, w, '#0f7b4f' if i == 2 else '#5b6675', labels[i] + (' &#10003;' if i == 2 else '')))
-        if i == 2:
-            bars.append('<rect x="%d" y="%d" width="92" height="%d" fill="none" stroke="#0f7b4f" '
-                        'stroke-width="2" rx="3"/>' % (x - 3, y - 4, base + salv[i] - y + 8))
-            bars.append('<text x="%d" y="%d" font-size="10.5" font-weight="700" fill="#0f7b4f" '
-                        'text-anchor="middle">$5.85M</text>' % (x + 43, y - 9))
+            out.append('<rect x="%d" y="%d" width="86" height="%d" fill="%s"/>' % (x, y, hh, col))
+        sh = max(round(sal * PER_M), 2)
+        out.append('<rect x="%d" y="%d" width="86" height="%d" fill="#9aa7b4"/>' % (x, base, sh))
+        win = i == 2
+        out.append('<text x="%d" y="182" font-size="11" font-weight="%d" fill="%s" text-anchor="middle">%s</text>'
+                   % (x + 43, 700 if win else 400, '#0f7b4f' if win else '#5b6675',
+                      label + (' &#10003;' if win else '')))
+        if win:
+            out.append('<rect x="%d" y="%d" width="92" height="%d" fill="none" stroke="#0f7b4f" '
+                       'stroke-width="2" rx="3"/>' % (x - 3, y - 4, base + sh - y + 8))
+            out.append('<text x="%d" y="%d" font-size="10.5" font-weight="700" fill="#0f7b4f" '
+                       'text-anchor="middle">$5.85M net</text>' % (x + 43, y - 9))
         x += 152
-    grid = ''.join('<line x1="52" y1="%d" x2="530" y2="%d" stroke="#eef2f6"/>' % (y, y)
-                   for y in (40, 77, 114))
+    grid = ''.join('<line x1="52" y1="%d" x2="530" y2="%d" stroke="#eef2f6"/>' % (y, y) for y in (40, 77, 114))
     axis = ('<line x1="52" y1="150" x2="530" y2="150" stroke="#cdd6e2"/>'
             '<text x="46" y="154" font-size="9" fill="#9aa7b4" text-anchor="end">0</text>'
+            '<text x="46" y="80" font-size="9" fill="#9aa7b4" text-anchor="end">$4M</text>'
             '<text x="46" y="44" font-size="9" fill="#9aa7b4" text-anchor="end">$6M</text>')
-    return svg(540, 190, grid + axis + ''.join(bars))
+    return svg(540, 190, grid + axis + ''.join(out))
+
+
+def legend(items):
+    sw = ''.join('<span style="display:inline-flex;align-items:center;gap:3px;">'
+                 '<span style="width:8px;height:8px;background:%s;display:inline-block;"></span>%s</span>'
+                 % (c, t) for c, t in items)
+    return ('<div style="display:flex;gap:9px;flex-wrap:wrap;font-size:9px;color:var(--muted);'
+            'margin-top:2px;">%s</div>' % sw)
+
+
+CAT_LEGEND = legend([('#1f4e79', 'Initial'), ('#3e7cc0', 'Maintenance'), ('#6aa9df', 'Rehab'),
+                     ('#d98a2b', 'Lost revenue'), ('#9aa7b4', 'Salvage, below the line')])
+ALT_LEGEND = legend([('#3e7cc0', 'Alternative 1'), ('#1c2634', 'Alternative 2'), ('#0f7b4f', 'Alternative 3')])
 
 
 def chart_rate(h=176):
-    """2. Net present worth vs. discount rate, with the axis floor lifted off zero."""
-    ser = [('#3e7cc0', '68,36 148,52 228,70 308,88 388,105 468,120 512,128'),
-           ('#1c2634', '68,44 148,54 228,66 308,78 388,90 468,101 512,107'),
-           ('#0f7b4f', '68,52 148,60 228,70 308,80 388,91 468,102 512,108')]
-    lines = ''.join('<polyline points="%s" fill="none" stroke="%s" stroke-width="%s"/>'
-                    % (p, c, '2.6' if c == '#0f7b4f' else '2') for c, p in ser)
-    grid = ''.join('<line x1="68" y1="%d" x2="520" y2="%d" stroke="#eef2f6"/>' % (y, y)
-                   for y in (36, 66, 96, 126))
-    cross = ('<line x1="232" y1="24" x2="232" y2="150" stroke="#d98a2b" stroke-width="1.4" '
+    """2. Net present worth vs. discount rate. Axis runs $5.4M to $6.4M, 100 px per $M, so the
+    curves start where the sensitivity block actually puts them at 2%."""
+    top, per = 40, 100.0                      # y=40 is $6.4M
+    y = lambda v: round(top + (6.4 - v) * per)
+    ser = [('#3e7cc0', 6.311, 5.45), ('#1c2634', 6.048, 5.70), ('#0f7b4f', 5.844, 5.60)]
+    lines, xs = '', [68, 143, 218, 293, 368, 443, 512]
+    for col, v0, v1 in ser:
+        pts = ' '.join('%d,%d' % (x, y(v0 + (v1 - v0) * (i / 6.0) ** 1.08))
+                       for i, x in enumerate(xs))
+        lines += ('<polyline points="%s" fill="none" stroke="%s" stroke-width="%s"/>'
+                  % (pts, col, '2.6' if col == '#0f7b4f' else '2'))
+    cross = ('<line x1="404" y1="28" x2="404" y2="150" stroke="#d98a2b" stroke-width="1.4" '
              'stroke-dasharray="4 3"/>'
-             '<text x="238" y="34" font-size="9.5" font-weight="700" fill="#d98a2b">winner changes ~4.2%</text>')
+             '<text x="398" y="38" font-size="9.5" font-weight="700" fill="#d98a2b" '
+             'text-anchor="end">Alternative 1 takes over</text>')
+    grid = ''.join('<line x1="68" y1="%d" x2="520" y2="%d" stroke="#eef2f6"/>' % (v, v)
+                   for v in (y(6.2), y(6.0), y(5.8), y(5.6)))
     ax = ('<line x1="68" y1="150" x2="520" y2="150" stroke="#cdd6e2"/>'
-          '<text x="62" y="40" font-size="9" fill="#9aa7b4" text-anchor="end">$6.4M</text>'
-          '<text x="62" y="130" font-size="9" fill="#9aa7b4" text-anchor="end">$5.8M</text>'
-          '<text x="68" y="166" font-size="9" fill="#9aa7b4">2%</text>'
-          '<text x="294" y="166" font-size="9" fill="#9aa7b4" text-anchor="middle">5%</text>'
-          '<text x="520" y="166" font-size="9" fill="#9aa7b4" text-anchor="end">8%</text>')
+          '<text x="62" y="%d" font-size="9" fill="#9aa7b4" text-anchor="end">$6.4M</text>'
+          '<text x="62" y="%d" font-size="9" fill="#9aa7b4" text-anchor="end">$5.6M</text>'
+          '<text x="68" y="166" font-size="9" fill="#9aa7b4">2%%</text>'
+          '<text x="294" y="166" font-size="9" fill="#9aa7b4" text-anchor="middle">5%%</text>'
+          '<text x="520" y="166" font-size="9" fill="#9aa7b4" text-anchor="end">8%%</text>'
+          % (y(6.4) + 4, y(5.6) + 4))
     return svg(540, 190, grid + cross + lines + ax)
 
 
-def chart_bars(seed, color='#3e7cc0', n=26):
-    hs = [(seed * (i + 3) * 7) % 62 for i in range(n)]
-    hs[0] = 78
-    bars = ''.join('<rect x="%d" y="%d" width="7" height="%d" fill="%s"/>'
-                   % (26 + i * 11, 100 - v, v, color) for i, v in enumerate(hs))
-    return svg(320, 118, '<line x1="20" y1="100" x2="316" y2="100" stroke="#cdd6e2"/>' + bars)
+YEARS = 31
+
+
+def year_bars(spikes, color='#3e7cc0', y0=None):
+    """A bar per year of the analysis period. `spikes` maps year -> height in px."""
+    out = ''.join('<rect x="%d" y="%d" width="7" height="%d" fill="%s"/>'
+                  % (26 + yr * 9.4, 100 - h, h, color)
+                  for yr, h in sorted(spikes.items()))
+    ticks = ''.join('<text x="%d" y="112" font-size="8" fill="#9aa7b4" text-anchor="middle">%d</text>'
+                    % (26 + yr * 9.4 + 3, 2028 + yr) for yr in (0, 10, 20, 30))
+    return svg(320, 118, '<line x1="20" y1="100" x2="316" y2="100" stroke="#cdd6e2"/>' + out + ticks)
+
+
+SPEND = {0: 86, 8: 9, 12: 14, 16: 9, 20: 26, 24: 9, 28: 14}     # construction, then maintenance and rehab
+CLOSURE = {0: 62, 12: 14, 20: 22, 28: 14}                        # the years the runway is actually shut
 
 
 def chart_cumulative():
-    ser = [('#3e7cc0', '26,88 60,44 120,40 180,36 240,32 300,26'),
-           ('#1c2634', '26,92 60,30 120,28 180,25 240,22 300,18'),
-           ('#0f7b4f', '26,94 60,36 120,34 180,31 240,28 300,24')]
-    lines = ''.join('<polyline points="%s" fill="none" stroke="%s" stroke-width="%s"/>'
-                    % (p, c, '2.4' if c == '#0f7b4f' else '1.8') for c, p in ser)
+    """4. Cumulative discounted cost. Each line has to END in the order the table gives:
+    Alternative 3 lowest, then Alternative 1, then Alternative 2."""
+    ser = [('#3e7cc0', 6.036), ('#1c2634', 6.065), ('#0f7b4f', 5.852)]
+    init = {'#3e7cc0': 4.29, '#1c2634': 5.92, '#0f7b4f': 5.68}
+    y = lambda v: round(100 - v * 13.0)
+    lines = ''
+    for col, end in ser:
+        a = init[col]
+        pts = ' '.join('%d,%d' % (26 + i * 9.1, y(a + (end - a) * (i / 30.0) ** 0.55))
+                       for i in range(0, 31, 3))
+        lines += ('<polyline points="26,100 %s" fill="none" stroke="%s" stroke-width="%s"/>'
+                  % (pts, col, '2.4' if col == '#0f7b4f' else '1.8'))
     return svg(320, 118, '<line x1="20" y1="100" x2="316" y2="100" stroke="#cdd6e2"/>' + lines)
 
 
@@ -163,8 +208,9 @@ def chart_benchmark():
         out.append('<rect x="%.0f" y="%d" width="%.0f" height="11" fill="%s" rx="1"/>'
                    % (96, y, max(x1 - 96, 4) if a == b else x1 - x0, c) if a == b else
                    '<rect x="%.0f" y="%d" width="%.0f" height="11" fill="%s" rx="1"/>' % (x0, y, x1 - x0, c))
-        out.append('<text x="%.0f" y="%d" font-size="9" font-weight="700" fill="#3a4757">$%d</text>'
-                   % (x1 + 5, y + 9, b))
+        lab = '$%d&#8211;$%d' % (a, b) if a != b else '$%d' % b
+        out.append('<text x="%.0f" y="%d" font-size="9" font-weight="700" fill="#3a4757">%s</text>'
+                   % (x1 + 5, y + 9, lab))
         y += 24
     return svg(320, 118, ''.join(out))
 
@@ -217,14 +263,25 @@ def fact_rows(extra_input=True):
 
 
 def location_rail():
-    return ('<div class="p" style="display:flex;flex-direction:column;background:#fbfcfd;">'
+    """The right-hand panel of the chart row. It has to fit 240 px: 16 for the title, 84 for the
+    map, 107 for six facts, against a 228 px content box. The runway width is last and must stay
+    visible &#8212; it is the one editable cell in the block and the export macro reads it."""
+    facts = ''.join('<div style="display:flex;justify-content:space-between;gap:8px;font-size:10.5px;'
+                    'line-height:1.35;padding:1px 0;border-bottom:1px solid #f0f3f7;">'
+                    '<span style="color:var(--muted);">%s</span><span style="font-weight:600;">%s</span></div>'
+                    % kv for kv in FACTS)
+    facts += ('<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;'
+              'font-size:10.5px;padding:2px 0;">'
+              '<span style="color:var(--muted);">Runway width</span>'
+              '<span style="background:#f2f4f7;border:1px solid #bfbfbf;padding:0 9px;font-weight:700;">75 ft</span></div>')
+    return ('<div class="p" style="display:flex;flex-direction:column;background:var(--panel);">'
             '<div style="display:flex;align-items:baseline;justify-content:space-between;">'
             '<div class="ctitle">Project location</div>'
             '<span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;'
-            'color:#3e7cc0;background:#eef4fb;padding:1px 6px;border-radius:20px;">Context</span></div>'
-            '<div class="sub" style="margin:1px 0 2px;">Where this project sits, and the two facts the Google Earth export reads.</div>'
-            + svg(360, 96, TN + DIVISIONS + TN_DOTS, grow=False)
-            + '<div style="margin-top:3px;">' + fact_rows() + '</div></div>')
+            'color:var(--blue-dk);background:var(--blue-soft);padding:1px 6px;border-radius:20px;">Context</span></div>'
+            '<svg width="100%" height="84" viewBox="0 0 360 96" preserveAspectRatio="xMidYMid meet" '
+            'style="display:block;margin-top:2px;">' + TN + DIVISIONS + TN_DOTS + '</svg>'
+            '<div style="margin-top:2px;">' + facts + '</div></div>')
 
 
 def location_strip():
@@ -301,7 +358,7 @@ def fold(y):
 
 
 LOGIC = '''<script data-dc-script data-props='{"screen":{"editor":"enum",
-  "options":["15 in FHD at 125% (624 px)","15 in FHD at 150% (488 px)","15 in FHD at 100% (840 px)"],
+  "options":["15 in FHD at 125% (624 px)","15 in FHD at 150% (480 px)","15 in FHD at 100% (840 px)"],
   "default":"15 in FHD at 125% (624 px)","section":"Screen"}}'>
 class Component extends DCLogic {
   renderVals() {
@@ -314,13 +371,15 @@ class Component extends DCLogic {
 
 
 C1 = lambda: panel('1. Present worth by category', 'Where the money goes. Salvage sits below the line.',
-                   chart_category(), key=True)
+                   chart_category() + CAT_LEGEND, key=True)
 C2 = lambda: panel('2. Net present worth vs. discount rate',
                    'Does the winner hold? The axis starts at the data, not at zero.',
-                   chart_rate(), key=True)
-SUP = [lambda: panel('3. Expenditure by year', 'Undiscounted, as it falls.', chart_bars(5)),
-       lambda: panel('4. Cumulative discounted cost', 'Each line ends at its net present worth.', chart_cumulative()),
-       lambda: panel('5. Runway closure days', 'Days the runway is out, by year.', chart_bars(3, '#d98a2b')),
+                   chart_rate() + ALT_LEGEND, key=True)
+SUP = [lambda: panel('3. Expenditure by year', 'Undiscounted, as it falls.', year_bars(SPEND)),
+       lambda: panel('4. Cumulative discounted cost', 'Each line ends at its net present worth.',
+                     chart_cumulative() + ALT_LEGEND),
+       lambda: panel('5. Runway closure days', 'The years the runway is shut, and for how long.',
+                     year_bars(CLOSURE, '#d98a2b')),
        lambda: panel('8. Unit cost vs. published TN work', 'Against the 2024&#8211;25 all-in band.', chart_benchmark())]
 SEC = [lambda: panel('6. Section, mainline', 'Inches, read back from the quantities.', chart_section('m')),
        lambda: panel('7. Section with shoulder', 'Combined mainline and shoulder area.', chart_section('s'))]
@@ -340,7 +399,7 @@ def write(name, w, body, logic=True):
 write('Main.dc.html', BAND_WIDE,
       fold(624) + HEADER + CONTEXT + tiles() + VERDICT
       + freeze_line()
-      + row('556px 556px 371px', 12 * ROW, [C1, C2, location_rail])
+      + row('555px 555px 371px', 12 * ROW, [C1, C2, location_rail])
       + row('repeat(4,minmax(0,1fr))', 9 * ROW, SUP)
       + row('repeat(2,minmax(0,1fr))', 8 * ROW, SEC)
       + tables())
@@ -349,7 +408,7 @@ write('Main.dc.html', BAND_WIDE,
 write('OptionB.dc.html', BAND_NARROW,
       fold(624) + HEADER + CONTEXT + tiles() + VERDICT
       + freeze_line()
-      + row('434px 434px 371px', 12 * ROW, [C1, C2, location_rail])
+      + row('433px 434px 371px', 12 * ROW, [C1, C2, location_rail])
       + row('repeat(4,minmax(0,1fr))', 9 * ROW, SUP)
       + sectitle('The numbers &#8212; every alternative, in full', 'Tables continue below.'))
 
@@ -418,15 +477,15 @@ PROPOSED = [('header band, 2 rows', 40, NAVY, ''),
             ('four supporting charts, 9 rows', 180, LT, 'flush, no gutter')]
 
 SCREENS = [('1920&#215;1080 at 125%', '1,536&#215;864', '1,488 &#215; 624', 'Windows default for 15.6 in &#8212; the target'),
-           ('1920&#215;1080 at 150%', '1,280&#215;720', '1,232 &#215; 480', 'band must stay under 1,240 px'),
+           ('1920&#215;1080 at 150%', '1,280&#215;720', '1,232 &#215; 480', 'no band fits this without side-scroll'),
            ('1920&#215;1080 at 100%', '1,920&#215;1080', '1,872 &#215; 840', 'room to spare'),
            ('1600&#215;900 at 100%', '1,600&#215;900', '1,552 &#215; 660', 'comfortable')]
 
-PLACE = [('1. Present worth by category', 'G13', '556 &#215; 240', '12'),
-         ('2. Net present worth vs. rate', 'at 556 px', '556 &#215; 240', '12'),
+PLACE = [('1. Present worth by category', 'column G', '555 &#215; 240', '12'),
+         ('2. Net present worth vs. rate', 'at 556 px', '555 &#215; 240', '12'),
          ('Project location', 'at 1,112 px', '371 &#215; 240', '12'),
-         ('3 &#183; 4 &#183; 5 &#183; 8, supporting', 'row 31', '371 &#215; 180 each', '9'),
-         ('6 &#183; 7, section', 'row 40', '741 &#215; 160 each', '8')]
+         ('3 &#183; 4 &#183; 5 &#183; 8, supporting', 'the row below', '370 &#215; 180 each', '9'),
+         ('6 &#183; 7, section', 'the row below that', '741 &#215; 160 each', '8')]
 
 
 def block(title, lede, body, w='1fr'):
@@ -442,11 +501,13 @@ FINDINGS = [('Two rows of three tiles cost 169 px for six numbers.',
             ('A section title and a how-to line sit between the verdict and the first plot.',
              'Both belong in the header band or a cell note, not in the first screen.', '&#8722;64 px'),
             ('Every plot is inset 10 px from its neighbour.',
-             'Three gutters across the supporting row is 30 px of grey between instruments; '
-             'a 1 px hairline reads as one panel and gives the width back to the plots.', '&#8722;29 px'),
+             'Three gutters across the supporting row is 30 px of grey between instruments. A 1 px '
+             'hairline reads as one panel and hands 27 px of width back to the plots &#8212; width, not '
+             'height, so it does not shorten the first screen.', '&#8722;27 px wide'),
             ('The band is 1,239 px on a screen that offers 1,488.',
-             'The 249 px to the right of column R is empty &#8212; almost exactly the width the project '
-             'location card needs.', '+249 px')]
+             'The 244 px right of column R is empty and can join the band. It is most of the project '
+             'location card but not all of it: the card is 371 px, so the other 127 px comes off the two '
+             'key plots, which go from about 615 px each to 555.', '+244 px')]
 
 
 def findings():
@@ -483,7 +544,8 @@ grid_body = (
             'On a 624 px grid that is 1.7 screens of scrolling before any number appears.',
             stack(TODAY, total_label='before the results table, against 624 px of screen'))
     + block('Proposed &#8212; 580 px to the end of the supporting plots',
-            'Fits the 624 px grid with 44 px to spare, and the project location is on it.',
+            'Fits the 624 px grid with about 40 px to spare once the frozen-pane rule is drawn, '
+            'and the project location is on it.',
             stack(PROPOSED, total_label='with the section charts and the tables below the fold'))
     + '</div></div>')
 

@@ -898,6 +898,215 @@ def plot_nothing_for_absent(x, st):
     return x
 
 
+# ---------------------------------------------------------------------------- Option A
+# The approved layout: one 15-inch screen carries the whole decision. A 15.6 in FHD laptop at
+# Windows' default 125% scaling gives Excel a grid of 1,488 x 624 px, so the band grows from
+# 1,239 px to 1,483 by taking in the empty columns right of R, the six tiles collapse from two
+# rows of three into one row of six, the plots touch instead of sitting in 10 px gutters, and the
+# project location moves off the foot of the sheet onto the chart row beside the two key plots.
+A_PX = [125, 122, 100, 147, 123, 124, 123, 124, 130, 117, 120, 127]   # G..R; 1,482 px in all
+A_BAND = sum(A_PX)
+A_RAIL_PX = sum(A_PX[:9])                  # 1,118: the left edge of P, where the rail starts
+A_RAIL_W = sum(A_PX[9:])                   # 365: P:R, the project-location rail
+A_TILE = 3                                 # kicker, value and caption on rows 3, 4, 5
+A_VERDICT = 6
+A_KEY, A_KEY_ROWS = 7, 12                  # 240 px, and the rail shares these rows
+A_SUP, A_SUP_ROWS = 19, 9                  # 180 px
+A_SEC, A_SEC_ROWS = 28, 8                  # 160 px
+A_HEIGHTS = {2: 15, 3: 11, 4: 19, 5: 15, 6: 30}    # 53 + 20 + 60 + 40 = 173 px frozen,
+                                                   # row 1 keeps the 40 pt band every sheet has
+A_FREEZE = 7
+# where each block of the built sheet lands. Only G:R moves; the chart data in W and beyond
+# shares these row numbers and stays where it is.
+A_MOVE = {52: 36, 54: 37}                                        # chart-8 note, THE NUMBERS title
+A_MOVE.update({r: r - 17 for r in range(55, 71)})                 # results table and comparison
+A_MOVE.update({r: r - 35 for r in range(90, 98)})                 # pavement section
+A_MOVE.update({112: 64, 114: 66, 115: 67, 116: 68, 120: 70, 122: 72})    # the closing notes
+A_TABLE = 38                               # the results header, once moved
+A_HOWTO = 69                               # the how-to line, with the closing notes
+A_VBACH = 74                               # the chart the Alternative Setup form maintains
+A_LAST = 73                                # nothing below this
+
+
+def make_remapper(rowmap):
+    """A formula/sqref rewriter for one block move. Only cells inside the band move, and a
+    reference that names another sheet is left alone."""
+    def one(a):
+        m = re.match(r'(\$?)([A-Z]{1,2})(\$?)(\d{1,3})$', a)
+        if not m: return a
+        col, row = D.colnum(m.group(2)), int(m.group(4))
+        if BAND_FIRST <= col <= BAND_LAST: row = rowmap.get(row, row)
+        return '%s%s%s%d' % (m.group(1), m.group(2), m.group(3), row)
+
+    def span(t):
+        def sub(m):
+            if m.group('sheet'): return m.group(0)
+            out = one(m.group('a'))
+            if m.group('b'): out += ':' + one(m.group('b'))
+            return out
+        return REF_RE.sub(sub, t)
+
+    def formula(f):
+        out, i = [], 0
+        for m in re.finditer(r'"(?:[^"]|"")*"', f):
+            out.append(span(f[i:m.start()])); out.append(m.group(0)); i = m.end()
+        out.append(span(f[i:]))
+        return ''.join(out)
+
+    def sqref(ref):
+        return ' '.join(':'.join(one(a) for a in part.split(':')) for part in ref.split())
+    return formula, sqref
+
+
+def move_rows(x, rowmap, cols):
+    """Lift whole rows of the band to new row numbers, carrying their heights, then rewrite every
+    reference, conditional-formatting range, merge and validation that named them."""
+    heights, moved = {}, {}
+    for src, dst in rowmap.items():
+        m = D.get_row(x, src)
+        if m:
+            h = re.search(r' ht="([^"]+)"', m.group(0))
+            if h: heights[dst] = h.group(1)
+        for col in cols:
+            ref = '%s%d' % (col, src)
+            cm = D.CELL_RE(ref).search(x)
+            if not cm: continue
+            moved['%s%d' % (col, dst)] = cm.group(0).replace(
+                '<c r="%s"' % ref, '<c r="%s%d"' % (col, dst), 1)
+            x = x[:cm.start()] + x[cm.end():]
+    for dst in sorted(moved, key=lambda r: (D.split_ref(r)[1], D.colnum(D.split_ref(r)[0]))):
+        x = D.put_cell(x, dst, moved[dst])
+
+    formula, sqref = make_remapper(rowmap)
+    x = re.sub(r'<f>(.*?)</f>',
+               lambda m: '<f>' + D.esc(formula(html.unescape(m.group(1)))) + '</f>', x, flags=re.S)
+    for tag in ('formula', 'formula1', 'formula2'):
+        x = re.sub(r'<%s>(.*?)</%s>' % (tag, tag),
+                   lambda m, t=tag: '<%s>%s</%s>' % (t, D.esc(formula(html.unescape(m.group(1)))), t),
+                   x, flags=re.S)
+    x = re.sub(r'(<conditionalFormatting sqref=")([^"]+)(")',
+               lambda m: m.group(1) + sqref(m.group(2)) + m.group(3), x)
+    x = re.sub(r'(<mergeCell ref=")([^"]+)(")',
+               lambda m: m.group(1) + sqref(m.group(2)) + m.group(3), x)
+    return x, heights
+
+
+def width_for(px):
+    """The width unit that renders as `px`. Excel rounds through a 256ths grid, so this searches
+    rather than inverting the formula."""
+    best = min((abs(D.px_of(w / 100.0) - px), w / 100.0) for w in range(100, 9000))
+    return best[1]
+
+
+A_FACTS = [('City / county', 'O101'), ('TDOT Grand Division', 'O102'), ('Coordinates', 'O103'),
+           ('Elevation', 'O104'), ('Mainline area', 'O106'), ('Runway width, ft', 'O107')]
+A_RAIL_ROW0 = A_KEY + 6                    # the facts start here; the map has rows A_KEY+1..+5
+
+
+def option_a(x, st):
+    """Turn the built Summary into the approved Option A layout."""
+    band = [D.colname(c) for c in range(BAND_FIRST, BAND_LAST + 1)]
+    rail = [D.colname(c) for c in range(BAND_FIRST + 9, BAND_LAST + 1)]      # P, Q, R
+
+    # ---- the band takes in the width the screen already offers, in six even pairs of 247 px so
+    # the tile strip divides cleanly
+    x = D.set_widths(x, {BAND_FIRST + i: width_for(px) for i, px in enumerate(A_PX)})
+
+    # ---- keep what the rail needs before the block it came from is taken apart
+    keep = {}
+    for label, src in A_FACTS:
+        m = D.CELL_RE(src).search(x)
+        if m: keep[label] = m.group(0)
+
+    # ---- six tiles in one row. Two rows of three cost 169 px for six numbers; one row costs 60.
+    # Nothing on any sheet references G3:R9, so the tiles can be rearranged freely.
+    tile_src = [('G', 3), ('K', 3), ('O', 3), ('G', 7), ('K', 7), ('O', 7)]
+    tile_dst = ['G', 'I', 'K', 'M', 'O', 'Q']
+    lifted = {}
+    for (col, r0), dst in zip(tile_src, tile_dst):
+        for dr in range(3):
+            m = D.CELL_RE('%s%d' % (col, r0 + dr)).search(x)
+            if not m: continue
+            lifted['%s%d' % (dst, A_TILE + dr)] = m.group(0).replace(
+                '<c r="%s%d"' % (col, r0 + dr), '<c r="%s%d"' % (dst, A_TILE + dr), 1)
+    m = D.CELL_RE('G10').search(x)                      # the verdict banner comes up with them
+    if m:
+        lifted['G%d' % A_VERDICT] = m.group(0).replace('<c r="G10"', '<c r="G%d"' % A_VERDICT, 1)
+    # The how-to line cost 35 px of the first screen sitting between the verdict and the first
+    # plot. It still names the hidden helper block, so it joins the closing notes instead.
+    m = D.CELL_RE('G12').search(x)
+    howto = m.group(0).replace('<c r="G12"', '<c r="G%d"' % A_HOWTO, 1) if m else None
+    for r in range(3, 13):        # the old two-row tile block, the banner, the title and its note
+        for col in band:
+            x = D.remove_cell(x, '%s%d' % (col, r))
+    for dst in sorted(lifted, key=lambda r: (D.split_ref(r)[1], D.colnum(D.split_ref(r)[0]))):
+        x = D.put_cell(x, dst, lifted[dst])
+
+    # the caption under the initial-construction tile said the winner was the cheapest to build.
+    # It often is not: on the worked example Alternative 1 comes in $1.4M lower and still loses.
+    m = D.CELL_RE('M5').search(x)
+    if m:
+        x = (x[:m.start()] + re.sub(r'(<is><t[^>]*>).*?(</t></is>)',
+                                    r'\g<1>for the lowest-present-worth alternative\g<2>', m.group(0))
+             + x[m.end():])
+
+    # ---- merges: the old two-row strip and banner go, the even six-up strip comes in
+    x = D.drop_merge(x, lambda r: re.match(r'^[A-R](?:[3-9]|1[0-2]):', r))
+    pairs = (('G', 'H'), ('I', 'J'), ('K', 'L'), ('M', 'N'), ('O', 'P'), ('Q', 'R'))
+    x = D.merges(x, ['%s%d:%s%d' % (a, r, b, r) for r in range(A_TILE, A_TILE + 3) for a, b in pairs]
+                 + ['G2:R2', 'G%d:R%d' % (A_VERDICT, A_VERDICT)])
+    # the tile rules moved with their tiles: margin-to-next is the second, rate sensitivity the last
+    x = re.sub(r'(<conditionalFormatting sqref=")K3:N5(")', r'\g<1>I3:J5\g<2>', x)
+    x = re.sub(r'(<conditionalFormatting sqref=")O8(")', r'\g<1>Q4\g<2>', x)
+
+    # ---- the tables and everything under them come up behind the plots
+    x, heights = move_rows(x, A_MOVE, band)
+    for r in range(A_KEY, 131):
+        x = D.reset_row(x, r)
+    for dst, h in heights.items():
+        x = D.row_height(x, dst, h)
+    if howto: x = D.put_cell(x, 'G%d' % A_HOWTO, howto)
+    x = D.drop_merge(x, lambda r: A_LAST <= int(re.match(r'[A-Z]+(\d+)', r).group(1)) <= 130)
+    for r in range(A_LAST, 131):
+        for col in band:
+            x = D.remove_cell(x, '%s%d' % (col, r))
+
+    # ---- the project location, beside the plots instead of two screens below them
+    s_head = st.add(font=FONT(9, b=True, color=WHITE), fill=FILL(NAVY), alignment=ALIGN(indent=1))
+    s_lbl = st.add(font=FONT(9, color=MUTED), fill=FILL(WHITE),
+                   border=BORDER(bottom=True, color='FFF0F3F7'), alignment=ALIGN(v='center', indent=1))
+    s_val = st.add(font=FONT(9, b=True), fill=FILL(WHITE),
+                   border=BORDER(bottom=True, color='FFF0F3F7'), alignment=ALIGN(v='center', indent=1))
+    s_in = st.add(font=FONT(9, b=True), fill=FILL(INPUT),
+                  border=BORDER(True, True, True, True, color='FFBFBFBF'),
+                  alignment=ALIGN(v='center', indent=1))
+    bm = D.CELL_RE('G%d' % A_VERDICT).search(x)
+    if bm:
+        bs = re.search(r' s="(\d+)"', bm.group(0))
+        if bs: x = D.restyle(x, [A_VERDICT], band[1:], int(bs.group(1)))
+    x = D.restyle(x, [A_KEY], rail, s_head)
+    x = D.text(x, 'P%d' % A_KEY, 'PROJECT LOCATION', s_head)
+    for i, (label, src) in enumerate(A_FACTS):
+        r = A_RAIL_ROW0 + i
+        last = i == len(A_FACTS) - 1
+        x = D.text(x, 'P%d' % r, label, s_lbl)
+        x = D.restyle(x, [r], ['Q', 'R'], s_in if last else s_val)
+        cell = keep.get(label)
+        if cell:
+            body = re.sub(r'<c r="[A-Z]+\d+"', '<c r="Q%d"' % r, cell, count=1)
+            body = re.sub(r' s="\d+"', ' s="%d"' % (s_in if last else s_val), body, count=1)
+            x = D.put_cell(x, 'Q%d' % r, body)
+    x = D.merges(x, ['P%d:R%d' % (A_KEY, A_KEY)]
+                 + ['Q%d:R%d' % (A_RAIL_ROW0 + i, A_RAIL_ROW0 + i) for i in range(len(A_FACTS))])
+
+    # ---- the frozen band, and the heights that make it exactly 160 px
+    for r, ht in A_HEIGHTS.items():
+        x = D.row_height(x, r, ht)
+    x = D.row_height(x, 37, 22)
+    x = D.sheet_view(x, freeze='A%d' % A_FREEZE)
+    return x
+
+
 def relocate_tables(x, st):
     """Move the results table and the comparison block below the charts, and bring the three
     section titles up with the charts. Columns G:R only: the chart data in W and beyond shares
@@ -937,6 +1146,13 @@ def relocate_tables(x, st):
                lambda m: '<f>' + D.esc(remap_formula(html.unescape(m.group(1)))) + '</f>', x, flags=re.S)
     x = re.sub(r'(<conditionalFormatting sqref=")([^"]+)(")',
                lambda m: m.group(1) + remap_sqref(m.group(2)) + m.group(3), x)
+    # A conditional-formatting rule keeps its test in <formula>, not <f>, so the sweep above left
+    # all five of them pointing at the table's old rows: the winner row never lit up and the two
+    # tile rules never fired. Data validation hides its test the same way.
+    for tag in ('formula', 'formula1', 'formula2'):
+        x = re.sub(r'<%s>(.*?)</%s>' % (tag, tag),
+                   lambda m, t=tag: '<%s>%s</%s>' % (t, D.esc(remap_formula(html.unescape(m.group(1)))), t),
+                   x, flags=re.S)
     # the tile rules were left pointing at the old columns when the six tiles were made even
     x = x.replace('<conditionalFormatting sqref="J3:M5">', '<conditionalFormatting sqref="K3:N5">')
     x = x.replace('<conditionalFormatting sqref="N8">', '<conditionalFormatting sqref="O8">')
@@ -1093,14 +1309,19 @@ def summary(rd, wr, st):
     for c in 'STUV':
         x = re.sub(r'<col min="%d" max="%d"[^>]*/>' % (D.colnum(c), D.colnum(c)), '', x)
 
-    # the tiles and the verdict stay in view; the charts scroll under them
-    x = D.sheet_view(x, freeze='A11', gridlines=False)
+    x = D.sheet_view(x, gridlines=False)
+    x = option_a(x, st)                     # the approved one-screen layout
     wr(SUM_PART, x)
     # the print area reached out to column V for the map; the band ends at R now
     w = rd('xl/workbook.xml')
     w = re.sub(r'(<definedName name="_xlnm.Print_Area" localSheetId="13">)Summary!\$A\$1:\$V\$\d+',
-               r'\g<1>Summary!$A$1:$R$%d' % (LOC_ROW + 20), w)
+               r'\g<1>Summary!$A$1:$R$%d' % A_LAST, w)
     wr('xl/workbook.xml', w)
+    offs, acc = {}, 0
+    for i, w in enumerate(A_PX):
+        offs[BAND_FIRST + i] = acc
+        acc += w
+    offs[BAND_LAST + 1] = acc
     summary_charts(rd, wr, offs, acc)
 
 
@@ -1115,17 +1336,23 @@ def chart_parts(drawing, rd):
 
 
 def summary_charts(rd, wr, offs, band_px):
-    half, quarter = band_px / 2.0, band_px / 4.0
-    key_h, sup_h = KEY_ROWS * ROW_PX, SUP_ROWS * ROW_PX
+    """Three bands of plots that touch. The 10 px gutter every chart used to carry put 30 px of
+    grey between instruments across the supporting row; flush edges read as one panel and hand
+    the width back to the plots."""
+    key_h = A_KEY_ROWS * ROW_PX
+    sup_h, sec_h = A_SUP_ROWS * ROW_PX, A_SEC_ROWS * ROW_PX
+    half = A_RAIL_PX / 2.0              # the two key plots share everything left of the rail
+    quarter, sec_w = band_px / 4.0, band_px / 2.0
     plan = {
-        'Summary Chart 1': (0, KEY_ROW, half - 10, key_h),
-        'Summary Chart 2': (half, KEY_ROW, half - 10, key_h),
-        'Summary Chart 3': (0, SUP_ROW, quarter - 10, sup_h),
-        'Summary Chart 4': (quarter, SUP_ROW, quarter - 10, sup_h),
-        'Summary Chart 5': (2 * quarter, SUP_ROW, quarter - 10, sup_h),
-        'Summary Chart 8': (3 * quarter, SUP_ROW, quarter - 10, sup_h),
-        'Summary Chart 6': (0, SEC_ROW, quarter - 10, sup_h),
-        'Summary Chart 7': (quarter, SEC_ROW, quarter - 10, sup_h),
+        'Summary Chart 1': (0, A_KEY, half, key_h),
+        'Summary Chart 2': (half, A_KEY, half, key_h),
+        'Summary Chart 3': (0, A_SUP, quarter, sup_h),
+        'Summary Chart 4': (quarter, A_SUP, quarter, sup_h),
+        'Summary Chart 5': (2 * quarter, A_SUP, quarter, sup_h),
+        'Summary Chart 8': (3 * quarter, A_SUP, quarter, sup_h),
+        'Summary Chart 6': (0, A_SEC, sec_w, sec_h),
+        'Summary Chart 7': (sec_w, A_SEC, sec_w, sec_h),
+        'Summary Chart 9': (A_RAIL_PX, A_KEY + 1, A_RAIL_W, 5 * ROW_PX),   # the locator map
     }
     drawing = drawing_of(SUM_PART, rd)
     d = rd(drawing)
@@ -1134,12 +1361,6 @@ def summary_charts(rd, wr, offs, band_px):
         body = m.group(0)
         nm = re.search(r'name="([^"]*)"', body)
         if not nm or nm.group(1) not in plan:
-            if nm and nm.group(1) == 'Summary Chart 9':      # the locator map follows the block
-                c, off = at_px(offs, 0)
-                body = re.sub(r'<xdr:from><xdr:col>\d+</xdr:col><xdr:colOff>\d+</xdr:colOff>'
-                              r'<xdr:row>\d+</xdr:row>',
-                              '<xdr:from><xdr:col>%d</xdr:col><xdr:colOff>%d</xdr:colOff>'
-                              '<xdr:row>%d</xdr:row>' % (c, off, LOC_ROW + 1), body)
             return body
         px_x, row, w, h = plan[nm.group(1)]
         c, off = at_px(offs, px_x)
@@ -1153,6 +1374,12 @@ def summary_charts(rd, wr, offs, band_px):
         return body
 
     d = re.sub(r'<xdr:oneCellAnchor>.*?</xdr:oneCellAnchor>', place, d, flags=re.S)
+    # 'Chart 1', the one the Alternative Setup form maintains, is parked below the dashboard with
+    # a note above it. Its note moved up with the rest, so the chart moves the same distance.
+    d = re.sub(r'(<xdr:twoCellAnchor[^>]*>.*?<xdr:row>)(\d+)(</xdr:row>.*?<xdr:row>)(\d+)(</xdr:row>)',
+               lambda m: m.group(1) + str(A_VBACH - 1) + m.group(3)
+                         + str(A_VBACH - 1 + int(m.group(4)) - int(m.group(2))) + m.group(5),
+               d, count=1, flags=re.S)
     wr(drawing, d)
 
     # The chart data sits in the same rows as the old chart area, which is hidden now. Excel

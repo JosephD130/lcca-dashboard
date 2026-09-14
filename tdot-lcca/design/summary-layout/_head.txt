@@ -13,6 +13,7 @@
       --green:#0f7b4f; --green-soft:#e4f2ea; --amber:#d98a2b;
       --grey:#9aa7b4; --ink:#1c2634; --muted:#5b6675; --line:#dfe4ea;
       --paper:#eef1f4; --card:#ffffff; --red:#c8102e;
+      --blue-soft:#dce7f3; --panel:#fbfcfd; --agg:#cdb894; --sub:#e3d7bd;
     }
     *{box-sizing:border-box;}
     body{margin:0;font-family:"Segoe UI",Calibri,system-ui,sans-serif;color:var(--ink);background:var(--paper);}
@@ -22,7 +23,7 @@
     .sub{font-size:9.5px;color:var(--muted);}
     /* flush panels: one hairline grid, zero gutters */
     .flush{display:grid;gap:1px;background:var(--line);border-bottom:1px solid var(--line);}
-    .p{background:var(--card);padding:8px 11px 6px;overflow:hidden;}
+    .p{background:var(--card);padding:7px 8px 5px;overflow:hidden;}
     .key{display:inline-flex;align-items:center;background:var(--green-soft);color:var(--green);
       font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:1px 6px;border-radius:20px;}
     th,td{text-align:right;padding:4px 9px;font-size:11px;white-space:nowrap;}

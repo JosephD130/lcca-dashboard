@@ -393,6 +393,11 @@ def box(x, st, r0, r1, c0, c1, fill=None, font=None, align=None, color=LINE):
 EMU_PX = 9525
 
 
+def px_of(w):
+    """The pixel width Excel lays out for one column-width unit."""
+    return int(((256 * w + int(128 / 7)) / 256) * 7)
+
+
 def col_px(widths, default=8.7109375):
     """{column index: pixel width} for the widths dict `cols()` was given."""
     def px(w): return int(((256 * w + int(128 / 7)) / 256) * 7)
@@ -408,3 +413,21 @@ def anchor_right(px_of, default_px, right_col, w_emu):
     while acc + px_of.get(c, default_px) <= left:
         acc += px_of.get(c, default_px); c += 1
     return c - 1, int(round((left - acc) * EMU_PX))
+
+
+def reset_row(x, r):
+    """Drop a row's height and hidden flag so it goes back to the sheet default."""
+    m = get_row(x, r)
+    if not m: return x
+    row = m.group(0)
+    head = row[:row.index('>') + 1] if not row.endswith('/>') else row
+    new = re.sub(r' (?:ht|customHeight|hidden)="[^"]*"', '', head)
+    return x[:m.start()] + new + row[len(head):] + x[m.end():]
+
+
+def drop_merge(x, pred):
+    """Remove every merge whose ref satisfies `pred`, keeping the count attribute honest."""
+    keep = [r for r in re.findall(r'<mergeCell ref="([^"]+)"/>', x) if not pred(r)]
+    return re.sub(r'<mergeCells count="\d+">.*?</mergeCells>',
+                  '<mergeCells count="%d">%s</mergeCells>'
+                  % (len(keep), ''.join('<mergeCell ref="%s"/>' % r for r in keep)), x, flags=re.S)
