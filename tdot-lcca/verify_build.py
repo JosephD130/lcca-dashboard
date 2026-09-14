@@ -292,9 +292,16 @@ check('Pay_Items part headings band the left of the table',
 check('Pay_Items freezes the header and repeats the band and the header in print',
       pi.freeze_panes == 'A3' and 'Pay_Items!$1:$2' in rd('xl/workbook.xml'), pi.freeze_panes)
 mp = wb['Maintenance Policies']
-check('Maintenance Policies says it is reference and which table drives which alternative',
-      'Reference' in str(mp['C3'].value) and 'Table 1' in str(mp['C4'].value) and 'Rate' in str(mp['C5'].value),
-      str(mp['C4'].value)[:60])
+check('Maintenance Policies says it is live, and which table drives which alternative',
+      'live' in str(mp['C3'].value) and 'Table 1' in str(mp['C4'].value) and 'Rate' in str(mp['C5'].value),
+      str(mp['C3'].value)[:70])
+# the sheet is read by the templates, so the note must not tell anyone otherwise
+mp_refs = set()
+for p_ in names:
+    if not re.match(r'xl/worksheets/sheet\d+\.xml$', p_): continue
+    mp_refs |= set(re.findall(r"Maintenance Policies'!\$?([DE])\$?\d+", rd(p_)))
+check('and that is true: the templates read both its Rate and Year Applied columns',
+      mp_refs == {'D', 'E'} and 'changes nothing' not in str(mp['C3'].value), sorted(mp_refs))
 check('the four maintenance tables carry a header band',
       all(mp.cell(r, 2).font.color and mp.cell(r, 2).font.color.rgb.endswith('FFFFFF') for r in (9, 36, 50, 75)),
       [mp.cell(r, 2).value for r in (9, 36, 50, 75)])

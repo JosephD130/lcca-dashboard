@@ -158,9 +158,16 @@ updated; a private copy of the old macro would need the same edit.
 
 ### Maintenance Policies
 
-- Navigation band, a title, and four lines beside the logo: that the sheet is reference only because
-  the schedules live in the hidden templates, which table drives which alternative type, what the
-  Rate column means, and where closure days actually come from.
+- Navigation band, a title, and four lines beside the logo: that the sheet is **live**, which table
+  drives which alternative type, what the Rate column means, and where closure days actually come from.
+- Correction to the v1.2.0 line first written here. It said the sheet was reference only, that the
+  schedules live in the hidden templates and that editing a number here changes nothing. That is the
+  opposite of the truth and it is now fixed. Every Rate cell in column D and every Year Applied cell in
+  column E is read by the alternative worksheets: D10 sets a maintenance quantity, E22 sets the year
+  the HMA overlay happens, D32 sets the HMA salvage credit, D46 the PCC one. A user who believed the
+  old note could have changed a policy number expecting nothing to happen and silently moved every
+  result. The verifier now checks both that the note says "live" and that the templates really do read
+  both columns, so the claim cannot drift from the file again.
 - The four table headers sit on a navy band and stay visible as the sheet scrolls.
 
 
@@ -275,9 +282,20 @@ them. They are read from v1.2.0.
   not. Table 1 places the mill and overlay at year 20, so a 16-year overlay life leaves 6 of 16 years
   at year 30, which is 37.5%, not 12.5%. Two of 16 is what an overlay placed at **year 16** would
   leave, the rehabilitation year in Table 3 rather than Table 1. Correcting HMA to 37.5% narrows
-  Murfreesboro from PCC by $780,532 to PCC by $543,376 and widens Upper Cumberland from HMA by
-  $585,697 to HMA by $922,507. Neither winner changes, but the number is wrong on its own terms and
-  should be either corrected or deliberately restated as a policy haircut.
+  Murfreesboro from PCC by $780,532 to PCC by $543,376. The winner does not change, but the number is
+  wrong on its own terms and should be either corrected or deliberately restated as a policy haircut.
+  Two things make it worse than a single wrong constant. First, the salvage *year* is
+  `='General Information'!D33`, a user input, and the overlay *year* is `='Maintenance Policies'!E22`,
+  a policy input, while the fraction is a fixed constant: three quantities that have to agree, only
+  one of them frozen. So the sheet can be right at only one combination, and HMA is not right even
+  there. Second, PCC's 25 percent is a constant for the same reason; it is correct at exactly 30 years
+  and nowhere else. Recomputed on Murfreesboro at 3 percent: at 30 years HMA should credit 37.5 percent
+  (not 12.5) and PCC 25 percent, margin $780,532 to $543,376; at 25 years HMA should credit 68.8 percent
+  and PCC 37.5 percent, margin $880,950 to $764,458; at 20 years the overlay is placed in the salvage
+  year itself, so HMA should credit 100 percent and PCC 50 percent, margin $755,381 to $804,006. The
+  direction of the error is not even stable: correcting it narrows the margin at 30 years and widens it
+  at 20, so the current figure cannot be defended as conservative toward either pavement. The
+  Neel-Schaffer review ran at 20 years. `verification/salvage_impact.py` reproduces this table.
 - Lost revenue counts gross fuel sales and tenant rent as lost during a runway closure. A per-category
   "% lost during closure" factor on RevenueData would be more defensible.
 - FAA AIP discount rate: PGL 22-01 (June 2022) replaced the fixed 7% with OMB A-94 real rates (2.0% for

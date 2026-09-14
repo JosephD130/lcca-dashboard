@@ -677,8 +677,9 @@ def reference_sheets(work, rd, wr, btn_dark, btn_blue):
     x = button(x, 'C1', 'Summary', 'Summary!G1', btn_blue)
     x = row_height(x, 1, 22)
     x = text(x, 'C2', 'MAINTENANCE AND REHABILITATION POLICIES', s_title)
-    x = text(x, 'C3', 'Reference: what each alternative type does to the pavement and when. The schedules themselves live '
-                      'in the hidden alternative templates, so editing a number here changes nothing.', s_note)
+    x = text(x, 'C3', 'What each alternative type does to the pavement and when. This sheet is live: every Rate and '
+                      'Year Applied cell below is read by the alternative worksheets, so a number changed here '
+                      'changes quantities, timing and the salvage credit on every alternative of that type.', s_note)
     x = text(x, 'C4', 'Table 1 drives a New HMA alternative, Table 2 a New PCC alternative, Table 3 an HMA overlay and '
                       'Table 4 a PCC rehabilitation. Alternative Setup copies the matching template.', s_note)
     x = text(x, 'C5', 'Rate is the share of the quantity the activity covers: 1 means the whole mainline area, the whole '
