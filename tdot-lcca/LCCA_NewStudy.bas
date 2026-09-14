@@ -4,8 +4,8 @@ Attribute VB_Name = "LCCA_NewStudy"
 '  NewStudy: save a clean copy of this workbook so the next project starts from
 '  a blank form, without touching the study that is open.
 '
-'  Import once: Alt+F11, File > Import File..., pick LCCA_NewStudy.bas.
-'  Then use the "+ New Study" button on General Information, or Alt+F8 > NewStudy.
+'  Run it from the "+ New Study" button on General Information, or Alt+F8 >
+'  NewStudy. This module ships inside the workbook; no import step is needed.
 ' -----------------------------------------------------------------------------
 Option Explicit
 

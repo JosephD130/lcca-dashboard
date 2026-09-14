@@ -438,7 +438,8 @@ check('the step line moved off row 1 to make room for the button',
       gi['B1'].value is None and str(gi['C1'].value).startswith('STEP 2 of 5'))
 check('the New Study button is on the sheet and wired to the macro',
       'macro="NewStudy"' in rd('xl/drawings/drawing4.xml') and 'btnNewStudy' in rd('xl/drawings/drawing4.xml'))
-check('and the sheet says how to enable it', 'LCCA_NewStudy.bas' in str(gi['B2'].value))
+check('and the sheet says the macro is built in, no import needed',
+      'built in' in str(gi['B2'].value) and 'import' not in str(gi['B2'].value).lower())
 check('the free-text inputs carry a border so they stop reading as one grey block',
       all(gi.cell(r, 4).border.left.style for r in list(range(14, 18)) + list(range(21, 25))))
 check('the salvage note is out of the input column', gi['D35'].value is None and 'Remaining service life' in str(gi['F35'].value))

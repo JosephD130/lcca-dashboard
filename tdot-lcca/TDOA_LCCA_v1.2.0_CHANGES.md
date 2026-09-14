@@ -3,9 +3,11 @@
 Base: `TDOA_LCCA_Framework_v1.1.2_ARA_Task2_08182026.xlsm`
 Output: `TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm` (self-contained, nothing to import)
 
-All workbook edits were made directly in the sheet XML so the VBA project, the 192 ActiveX
-pay-item comboboxes, the tables and data validations are untouched. The new Summary sheet is
-formulas and charts only; no VBA was added or changed.
+All workbook edits were made directly in the sheet XML so the ActiveX pay-item comboboxes, the
+tables and data validations are untouched. The new Summary sheet is formulas and charts only. The
+only VBA change is one added standard module, `LCCA_NewStudy`, which drives the New Study button
+(see below); the existing modules, the two UserForms and all 105 ActiveX controls are carried
+through unchanged.
 
 ## 1. Calculation fixes (these change answers)
 
@@ -331,10 +333,15 @@ Row 1 carries a **New Study** button. It saves a clean copy of the workbook besi
 percent, 10 and 5 percent, indirect cost off) and every alternative worksheet and its Database and
 Summary rows removed. The open study is not touched.
 
-Because the VBA project is carried through byte for byte, the macro ships beside the workbook as
-`LCCA_NewStudy.bas` and is imported once (Alt+F11, File, Import File), the same arrangement the KML
-export already uses. General Information says so next to the button. Until it is imported the button
-reports that the macro cannot be found.
+The macro is built into the workbook, so the button works on open with nothing to import. The
+`LCCA_NewStudy` standard module was added to the VBA project directly: the project was purged
+(the version-locked performance cache removed from every module, the `__SRP_*` streams deleted,
+`_VBA_PROJECT` truncated to its 7-byte header), which makes it source-only so Excel recompiles all
+of it on open, and the new module was appended as source. Purging touches only the code caches, so
+the two UserForms and all 105 ActiveX combo boxes come through untouched. `LCCA_NewStudy.bas` is
+kept in the repo as the reviewable source of that module. The build tooling is `inject_newstudy.py`
+with `ovba.py` (an MS-OVBA compressor, round-trip checked against oletools), `cfb.py` (a compound
+file writer) and `dirparse.py`; `verification/check_newstudy.py` re-proves the result.
 
 ## 4. Housekeeping
 
