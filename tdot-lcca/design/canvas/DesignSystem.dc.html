@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{
+      --navy:#1c2634; --blue:#3e7cc0; --blue-dk:#1f4e79; --blue-lt:#6aa9df;
+      --blue-soft:#dce7f3; --green:#0f7b4f; --green-soft:#e4f2ea; --amber:#d98a2b;
+      --grey:#9aa7b4; --ink:#1c2634; --muted:#5b6675; --line:#dfe4ea;
+      --paper:#eef1f4; --card:#ffffff; --red:#c8102e;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:"Segoe UI",Calibri,system-ui,sans-serif;color:var(--ink);background:var(--paper);}
+    a{color:var(--blue);} a:hover{color:#2c5f9c;}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:8px;}
+    .sechead{font-size:10.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+    .kicker{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+    .mono{font-family:Consolas,"Courier New",monospace;font-size:10.5px;}
+    td,th{font-size:11px;padding:5px 8px;text-align:left;}
+  </style>
+</helmet>
+
+<div style="width:1280px;background:var(--paper);padding-bottom:22px;">
+
+  <div style="display:flex;align-items:center;gap:12px;background:var(--navy);padding:10px 20px;">
+    <div style="flex-grow:1;color:#fff;font-size:17px;font-weight:800;">LCCA workbook &#8212; design system</div>
+    <div style="color:#9fb0c4;font-size:11.5px;">One band, one header, one card, one type scale across every sheet</div>
+  </div>
+
+  <div style="padding:12px 20px 0;display:flex;flex-direction:column;gap:11px;">
+
+    <!-- THE RULE -->
+    <div class="card" style="padding:13px 15px;">
+      <div class="sechead" style="margin-bottom:8px;">The rule that governs everything: one 1,240&#8201;px band</div>
+      <div style="display:flex;gap:18px;align-items:flex-start;">
+        <div style="flex-grow:1;">
+          <svg width="100%" viewBox="0 0 700 150">
+            <!-- screens -->
+            <text x="0" y="12" font-size="10" fill="#5b6675">usable width after row headers and scrollbar</text>
+            <g font-size="10" fill="#5b6675">
+              <text x="0" y="36">1366 laptop</text><rect x="112" y="26" width="264" height="12" fill="#cfd8e2"/><text x="382" y="36">1,319 px</text>
+              <text x="0" y="60">1600 laptop</text><rect x="112" y="50" width="311" height="12" fill="#cfd8e2"/><text x="429" y="60">1,553 px</text>
+              <text x="0" y="84">1920 @125%</text><rect x="112" y="74" width="298" height="12" fill="#cfd8e2"/><text x="416" y="84">1,489 px</text>
+              <text x="0" y="108">1920 @100%</text><rect x="112" y="98" width="375" height="12" fill="#cfd8e2"/><text x="493" y="108">1,873 px</text>
+            </g>
+            <!-- the band -->
+            <rect x="112" y="120" width="248" height="16" fill="#0f7b4f"/>
+            <text x="368" y="132" font-size="10" font-weight="700" fill="#0f7b4f">1,240 px content band (12.9 in) &#8212; fits all of them</text>
+            <line x1="360" y1="20" x2="360" y2="140" stroke="#0f7b4f" stroke-width="1.2" stroke-dasharray="3 3"/>
+          </svg>
+        </div>
+        <div style="width:290px;font-size:11px;color:var(--muted);line-height:1.55;">
+          Nothing sits to the right of the band. Reference blocks that used to live off-screen
+          (the locator map, the at-a-glance facts) move <strong style="color:var(--ink);">below</strong> the charts.
+          Helper data stays far right, outside the print area, where nobody scrolls to it.
+          The sheet scrolls <strong style="color:var(--ink);">vertically only</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;">
+
+      <!-- COLOR -->
+      <div class="card" style="padding:13px 15px;">
+        <div class="sechead" style="margin-bottom:9px;">Color</div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;">
+          <div><div style="height:34px;background:#1c2634;border-radius:5px;"></div><div class="kicker" style="margin-top:4px;">Navy</div><div class="mono" style="color:#5b6675;">#1C2634</div></div>
+          <div><div style="height:34px;background:#3e7cc0;border-radius:5px;"></div><div class="kicker" style="margin-top:4px;">Blue</div><div class="mono" style="color:#5b6675;">#3E7CC0</div></div>
+          <div><div style="height:34px;background:#0f7b4f;border-radius:5px;"></div><div class="kicker" style="margin-top:4px;">Green</div><div class="mono" style="color:#5b6675;">#0F7B4F</div></div>
+          <div><div style="height:34px;background:#d98a2b;border-radius:5px;"></div><div class="kicker" style="margin-top:4px;">Amber</div><div class="mono" style="color:#5b6675;">#D98A2B</div></div>
+        </div>
+        <div style="font-size:10.5px;color:var(--muted);margin-top:9px;line-height:1.5;">
+          Navy is structure (header bands, table headers). Blue is navigation and the first data series.
+          Green means <strong style="color:var(--ink);">the answer</strong> &#8212; the winner, the key plots, nothing else.
+          Amber is the single attention colour: something needs input, or the result is sensitive.
+        </div>
+        <div style="display:flex;gap:7px;margin-top:9px;">
+          <div style="flex-grow:1;height:22px;background:#1f4e79;border-radius:3px;"></div>
+          <div style="flex-grow:1;height:22px;background:#3e7cc0;border-radius:3px;"></div>
+          <div style="flex-grow:1;height:22px;background:#6aa9df;border-radius:3px;"></div>
+          <div style="flex-grow:1;height:22px;background:#d98a2b;border-radius:3px;"></div>
+          <div style="flex-grow:1;height:22px;background:#9aa7b4;border-radius:3px;"></div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;">Cost categories, in stacking order: initial, maintenance, rehab, lost revenue, salvage.</div>
+      </div>
+
+      <!-- TYPE -->
+      <div class="card" style="padding:13px 15px;">
+        <div class="sechead" style="margin-bottom:9px;">Type &#8212; Segoe UI, falling back to Calibri</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <div style="display:flex;align-items:baseline;gap:11px;"><span class="mono" style="width:74px;color:var(--muted);">22 / 800</span><span style="font-size:22px;font-weight:800;">$5,852,247</span><span style="font-size:10px;color:var(--muted);">the answer</span></div>
+          <div style="display:flex;align-items:baseline;gap:11px;"><span class="mono" style="width:74px;color:var(--muted);">17 / 800</span><span style="font-size:17px;font-weight:800;">LCCA Summary</span><span style="font-size:10px;color:var(--muted);">sheet title, tile value</span></div>
+          <div style="display:flex;align-items:baseline;gap:11px;"><span class="mono" style="width:74px;color:var(--muted);">13 / 700</span><span style="font-size:13px;font-weight:700;">Present worth by category</span><span style="font-size:10px;color:var(--muted);">card title</span></div>
+          <div style="display:flex;align-items:baseline;gap:11px;"><span class="mono" style="width:74px;color:var(--muted);">11.5 / 400</span><span style="font-size:11.5px;">Body and table cells</span></div>
+          <div style="display:flex;align-items:baseline;gap:11px;"><span class="mono" style="width:74px;color:var(--muted);">10.5 / 600</span><span style="font-size:10.5px;font-weight:600;color:var(--muted);">Field label</span></div>
+          <div style="display:flex;align-items:baseline;gap:11px;"><span class="mono" style="width:74px;color:var(--muted);">9.5 / 700</span><span class="kicker">Section kicker</span></div>
+        </div>
+        <div style="font-size:10.5px;color:var(--muted);margin-top:10px;line-height:1.5;">
+          Six sizes, no more. Weight carries the hierarchy, not size alone &#8212; which is what keeps
+          a dense engineering sheet readable at 100% zoom.
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPONENTS -->
+    <div class="card" style="padding:13px 15px;">
+      <div class="sechead" style="margin-bottom:9px;">Components, shared by every sheet</div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;">
+
+        <div>
+          <div class="kicker" style="margin-bottom:4px;">Header band</div>
+          <div style="display:flex;align-items:center;gap:6px;background:var(--navy);padding:7px 9px;border-radius:5px;">
+            <div style="color:#cdd6e2;font-size:9px;border:1px solid #3a4757;border-radius:3px;padding:3px 5px;">&#9664; Back</div>
+            <div style="flex-grow:1;color:#fff;font-size:11px;font-weight:800;">Title</div>
+            <div style="background:var(--red);color:#fff;font-weight:800;font-size:8px;padding:2px 4px;border-radius:2px;">TN</div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:5px;">Same on every sheet: back, title, context, mark.</div>
+        </div>
+
+        <div>
+          <div class="kicker" style="margin-bottom:4px;">KPI tile</div>
+          <div class="card" style="padding:8px 10px;">
+            <div class="kicker">Margin to next</div>
+            <div style="font-size:17px;font-weight:800;margin-top:3px;">$183,970</div>
+            <div style="font-size:10px;color:var(--muted);">3.1% over Alt 1</div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:5px;">Label, number, one line of context.</div>
+        </div>
+
+        <div>
+          <div class="kicker" style="margin-bottom:4px;">Table row, winner</div>
+          <div class="card" style="overflow:hidden;">
+            <div style="background:var(--navy);color:#c9d4e2;font-size:9px;padding:5px 8px;text-transform:uppercase;letter-spacing:.04em;">Alternative &nbsp; Net PW</div>
+            <div style="display:flex;justify-content:space-between;padding:6px 8px;font-size:10.5px;border-bottom:1px solid var(--line);"><span>Alt 1</span><span>$6,036,217</span></div>
+            <div style="display:flex;justify-content:space-between;padding:6px 8px;font-size:10.5px;background:var(--green-soft);"><span style="font-weight:800;">Alt 3 &#10003;</span><span style="font-weight:800;color:var(--green);">$5,852,247</span></div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:5px;">Winner tinted green, never bolded alone.</div>
+        </div>
+
+        <div>
+          <div class="kicker" style="margin-bottom:4px;">Chart card &#8212; key vs. supporting</div>
+          <div style="display:flex;gap:7px;">
+            <div class="card" style="flex-grow:1;border:1px solid #bfe0cf;border-top:3px solid var(--green);padding:7px 8px;height:64px;">
+              <div style="font-size:9.5px;font-weight:700;">Key</div>
+              <div style="font-size:8.5px;color:var(--muted);">6.4 in wide</div></div>
+            <div class="card" style="flex-grow:1;padding:7px 8px;height:64px;">
+              <div style="font-size:9.5px;font-weight:700;color:var(--muted);">Supporting</div>
+              <div style="font-size:8.5px;color:var(--muted);">3.1 in wide</div></div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:5px;">Green top rule marks a decision plot.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXCEL SPEC -->
+    <div class="card" style="padding:13px 15px;">
+      <div class="sechead" style="margin-bottom:8px;">What this means in the Excel sheet</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="background:var(--navy);color:#c9d4e2;">
+          <th style="font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;">Element</th>
+          <th style="font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;">Today</th>
+          <th style="font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;">Target</th>
+          <th style="font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;">Why</th></tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--line);"><td>Key charts, 2 up</td><td class="mono">6.50 in each = 13.00 in</td><td class="mono" style="color:var(--green);font-weight:700;">6.40 in each = 12.90 in</td><td style="color:var(--muted);">13.00 in already overruns a 1366 laptop before any gutter</td></tr>
+          <tr style="border-bottom:1px solid var(--line);"><td>Supporting charts, 4 up</td><td class="mono">6.50 in each, 2 up</td><td class="mono" style="color:var(--green);font-weight:700;">3.10 in each</td><td style="color:var(--muted);">four fit the band on one row instead of stacking</td></tr>
+          <tr style="border-bottom:1px solid var(--line);"><td>Locator map, at a glance</td><td class="mono">column S, right of the band</td><td class="mono" style="color:var(--green);font-weight:700;">below the charts</td><td style="color:var(--muted);">this is what forces the horizontal scroll today</td></tr>
+          <tr><td>Chart data, map data</td><td class="mono">columns W and beyond</td><td class="mono">unchanged, outside the print area</td><td style="color:var(--muted);">helper blocks nobody scrolls to</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

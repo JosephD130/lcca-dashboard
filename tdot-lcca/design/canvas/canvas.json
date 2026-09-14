@@ -1,13 +1,16 @@
 {
   "artboards": [
-    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 1200, "title": "Summary dashboard (optimized)" },
-    { "file": "GeneralInformation.dc.html", "x": 1560, "y": 0, "w": 1240, "h": 780, "title": "General Information (optimized)" }
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1280, "h": 1060, "title": "Summary dashboard — fits a laptop" },
+    { "file": "GeneralInformation.dc.html", "x": 1400, "y": 0, "w": 1280, "h": 700, "title": "General Information" },
+    { "file": "DesignSystem.dc.html", "x": 1400, "y": 820, "w": 1280, "h": 700, "title": "Design system & Excel spec" }
   ],
   "annotations": [
-    { "id": "note-summary", "x": 0, "y": -150, "w": 620,
-      "text": "SUMMARY DASHBOARD\nOne verdict banner up top, six KPI tiles on an even grid, a compact 3-row table, and the six charts in a clean 3x2 grid with real axis labels and legends. Nothing overlaps, everything is the same size class." },
-    { "id": "note-gi", "x": 1560, "y": -150, "w": 620,
-      "text": "GENERAL INFORMATION\nTwo-column form (Airport | Project) instead of one tall column, the LCCA parameters as a single six-up band, and the navigation buttons collapsed into one action toolbar. Cuts the vertical scroll by roughly 40%." }
+    { "id": "note-width", "x": 0, "y": -170, "w": 660,
+      "text": "THE CONSTRAINT\nEvery artboard is 1280 px wide with a 1240 px content band — the width that still fits a 1366-wide laptop after Excel's row headers and scrollbar. Nothing sits to the right of the band, so the sheet scrolls vertically only." },
+    { "id": "note-summary", "x": 700, "y": -170, "w": 540,
+      "text": "SUMMARY\nVerdict, six tiles, full-width table, the two key plots side by side, then four supporting plots in one row. The locator map and at-a-glance facts move below the charts — they are what pushes the sheet off-screen today." },
+    { "id": "note-system", "x": 1400, "y": 760, "w": 620,
+      "text": "The shared rules, plus the table at the bottom giving the exact Excel chart widths this implies." }
   ],
   "launch": { "view": "canvas" }
 }
