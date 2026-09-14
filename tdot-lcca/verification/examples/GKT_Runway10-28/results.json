@@ -647,15 +647,15 @@
    "Alternative 1 spend",
    "Alternative 2 spend",
    "Alternative 3 spend",
-   "",
+   " ",
    "Alternative 1 cumulative PW",
    "Alternative 2 cumulative PW",
    "Alternative 3 cumulative PW",
-   "",
+   " ",
    "Alternative 1 closure days",
    "Alternative 2 closure days",
    "Alternative 3 closure days",
-   "",
+   " ",
    ""
   ],
   "byyear": [
@@ -1255,8 +1255,8 @@
    "$5,681,474",
    "$124 / S.Y.",
    "the winner changes",
-   "of the lowest-cost alternative, including 10% mobilization and 5% engineering",
-   "initial construction over the mainline area; see the benchmark under chart 5",
+   "lowest initial construction cost",
+   "per S.Y. of mainline area",
    "the lowest-cost alternative is not the same at every rate: see chart 2"
   ],
   "benchmark": [

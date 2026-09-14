@@ -293,12 +293,19 @@ check('the navigation sits on consecutive rows, not a stack with gaps',
       all(gi[c].value in (None, '') for c in ('D49', 'D50', 'D51', 'D52')))
 check('General Information shows the five-step flow',
       '1 Overview' in str(gi['B4'].value) and '5 Summary' in str(gi['B4'].value), str(gi['B4'].value)[:60])
-steps = {'Overview': wb['Overview']['G1'].value, 'Instructions': wb['Instructions']['G1'].value,
-         'Pay_Items': wb['Pay_Items']['C1'].value, 'TMP(NewHMA)': wb['TMP(NewHMA)']['D1'].value,
+# the step marker leads the sheet's one-line summary, so the band itself can carry the sheet's name
+steps = {'Overview': wb['Overview']['B2'].value, 'Instructions': wb['Instructions']['B2'].value,
+         'Pay_Items': wb['Pay_Items']['E1'].value, 'TMP(NewHMA)': wb['TMP(NewHMA)']['A3'].value,
          'Summary': ws['M1'].value}
 check('every sheet in the flow says which step it is',
       [str(v).strip()[:11] for v in steps.values()] == ['STEP 1 of 5', 'STEP 1 of 5', 'STEP 3 of 5', 'STEP 4 of 5', 'STEP 5 of 5'],
       {k: str(v).strip()[:14] for k, v in steps.items()})
+names_in_band = {'Overview': wb['Overview']['G1'].value, 'Instructions': wb['Instructions']['G1'].value,
+                 'Pay_Items': wb['Pay_Items']['C1'].value, 'Typical Values': wb['Typical Values']['C1'].value,
+                 'Method': wb['Method']['C1'].value, 'TMP(NewHMA)': wb['TMP(NewHMA)']['D1'].value}
+check('and the band names the sheet, the alternative worksheets live from their own title',
+      [str(v) for v in names_in_band.values()] ==
+      ['Overview', 'Instructions', 'Pay Items', 'Typical Values', 'Method', '=$A$33'], names_in_band)
 for name in ('Overview', 'Instructions', 'Pay_Items', 'Maintenance Policies'):
     sh = wb[name]
     b = [c for c in ('A1', 'B1') if 'HYPERLINK' in str(sh[c].value)]
@@ -320,10 +327,11 @@ check('Pay_Items part headings band the left of the table',
 check('Pay_Items freezes the header and repeats the band and the header in print',
       pi.freeze_panes == 'A3' and 'Pay_Items!$1:$2' in rd('xl/workbook.xml'), pi.freeze_panes)
 mp = wb['Maintenance Policies']
-check('Maintenance Policies says it is live and what Rate and Year Applied mean, in one note',
-      'live' in str(mp['C3'].value) and 'Rate' in str(mp['C3'].value)
-      and mp['C4'].value is None and mp['C5'].value is None,
-      str(mp['C3'].value)[:70])
+check('Maintenance Policies leads with the fact that it is live, then what Rate and Year mean',
+      'live' in str(mp['B3'].value) and 'Rate' in str(mp['B4'].value)
+      and all(mp['C%d' % r].value is None for r in (2, 3, 4, 5))
+      and str(mp['B6'].value) == 'Rehabilitation' and str(mp['C6'].value) == 'Salvage credit',
+      [str(mp['B3'].value)[:44], str(mp['B4'].value)[:44]])
 # the sheet is read by the templates, so the note must not tell anyone otherwise
 mp_refs = set()
 for p_ in names:
