@@ -19,8 +19,14 @@ questions it cannot answer, because they only exist in desktop Excel on Windows:
 1. A Windows machine or VM with **desktop Excel** installed. Use the version TDOT standardises
    on. Excel for the web and the Microsoft Graph API will not do: they recalculate correctly but
    do not run VBA.
-2. This folder, the workbook, and `GKT_LCCA_run.xlsx` (shipped here) on that machine.
+2. This whole folder on that machine, unzipped somewhere ordinary like the Desktop. It already
+   contains everything: the script, the workbook, the worked example and the baseline.
 3. Excel closed before you start. The script drives its own instance.
+
+Windows marks files that came from the internet, which puts Excel into Protected View and stops
+the macros loading. The script clears that mark on its own folder before it starts, so you do not
+have to. If Windows still complains when you double-click `Run.cmd`, right-click it, choose
+Properties, and tick **Unblock** at the bottom.
 
 Two Trust Center settings, once per machine:
 
@@ -33,22 +39,21 @@ Two Trust Center settings, once per machine:
 
 ## Running it
 
+Everything lives in one folder. The script finds the workbook beside itself or up the repo, and
+writes its output to an `out` folder beside itself, so there is nothing to configure.
+
+Double-click **Run.cmd**. That is the automatic suite: no clicking, about a minute.
+
+Double-click **Run-Interactive.cmd** to also exercise the two macros that open a dialog. It stops
+twice and tells you what to click: once to save the New Study copy into a folder it names, once to
+add an alternative through the Alternative Setup form. It checks the result of each.
+
+From a prompt instead, if you prefer:
+
 ```powershell
-cd <the repo>\tdot-lcca
-powershell -ExecutionPolicy Bypass -File .\verification\win\Run-ExcelChecks.ps1 -OutDir .\out
+powershell -ExecutionPolicy Bypass -File .\Run-ExcelChecks.ps1
+powershell -ExecutionPolicy Bypass -File .\Run-ExcelChecks.ps1 -Interactive
 ```
-
-That is the automatic suite. No clicking, about a minute.
-
-To also exercise the two macros that open a dialog:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\verification\win\Run-ExcelChecks.ps1 -OutDir .\out -Interactive
-```
-
-It will stop twice and tell you what to click: once to save the New Study copy into a folder it
-names, once to add an alternative through the Alternative Setup form. It checks the result of
-each.
 
 ## What comes back
 

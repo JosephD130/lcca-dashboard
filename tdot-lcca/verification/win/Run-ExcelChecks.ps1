@@ -31,7 +31,7 @@
 #>
 [CmdletBinding()]
 param(
-  [string] $Workbook  = "$PSScriptRoot\..\..\TDOA_LCCA_Framework_v1.2.0_ARA_09112026.xlsm",
+  [string] $Workbook  = '',
   [string] $Baseline  = "$PSScriptRoot\baseline.json",
   [string] $ExampleDir = '',
   [string] $OutDir    = "$PSScriptRoot\out",
@@ -39,6 +39,29 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
+# The workbook may sit beside this script (a folder you unzipped) or two levels up (the repo).
+if (-not $Workbook) {
+  $candidates = @(
+    (Join-Path $PSScriptRoot 'TDOA_LCCA_Framework_*.xlsm'),
+    (Join-Path $PSScriptRoot '..\..\TDOA_LCCA_Framework_*.xlsm'),
+    (Join-Path (Get-Location) 'TDOA_LCCA_Framework_*.xlsm')
+  )
+  foreach ($c in $candidates) {
+    $hit = @(Get-ChildItem $c -File -ErrorAction SilentlyContinue | Sort-Object Name -Descending)
+    if ($hit.Count -gt 0) { $Workbook = $hit[0].FullName; break }
+  }
+  if (-not $Workbook) {
+    Write-Host 'FAIL  could not find TDOA_LCCA_Framework_*.xlsm beside this script or in the repo.'
+    Write-Host '      Put the workbook in this folder, or pass -Workbook <path>.'
+    exit 2
+  }
+}
+
+# Windows marks anything downloaded from the internet, which puts Excel into Protected View and
+# stops the macros loading. Clear it for this folder before we start.
+Get-ChildItem $PSScriptRoot -File -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue
+if (Test-Path $Workbook) { Unblock-File $Workbook -ErrorAction SilentlyContinue }
 $script:Results = @()
 $script:Fails   = 0
 
