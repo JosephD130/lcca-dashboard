@@ -125,7 +125,12 @@ check('print areas defined for the Summary and General Information',
 print(); print('=' * 78); print('CHARTS'); print('=' * 78)
 charts = sorted((n for n in names if re.match(r'xl/charts/chart\d+\.xml$', n)), key=lambda n: int(re.search(r'\d+', n.split('/')[-1]).group()))
 check('fifteen charts: six original, eight on the Summary, one locator map', len(charts) == 15, len(charts))
+# The six small multiples (charts 3 to 8) drop their axis titles on purpose: at
+# 3.1 in wide the title, the legend and two axis titles collide. Their own titles
+# say what the axes are. The large charts still name both.
+SMALL = {'chart9.xml', 'chart10.xml', 'chart11.xml', 'chart12.xml', 'chart13.xml', 'chart14.xml'}
 for n in charts:
+    if n.split('/')[-1] in SMALL: continue
     c = rd(n)
     ts = re.findall(r'<a:t>([^<]*)</a:t>', c)
     has_x = any(t in ('Calendar year', 'Alternative', 'Discount rate (%)', 'Scenario', 'Longitude') for t in ts)
@@ -133,10 +138,20 @@ for n in charts:
                       'Cumulative discounted cost ($)', 'Closure days', 'Thickness (inches)', 'Latitude',
                       'Initial construction / mainline S.Y.') for t in ts)
     check('%s names both axes' % n.split('/')[-1], has_x and has_y, ts[:4])
-summary_charts = charts[6:13]      # the seven cost and section charts; the benchmark and the map carry no legend
-check('the seven Summary charts put the legend beside the plot',
-      all(re.search(r'<legendPos val="r"/>', rd(n)) for n in summary_charts),
-      [re.findall(r'<legendPos val="(\w)"/>', rd(n)) for n in summary_charts])
+check('the small multiples carry no axis titles and no type above 8 pt',
+      all(not re.search(r'<(catAx|valAx)>[\s\S]*?<title>', rd('xl/charts/' + m)) and
+          max(int(v) for v in re.findall(r'sz="(\d+)"', rd('xl/charts/' + m))) <= 800 for m in SMALL),
+      {m: max(int(v) for v in re.findall(r'sz="(\d+)"', rd('xl/charts/' + m))) for m in SMALL})
+# the two key charts are wide enough for a legend beside the plot; the small
+# multiples put theirs underneath, where it costs height instead of width
+check('the two key charts keep the legend beside the plot',
+      all('<legendPos val="r"/>' in rd('xl/charts/%s.xml' % m) for m in ('chart7', 'chart8')),
+      [re.findall(r'<legendPos val="(\w)"/>', rd('xl/charts/%s.xml' % m)) for m in ('chart7', 'chart8')])
+check('the small multiples put the legend under the plot',
+      all('<legendPos val="b"/>' in rd('xl/charts/%s.xml' % m)
+          for m in ('chart9', 'chart10', 'chart11', 'chart12', 'chart13')),
+      [re.findall(r'<legendPos val="(\w)"/>', rd('xl/charts/%s.xml' % m))
+       for m in ('chart9', 'chart10', 'chart11', 'chart12', 'chart13')])
 check('money axes read to one decimal in millions',
       sum('$#,##0.0,,&quot;M&quot;' in rd(n) or '$#,##0.0,,"M"' in rd(n) for n in charts) >= 5)
 c6 = rd([n for n in charts if n.endswith('chart6.xml')][0])
@@ -164,7 +179,7 @@ check('the margin tile turns amber only when the two best are within five percen
       and '<0.05' in sx.replace('&lt;', '<'), cfs)
 check('lowest-cost row still highlighted in both tables',
       cfs.get('G%d:R%d' % (T0, T1)) == 'expression' and cfs.get('G%d:P%d' % (CMP0, CMP0 + 3)) == 'expression', cfs)
-bm = [n for n in charts if 'Unit cost against published' in rd(n)]
+bm = [n for n in charts if 'Unit cost vs. published' in rd(n)]
 bx = rd(bm[0]) if bm else ''
 check('chart 8 is the unit-cost benchmark: a stacked bar whose first series is invisible',
       len(bm) == 1 and 'stacked' in bx and 'a:noFill' in bx and '<legend>' not in bx,
@@ -272,8 +287,12 @@ check('the how-to card names all five steps in order',
       and all(t in card for t in ('Overview', 'General Information', 'Pay_Items', 'Alternative Setup', 'Summary')),
       card[:80])
 check('five navigation buttons on General Information, one per destination',
-      all('HYPERLINK' in str(gi[c].value) for c in ('D44', 'D46', 'D48', 'D50', 'D52')),
-      [str(gi[c].value)[:40] for c in ('D44', 'D46', 'D48', 'D50', 'D52')])
+      all('HYPERLINK' in str(gi[c].value) for c in ('D44', 'D45', 'D46', 'D47', 'D48')),
+      [str(gi[c].value)[:40] for c in ('D44', 'D45', 'D46', 'D47', 'D48')])
+check('the navigation sits on consecutive rows, not a stack with gaps',
+      all(gi[c].value in (None, '') for c in ('D49', 'D50', 'D51', 'D52')))
+check('General Information shows the five-step flow',
+      '1 Overview' in str(gi['B4'].value) and '5 Summary' in str(gi['B4'].value), str(gi['B4'].value)[:60])
 steps = {'Overview': wb['Overview']['G1'].value, 'Instructions': wb['Instructions']['G1'].value,
          'Pay_Items': wb['Pay_Items']['C1'].value, 'TMP(NewHMA)': wb['TMP(NewHMA)']['D1'].value,
          'Summary': ws['M1'].value}
