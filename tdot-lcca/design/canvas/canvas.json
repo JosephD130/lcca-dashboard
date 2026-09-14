@@ -1,0 +1,13 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 1200, "title": "Summary dashboard (optimized)" },
+    { "file": "GeneralInformation.dc.html", "x": 1560, "y": 0, "w": 1240, "h": 780, "title": "General Information (optimized)" }
+  ],
+  "annotations": [
+    { "id": "note-summary", "x": 0, "y": -150, "w": 620,
+      "text": "SUMMARY DASHBOARD\nOne verdict banner up top, six KPI tiles on an even grid, a compact 3-row table, and the six charts in a clean 3x2 grid with real axis labels and legends. Nothing overlaps, everything is the same size class." },
+    { "id": "note-gi", "x": 1560, "y": -150, "w": 620,
+      "text": "GENERAL INFORMATION\nTwo-column form (Airport | Project) instead of one tall column, the LCCA parameters as a single six-up band, and the navigation buttons collapsed into one action toolbar. Cuts the vertical scroll by roughly 40%." }
+  ],
+  "launch": { "view": "canvas" }
+}
