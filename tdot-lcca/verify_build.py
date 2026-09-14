@@ -17,7 +17,7 @@ ws = wb['Summary']
 # the Summary row map, the same constants build_summary.py lays the sheet out with
 KPI0, HDR, T0, T1 = 3, 11, 12, 15
 VER, VER2, CMP, CMPH, CMP0 = 17, 18, 20, 21, 22
-CHT, HOW, C1, C2, C3, BMN = 28, 29, 30, 48, 66, 87
+CHT, HOW, C1, C2, C3, BMN = 28, 29, 30, 48, 59, 87
 SEC_T, CH67, NOTE67, MAP0, A0 = 90, 100, 120, 130, 132
 VBACH = 123       # where the chart the Alternative Setup form maintains is parked
 SENS0, SENS1 = 12, 36
@@ -66,7 +66,8 @@ check('column G onward visible', not ws.column_dimensions['G'].hidden)
 check('navigation buttons sit in the first visible column', 'HYPERLINK' in str(ws['G1'].value) and 'HYPERLINK' in str(ws['H1'].value),
       (ws['G1'].value, ws['H1'].value))
 check('title moved beside the buttons', ws['J1'].value == 'LCCA SUMMARY')
-check('note explains the hidden block', 'hidden' in str(ws.cell(HDR - 1, 7).value) and 'unhide' in str(ws.cell(HDR - 1, 7).value).lower())
+check('note explains the hidden block', 'hidden' in str(ws.cell(HOW, 7).value) and 'unhide' in str(ws.cell(HOW, 7).value).lower())
+check('the verdict banner leads with the winner', str(ws.cell(HDR - 1, 7).value).startswith('=IF(COUNT($O$12:$O$15)=0') and 'Lowest present worth' in str(ws.cell(HDR - 1, 7).value))
 check('results table header intact', [ws.cell(HDR, c).value for c in range(7, 19)] ==
       ['Worksheet', 'Alternative', 'Type', 'Initial construction', 'Maintenance PW', 'Rehabilitation PW', 'Lost revenue PW',
        'Salvage PW', 'Net present worth', 'vs. lowest NPW', 'Closure days in period', 'Runway availability'],
@@ -82,7 +83,7 @@ check('the two verdict lines sit under the results table',
       and 'lowest-cost alternative' in str(ws.cell(VER2, 7).value),
       (str(ws.cell(VER, 7).value)[:40], str(ws.cell(VER2, 7).value)[:40]))
 check('the charts block is labelled and carries its how-to-read line',
-      ws.cell(CHT, 7).value == 'CHARTS' and str(ws.cell(HOW, 7).value).startswith('How to read'),
+      str(ws.cell(CHT, 7).value).startswith('KEY RESULTS') and str(ws.cell(HOW, 7).value).startswith('How to read'),
       (ws.cell(CHT, 7).value, str(ws.cell(HOW, 7).value)[:30]))
 check('the notes under the chart rows are where the row map says',
       'per S.Y.' in str(ws.cell(BMN, 7).value) and 'Charts 6 and 7' in str(ws.cell(NOTE67, 7).value)
@@ -184,8 +185,8 @@ check('project identity line on its own row under the band',
       'D$9' in str(ws['G2'].value) and 'construction' in str(ws['G2'].value), str(ws['G2'].value)[:50])
 check('map data block labelled and outside the print area', 'MAP DATA' in str(ws.cell(MAP0, 23).value))
 coords = [(ws.cell(r, 25).value, ws.cell(r, 26).value) for r in range(A0, A0 + 79)]
-check('79 airports in the map block, 74 with published coordinates',
-      len(coords) == 79 and sum(1 for a, b in coords if isinstance(a, (int, float)) and isinstance(b, (int, float))) == 74,
+check('79 airports in the map block, all 79 with published coordinates',
+      len(coords) == 79 and sum(1 for a, b in coords if isinstance(a, (int, float)) and isinstance(b, (int, float))) == 79,
       (len(coords), sum(1 for a, b in coords if isinstance(a, (int, float)))))
 check('coordinates fall inside Tennessee',
       all(-90.5 < a < -81.5 and 34.9 < b < 36.8 for a, b in coords if isinstance(a, (int, float))))
@@ -275,7 +276,7 @@ check('five navigation buttons on General Information, one per destination',
       [str(gi[c].value)[:40] for c in ('D44', 'D46', 'D48', 'D50', 'D52')])
 steps = {'Overview': wb['Overview']['G1'].value, 'Instructions': wb['Instructions']['G1'].value,
          'Pay_Items': wb['Pay_Items']['C1'].value, 'TMP(NewHMA)': wb['TMP(NewHMA)']['D1'].value,
-         'Summary': ws.cell(HDR - 1, 7).value}
+         'Summary': ws['M1'].value}
 check('every sheet in the flow says which step it is',
       [str(v).strip()[:11] for v in steps.values()] == ['STEP 1 of 5', 'STEP 1 of 5', 'STEP 3 of 5', 'STEP 4 of 5', 'STEP 5 of 5'],
       {k: str(v).strip()[:14] for k, v in steps.items()})
