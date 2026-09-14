@@ -45,9 +45,9 @@
 2. POPULATED WORKBOOK  MBT_check.xlsm  (scenarios and the section read-back)
 ==============================================================================
   PASS  only the pre-existing template errors are present  |  {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}
-  PASS  NPW unchanged by everything added  |  8,809,266.42 / 8,028,734.49
+  PASS  NPW matches the recomputed Murfreesboro baseline  |  8,572,110.60 / 8,028,734.49
   PASS  agency + user = total in the comparison block
-  PASS  EUAC matches the closed form  |  449,442.25
+  PASS  EUAC matches the closed form  |  437,342.73
   PASS  section read-back reproduces the typed description  |  5" P401 on 16" P209
   PASS  excavation check agrees for the asphalt alternative  |  agrees
   PASS  excavation check flags the 8 in / 9 in concrete mismatch  |  differs by -1.0 in
@@ -55,11 +55,11 @@
   PASS  shoulder chart is empty with no shoulder area
   PASS  shoulder chart scales the derived layers  |  0.00 -> 0.00
   PASS  named concrete thickness does not scale  |  0.00 / 0.00
-  PASS  discount rate 7%: verdict recomputes  |  Lowest present worth: Alternative 1   |   margin to next: $1,025,177   |   7% over 30 years   | 
+  PASS  discount rate 7%: verdict recomputes  |  Lowest present worth: Alternative 1   |   margin to next: $1,100,798   |   7% over 30 years   | 
   PASS  discount rate 7%: no new errors
-  PASS  analysis period 20 years: verdict recomputes  |  Lowest present worth: Alternative 2   |   margin to next: $755,381   |   3% over 20 years   |   
+  PASS  analysis period 20 years: verdict recomputes  |  Lowest present worth: Alternative 2   |   margin to next: $804,006   |   3% over 20 years   |   
   PASS  analysis period 20 years: no new errors
-  PASS  lost revenue off: verdict recomputes  |  Lowest present worth: Alternative 2   |   margin to next: $780,532   |   3% over 30 years   |   
+  PASS  lost revenue off: verdict recomputes  |  Lowest present worth: Alternative 2   |   margin to next: $543,376   |   3% over 30 years   |   
   PASS  lost revenue off: no new errors
   PASS  unknown airport does not error  |  {'TMP(NewPCC)_IndirectCost': 30, 'TMP(NewPCC)': 30}
   PASS  deleting a Database row leaves no #REF!  |  Alt 2 (New PCC)

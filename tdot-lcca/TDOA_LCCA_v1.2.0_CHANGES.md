@@ -369,7 +369,7 @@ and six charts populate from the MBT data (render in `Summary_sheet_MBT_render.p
 verified: the charts on the alternative worksheets in Excel itself (LibreOffice does not render
 charts on the ActiveX-bearing sheets); step 3 above covers it.
 
-For the v1.2.0 pay item and pricing changes specifically: 139 static checks on the built package all
+For the v1.2.0 pay item, pricing and salvage changes specifically: 149 static checks on the built package all
 pass; all 105 combo box streams were re-parsed with an independent implementation of [MS-OFORMS] and
 each consumes exactly to the end of its stream; a scripted run copies an alternative template, prices
 it at Regular, fills a Middle cost for one item and confirms that item reprices while every other item
@@ -388,6 +388,14 @@ cell-level diff of the whole workbook against the previous build shows 643 chang
 on the five alternative templates, General Information, Pay_Items, Typical Values and Method; the
 Summary, Database, RevenueData, Maintenance Policies, Overview and Instructions sheets are untouched.
 The printed worked example is 30 pages, unchanged, so the wider picker column costs no paper.
+
+The salvage fix was verified separately. Nine of those static checks cover the formulas themselves, and
+`verification/check_salvage.py` drives the built file at five analysis periods (30, 25, 20, 36 and 15),
+confirming the fraction, the year shown and the sentence on each salvage row at every one, including
+the two edge cases where the overlay is fully consumed and where the period ends before it is laid. The
+full click-through was re-run on the fixed build and passes 60 of 60: the recomputed Murfreesboro
+baseline reads $8,572,110.60 and $8,028,734.49, and the 20-year and lost-revenue-off rounds reproduce
+the $804,006 and $543,376 margins that were predicted before the change was built.
 
 Not verified here: how Excel itself divides the drop-down list between the two columns, which is what
 step 8 above asks for.
