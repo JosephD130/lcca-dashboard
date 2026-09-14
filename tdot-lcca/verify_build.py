@@ -66,7 +66,7 @@ check('column G onward visible', not ws.column_dimensions['G'].hidden)
 check('navigation buttons sit in the first visible column', 'HYPERLINK' in str(ws['G1'].value) and 'HYPERLINK' in str(ws['H1'].value),
       (ws['G1'].value, ws['H1'].value))
 check('title moved beside the buttons', ws['J1'].value == 'LCCA SUMMARY')
-check('note explains the hidden block', 'hidden' in str(ws.cell(HDR - 1, 7).value) and 'Unhide' in str(ws.cell(HDR - 1, 7).value))
+check('note explains the hidden block', 'hidden' in str(ws.cell(HDR - 1, 7).value) and 'unhide' in str(ws.cell(HDR - 1, 7).value).lower())
 check('results table header intact', [ws.cell(HDR, c).value for c in range(7, 19)] ==
       ['Worksheet', 'Alternative', 'Type', 'Initial construction', 'Maintenance PW', 'Rehabilitation PW', 'Lost revenue PW',
        'Salvage PW', 'Net present worth', 'vs. lowest NPW', 'Closure days in period', 'Runway availability'],
@@ -294,8 +294,9 @@ check('Pay_Items part headings band the left of the table',
 check('Pay_Items freezes the header and repeats the band and the header in print',
       pi.freeze_panes == 'A3' and 'Pay_Items!$1:$2' in rd('xl/workbook.xml'), pi.freeze_panes)
 mp = wb['Maintenance Policies']
-check('Maintenance Policies says it is live, and which table drives which alternative',
-      'live' in str(mp['C3'].value) and 'Table 1' in str(mp['C4'].value) and 'Rate' in str(mp['C5'].value),
+check('Maintenance Policies says it is live and what Rate and Year Applied mean, in one note',
+      'live' in str(mp['C3'].value) and 'Rate' in str(mp['C3'].value)
+      and mp['C4'].value is None and mp['C5'].value is None,
       str(mp['C3'].value)[:70])
 # the sheet is read by the templates, so the note must not tell anyone otherwise
 mp_refs = set()
@@ -438,8 +439,9 @@ check('the step line moved off row 1 to make room for the button',
       gi['B1'].value is None and str(gi['C1'].value).startswith('STEP 2 of 5'))
 check('the New Study button is on the sheet and wired to the macro',
       'macro="NewStudy"' in rd('xl/drawings/drawing4.xml') and 'btnNewStudy' in rd('xl/drawings/drawing4.xml'))
-check('and the sheet says the macro is built in, no import needed',
-      'built in' in str(gi['B2'].value) and 'import' not in str(gi['B2'].value).lower())
+check('the New Study caption is short and says nothing about importing',
+      'import' not in str(gi['B2'].value).lower() and len(str(gi['B2'].value)) < 90,
+      str(gi['B2'].value))
 check('the free-text inputs carry a border so they stop reading as one grey block',
       all(gi.cell(r, 4).border.left.style for r in list(range(14, 18)) + list(range(21, 25))))
 check('the salvage note is out of the input column', gi['D35'].value is None and 'Remaining service life' in str(gi['F35'].value))

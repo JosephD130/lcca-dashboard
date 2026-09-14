@@ -328,10 +328,11 @@ caught, because they are about what Excel shows rather than what it computes.
 
 ### New Study
 
-Row 1 carries a **New Study** button. It saves a clean copy of the workbook beside the current one as
-`<name>_1.xlsm`, `_2` and so on, with every input cleared, the workbook defaults restored (30 years, 3
-percent, 10 and 5 percent, indirect cost off) and every alternative worksheet and its Database and
-Summary rows removed. The open study is not touched.
+Row 1 carries a **New Study** button. It opens a Save As dialog so you choose where the new file goes
+and what to call it, pre-filled with `<name>_1.xlsm` (`_2` and so on) next to the current file. It then
+saves a clean copy there with every input cleared, the workbook defaults restored (30 years, 3 percent,
+10 and 5 percent, indirect cost off) and every alternative worksheet and its Database and Summary rows
+removed. The open study is not touched.
 
 The macro is built into the workbook, so the button works on open with nothing to import. The
 `LCCA_NewStudy` standard module was added to the VBA project directly: the project was purged

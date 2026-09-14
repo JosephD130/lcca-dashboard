@@ -12,35 +12,39 @@ Option Explicit
 Public Sub NewStudy()
     Dim src As Workbook, copyWb As Workbook
     Dim target As String, baseName As String, folder As String, ext As String
-    Dim n As Long, i As Long, answer As VbMsgBoxResult
+    Dim n As Long, i As Long
     Dim ws As Worksheet, keep As Object
+
+    Dim suggested As Variant
 
     Set src = ThisWorkbook
 
-    If src.Path = "" Then
-        MsgBox "Save this workbook somewhere first, then click New Study again." & vbCrLf & vbCrLf & _
-               "New Study writes the fresh copy next to the file it starts from, so the file needs a home.", _
-               vbExclamation, "New Study"
-        Exit Sub
-    End If
-
-    ' --- next free name beside this one: <name>_1.xlsm, _2, _3 ...
-    folder = src.Path
+    ' --- suggest a name beside the current file: <name>_1.xlsm, _2, _3 ...
     i = InStrRev(src.Name, ".")
-    baseName = Left$(src.Name, i - 1)
-    ext = Mid$(src.Name, i)
+    If i > 0 Then
+        baseName = Left$(src.Name, i - 1)
+        ext = Mid$(src.Name, i)
+    Else
+        baseName = src.Name
+        ext = ".xlsm"
+    End If
+    folder = src.Path
+    If folder = "" Then folder = Application.DefaultFilePath
+
     n = 1
     Do While Len(Dir$(folder & Application.PathSeparator & baseName & "_" & n & ext)) > 0
         n = n + 1
     Loop
-    target = folder & Application.PathSeparator & baseName & "_" & n & ext
+    suggested = folder & Application.PathSeparator & baseName & "_" & n & ext
 
-    answer = MsgBox("Start a new study?" & vbCrLf & vbCrLf & _
-                    "This saves a clean copy with every input cleared and every alternative removed:" & vbCrLf & vbCrLf & _
-                    baseName & "_" & n & ext & vbCrLf & vbCrLf & _
-                    "The study you have open is not changed.", _
-                    vbQuestion + vbOKCancel + vbDefaultButton1, "New Study")
-    If answer <> vbOK Then Exit Sub
+    ' --- let the user choose where to save it and under what name
+    suggested = Application.GetSaveAsFilename( _
+        InitialFileName:=suggested, _
+        FileFilter:="Excel Macro-Enabled Workbook (*.xlsm), *.xlsm", _
+        Title:="Save the new study as")
+    If VarType(suggested) = vbBoolean Then Exit Sub          ' Cancel
+    target = CStr(suggested)
+    If LCase$(Right$(target, 5)) <> ".xlsm" Then target = target & ".xlsm"
 
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
