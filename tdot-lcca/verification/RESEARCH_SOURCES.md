@@ -35,6 +35,14 @@ the sheet carries its URL. Confirm the primary paragraphs before quoting them to
 - Legacy: AIP Handbook 5100.38D table requiring 7% and 20 years (pre-2022); AC 150/5320-6E Appendix 1
   suggested 4% and 20 years with straight-line residual value (dropped in 6F/6G).
 - AAPTP 06-06 (Auburn/NCAT): NPW, 4%, 20 years, remaining-life salvage; user cost includes lost airport revenue.
+  Remaining-life salvage is a prorated share of the last treatment: remaining life divided by expected life,
+  times the cost of that treatment. That method is AAPTP's and FAA's, and it is the form the workbook uses.
+  The two fractions in the workbook are not theirs: they came with the 2022 APTech framework. Checked against
+  the workbook's own schedules, PCC holds (10 of 40 years left at year 30 is 25%) and HMA does not: Table 1
+  places the mill and overlay at year 20, so a 16-year overlay life leaves 6 of 16 years at year 30, or 37.5%,
+  not the 12.5% the sheet carries. 2 of 16 corresponds to an overlay at year 16, which is Table 3's rehab year.
+  Direct fetches of eng.auburn.edu and faa.gov were blocked by the egress proxy; the method wording is from
+  search-engine excerpts of the report. Confirm against the PDF before quoting it.
 - Caltrans LCCA manual (2013): 4% real; 20/35/55-year periods; RealCost reports agency and user cost as
   present value and EUAC per alternative, then the lowest-cost alternative.
 

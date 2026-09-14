@@ -1,4 +1,4 @@
-file            examples/ex1_GKT/GKT_Runway_10_28_LCCA.kml  (14,341 bytes)
+file            verification/examples/GKT_Runway10-28/GKT_Runway_10_28_LCCA.kml  (14,341 bytes)
 root            {http://www.opengis.net/kml/2.2}kml
 styles          4 defined: airport, alt, altLow, event
 geometry        18 points, 6 rings, extent lon -83.53796..-83.51840 lat 35.85612..35.85984

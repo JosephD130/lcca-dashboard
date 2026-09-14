@@ -111,7 +111,7 @@ PASS  Method sheet has its navigation buttons
 PASS  Method sheet states it feeds nothing
 PASS  eleven sections, in order   |   ['1. The answer the workbook produces', '2. Step 1: initial construction cost', '3. Step 2: when the later work happens', '4. Step 3: what each maintenance and 
 PASS  the live block reads the workbook (period, rate, CRF, discount factor, alternatives)   |   14
-PASS  documented formulas are stored as text, not evaluated   |   29
+PASS  documented formulas are stored as text, not evaluated   |   30
 PASS  assumptions section names the four open questions
 PASS  Typical Values sources are plain text, not hyperlinks   |   45
 PASS  only the original tn.gov hyperlink object remains
@@ -166,5 +166,25 @@ PASS  row 1 repeats at the top of every printed page, so the mark prints through
 PASS  Pay_Items repeats its table header as well as the band   |   ['Pay_Items!$1:$2']
 
 ==============================================================================
-123 checks, 0 failed
+THE PAY ITEM PICKER AND THE PRICING SOURCE
+==============================================================================
+PASS  all 105 pay item pickers carry a ListWidth   |   (105, 105)
+PASS  and it is wide enough for the longest description at two columns   |   [9.0]
+PASS  every picker still lists the pay item number beside the description
+PASS  the picker column is wide enough to read what was picked   |   {'TMP(NewHMA)': 53.71, 'TMP(NewPCC)': 53.71, 'TMP(HMARehab)': 53.71, 'TMP(NewHMA)_IndirectCost': 53.71, 'TMP(NewPCC)_IndirectCost': 53.71}
+PASS  and each picker ends exactly at that column's edge   |   {('3', '0')}
+PASS  every alternative worksheet picks a pricing source, defaulting to Regular   |   {'TMP(NewHMA)': ('Regular', 'Price from:', '=IFERROR(MATCH($C$11,PriceSources,0),1)'), 'TMP(NewPCC)': ('Regular', 'Price from:', '=IFERROR(MATCH($C$11,PriceSour
+PASS  and resolves it to a column number, falling back to Regular when the cell is empty
+PASS  C11 is a list, not free text
+PASS  the three names those lookups read are defined   |   {'PriceSources': '{&quot;Regular&quot;,&quot;Middle&quot;,&quot;West&quot;,&quot;East&quot;}', 'UnitCostGrid': 'Table2[[Unit Cost]:[East]]', 'PayItemKeys': 'Tab
+PASS  the grid is the four unit cost columns of Table2
+PASS  all 156 unit cost lookups on the five templates read the chosen column   |   (468, 0)
+PASS  Pay_Items marks Middle, West and East as fillable
+PASS  TMP(HMARehab) hides its working columns like every other template
+PASS  and its chart still plots them
+PASS  the always-blank Airport Owner row now carries the county   |   ('County:', '=IF(D9="","N/A",VLOOKUP(Airport_Name,Table17[],4))')
+PASS  and State Region below it is unmoved, so the Summary still finds it
+
+==============================================================================
+139 checks, 0 failed
 ALL PASS

@@ -330,6 +330,61 @@ check('Pay_Items repeats its table header as well as the band',
       any(t.endswith("Pay_Items!$1:$2") for _, t in titles), [t for _, t in titles if 'Pay_Items' in t])
 
 
+print(); print('=' * 78); print('THE PAY ITEM PICKER AND THE PRICING SOURCE'); print('=' * 78)
+import struct
+ALT = ['TMP(NewHMA)', 'TMP(NewPCC)', 'TMP(HMARehab)', 'TMP(NewHMA)_IndirectCost', 'TMP(NewPCC)_IndirectCost']
+combos = [n for n in names if re.match(r'xl/activeX/activeX\d+\.bin$', n)
+          and z.read(n)[:16] == bytes.fromhex('301dd28b42ecce119e0d00aa006002f3')]
+widths, masked = set(), 0
+for n in combos:
+    d = z.read(n)
+    if struct.unpack('<Q', d[20:28])[0] & (1 << 10):
+        masked += 1
+        widths.add(struct.unpack('<i', d[36:40])[0])
+check('all 105 pay item pickers carry a ListWidth', len(combos) == 105 and masked == 105, (len(combos), masked))
+check('and it is wide enough for the longest description at two columns',
+      widths == {22860}, [round(w / 2540.0, 2) for w in widths])
+check('every picker still lists the pay item number beside the description',
+      all(rd(p).count('listFillRange="Pay_Items!C3:D59"') == rd(p).count('<controlPr ')
+          for p in names if re.match(r'xl/worksheets/sheet\d+\.xml$', p) and 'listFillRange' in rd(p)))
+widecol = {}
+for t in ALT:
+    sh = wb[t]
+    widecol[t] = round(sh.column_dimensions['C'].width, 2)
+check('the picker column is wide enough to read what was picked', set(widecol.values()) == {53.71}, widecol)
+anch = set()
+for p in names:
+    if not re.match(r'xl/worksheets/sheet\d+\.xml$', p): continue
+    for m in re.finditer(r'<from><xdr:col>2</xdr:col>.*?</from><to><xdr:col>(\d+)</xdr:col><xdr:colOff>(\d+)</xdr:colOff>', rd(p), re.S):
+        anch.add(m.groups())
+check('and each picker ends exactly at that column\'s edge', anch == {('3', '0')}, anch)
+
+src = {t: (wb[t]['C11'].value, wb[t]['B11'].value, wb[t]['I11'].value) for t in ALT}
+check('every alternative worksheet picks a pricing source, defaulting to Regular',
+      all(v[0] == 'Regular' and v[1] == 'Price from:' for v in src.values()), src)
+check('and resolves it to a column number, falling back to Regular when the cell is empty',
+      all(v[2] == '=IFERROR(MATCH($C$11,PriceSources,0),1)' for v in src.values()))
+dv = [rd('xl/worksheets/sheet%d.xml' % i) for i in (1, 8, 10, 11, 12)]
+check('C11 is a list, not free text',
+      all('sqref="C11"' in x and '&quot;Regular,Middle,West,East&quot;' in x for x in dv))
+nm = dict(re.findall(r'<definedName name="(PriceSources|UnitCostGrid|PayItemKeys)">([^<]*)</definedName>', rd('xl/workbook.xml')))
+check('the three names those lookups read are defined', len(nm) == 3, nm)
+check('the grid is the four unit cost columns of Table2', nm.get('UnitCostGrid') == 'Table2[[Unit Cost]:[East]]')
+TPL = ['xl/worksheets/sheet%d.xml' % i for i in (1, 8, 10, 11, 12)]
+old = sum(rd(p).count('Table2[Pay Item Description],Table2[Unit Cost]') for p in TPL)
+new = sum(rd(p).count('INDEX(UnitCostGrid,MATCH(') for p in TPL)
+check('all 156 unit cost lookups on the five templates read the chosen column',
+      new == 156 * 3 and old == 0, (new, old))
+check('Pay_Items marks Middle, West and East as fillable',
+      all(wb['Pay_Items'].cell(r, c).fill.fgColor.rgb == 'FFEDEDED' for r in (3, 30, 59) for c in (7, 8, 9)))
+check('TMP(HMARehab) hides its working columns like every other template',
+      all(wb['TMP(HMARehab)'].column_dimensions[c].hidden for c in ('I', 'L', 'BL')))
+check('and its chart still plots them', 'plotVisOnly val="0"' in rd('xl/charts/chart5.xml'))
+gi = wb['General Information']
+check('the always-blank Airport Owner row now carries the county',
+      gi['C12'].value == 'County:' and gi['D12'].value.endswith('Table17[],4))'), (gi['C12'].value, gi['D12'].value))
+check('and State Region below it is unmoved, so the Summary still finds it', gi['C13'].value == 'State Region:')
+
 print(); print('=' * 78)
 print('%d checks, %d failed' % (checks, len(fails)))
 print('ALL PASS' if not fails else 'FAILED: ' + '; '.join(fails))

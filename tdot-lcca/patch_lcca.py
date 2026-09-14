@@ -5,6 +5,7 @@ tables and data validations are preserved (openpyxl would drop them).
 """
 import re, html, sys, os, zipfile, shutil
 from xml.dom import minidom
+import pricing_patch
 from build_summary import transplant, add_plain_sheet, add_style, add_dxf, FONT, FILL, BORDER_BOTTOM, BORDER_BOX
 import build_helpers, helpers_content, build_method
 build_helpers.set_sections(helpers_content.sections()); build_helpers.HINTS.update(helpers_content.HINTS)
@@ -307,7 +308,7 @@ def main(src, out, mbt_mode=False):
         c = re.sub(r'<c:plotVisOnly val="[01]"/>', '<c:plotVisOnly val="0"/>', c)   # its source columns A:E are hidden now
         c = re.sub(r'(<c:valAx>.*?)<c:numFmt[^/]*/>', r'\1<c:numFmt formatCode="$#,##0.0,,&quot;M&quot;" sourceLinked="0"/>', c, count=1, flags=re.S)
         wr(cmp_chart, c)
-    design_pass(work, rd, wr, gi_part, summ_part, tpl, tabs)
+    design_pass(work, rd, wr, gi_part, summ_part, tpl, tabs, mbt_mode)
 
     # --- workbook: drop broken external links, force full recalculation on open
     w = rd('xl/workbook.xml')
@@ -345,10 +346,12 @@ def main(src, out, mbt_mode=False):
 STEP_ALT = 'STEP 4 of 5'
 GUIDE_HMA = ('The quantities for this alternative. Grey cells are yours: C4 to C8 project data (filled from '
              'General Information), F4 to F10 closure days, C13 to C22 pay items and E13 to E22 quantities. '
-             'Everything else calculates. Unit costs come from Pay_Items.')
+             'Everything else calculates. Unit costs come from Pay_Items, and C11 picks which division '
+             'they are priced from.')
 GUIDE_PCC = ('The quantities for this alternative. Grey cells are yours: C4 to C7 project data (filled from '
              'General Information), F4 and F5 closure days, C13 to C22 pay items and E13 to E22 quantities. '
-             'Everything else calculates. Unit costs come from Pay_Items.')
+             'Everything else calculates. Unit costs come from Pay_Items, and C11 picks which division '
+             'they are priced from.')
 
 
 # ------------------------------------------------------------------ design pass (look and first-run UX)
@@ -381,7 +384,7 @@ def tab_color(x, rgb):
     return x.replace('<dimension', '<sheetPr><tabColor rgb="%s"/></sheetPr><dimension' % rgb, 1)
 
 
-def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs):
+def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs, mbt_mode=False):
     """Visual and first-run usability pass: quick-start card and live input checklist on General
     Information, section bands, navigation on every alternative sheet, and tab colours. Nothing here
     changes a calculation; every cell added is text or a HYPERLINK."""
@@ -484,6 +487,13 @@ def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs):
         w = (w.replace('</definedNames>', pa + '</definedNames>') if '</definedNames>' in w
              else w.replace('</sheets>', '</sheets><definedNames>' + pa + '</definedNames>', 1))
     wr('xl/workbook.xml', w)
+
+    # ---- the pay item picker and the division the alternative is priced from. This runs before the
+    # logo band, which anchors the mark from the column widths this pass changes.
+    if not mbt_mode:
+        touched, skipped = pricing_patch.combo_list_width(work)
+        print('combo boxes given a ListWidth: %d (skipped %d)' % (len(touched), len(skipped)))
+        pricing_pass(work, rd, wr, [part for part, _ in template_parts])
 
     # ---- the two reference sheets a user passes through while setting a project up
     reference_sheets(work, rd, wr, btn_dark, btn_blue)
@@ -634,9 +644,9 @@ def reference_sheets(work, rd, wr, btn_dark, btn_blue):
     x = restyle(x, [4, 26, 34, 37, 44, 48, 54], 'A', s_band)
     for r, t in [(61, 'Every alternative worksheet prices its quantities from the Unit Cost column above, by looking up the '
                       'pay item description. Change a cost here and every alternative reprices when the workbook recalculates.'),
-                 (62, 'The Middle, West and East columns under "Average Pay Item Unit Cost" are empty in this release, so a '
-                      'West division project is priced on the same statewide numbers as a Middle one. The Summary states '
-                      'this beside the locator map and the Method sheet carries it as an open assumption.'),
+                 (62, 'The Middle, West and East columns under "Average Pay Item Unit Cost" are the division averages. '
+                      'Each alternative worksheet picks one of them in C11, and any cell left blank there is priced from '
+                      'Unit Cost instead. They ship empty, so until they are filled every division prices the same.'),
                  (63, '%d of the %d pay items carry no unit cost. An alternative that uses one of them prices it at $0, so '
                       'check the Unit Cost column before entering quantities.' % (blank, len(items))),
                  (64, 'Typical ranges and the published sources behind these costs are on the Typical Values sheet.')]:
@@ -901,6 +911,138 @@ def package_hygiene(work, P, rd, wr):
     a = rd('docProps/app.xml')
     a = re.sub(r'<Company>[^<]*</Company>', '<Company>TDOT Aeronautics Division</Company>', a) if '<Company>' in a else a.replace('</Properties>', '<Company>TDOT Aeronautics Division</Company></Properties>')
     wr('docProps/app.xml', a)
+
+
+
+# ---------------------------------------------------------------------------------------------
+# The pay item picker and the division an alternative is priced from.
+PRICE_NOTE = 'Prices from that column on Pay_Items. '
+
+
+def pricing_pass(work, rd, wr, template_parts):
+    """Widen the pay item pickers and give every alternative worksheet a pricing source.
+
+    Column C carries the picker, so it grows and B and A give up the width; the combo box is anchored
+    to C's right-hand edge, so it grows with it. Above the table, C11 chooses which of the four unit
+    cost columns on Pay_Items the alternative is priced from, and every unit cost lookup on the sheet
+    reads that column, falling back to Unit Cost where the regional cell is blank. I11 holds the
+    column number so those lookups stay one line long; column I is a hidden spacer on every template.
+    """
+    GREY, PALE = 'FF595959', 'FFEAF2FB'
+    s_lab = add_style(work, font=FONT(9, b=True, color=GREY),
+                      alignment='horizontal="right" vertical="center"')
+    s_pick = add_style(work, font=FONT(10), fill=FILL('FFD9D9D9'), border=BORDER_BOX,
+                       alignment='horizontal="left" vertical="center" indent="1"')
+    s_note = add_style(work, font=FONT(9, i=True, color=GREY),
+                       alignment='horizontal="left" vertical="center"')
+    s_hide = add_style(work, font=FONT(8, color=GREY), alignment='horizontal="left"')
+    dv = ('<dataValidation type="list" allowBlank="0" showInputMessage="1" showErrorMessage="1"'
+          ' errorTitle="Pricing source" error="Choose Regular, Middle, West or East."'
+          ' promptTitle="Price from" prompt="Which unit cost column on Pay_Items this alternative is'
+          ' priced from. Regular is the statewide Unit Cost column." sqref="C11">'
+          '<formula1>&quot;%s&quot;</formula1></dataValidation>' % ','.join(pricing_patch.PRICE_SOURCES))
+    note = ('"%s"&amp;IF(\'General Information\'!$D$13="N/A","Pick an airport to see its division.",'
+            '"This airport is in the "&amp;\'General Information\'!$D$13&amp;" division.")' % PRICE_NOTE)
+
+    for part in template_parts:
+        x = rd(part)
+        # --- the picker gets the width, and the combo box with it
+        x = pricing_patch.set_col(x, 1, 1, width='12.28515625', customWidth='1')
+        x = pricing_patch.set_col(x, 2, 2, width='19.7109375', customWidth='1')
+        x = pricing_patch.set_col(x, 3, 3, width='53.7109375', customWidth='1')
+        x = pricing_patch.widen_combo(x)
+        # --- TMP(HMARehab) never had its working columns hidden; every other template does
+        if part == 'xl/worksheets/sheet12.xml':
+            x = pricing_patch.set_col(x, 4, 4, width='17.42578125', customWidth='1')
+            for lo, hi in [(9, 9)] + [(c, c) for c in range(10, 65)]:
+                m = re.search(r'<col min="%d" max="%d"[^>]*/>' % (lo, hi), x)
+                if m and 'hidden' not in m.group(0):
+                    x = x[:m.start()] + m.group(0).replace('/>', ' hidden="1"/>') + x[m.end():]
+                elif not m:
+                    x = pricing_patch.set_col(x, lo, hi, width='13.28515625', hidden='1', customWidth='1')
+        # --- the pricing source, one row above the pay item table
+        x = ensure_row(x, 10); x = ensure_row(x, 11)
+        x = put_cell(x, 'B11', '<c r="B11" s="%s" t="inlineStr"><is><t>Price from:</t></is></c>' % s_lab)
+        x = put_cell(x, 'C11', '<c r="C11" s="%s" t="inlineStr"><is><t>%s</t></is></c>'
+                     % (s_pick, pricing_patch.PRICE_SOURCES[0]))
+        x = put_cell(x, 'D11', '<c r="D11" s="%s" t="str"><f>%s</f><v>%s</v></c>'
+                     % (s_note, note, html.escape(PRICE_NOTE + 'Pick an airport to see its division.',
+                                                  quote=False)))
+        for col in 'EFG':
+            x = put_cell(x, '%s11' % col, '<c r="%s11" s="%s"/>' % (col, s_note))
+        x = put_cell(x, 'I10', '<c r="I10" s="%s" t="inlineStr"><is><t>Price column: 1 Regular, 2 Middle, 3 West, 4 East</t></is></c>' % s_hide)
+        x = put_cell(x, 'I11', '<c r="I11" s="%s"><f>%s</f><v>1</v></c>'
+                     % (s_hide, esc('IFERROR(MATCH($C$11,PriceSources,0),1)')))
+        x = row_height(x, 11, 18)
+        # --- an empty pay item line used to print a 0 under "Pay Item", right beside its line
+        # number. Blank reads better, and the item cost tests the description instead.
+        for r in range(13, 23):
+            m = get_row(x, r)
+            if not m: continue
+            row = re.sub(r'(<c r="B%d"[^>]*><f>IF\(C%d=""),0,' % (r, r), r'\1,"",', m.group(0))
+            # the cached 0 is no longer what the formula returns, and an app that trusts the cache
+            # would go on printing it
+            row = re.sub(r'(<c r="B%d"[^>]*>(?:<f>.*?</f>))<v>[^<]*</v>' % r, r'\1', row)
+            x = x[:m.start()] + row + x[m.end():]
+        # G13 is the shared master over G13:G22, so this one substitution carries the column
+        x, k = re.subn(r'IF\(B(\d+)&lt;&gt;0,F\1\*E\1,0\)', r'IF(C\1="",0,F\1*E\1)', x)
+        assert k, part
+        # --- every unit cost on the sheet now reads the chosen column
+        x, n = pricing_patch.OLD_UNIT_COST.subn(pricing_patch.new_unit_cost, x)
+        assert n, part
+        # --- the merge under the note, and the validation list on C11
+        x = re.sub(r'<mergeCells count="(\d+)">(.*?)</mergeCells>',
+                   lambda m: '<mergeCells count="%d">%s<mergeCell ref="D11:G11"/></mergeCells>'
+                   % (int(m.group(1)) + 1, m.group(2)), x, count=1, flags=re.S)
+        if '<dataValidations' in x:
+            x = re.sub(r'<dataValidations count="(\d+)"([^>]*)>',
+                       lambda m: '<dataValidations count="%d"%s>' % (int(m.group(1)) + 1, m.group(2)), x, count=1)
+            x = x.replace('</dataValidations>', dv + '</dataValidations>', 1)
+        else:
+            x = insert_before(x, '<dataValidations count="1">' + dv + '</dataValidations>',
+                              ['hyperlinks', 'printOptions', 'pageMargins'])
+        wr(part, x)
+
+    # TMP(HMARehab)'s own chart reads the columns just hidden, so let it plot them anyway
+    c = rd('xl/charts/chart5.xml')
+    wr('xl/charts/chart5.xml', re.sub(r'<c:plotVisOnly val="1"/>', '<c:plotVisOnly val="0"/>', c))
+
+    # --- the names the new lookups read
+    w = rd('xl/workbook.xml')
+    names = [('PriceSources', '{' + ','.join('&quot;%s&quot;' % s for s in pricing_patch.PRICE_SOURCES) + '}'),
+             ('UnitCostGrid', 'Table2[[Unit Cost]:[East]]'),
+             ('PayItemKeys', 'Table2[Pay Item Description]')]
+    add = ''.join('<definedName name="%s">%s</definedName>' % (n, r) for n, r in names
+                  if 'definedName name="%s"' % n not in w)
+    if add:
+        w = (w.replace('</definedNames>', add + '</definedNames>') if '</definedNames>' in w
+             else w.replace('</sheets>', '</sheets><definedNames>' + add + '</definedNames>', 1))
+        wr('xl/workbook.xml', w)
+
+    # --- Pay_Items: the three regional columns are inputs now, so mark and explain them
+    s_reg = add_style(work, font=FONT(10), fill=FILL('FFEDEDED'), border=BORDER_BOX,
+                      alignment='horizontal="right" vertical="center"', numfmt='&quot;$&quot;#,##0.00')
+    x = rd('xl/worksheets/sheet5.xml')
+    for r in range(3, 60):
+        for col in 'GHI':
+            ref = '%s%d' % (col, r)
+            if not cell_re(ref).search(get_row(x, r).group(0) if get_row(x, r) else ''):
+                x = put_cell(x, ref, '<c r="%s"/>' % ref)          # an empty cell cannot carry a style
+    x = restyle(x, range(3, 60), 'GHI', s_reg)
+    x = put_cell(x, 'J2', '<c r="J2" s="%s" t="inlineStr"><is><t>Notes</t></is></c>' % style_of(x, 'I2'))
+    wr('xl/worksheets/sheet5.xml', x)
+
+    # --- General Information: the Owner column of Table17 is empty for all 79 airports; County is not
+    x = rd(gi_part_name())
+    x = put_cell(x, 'C12', '<c r="C12" s="%s" t="inlineStr"><is><t>County:</t></is></c>' % style_of(x, 'C11'))
+    x = put_cell(x, 'D12', '<c r="D12" s="%s" t="str"><f>%s</f><v>N/A</v></c>'
+                 % (style_of(x, 'D11'), esc('IF(D9="","N/A",VLOOKUP(Airport_Name,Table17[],4))')))
+    wr(gi_part_name(), x)
+
+
+def gi_part_name():
+    return 'xl/worksheets/sheet4.xml'
+
 
 if __name__ == '__main__':
     main(sys.argv[1], sys.argv[2], mbt_mode=('--mbt' in sys.argv))

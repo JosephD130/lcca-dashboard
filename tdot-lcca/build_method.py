@@ -37,10 +37,19 @@ SECTIONS = [
   ['Item cost', 'Alt sheet G13:G22', '=IF(B13<>0,F13*E13,0)',
    'The quantity you type in column E times the unit cost the item carries on Pay_Items. Ten item lines are available.',
    'Alternative worksheet'],
-  ['Unit cost, item number, unit', 'Alt sheet B, D and F columns', '=VLOOKUP(C13,CHOOSE({1,2},Table2[Pay Item Description],Table2[Unit Cost]),2,0)',
+  ['Unit cost, item number, unit', 'Alt sheet B, D and F columns',
+   '=IF(C13="","N/A",IF(INDEX(UnitCostGrid,MATCH(C13,PayItemKeys,0),$I$11)="",INDEX(UnitCostGrid,MATCH(C13,PayItemKeys,0),1),'
+   'INDEX(UnitCostGrid,MATCH(C13,PayItemKeys,0),$I$11)))',
    'Unit costs are never typed on an alternative sheet. Picking a description in column C pulls the item number, the '
-   'unit and the price from Pay_Items, so a price change for every future project is one edit on Pay_Items column F.',
-   'Pay_Items (Table2), column F'],
+   'unit and the price from Pay_Items, so a price change for every future project is one edit on Pay_Items. '
+   'UnitCostGrid is Table2[[Unit Cost]:[East]], the four price columns; I11 turns the division picked in C11 into '
+   'which of them to read.', 'Pay_Items (Table2), columns F to I'],
+  ['Which division the alternative is priced from', 'Alt sheet C11 and I11',
+   '=IFERROR(MATCH($C$11,PriceSources,0),1)',
+   'C11 is a list: Regular, Middle, West or East. Regular is the statewide Unit Cost column and is what a new '
+   'alternative ships with. Any item the chosen division leaves blank is priced from Unit Cost instead, so filling '
+   'one regional cost prices that item regionally and changes nothing else. An empty C11 reads as Regular.',
+   'v1.2.0, Pay_Items columns F to I'],
   ['Pay-item subtotal', 'Alt sheet G24', '=SUM(G13:G22)',
    'The ten item lines. (In v1.1.2 this summed G14:G22 and silently dropped item 1.)', 'v1.2.0 fix 1'],
   ['Mobilization', 'Alt sheet G25', "=(%s!$D$36/100)*G24" % GI,
@@ -196,7 +205,11 @@ SECTIONS = [
    'Concrete recovers 25 percent of total initial cost, asphalt 12.5 percent of one overlay. Concrete therefore '
    'carries a large year-30 credit that moves with the discount rate in step with its costs, which is why the concrete '
    'curves in chart 2 are nearly flat while the asphalt curve falls. In some projects this line alone decides the '
-   'answer.', 'Pre-existing policy; flagged for decision'],
+   'answer. The method is the remaining-life rule in AAPTP 06-06 and FAA guidance; the two fractions are this '
+   'workbook\'s own. PCC checks out: 10 of 40 years left at year 30 is 25 percent. HMA does not. Table 1 places the '
+   'mill and overlay at year 20, so a 16-year overlay life leaves 6 of 16 years at year 30, which is 37.5 percent, '
+   'not 12.5. Two of 16 is what an overlay placed at year 16 would leave, the rehab year in Table 3.',
+   'Pre-existing policy; flagged for decision'],
   ['Lost revenue is gross revenue', 'RevenueData; Alt sheet F2', '',
    'The whole of the airport\'s fuel, tenant and other revenue is treated as lost for every closure day. A percentage '
    'lost by category would be more defensible.', 'Pre-existing; flagged for decision'],
@@ -210,11 +223,11 @@ SECTIONS = [
   ['Asphalt unit weight for the section read-back', 'Summary J81', '',
    '145 pcf, the value that reproduces the Murfreesboro section exactly. It affects the displayed thickness only, '
    'never a cost.', 'Summary, v1.2.0'],
-  ['Unit costs are statewide, not regional', 'Pay_Items columns G, H, I', '',
-   'The sheet carries a header "Average Pay Item Unit Cost" spanning Middle, West and East columns, and all three are '
-   'empty. Every alternative prices off the single Unit Cost column, so a West-division project is estimated on the '
-   'same numbers as a Middle one. The locator map on the Summary colors the airports by division so the project\'s '
-   'region sits beside the pricing basis.', 'Pre-existing; worth a decision'],
+  ['The division columns are wired but empty', 'Pay_Items columns G, H, I', '',
+   'Middle, West and East are read from v1.2.0: each alternative picks one in C11 and prices from it. They ship '
+   'empty, and a blank cell falls back to the statewide Unit Cost, so until Aeronautics fills them every division '
+   'still prices the same. The locator map on the Summary colors the airports by division, and General Information '
+   'D13 names the one the selected airport sits in.', 'v1.2.0; the numbers are still a decision'],
   ['Unit costs date from the 2022 framework', 'Pay_Items column F', '',
    'The Typical Values sheet compares them with recent bid prices. The asphalt defaults look low against 2025 '
    'southeastern bids.', 'Typical Values, section 3'],

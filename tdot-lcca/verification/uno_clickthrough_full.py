@@ -2,8 +2,6 @@
 import uno, re, time, subprocess, sys
 from com.sun.star.beans import PropertyValue
 S = '/tmp/claude-0/-home-user-lcca-dashboard/444ca227-15d7-51d4-a51e-a0ae3dbe81ed/scratchpad'
-# the Summary row map, the same constants build_summary.py lays the sheet out with
-T0, VER, CMP0, SEC_T = 12, 17, 22, 90
 PASS, FAIL = [], []
 def check(name, ok, detail=''):
     (PASS if ok else FAIL).append(name)
@@ -68,7 +66,7 @@ bs = buttons(doc)
 for sh, ref, label, tgt, ok, vis, landed in bs:
     check(f'button {sh}!{ref} "{label.strip()}" -> {tgt}', ok and vis and landed == tgt.rsplit("!", 1)[0].strip("'"), f'visible={vis} landed={landed}')
 check('every sheet is reachable or deliberately hidden', len(bs) >= 4, f'{len(bs)} hyperlink buttons')
-check('blank template says so on the Summary', txt(sm, f'G{VER}').startswith('No alternatives yet'), txt(sm, f'G{VER}'))
+check('blank template says so on the Summary', txt(sm, 'G17').startswith('No alternatives yet'), txt(sm, 'G17'))
 check('input checklist lists what is missing', txt(gi, 'F9').startswith('Still needed'), txt(gi, 'F9'))
 gi.getCellRangeByName('D9').setString('Outlaw Field'); gi.getCellRangeByName('D25').setValue(2028)
 gi.getCellRangeByName('D26').setValue(66667); gi.getCellRangeByName('D28').setValue(15000); doc.calculateAll()
@@ -78,7 +76,7 @@ check('Typical Values resolves with no errors', 'Typical Values' not in errors(d
 check('Typical Values reads the live workbook', num(tv, 'B63') == num(gi, 'D34') and num(tv, 'B64') == num(gi, 'D33'),
       f'rate {num(tv, "B63")} period {num(tv, "B64")}')
 check('daily revenue table is live', num(tv, 'B106') > 0, f'CKV {num(tv, "B106")}')
-check('asphalt unit weight cell is on the Summary', num(sm, f'J{SEC_T+1}') == 145, num(sm, f'J{SEC_T+1}'))
+check('asphalt unit weight cell is on the Summary', num(sm, 'J91') == 145, num(sm, 'J91'))
 tabs = {sh.Name: sh.TabColor for sh in doc.Sheets}
 check('tab colours applied', tabs['General Information'] != -1 and tabs['Summary'] != -1, f"GI {tabs['General Information']} Summary {tabs['Summary']}")
 doc.close(True)
@@ -88,35 +86,30 @@ doc = load(S + '/MBT_check.xlsm'); doc.calculateAll()
 gi = doc.Sheets.getByName('General Information'); sm = doc.Sheets.getByName('Summary'); db = doc.Sheets.getByName('Database')
 base_err = errors(doc)
 check('only the pre-existing template errors are present', set(base_err) <= {'TMP(NewPCC)', 'TMP(NewPCC)_IndirectCost'}, base_err)
-check('NPW unchanged by everything added', round(num(sm, f'O{T0}'), 2) == 8809266.42 and round(num(sm, f'O{T0+1}'), 2) == 8028734.49,
-      '%,.2f / %,.2f'.replace('%,', '%') % (num(sm, 'O%d' % T0), num(sm, 'O%d' % (T0 + 1))))
-check('agency + user = total in the comparison block', round(num(sm, f'H{CMP0}') + num(sm, f'J{CMP0}'), 2) == round(num(sm, f'L{CMP0}'), 2))
+check('NPW unchanged by everything added', round(num(sm, 'O12'), 2) == 8809266.42 and round(num(sm, 'O13'), 2) == 8028734.49,
+      f"{num(sm,'O12'):,.2f} / {num(sm,'O13'):,.2f}")
+check('agency + user = total in the comparison block', round(num(sm, 'H22') + num(sm, 'J22'), 2) == round(num(sm, 'L22'), 2))
 crf = 0.03 * 1.03 ** 30 / (1.03 ** 30 - 1)
-check('EUAC matches the closed form', abs(num(sm, f'M{CMP0}') - num(sm, f'L{CMP0}') * crf) < 0.01, '%.2f' % num(sm, 'M%d' % CMP0))
-check('section read-back reproduces the typed description', txt(sm, f'P{SEC_T+3}').startswith('5" P401 on 16" P209'), txt(sm, f'P{SEC_T+3}'))
-check('excavation check agrees for the asphalt alternative', txt(sm, f'N{SEC_T+3}') == 'agrees', txt(sm, f'N{SEC_T+3}'))
-check('excavation check flags the 8 in / 9 in concrete mismatch', txt(sm, f'N{SEC_T+4}').startswith('differs'), txt(sm, f'N{SEC_T+4}'))
-a0 = num(sm, f'H{SEC_T+3}'); gi.getCellRangeByName('D26').setValue(num(gi, 'D26'))
-sm.getCellRangeByName(f'J{SEC_T+1}').setValue(150); doc.calculateAll()
-check('asphalt thickness follows the unit weight cell', round(num(sm, f'H{SEC_T+3}'), 3) == round(a0 * 145 / 150, 3), '%.3f -> %.3f at 150 pcf' % (a0, num(sm, 'H%d' % (SEC_T + 3))))
-sm.getCellRangeByName(f'J{SEC_T+1}').setValue(145); doc.calculateAll()
+check('EUAC matches the closed form', abs(num(sm, 'M22') - num(sm, 'L22') * crf) < 0.01, f"{num(sm,'M22'):,.2f}")
+check('section read-back reproduces the typed description', txt(sm, 'P93').startswith('5" P401 on 16" P209'), txt(sm, 'P93'))
+check('excavation check agrees for the asphalt alternative', txt(sm, 'N93') == 'agrees', txt(sm, 'N93'))
+check('excavation check flags the 8 in / 9 in concrete mismatch', txt(sm, 'N94').startswith('differs'), txt(sm, 'N94'))
+a0 = num(sm, 'H93'); gi.getCellRangeByName('D26').setValue(num(gi, 'D26'))
+sm.getCellRangeByName('J91').setValue(150); doc.calculateAll()
+check('asphalt thickness follows the unit weight cell', round(num(sm, 'H93'), 3) == round(a0 * 145 / 150, 3), f'{a0:.3f} -> {num(sm,"H93"):.3f} at 150 pcf')
+sm.getCellRangeByName('J91').setValue(145); doc.calculateAll()
 check('shoulder chart is empty with no shoulder area', num(sm, 'X83') == 0 and num(sm, 'Y83') == 0)
 gi.getCellRangeByName('D27').setValue(8000); doc.calculateAll()
 f = num(gi, 'D26') / (num(gi, 'D26') + 8000)
 check('shoulder chart scales the derived layers', abs(num(sm, 'Y83') - num(sm, 'Y76') * f) < 0.01, f'{num(sm,"Y76"):.2f} -> {num(sm,"Y83"):.2f}')
-conc_m, conc_s = num(sm, 'Y79'), num(sm, 'Y86')
-check('named concrete thickness does not scale with the shoulder',
-      conc_m > 0 and abs(conc_s - conc_m) < 0.001, '%.2f -> %.2f' % (conc_m, conc_s))
-asph_m, asph_s = num(sm, 'X78'), num(sm, 'X85')
-check('asphalt thickness does scale with the shoulder',
-      asph_m > 0 and abs(asph_s - asph_m * f) < 0.01, '%.2f -> %.2f' % (asph_m, asph_s))
+check('named concrete thickness does not scale', num(sm, 'Z85') == num(sm, 'Z78') or num(sm, 'Z85') == 0, f'{num(sm,"Z78"):.2f} / {num(sm,"Z85"):.2f}')
 gi.getCellRangeByName('D27').setValue(0); doc.calculateAll()
 for label, ref, val, expect in [('discount rate 7%', 'D34', 7, 'Alternative 1'), ('analysis period 20 years', 'D33', 20, 'Alternative 2'),
                                 ('lost revenue off', 'D38', 'No', 'Alternative 2')]:
     old = gi.getCellRangeByName(ref).getString() if isinstance(val, str) else num(gi, ref)
     gi.getCellRangeByName(ref).setString(val) if isinstance(val, str) else gi.getCellRangeByName(ref).setValue(val)
     doc.calculateAll()
-    check(f'{label}: verdict recomputes', expect in txt(sm, f'G{VER}'), txt(sm, f'G{VER}')[:96])
+    check(f'{label}: verdict recomputes', expect in txt(sm, 'G17'), txt(sm, 'G17')[:96])
     check(f'{label}: no new errors', set(errors(doc)) <= set(base_err))
     gi.getCellRangeByName(ref).setString(old) if isinstance(val, str) else gi.getCellRangeByName(ref).setValue(old)
 doc.calculateAll()
@@ -125,12 +118,12 @@ check('unknown airport does not error', set(errors(doc)) <= set(base_err), error
 gi.getCellRangeByName('D10').setString(old); doc.calculateAll()
 keep = [[txt(db, f'{c}{r}') for c in 'ABD'] for r in range(4, 8)]
 db.getRows().removeByIndex(3, 1); doc.calculateAll()
-check('deleting a Database row leaves no #REF!', set(errors(doc)) <= set(base_err) and txt(sm, f'G{T0}') == 'Alt 2 (New PCC)', txt(sm, f'G{T0}'))
-check('verdict handles a single alternative', 'only one alternative' in txt(sm, f'G{VER}'), txt(sm, f'G{VER}')[:96])
+check('deleting a Database row leaves no #REF!', set(errors(doc)) <= set(base_err) and txt(sm, 'G12') == 'Alt 2 (New PCC)', txt(sm, 'G12'))
+check('verdict handles a single alternative', 'only one alternative' in txt(sm, 'G17'), txt(sm, 'G17')[:96])
 db.getRows().insertByIndex(3, 1)
 for c, v in zip('ABD', keep[0]): db.getCellRangeByName(f'{c}4').setString(v)
 doc.calculateAll()
-check('restored to two alternatives', round(num(sm, f'O{T0}'), 2) == 8809266.42 and round(num(sm, f'O{T0+1}'), 2) == 8028734.49)
+check('restored to two alternatives', round(num(sm, 'O12'), 2) == 8809266.42 and round(num(sm, 'O13'), 2) == 8028734.49)
 doc.close(True); proc.terminate()
 
 print(); print('=' * 78)

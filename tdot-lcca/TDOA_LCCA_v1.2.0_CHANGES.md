@@ -151,10 +151,10 @@ updated; a private copy of the old macro would need the same edit.
   printed page.
 - The Unit Cost column is marked as the input it is: grey fill, currency format, a box. Nothing about
   the values changed, and Table2 (C2:I59) with all 56 pay items is untouched.
+- Middle, West and East are marked as fillable too, in a lighter grey, now that they are read.
 - The part headings in column A read as bands down the left of the table.
-- Four notes under the table say what the sheet drives, that the Middle, West and East average-cost
-  columns are empty so a West division project is priced on statewide numbers, that 29 of the 56 pay
-  items carry no unit cost at all and will price at $0 if used, and where the sources are.
+- Four notes under the table say what the sheet drives, how the division columns are used, that 29 of
+  the 56 pay items carry no unit cost at all and will price at $0 if used, and where the sources are.
 
 ### Maintenance Policies
 
@@ -189,6 +189,56 @@ square.
   Aeronautics address block moved to the left margin under the band, where the logo used to sit.
 
 
+## 3f. The pay item picker and the division an alternative is priced from
+
+### The picker reads now
+
+Each pay item picker is a Forms 2.0 combo box listing two columns, `Pay_Items!C3:D59`: the pay item
+number and its description. A Forms combo box sizes its drop-down list to the control unless
+ListWidth says otherwise, and with no explicit column widths it splits that evenly, so each column
+got about 1.45 in. Ten characters of pay item number fit in that; a 76-character description did not,
+which is why most of the list read as truncated fragments.
+
+- Every one of the 105 pickers now carries a ListWidth of 9 in, so an even split gives each column
+  4.5 in, enough for the longest description in the catalogue. The number stays in the list.
+- The picker column (C) on every alternative template goes from 41.7 to 53.7 characters wide, and each
+  combo box is re-anchored to end exactly at that column's edge, so what you picked reads in the cell
+  as well as in the list. Columns A and B give up the width, so the table prints the same.
+- This is a change inside the persisted ActiveX streams ([MS-OFORMS] MorphDataControl): the property
+  mask gains fListWidth, the DataBlock gains the four bytes that property needs, and cbMorphData grows
+  to match. All 105 were re-parsed afterwards with an independent implementation of the format and
+  each one consumes exactly to the end of its stream.
+
+### Which division the alternative is priced from
+
+Pay_Items has carried Middle, West and East columns beside Unit Cost since v1.1.2 and nothing read
+them. They are read from v1.2.0.
+
+- Every alternative worksheet has a **Price from** list in C11, one row above the pay item table:
+  Regular, Middle, West or East. A new alternative ships set to Regular, which is the statewide Unit
+  Cost column, so nothing changes until someone picks otherwise.
+- All 156 unit cost lookups on the five templates now read the chosen column. Any item the chosen
+  division leaves blank is priced from Unit Cost instead, so filling one regional cost prices that one
+  item regionally and changes nothing else. An empty C11 reads as Regular rather than producing an error.
+- The note beside the list names the division the selected airport sits in, read from General
+  Information D13, so the person choosing can see which column matches the project.
+- Three workbook names carry the lookup: `PriceSources` (the four labels), `UnitCostGrid`
+  (`Table2[[Unit Cost]:[East]]`) and `PayItemKeys` (`Table2[Pay Item Description]`). I11 on each sheet
+  turns the choice into a column number; column I is a hidden spacer on every template.
+- Every result in this release is unchanged as a consequence: both worked examples and the Murfreesboro
+  regression recompute to the same numbers they did before, because the regional columns ship empty and
+  Regular is the same column the old formula read.
+
+### Two things fixed alongside
+
+- TMP(HMARehab) was the one template whose working columns (I to BL) were never hidden, so an HMA
+  overlay alternative opened showing its internal cost blocks and chart data. They are hidden now, and
+  that sheet's chart is set to plot hidden cells so it still draws.
+- General Information's **Airport Owner** row read `Table17` column 6, which is empty for all 79
+  airports, so it always showed blank. It now reads column 4 and is labelled **County**, which is
+  populated for every airport. State Region below it has not moved, so the Summary still finds it.
+
+
 ## 4. Housekeeping
 
 - Instructions text box: ActiveX "blocked content" steps added (Trust Center > ActiveX Settings,
@@ -219,6 +269,15 @@ square.
   Upper Cumberland HMA wins under every variant, so there the rule moves the margin (from $586K to
   $2.1M on a common rule) but not the winner. Left as policy; the decision workbook's salvage
   multiplier and the new sensitivity block make it visible.
+  The *method* is not ours: AAPTP 06-06 and FAA guidance prescribe remaining-life salvage, a prorated
+  share of the last treatment. The two *fractions* are the workbook's own, inherited from the 2022
+  APTech framework. PCC's checks out arithmetically: 10 of 40 years left at year 30 is 25%. HMA's does
+  not. Table 1 places the mill and overlay at year 20, so a 16-year overlay life leaves 6 of 16 years
+  at year 30, which is 37.5%, not 12.5%. Two of 16 is what an overlay placed at **year 16** would
+  leave, the rehabilitation year in Table 3 rather than Table 1. Correcting HMA to 37.5% narrows
+  Murfreesboro from PCC by $780,532 to PCC by $543,376 and widens Upper Cumberland from HMA by
+  $585,697 to HMA by $922,507. Neither winner changes, but the number is wrong on its own terms and
+  should be either corrected or deliberately restated as a policy haircut.
 - Lost revenue counts gross fuel sales and tenant rent as lost during a runway closure. A per-category
   "% lost during closure" factor on RevenueData would be more defensible.
 - FAA AIP discount rate: PGL 22-01 (June 2022) replaced the fixed 7% with OMB A-94 real rates (2.0% for
@@ -240,6 +299,17 @@ square.
 6. Click the navigation buttons on General Information, on the Summary and on an alternative sheet.
 7. On the Summary, check the pavement section block: the derived thickness should match the section you
    designed, and the excavation check should agree with it.
+8. On an alternative sheet, open a pay item picker in column C. The list should show the pay item
+   number and the whole description, not a truncated fragment. Tell us if it still reads short: the
+   list width is set explicitly but the split between the two columns is left to Excel, and there is a
+   further property we can set if Excel splits it against the control rather than the list.
+9. On the same sheet, set **Price from** (C11) to Middle and put a cost in Pay_Items column G for one
+   item you used. That item should reprice; everything else should hold at the statewide Unit Cost.
+
+`TDOA_LCCA_v1.2.0_dropdown-test.xlsm` is the same build with TMP(NewHMA) left visible, so steps 8 and
+9 can be done in about ten seconds without enabling macros or running Alternative Setup: open it, go
+to the TMP(NewHMA) tab, click a picker in column C. Nothing on that copy feeds a real analysis; it
+exists only for that check and can be deleted afterwards.
 
 Scripted click-through done here (LibreOffice, UNO API): every button target exists and lands on a
 visible sheet; changing D34 to 7 flips the verdict to Alternative 1 (the 7% flag already warned);
@@ -259,3 +329,12 @@ the year-indexed columns reconcile to the NPW to the dollar, and the Summary tab
 and six charts populate from the MBT data (render in `Summary_sheet_MBT_render.png`). Not
 verified: the charts on the alternative worksheets in Excel itself (LibreOffice does not render
 charts on the ActiveX-bearing sheets); step 3 above covers it.
+
+For the v1.2.0 pay item and pricing changes specifically: 139 static checks on the built package all
+pass; all 105 combo box streams were re-parsed with an independent implementation of [MS-OFORMS] and
+each consumes exactly to the end of its stream; a scripted run copies an alternative template, prices
+it at Regular, fills a Middle cost for one item and confirms that item reprices while every other item
+holds at Unit Cost, that East with nothing filled prices everything at Unit Cost, and that an empty
+picker reads as Regular rather than producing an error (10 checks, all pass). Both worked examples and the
+Murfreesboro regression recompute to the same numbers as before the change. Not verified here: how
+Excel itself divides the drop-down list between the two columns, which is what step 8 above asks for.

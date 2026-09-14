@@ -55,7 +55,7 @@ aaptp acrp apmm apms astm atpb capm ctpb faarfield ncat duah nasr
 # --- domain shorthand that appears in headings and notes
 centerline sitework constructability tdoa incl verif evid
 # --- names the builders write into file and defined-name text
-hmarehab newhma newpcc salvagebase revenuedata lostrevenue directcost indirectcost dailyrevenue
+hmarehab newhma newpcc salvagebase revenuedata lostrevenue directcost indirectcost dailyrevenue unitcostgrid payitemkeys pricesources listwidth datablock morphdatacontrol oforms fillable acpa airnav mndot nist pdfs sasp geotextiles
 closuredays exportlccakml altchart imagerun xlfn xlnm datamashup sharepoint unpatched overridable
 worths befores diff calc stat repo intro const dirname screenshot screenshots hashfile certutil
 pypi rels workflow pptxgen pptxgenjs

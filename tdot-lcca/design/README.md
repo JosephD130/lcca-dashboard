@@ -10,7 +10,7 @@ experience can be reviewed without opening Excel:
 |---|---|
 | `Main.dc.html` | General Information, v1.2.0 (how-to card, live input checklist, section bands, buttons). Carries a switch between an empty project and the Outlaw Field test project. |
 | `Summary.dc.html` | Summary sheet, v1.2.0 (results table, verdict line, RealCost-style comparison block, five charts) |
-| `AltSheet.dc.html` | An alternative worksheet, v1.2.0 (navigation bar, input guide, pay-item table) |
+| `AltSheet.dc.html` | An alternative worksheet, v1.2.0 (navigation bar, input guide, the Price from control, pay-item table) |
 | `TypicalValues.dc.html` | The new Typical Values reference sheet (unit-cost section) |
 | `BeforeGeneralInfo.dc.html` | General Information as it is in v1.1.2 |
 | `BeforeSummary.dc.html` | Summary as it is in v1.1.2 (five columns and one chart) |
