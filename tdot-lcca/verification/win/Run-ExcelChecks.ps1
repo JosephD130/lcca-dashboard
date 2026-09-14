@@ -68,6 +68,31 @@ function Prop($obj, [string]$name, $fallback = $null) {
   try { return $obj.$name } catch { return $fallback }
 }
 
+function SetProp($obj, [string]$name, $value) {
+  try { $obj.$name = $value; return $true } catch { return $false }
+}
+
+# The tables and their column names, read straight out of the package. A repair is Excel throwing
+# something away, so comparing this between the file we handed Excel and the file Excel writes back
+# catches a repair without depending on a log file turning up.
+function Get-Tables([string]$xlsx) {
+  Add-Type -AssemblyName System.IO.Compression.FileSystem -ErrorAction SilentlyContinue
+  $zip = [IO.Compression.ZipFile]::OpenRead($xlsx)
+  try {
+    $out = @{}
+    foreach ($e in $zip.Entries) {
+      if ($e.FullName -notmatch '^xl/tables/table\d+\.xml$') { continue }
+      $sr = New-Object IO.StreamReader($e.Open())
+      $x  = $sr.ReadToEnd(); $sr.Dispose()
+      $nm = ([regex]::Match($x, '<table [^>]*?name="([^"]+)"')).Groups[1].Value
+      $cols = @([regex]::Matches($x, '<tableColumn [^>]*?name="([^"]*)"') |
+                ForEach-Object { $_.Groups[1].Value })
+      if ($nm) { $out[$nm] = ($cols -join ' | ') }
+    }
+    return $out
+  } finally { $zip.Dispose() }
+}
+
 # ---------------------------------------------------------------------------- preflight
 $here = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
 if (-not $OutDir)   { $OutDir   = Join-Path $here 'out' }
@@ -141,12 +166,20 @@ try {
     Check 'desktop Excel is installed and can be automated' $false $_.Exception.Message
     throw 'no Excel'
   }
-  $excel.Visible            = $false
-  $excel.DisplayAlerts      = $false
-  $excel.ScreenUpdating     = $false
-  $excel.AutomationSecurity = 1      # msoAutomationSecurityLow: let the workbook's macros load
-  $excel.Calculation        = -4135  # xlCalculationManual, so nothing recalcs before we ask
-  Check "Excel $(Prop $excel 'Version') build $(Prop $excel 'Build') is driving this run" $true ''
+  [void](SetProp $excel 'Visible' ([bool]$Interactive))
+  # with no human watching, a modal repair dialog would hang the run; with -Interactive we want to
+  # see it, so alerts are on and the script asks about it after the open
+  [void](SetProp $excel 'DisplayAlerts' ([bool]$Interactive))
+  [void](SetProp $excel 'ScreenUpdating' $false)
+  [void](SetProp $excel 'EnableEvents' $true)
+  [void](SetProp $excel 'AutomationSecurity' 1)   # msoAutomationSecurityLow: let the macros load
+  # Application.Calculation does not exist until a workbook is open. Excel answers 0x800A03EC if
+  # you set it before then, so hold a scratch workbook open across the switch.
+  $scratch = $null
+  try { $scratch = $excel.Workbooks.Add() } catch { }
+  $manual = SetProp $excel 'Calculation' -4135     # xlCalculationManual
+  Check "Excel $(Prop $excel 'Version') build $(Prop $excel 'Build') is driving this run" $true `
+    ("calculation set to manual: $manual")
 
   # -------------------------------------------------------------------------- 1. repair on open
   Guard 'the open check' {
@@ -157,14 +190,36 @@ try {
     $before = Repair-Snapshot
     $script:wb = $excel.Workbooks.Open($working, 0, $false)  # UpdateLinks = 0, ReadOnly = false
     $script:openedBooks += $script:wb
+    if ($scratch) { try { $scratch.Close($false) } catch { } ; $scratch = $null }
     $logs = Repair-New $before
     Check 'Excel opened it without writing a repair log' ($logs.Count -eq 0) ($logs -join '; ')
     foreach ($l in $logs) {
       Copy-Item $l (Join-Path $OutDir (Split-Path $l -Leaf)) -Force -ErrorAction SilentlyContinue
       Write-Host ('      repair log says: ' + (Get-Content $l -Raw -ErrorAction SilentlyContinue))
     }
-    Check 'and did not mark it dirty on load, which a silent repair does' `
-      (Prop $script:wb 'Saved' $false) ("Saved=" + (Prop $script:wb 'Saved'))
+    Write-Host ("      (Saved=" + (Prop $script:wb 'Saved') +
+                " after load; Workbook_Open hides two sheets, so False is expected here)")
+
+    # A repair log is not guaranteed to appear with alerts suppressed, so also ask Excel to write
+    # the workbook back out and compare the tables. Excel dropping or renaming a table column is
+    # exactly the repair this workbook hit before.
+    $resaved = Join-Path $OutDir 'excel-resaved.xlsm'
+    if (Test-Path $resaved) { Remove-Item $resaved -Force -ErrorAction SilentlyContinue }
+    $script:wb.SaveCopyAs($resaved)
+    $wantTables = Get-Tables $Workbook
+    $gotTables  = Get-Tables $resaved
+    $diff = @()
+    foreach ($k in $wantTables.Keys) {
+      if (-not $gotTables.ContainsKey($k)) { $diff += "$k was dropped" }
+      elseif ($gotTables[$k] -ne $wantTables[$k]) { $diff += "$k columns: '$($gotTables[$k])' vs '$($wantTables[$k])'" }
+    }
+    foreach ($k in $gotTables.Keys) { if (-not $wantTables.ContainsKey($k)) { $diff += "$k appeared" } }
+    Check "all $($wantTables.Count) tables survive a round trip through Excel with their columns intact" `
+      ($diff.Count -eq 0) (@($diff | Select-Object -First 4) -join '; ')
+    if ($Interactive) {
+      $said = Read-Host '  Did Excel show a repair or validation message when it opened? y / n'
+      Check 'no repair or validation message appeared on screen' ("$said" -notmatch '^(y|Y)') "you answered '$said'"
+    }
     $rehab = $null
     try { $rehab = $script:wb.Worksheets('TMP(HMARehab)') } catch { }
     Check 'the Workbook_Open macro ran and hid the two rehab templates' `
@@ -285,8 +340,8 @@ try {
         $ex = $excel.Workbooks.Open($exWb, 0, $false)
         $script:openedBooks += $ex
         Check 'Excel opened the worked example without a repair log' ((Repair-New $b2).Count -eq 0) ''
-        $excel.Calculation = -4105            # xlCalculationAutomatic
-        $excel.CalculateFullRebuild()
+        [void](SetProp $excel 'Calculation' -4105)   # xlCalculationAutomatic
+        try { $excel.CalculateFullRebuild() } catch { $excel.Calculate() }
         $bad = @()
         foreach ($c in $base.cells) {
           $ws = $null
@@ -323,9 +378,9 @@ try {
   if ($Interactive) {
     Guard 'the New Study step' {
       Section 'INTERACTIVE: NEW STUDY'
-      $excel.Visible = $true
-      $excel.ScreenUpdating = $true
-      $script:wb.Activate()
+      [void](SetProp $excel 'Visible' $true)
+      [void](SetProp $excel 'ScreenUpdating' $true)
+      try { $script:wb.Activate() } catch { }
       $giBefore = "$($script:wb.Worksheets('General Information').Range('D9').Value2)"
       $stage = Join-Path $OutDir 'newstudy'
       if (-not (Test-Path $stage)) { New-Item -ItemType Directory -Path $stage -Force | Out-Null }
@@ -354,8 +409,8 @@ try {
 
     Guard 'the Alternative Setup step' {
       Section 'INTERACTIVE: ALTERNATIVE SETUP'
-      $excel.Visible = $true
-      $script:wb.Activate()
+      [void](SetProp $excel 'Visible' $true)
+      try { $script:wb.Activate() } catch { }
       try { $script:wb.Worksheets('General Information').Activate() } catch { }
       $sheetsBefore = @(); foreach ($s2 in $script:wb.Worksheets) { $sheetsBefore += $s2.Name }
       Write-Host ''

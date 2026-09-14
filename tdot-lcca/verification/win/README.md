@@ -69,9 +69,12 @@ In `-OutDir`:
 
 ## What it checks
 
-**Does Excel repair the file** — snapshots the places Excel writes repair logs, opens the
-workbook, and fails if a new one appears. Also flags a workbook that comes up already dirty,
-which is what a silent repair looks like.
+**Does Excel repair the file** — two ways, because a repair log is not guaranteed to appear when
+alerts are suppressed. It snapshots the places Excel writes repair logs and fails if a new one
+turns up, and independently asks Excel to write the workbook back out and compares every table and
+its column names against the original. A repair is Excel throwing something away, and a dropped or
+renamed table column is exactly the repair this workbook hit before. With `-Interactive` alerts are
+left on, so any repair message appears on screen and the script asks whether you saw one.
 
 **Macros** — that the Alternative Setup form and the New Study module are in the project, that
 `NewStudy`, `ClearStudy`, `SetupSummaryWs` and `LoadAlternativeList` are defined, and that no
