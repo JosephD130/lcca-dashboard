@@ -92,10 +92,16 @@ draw = rd('xl/drawings/drawing10.xml')
 anchors = [(int(c), int(r)) for c, r in
            re.findall(r'<xdr:from><xdr:col>(\d+)</xdr:col><xdr:colOff>\d+</xdr:colOff>'
                       r'<xdr:row>(\d+)</xdr:row>', draw)]
-want = [(6, C1 - 1), (13, C1 - 1), (6, C2 - 1), (13, C2 - 1), (6, C3 - 1), (13, C3 - 1),
-        (6, CH67 - 1), (13, CH67 - 1)]
+# the laptop band: two key charts side by side, then four supporting, then the
+# two section charts - all inside the 1,218 px the narrowed columns G:R now span
+want = [(6, C1 - 1), (12, C1 - 1),                                  # key pair
+        (6, C2 - 1), (8, C2 - 1), (12, C2 - 1), (15, C2 - 1),       # four supporting
+        (6, C3 - 1), (8, C3 - 1)]                                   # the two section charts
 check('the eight Summary charts are anchored where the row map says',
       all(a in anchors for a in want), sorted(set(anchors)))
+check('no chart starts beyond the dashboard band (column R)',
+      all(c <= 15 for c, r in anchors if r in (C1 - 1, C2 - 1, C3 - 1)),
+      sorted(c for c, r in anchors if r in (C1 - 1, C2 - 1, C3 - 1)))
 check('the chart the form maintains is parked below the dashboard', (6, VBACH - 1) in anchors,
       [a for a in anchors if a[0] == 6])
 check('chart-data block labelled do not edit', 'do not edit' in str(ws.cell(1, 23).value))
