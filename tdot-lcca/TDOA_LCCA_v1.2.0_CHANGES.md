@@ -335,6 +335,20 @@ pass; all 105 combo box streams were re-parsed with an independent implementatio
 each consumes exactly to the end of its stream; a scripted run copies an alternative template, prices
 it at Regular, fills a Middle cost for one item and confirms that item reprices while every other item
 holds at Unit Cost, that East with nothing filled prices everything at Unit Cost, and that an empty
-picker reads as Regular rather than producing an error (10 checks, all pass). Both worked examples and the
-Murfreesboro regression recompute to the same numbers as before the change. Not verified here: how
-Excel itself divides the drop-down list between the two columns, which is what step 8 above asks for.
+picker reads as Regular rather than producing an error (10 checks, all pass). A second, end-to-end run
+on the populated four-alternative McKellar-Sipes example doubles the Middle price of every item one
+alternative uses and confirms the chain all the way to the Summary: nothing moves while that sheet
+says Regular, switching it to Middle exactly doubles its initial construction and raises its net
+present worth, the other three alternatives are untouched, and switching back restores every number to
+the cent (8 checks, all pass).
+
+Both worked examples were re-run against the built file and deep-compared with the pre-change results,
+leaf by leaf and numbers to the cent: 1,124 values for Gatlinburg and 1,368 for McKellar-Sipes, with
+exactly one difference in each, General Information D12 going from blank to Sevier and to Madison. A
+cell-level diff of the whole workbook against the previous build shows 643 changed cells, all of them
+on the five alternative templates, General Information, Pay_Items, Typical Values and Method; the
+Summary, Database, RevenueData, Maintenance Policies, Overview and Instructions sheets are untouched.
+The printed worked example is 30 pages, unchanged, so the wider picker column costs no paper.
+
+Not verified here: how Excel itself divides the drop-down list between the two columns, which is what
+step 8 above asks for.
