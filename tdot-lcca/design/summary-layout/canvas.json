@@ -1,0 +1,27 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1483, "h": 1160,
+      "title": "Proposal — right rail, 1,480 px band" },
+    { "file": "Grid.dc.html", "x": 1600, "y": 0, "w": 1483, "h": 1340,
+      "title": "The sizing and spacing review" },
+    { "file": "OptionB.dc.html", "x": 0, "y": 1480, "w": 1239, "h": 700,
+      "title": "Option B — rail inside today's 1,240 band" },
+    { "file": "OptionC.dc.html", "x": 1400, "y": 1480, "w": 1239, "h": 760,
+      "title": "Option C — location in the frozen header" }
+  ],
+  "annotations": [
+    { "id": "t-brief", "x": 0, "y": -230, "w": 900, "kind": "title1",
+      "text": "Summary dashboard — sizing, spacing, and where the project location goes" },
+    { "id": "note-brief", "x": 0, "y": -160, "w": 900,
+      "text": "THE TARGET\nA 15.6 in FHD laptop at Windows' default 125% scaling gives Excel a grid of 1,488 x 624 px. That is the budget everything here is drawn against, and the red dashed line on each artboard is where it ends. The tweak chip above the artboard switches the line to 150% and 100%.\n\nTHREE THINGS CHANGED\nThe plots touch — a 1 px hairline instead of a 10 px gutter, so a row of charts reads as one instrument. The six tiles collapse from two rows of three into one row of six. And the project location moves off the bottom of the sheet onto the chart row, where it is the third panel beside the two key plots." },
+    { "id": "note-main", "x": 1600, "y": -160, "w": 700,
+      "text": "THE PROPOSAL\nThe band widens from 1,239 px to 1,483 by taking in the four empty columns right of R — almost exactly the width the location card needs, and it is space a 1,488 px screen already offers.\n\nFrozen band 160 px: header, project context strip, six tiles, verdict. Then 240 px of key plots with the location beside them, then 180 px of supporting plots. 580 px in all, inside the 624 budget. The section plots and every table sit below the fold.\n\nTHE TRADEOFF\nAt 150% scaling the window is only 1,232 px wide, so the rightmost 250 px would scroll sideways. Option B is the answer if that matters." },
+    { "id": "note-b", "x": 0, "y": 2230, "w": 620,
+      "text": "OPTION B — stay at 1,239 px\nSame three-panel chart row, same flush hairlines, but inside today's band: the two key plots drop from 556 to 434 px each to make room for the 371 px location card.\n\nWorks at every scaling a 15 in laptop is likely to use, including 150%. The cost is the key plots, which lose about a fifth of their width — chart 2's rate curves are the ones that feel it." },
+    { "id": "note-c", "x": 1400, "y": 2290, "w": 620,
+      "text": "OPTION C — location in the frozen header\nThe project location becomes a 60 px strip inside the frozen band: map on the left, facts in two columns, runway width as the one editable cell on the right. The two key plots then keep the full band width.\n\nIt is the only option where the location never scrolls away. The cost is height: the frozen band grows to 220 px, so the supporting plots fall below the fold on a 624 px screen, and the map has to be small." },
+    { "id": "note-impl", "x": 3200, "y": 1480, "w": 620,
+      "text": "WORTH KNOWING BEFORE ANY OF THIS IS BUILT\nMoving the project location off the foot of the sheet moves the runway-width cell with it. The Google Earth export macro reads that cell by address, so it would need updating in step with the layout.\n\nThe panel edges are pixel anchors on the drawing layer, not column boundaries, so the plots can sit flush at any width without disturbing the column widths the tables below depend on." }
+  ],
+  "launch": { "view": "canvas" }
+}
