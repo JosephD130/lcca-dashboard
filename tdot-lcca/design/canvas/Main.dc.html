@@ -20,9 +20,12 @@
     .card{background:var(--card);border:1px solid var(--line);border-radius:9px;}
     .ttl{font-size:12.5px;font-weight:700;color:var(--navy);letter-spacing:.02em;}
     .kicker{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;}
+    .sechead{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
     th,td{text-align:right;padding:8px 12px;font-size:12.5px;white-space:nowrap;}
     th{color:#c9d4e2;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
     td:first-child,th:first-child{text-align:left;}
+    .keypill{display:inline-flex;align-items:center;gap:5px;background:var(--green-soft);color:var(--win);
+      font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 9px;border-radius:20px;}
   </style>
 </helmet>
 
@@ -125,123 +128,125 @@
       </div>
     </div>
 
-    <!-- charts grid -->
-    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;">
+    <!-- KEY charts -->
+    <div class="sechead" style="margin-top:4px;">Key results &#8212; the two plots that decide it</div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;">
 
-      <!-- 1 present worth by category -->
-      <div class="card" style="padding:13px 15px;">
-        <div class="ttl">1 &#183; Present worth by category</div>
-        <svg width="100%" viewBox="0 0 400 172" style="margin-top:8px;">
-          <line x1="42" y1="130" x2="392" y2="130" stroke="#e3e8ee"/>
-          <line x1="42" y1="92" x2="392" y2="92" stroke="#eef2f6"/><line x1="42" y1="54" x2="392" y2="54" stroke="#eef2f6"/>
-          <!-- Alt1 -->
-          <g><rect x="80" y="66" width="46" height="64" fill="var(--blue-dk)"/><rect x="80" y="50" width="46" height="16" fill="var(--blue)"/>
-             <rect x="80" y="40" width="46" height="10" fill="var(--blue-lt)"/><rect x="80" y="34" width="46" height="6" fill="var(--amber)"/>
-             <rect x="80" y="130" width="46" height="7" fill="var(--grey)"/></g>
-          <!-- Alt2 -->
-          <g><rect x="177" y="42" width="46" height="88" fill="var(--blue-dk)"/><rect x="177" y="36" width="46" height="6" fill="var(--blue)"/>
-             <rect x="177" y="31" width="46" height="5" fill="var(--blue-lt)"/><rect x="177" y="28" width="46" height="3" fill="var(--amber)"/>
-             <rect x="177" y="130" width="46" height="15" fill="var(--grey)"/></g>
-          <!-- Alt3 winner -->
-          <g><rect x="274" y="46" width="46" height="84" fill="var(--blue-dk)"/><rect x="274" y="40" width="46" height="6" fill="var(--blue)"/>
-             <rect x="274" y="35" width="46" height="5" fill="var(--blue-lt)"/><rect x="274" y="32" width="46" height="3" fill="var(--amber)"/>
-             <rect x="274" y="130" width="46" height="14" fill="var(--grey)"/>
-             <rect x="272" y="30" width="50" height="117" fill="none" stroke="var(--win)" stroke-width="2" rx="2"/></g>
-          <text x="103" y="150" font-size="10" fill="#5b6675" text-anchor="middle">Alt 1</text>
-          <text x="200" y="150" font-size="10" fill="#5b6675" text-anchor="middle">Alt 2</text>
-          <text x="297" y="150" font-size="10" fill="#5b6675" text-anchor="middle">Alt 3</text>
-          <text x="36" y="134" font-size="9" fill="#9aa7b4" text-anchor="end">0</text>
-          <text x="36" y="57" font-size="9" fill="#9aa7b4" text-anchor="end">$4M</text>
+      <!-- KEY 1: present worth by category -->
+      <div class="card" style="border:1px solid #bfe0cf;border-top:3px solid var(--win);box-shadow:0 2px 8px rgba(15,123,79,.08);padding:15px 18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="ttl" style="font-size:14px;">Present worth by category</div>
+          <span class="keypill"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0f7b4f" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>Key</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--muted);margin:3px 0 6px;">Where each alternative's money goes &#8212; and why Alt 3 wins on total cost.</div>
+        <svg width="100%" viewBox="0 0 560 250">
+          <line x1="60" y1="196" x2="548" y2="196" stroke="#e3e8ee"/>
+          <line x1="60" y1="140" x2="548" y2="140" stroke="#eef2f6"/><line x1="60" y1="84" x2="548" y2="84" stroke="#eef2f6"/>
+          <g><rect x="120" y="100" width="74" height="96" fill="var(--blue-dk)"/><rect x="120" y="76" width="74" height="24" fill="var(--blue)"/>
+             <rect x="120" y="60" width="74" height="16" fill="var(--blue-lt)"/><rect x="120" y="51" width="74" height="9" fill="var(--amber)"/>
+             <rect x="120" y="196" width="74" height="10" fill="var(--grey)"/></g>
+          <g><rect x="264" y="64" width="74" height="132" fill="var(--blue-dk)"/><rect x="264" y="55" width="74" height="9" fill="var(--blue)"/>
+             <rect x="264" y="47" width="74" height="8" fill="var(--blue-lt)"/><rect x="264" y="42" width="74" height="5" fill="var(--amber)"/>
+             <rect x="264" y="196" width="74" height="22" fill="var(--grey)"/></g>
+          <g><rect x="408" y="70" width="74" height="126" fill="var(--blue-dk)"/><rect x="408" y="61" width="74" height="9" fill="var(--blue)"/>
+             <rect x="408" y="53" width="74" height="8" fill="var(--blue-lt)"/><rect x="408" y="48" width="74" height="5" fill="var(--amber)"/>
+             <rect x="408" y="196" width="74" height="21" fill="var(--grey)"/>
+             <rect x="405" y="45" width="80" height="176" fill="none" stroke="var(--win)" stroke-width="2.4" rx="3"/>
+             <text x="445" y="38" font-size="11" font-weight="700" fill="var(--win)" text-anchor="middle">$5.85M</text></g>
+          <text x="157" y="216" font-size="12" fill="#5b6675" text-anchor="middle">Alt 1</text>
+          <text x="301" y="216" font-size="12" fill="#5b6675" text-anchor="middle">Alt 2</text>
+          <text x="445" y="234" font-size="12" font-weight="700" fill="var(--win)" text-anchor="middle">Alt 3 &#10003;</text>
+          <text x="52" y="200" font-size="10" fill="#9aa7b4" text-anchor="end">0</text>
+          <text x="52" y="88" font-size="10" fill="#9aa7b4" text-anchor="end">$4M</text>
         </svg>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--muted);margin-top:4px;">
-          <span><span style="display:inline-block;width:8px;height:8px;background:var(--blue-dk);margin-right:3px;"></span>Initial</span>
-          <span><span style="display:inline-block;width:8px;height:8px;background:var(--blue);margin-right:3px;"></span>Maint</span>
-          <span><span style="display:inline-block;width:8px;height:8px;background:var(--blue-lt);margin-right:3px;"></span>Rehab</span>
-          <span><span style="display:inline-block;width:8px;height:8px;background:var(--amber);margin-right:3px;"></span>Lost rev</span>
-          <span><span style="display:inline-block;width:8px;height:8px;background:var(--grey);margin-right:3px;"></span>Salvage</span>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:6px;">
+          <span><span style="display:inline-block;width:9px;height:9px;background:var(--blue-dk);margin-right:4px;"></span>Initial</span>
+          <span><span style="display:inline-block;width:9px;height:9px;background:var(--blue);margin-right:4px;"></span>Maintenance</span>
+          <span><span style="display:inline-block;width:9px;height:9px;background:var(--blue-lt);margin-right:4px;"></span>Rehab</span>
+          <span><span style="display:inline-block;width:9px;height:9px;background:var(--amber);margin-right:4px;"></span>Lost revenue</span>
+          <span><span style="display:inline-block;width:9px;height:9px;background:var(--grey);margin-right:4px;"></span>Salvage</span>
         </div>
       </div>
 
-      <!-- 2 NPW vs rate -->
-      <div class="card" style="padding:13px 15px;">
-        <div class="ttl">2 &#183; Net present worth vs. discount rate</div>
-        <svg width="100%" viewBox="0 0 400 172" style="margin-top:8px;">
-          <line x1="42" y1="140" x2="392" y2="140" stroke="#e3e8ee"/>
-          <line x1="42" y1="40" x2="42" y2="140" stroke="#e3e8ee"/>
-          <polyline points="60,52 116,70 172,86 228,100 284,112 340,120 384,126" fill="none" stroke="var(--blue)" stroke-width="2"/>
-          <polyline points="60,96 116,94 172,92 228,93 284,95 340,98 384,101" fill="none" stroke="var(--navy)" stroke-width="2"/>
-          <polyline points="60,104 116,102 172,101 228,102 284,104 340,107 384,110" fill="none" stroke="var(--win)" stroke-width="2.4"/>
-          <line x1="172" y1="40" x2="172" y2="140" stroke="var(--amber)" stroke-width="1" stroke-dasharray="3 3"/>
-          <text x="172" y="36" font-size="9" fill="var(--amber)" text-anchor="middle">crossover ~4%</text>
-          <text x="60" y="153" font-size="9" fill="#9aa7b4" text-anchor="middle">2%</text>
-          <text x="228" y="153" font-size="9" fill="#9aa7b4" text-anchor="middle">5%</text>
-          <text x="384" y="153" font-size="9" fill="#9aa7b4" text-anchor="end">8%</text>
+      <!-- KEY 2: NPW vs rate -->
+      <div class="card" style="border:1px solid #bfe0cf;border-top:3px solid var(--win);box-shadow:0 2px 8px rgba(15,123,79,.08);padding:15px 18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="ttl" style="font-size:14px;">Net present worth vs. discount rate</div>
+          <span class="keypill"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0f7b4f" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>Key</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--muted);margin:3px 0 6px;">Does the winner hold at other rates? The concrete options lead up to ~4%.</div>
+        <svg width="100%" viewBox="0 0 560 250">
+          <line x1="60" y1="206" x2="548" y2="206" stroke="#e3e8ee"/>
+          <line x1="60" y1="46" x2="60" y2="206" stroke="#e3e8ee"/>
+          <line x1="230" y1="46" x2="230" y2="206" stroke="var(--amber)" stroke-width="1.2" stroke-dasharray="4 4"/>
+          <text x="230" y="40" font-size="11" font-weight="700" fill="var(--amber)" text-anchor="middle">crossover &#8776; 4%</text>
+          <polyline points="80,66 156,96 232,120 308,142 384,160 460,172 540,182" fill="none" stroke="var(--blue)" stroke-width="2.6"/>
+          <polyline points="80,132 156,129 232,127 308,128 384,132 460,137 540,142" fill="none" stroke="var(--navy)" stroke-width="2.6"/>
+          <polyline points="80,142 156,139 232,138 308,140 384,144 460,150 540,156" fill="none" stroke="var(--win)" stroke-width="3.2"/>
+          <circle cx="232" cy="138" r="4" fill="var(--win)"/>
+          <text x="80" y="222" font-size="11" fill="#9aa7b4" text-anchor="middle">2%</text>
+          <text x="308" y="222" font-size="11" fill="#9aa7b4" text-anchor="middle">5%</text>
+          <text x="540" y="222" font-size="11" fill="#9aa7b4" text-anchor="end">8%</text>
         </svg>
-        <div style="display:flex;gap:12px;font-size:10px;color:var(--muted);margin-top:4px;">
-          <span><span style="display:inline-block;width:10px;height:3px;background:var(--blue);vertical-align:middle;margin-right:4px;"></span>Alt 1 HMA</span>
-          <span><span style="display:inline-block;width:10px;height:3px;background:var(--navy);vertical-align:middle;margin-right:4px;"></span>Alt 2 PCC</span>
-          <span><span style="display:inline-block;width:10px;height:3px;background:var(--win);vertical-align:middle;margin-right:4px;"></span>Alt 3 PCC</span>
+        <div style="display:flex;gap:16px;font-size:11px;color:var(--muted);margin-top:6px;">
+          <span><span style="display:inline-block;width:12px;height:3px;background:var(--blue);vertical-align:middle;margin-right:5px;"></span>Alt 1 HMA</span>
+          <span><span style="display:inline-block;width:12px;height:3px;background:var(--navy);vertical-align:middle;margin-right:5px;"></span>Alt 2 PCC</span>
+          <span><span style="display:inline-block;width:12px;height:3px;background:var(--win);vertical-align:middle;margin-right:5px;"></span>Alt 3 PCC (winner)</span>
         </div>
       </div>
+    </div>
 
-      <!-- 3 expenditure stream -->
-      <div class="card" style="padding:13px 15px;">
-        <div class="ttl">3 &#183; Expenditure stream by year</div>
-        <svg width="100%" viewBox="0 0 400 172" style="margin-top:8px;">
-          <line x1="42" y1="140" x2="392" y2="140" stroke="#e3e8ee"/>
-          <rect x="52" y="40" width="12" height="100" fill="var(--blue-dk)"/>
-          <g fill="var(--blue)">
-            <rect x="106" y="118" width="9" height="22"/><rect x="150" y="120" width="9" height="20"/>
-            <rect x="194" y="112" width="9" height="28"/><rect x="238" y="110" width="9" height="30"/>
-            <rect x="270" y="86" width="9" height="54"/><rect x="322" y="122" width="9" height="18"/></g>
-          <text x="58" y="153" font-size="9" fill="#9aa7b4" text-anchor="middle">0</text>
-          <text x="274" y="153" font-size="9" fill="#9aa7b4" text-anchor="middle">20</text>
-          <text x="384" y="153" font-size="9" fill="#9aa7b4" text-anchor="end">30</text>
+    <!-- SUPPORTING charts -->
+    <div class="sechead" style="margin-top:8px;">Supporting detail</div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;">
+
+      <div class="card" style="padding:11px 13px;">
+        <div style="font-size:11.5px;font-weight:700;color:var(--muted);">Expenditure stream by year</div>
+        <svg width="100%" viewBox="0 0 300 120" style="margin-top:6px;">
+          <line x1="30" y1="98" x2="292" y2="98" stroke="#e3e8ee"/>
+          <rect x="40" y="30" width="10" height="68" fill="var(--blue-dk)"/>
+          <g fill="var(--blue)"><rect x="86" y="82" width="7" height="16"/><rect x="120" y="84" width="7" height="14"/>
+            <rect x="154" y="78" width="7" height="20"/><rect x="188" y="76" width="7" height="22"/>
+            <rect x="212" y="58" width="7" height="40"/><rect x="256" y="86" width="7" height="12"/></g>
+          <text x="44" y="112" font-size="8.5" fill="#9aa7b4" text-anchor="middle">0</text>
+          <text x="215" y="112" font-size="8.5" fill="#9aa7b4" text-anchor="middle">20</text>
+          <text x="290" y="112" font-size="8.5" fill="#9aa7b4" text-anchor="end">30</text>
         </svg>
-        <div style="font-size:10.5px;color:var(--muted);margin-top:4px;">Undiscounted spend; the tall bar is initial construction, the year-20 bar the rehabilitation.</div>
       </div>
 
-      <!-- 4 cumulative discounted -->
-      <div class="card" style="padding:13px 15px;">
-        <div class="ttl">4 &#183; Cumulative discounted cost</div>
-        <svg width="100%" viewBox="0 0 400 172" style="margin-top:8px;">
-          <line x1="42" y1="140" x2="392" y2="140" stroke="#e3e8ee"/><line x1="42" y1="40" x2="42" y2="140" stroke="#e3e8ee"/>
-          <polyline points="52,120 60,58 200,52 270,40 384,36" fill="none" stroke="var(--blue)" stroke-width="2"/>
-          <polyline points="52,120 60,74 200,70 270,58 384,52" fill="none" stroke="var(--navy)" stroke-width="2"/>
-          <polyline points="52,120 60,78 200,74 270,62 384,56" fill="none" stroke="var(--win)" stroke-width="2.4"/>
-          <text x="58" y="153" font-size="9" fill="#9aa7b4" text-anchor="middle">0</text>
-          <text x="384" y="153" font-size="9" fill="#9aa7b4" text-anchor="end">30 yr</text>
+      <div class="card" style="padding:11px 13px;">
+        <div style="font-size:11.5px;font-weight:700;color:var(--muted);">Cumulative discounted cost</div>
+        <svg width="100%" viewBox="0 0 300 120" style="margin-top:6px;">
+          <line x1="30" y1="98" x2="292" y2="98" stroke="#e3e8ee"/><line x1="30" y1="28" x2="30" y2="98" stroke="#e3e8ee"/>
+          <polyline points="40,86 46,44 150,40 205,30 290,27" fill="none" stroke="var(--blue)" stroke-width="1.8"/>
+          <polyline points="40,86 46,56 150,53 205,44 290,40" fill="none" stroke="var(--navy)" stroke-width="1.8"/>
+          <polyline points="40,86 46,59 150,56 205,47 290,43" fill="none" stroke="var(--win)" stroke-width="2.2"/>
+          <text x="44" y="112" font-size="8.5" fill="#9aa7b4" text-anchor="middle">0</text>
+          <text x="290" y="112" font-size="8.5" fill="#9aa7b4" text-anchor="end">30 yr</text>
         </svg>
-        <div style="font-size:10.5px;color:var(--muted);margin-top:4px;">Where the higher first cost is paid back over time.</div>
       </div>
 
-      <!-- 5 closure days -->
-      <div class="card" style="padding:13px 15px;">
-        <div class="ttl">5 &#183; Runway closure days by year</div>
-        <svg width="100%" viewBox="0 0 400 172" style="margin-top:8px;">
-          <line x1="42" y1="140" x2="392" y2="140" stroke="#e3e8ee"/>
-          <g fill="var(--amber)">
-            <rect x="60" y="96" width="10" height="44"/><rect x="150" y="108" width="10" height="32"/>
-            <rect x="240" y="90" width="10" height="50"/><rect x="300" y="120" width="10" height="20"/></g>
-          <text x="58" y="153" font-size="9" fill="#9aa7b4" text-anchor="middle">0</text>
-          <text x="384" y="153" font-size="9" fill="#9aa7b4" text-anchor="end">30</text>
+      <div class="card" style="padding:11px 13px;">
+        <div style="font-size:11.5px;font-weight:700;color:var(--muted);">Runway closure days by year</div>
+        <svg width="100%" viewBox="0 0 300 120" style="margin-top:6px;">
+          <line x1="30" y1="98" x2="292" y2="98" stroke="#e3e8ee"/>
+          <g fill="var(--amber)"><rect x="46" y="66" width="8" height="32"/><rect x="120" y="76" width="8" height="22"/>
+            <rect x="186" y="62" width="8" height="36"/><rect x="232" y="84" width="8" height="14"/></g>
+          <text x="44" y="112" font-size="8.5" fill="#9aa7b4" text-anchor="middle">0</text>
+          <text x="290" y="112" font-size="8.5" fill="#9aa7b4" text-anchor="end">30</text>
         </svg>
-        <div style="font-size:10.5px;color:var(--muted);margin-top:4px;">Days the runway is closed for work &#8212; the driver of lost revenue.</div>
       </div>
 
-      <!-- 6 unit cost vs band -->
-      <div class="card" style="padding:13px 15px;">
-        <div class="ttl">6 &#183; Unit cost vs. published TN band</div>
-        <svg width="100%" viewBox="0 0 400 172" style="margin-top:8px;">
-          <rect x="150" y="30" width="150" height="120" fill="#eef4fb"/>
-          <text x="225" y="24" font-size="9" fill="#9aa7b4" text-anchor="middle">$70&#8211;$210 published band</text>
-          <g font-size="10" fill="#5b6675">
-            <text x="44" y="52">Alt 1</text><rect x="80" y="44" width="62" height="12" fill="var(--blue)"/>
-            <text x="44" y="80">Alt 2</text><rect x="80" y="72" width="120" height="12" fill="var(--navy)"/>
-            <text x="44" y="108">Alt 3</text><rect x="80" y="100" width="112" height="12" fill="var(--win)"/></g>
-          <text x="384" y="150" font-size="9" fill="#9aa7b4" text-anchor="end">$ / S.Y.</text>
+      <div class="card" style="padding:11px 13px;">
+        <div style="font-size:11.5px;font-weight:700;color:var(--muted);">Unit cost vs. published band</div>
+        <svg width="100%" viewBox="0 0 300 120" style="margin-top:6px;">
+          <rect x="118" y="20" width="120" height="86" fill="#eef4fb"/>
+          <g font-size="9" fill="#5b6675">
+            <text x="30" y="40">Alt 1</text><rect x="62" y="33" width="48" height="9" fill="var(--blue)"/>
+            <text x="30" y="62">Alt 2</text><rect x="62" y="55" width="94" height="9" fill="var(--navy)"/>
+            <text x="30" y="84">Alt 3</text><rect x="62" y="77" width="88" height="9" fill="var(--win)"/></g>
+          <text x="290" y="112" font-size="8.5" fill="#9aa7b4" text-anchor="end">$ / S.Y.</text>
         </svg>
-        <div style="font-size:10.5px;color:var(--muted);margin-top:4px;">Each alternative's unit cost against Tennessee runway work, 2024&#8211;25.</div>
       </div>
     </div>
 
