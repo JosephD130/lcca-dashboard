@@ -86,7 +86,7 @@ doc = load(S + '/MBT_check.xlsm'); doc.calculateAll()
 gi = doc.Sheets.getByName('General Information'); sm = doc.Sheets.getByName('Summary'); db = doc.Sheets.getByName('Database')
 base_err = errors(doc)
 check('only the pre-existing template errors are present', set(base_err) <= {'TMP(NewPCC)', 'TMP(NewPCC)_IndirectCost'}, base_err)
-check('NPW unchanged by everything added', round(num(sm, 'O12'), 2) == 8809266.42 and round(num(sm, 'O13'), 2) == 8028734.49,
+check('NPW matches the recomputed Murfreesboro baseline', round(num(sm, 'O12'), 2) == 8572110.60 and round(num(sm, 'O13'), 2) == 8028734.49,
       f"{num(sm,'O12'):,.2f} / {num(sm,'O13'):,.2f}")
 check('agency + user = total in the comparison block', round(num(sm, 'H22') + num(sm, 'J22'), 2) == round(num(sm, 'L22'), 2))
 crf = 0.03 * 1.03 ** 30 / (1.03 ** 30 - 1)
@@ -123,7 +123,7 @@ check('verdict handles a single alternative', 'only one alternative' in txt(sm, 
 db.getRows().insertByIndex(3, 1)
 for c, v in zip('ABD', keep[0]): db.getCellRangeByName(f'{c}4').setString(v)
 doc.calculateAll()
-check('restored to two alternatives', round(num(sm, 'O12'), 2) == 8809266.42 and round(num(sm, 'O13'), 2) == 8028734.49)
+check('restored to two alternatives', round(num(sm, 'O12'), 2) == 8572110.60 and round(num(sm, 'O13'), 2) == 8028734.49)
 doc.close(True); proc.terminate()
 
 print(); print('=' * 78)

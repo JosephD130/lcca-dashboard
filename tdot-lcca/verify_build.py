@@ -392,6 +392,30 @@ check('the always-blank Airport Owner row now carries the county',
       gi['C12'].value == 'County:' and gi['D12'].value.endswith('Table17[],4))'), (gi['C12'].value, gi['D12'].value))
 check('and State Region below it is unmoved, so the Summary still finds it', gi['C13'].value == 'State Region:')
 
+print(); print('=' * 78); print('SALVAGE'); print('=' * 78)
+mp = wb['Maintenance Policies']
+check('the HMA salvage fraction is a formula, not a constant',
+      str(mp['D32'].value).startswith('=IF(E22>'), mp['D32'].value)
+check('and it divides remaining life by an expected life you can see and change',
+      mp['F32'].value == 16 and mp['F46'].value == 40 and mp['F9'].value == 'Asset life (yrs)',
+      (mp['F32'].value, mp['F46'].value))
+check('the PCC salvage fraction is a formula too',
+      str(mp['D46'].value).startswith('=MAX(0,MIN(1,(0+F46'), mp['D46'].value)
+check('both read the analysis period rather than assuming 30 years',
+      all("'General Information'!$D$33" in str(mp[r].value) for r in ('D32', 'D46', 'E32', 'E46')))
+check('the HMA fraction is guarded for a period that ends before the overlay',
+      "IF(E22>'General Information'!$D$33,0," in str(mp['D32'].value))
+check('the sentence on each salvage row restates itself from the numbers',
+      all(str(mp[r].value).startswith('="Salvage value: "&TEXT(') for r in ('C32', 'C46')))
+check('the two rehabilitation tables keep their stated zero salvage',
+      mp['D71'].value == 0 and mp['D85'].value == 0 and
+      'zero salvage' in str(mp['C71'].value) and 'zero salvage' in str(mp['C85'].value))
+check('every salvage row shows the year the credit is actually taken',
+      all(str(mp['E%d' % r].value) == "='General Information'!$D$33" for r in (32, 46, 71, 85)))
+check('the alternative templates still multiply that fraction by the salvaged cost',
+      all("-'Maintenance Policies'!D32*AV22" in rd(p_) for p_ in
+          ('xl/worksheets/sheet8.xml', 'xl/worksheets/sheet10.xml')))
+
 print(); print('=' * 78)
 print('%d checks, %d failed' % (checks, len(fails)))
 print('ALL PASS' if not fails else 'FAILED: ' + '; '.join(fails))

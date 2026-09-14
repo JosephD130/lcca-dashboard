@@ -22,12 +22,12 @@
   <Style id="airport"><IconStyle><scale>1.2</scale></IconStyle><LabelStyle><scale>1.0</scale></LabelStyle></Style>
   <Placemark>
     <name>McKellar-Sipes Regional Airport (MKL)</name>
-    <description><![CDATA[<h3>McKellar-Sipes Regional Airport (MKL)</h3><p>Jackson, West region<br/>Runway 2-20, Reconstruction<br/>Construction 2027, 30 years at 3%</p><table border="1" cellpadding="4" cellspacing="0"><tr><th>Alternative</th><th>Type</th><th>Initial</th><th>Net present worth</th><th>Closure days</th><th>Section</th></tr><tr><td>Alternative 1</td><td>HMA-New</td><td align="right">$12,372,457</td><td align="right">$16,528,084</td><td align="right">94</td><td>11" P401 on 8" P209 on 8" P154</td></tr><tr><td>Alternative 2</td><td>PCC-New</td><td align="right">$13,830,666</td><td align="right">$14,066,568</td><td align="right">36</td><td>9" P501 on 8" P209 on 8" P154</td></tr><tr><td>Alternative 3</td><td>HMA-New</td><td align="right">$14,671,662</td><td align="right">$18,827,288</td><td align="right">94</td><td>13" P401 on 13" P209</td></tr><tr><td>Alternative 4</td><td>PCC-New</td><td align="right">$14,418,903</td><td align="right">$14,594,219</td><td align="right">36</td><td>11" P501 on 8" P209</td></tr></table><p><b>Lowest present worth: Alternative 2   |   margin to next: $527,651   |   3% over 30 years   |   lost revenue: Yes</b><br/>Same lowest-cost alternative at 2% (OMB A-94 real rate, FAA PGL 22-01)   |   same at 7% (pre-2022 AIP rule)</p>]]></description>
+    <description><![CDATA[<h3>McKellar-Sipes Regional Airport (MKL)</h3><p>Jackson, West region<br/>Runway 2-20, Reconstruction<br/>Construction 2027, 30 years at 3%</p><table border="1" cellpadding="4" cellspacing="0"><tr><th>Alternative</th><th>Type</th><th>Initial</th><th>Net present worth</th><th>Closure days</th><th>Section</th></tr><tr><td>Alternative 1</td><td>HMA-New</td><td align="right">$12,372,457</td><td align="right">$16,265,638</td><td align="right">94</td><td>11" P401 on 8" P209 on 8" P154</td></tr><tr><td>Alternative 2</td><td>PCC-New</td><td align="right">$13,830,666</td><td align="right">$14,066,568</td><td align="right">36</td><td>9" P501 on 8" P209 on 8" P154</td></tr><tr><td>Alternative 3</td><td>HMA-New</td><td align="right">$14,671,662</td><td align="right">$18,564,842</td><td align="right">94</td><td>13" P401 on 13" P209</td></tr><tr><td>Alternative 4</td><td>PCC-New</td><td align="right">$14,418,903</td><td align="right">$14,594,219</td><td align="right">36</td><td>11" P501 on 8" P209</td></tr></table><p><b>Lowest present worth: Alternative 2   |   margin to next: $527,651   |   3% over 30 years   |   lost revenue: Yes</b><br/>Same lowest-cost alternative at 2% (OMB A-94 real rate, FAA PGL 22-01)   |   same at 7% (pre-2022 AIP rule)</p>]]></description>
     <styleUrl>#airport</styleUrl>
     <Point><coordinates>-88.915610,35.599880,0</coordinates></Point>
   </Placemark>
   <Folder>
-    <name>Alternative 1 - $16,528,084</name>
+    <name>Alternative 1 - $16,265,638</name>
     <Placemark>
       <name>Alternative 1 footprint</name>
       <description><![CDATA[11" P401 on 8" P209 on 8" P154<br/>Schematic footprint: 6,005 x 150 ft from the area entered, turned to the runway number. Not survey geometry.]]></description>
@@ -41,15 +41,15 @@
       </coordinates></LinearRing></outerBoundaryIs></Polygon>
     </Placemark>
     <Placemark>
-      <name>Alternative 1: $16,528,084</name>
+      <name>Alternative 1: $16,265,638</name>
       <styleUrl>#alt</styleUrl>
       <Polygon><extrude>1</extrude><altitudeMode>relativeToGround</altitudeMode>
         <outerBoundaryIs><LinearRing><coordinates>
-          -88.911556,35.599880,614.5
-          -88.910677,35.599880,614.5
-          -88.910677,35.599166,614.5
-          -88.911556,35.599166,614.5
-          -88.911556,35.599880,614.5
+          -88.911556,35.599880,613.3
+          -88.910677,35.599880,613.3
+          -88.910677,35.599166,613.3
+          -88.911556,35.599166,613.3
+          -88.911556,35.599880,613.3
       </coordinates></LinearRing></outerBoundaryIs></Polygon>
     </Placemark>
     <Placemark>
@@ -110,7 +110,7 @@
     </Placemark>
     <Placemark>
       <name>Alt 1 Salvage 2057</name>
-      <description><![CDATA[<b>Alternative 1</b><br/>Salvage<br/>Year 2057 (30 years after construction)<br/>Cost in the year: $-318,513]]></description>
+      <description><![CDATA[<b>Alternative 1</b><br/>Salvage<br/>Year 2057 (30 years after construction)<br/>Cost in the year: $-955,538]]></description>
       <TimeSpan><begin>2057-01-01</begin><end>2057-12-31</end></TimeSpan>
       <styleUrl>#event</styleUrl>
       <Point><coordinates>-88.912841,35.608716,0.0</coordinates></Point>
@@ -135,11 +135,11 @@
       <styleUrl>#altLow</styleUrl>
       <Polygon><extrude>1</extrude><altitudeMode>relativeToGround</altitudeMode>
         <outerBoundaryIs><LinearRing><coordinates>
-          -88.909190,35.599880,523.0
-          -88.908312,35.599880,523.0
-          -88.908312,35.599166,523.0
-          -88.909190,35.599166,523.0
-          -88.909190,35.599880,523.0
+          -88.909190,35.599880,530.4
+          -88.908312,35.599880,530.4
+          -88.908312,35.599166,530.4
+          -88.909190,35.599166,530.4
+          -88.909190,35.599880,530.4
       </coordinates></LinearRing></outerBoundaryIs></Polygon>
     </Placemark>
     <Placemark>
@@ -172,7 +172,7 @@
     </Placemark>
   </Folder>
   <Folder>
-    <name>Alternative 3 - $18,827,288</name>
+    <name>Alternative 3 - $18,564,842</name>
     <Placemark>
       <name>Alternative 3 footprint</name>
       <description><![CDATA[13" P401 on 13" P209<br/>Schematic footprint: 6,005 x 150 ft from the area entered, turned to the runway number. Not survey geometry.]]></description>
@@ -186,7 +186,7 @@
       </coordinates></LinearRing></outerBoundaryIs></Polygon>
     </Placemark>
     <Placemark>
-      <name>Alternative 3: $18,827,288</name>
+      <name>Alternative 3: $18,564,842</name>
       <styleUrl>#alt</styleUrl>
       <Polygon><extrude>1</extrude><altitudeMode>relativeToGround</altitudeMode>
         <outerBoundaryIs><LinearRing><coordinates>
@@ -255,7 +255,7 @@
     </Placemark>
     <Placemark>
       <name>Alt 3 Salvage 2057</name>
-      <description><![CDATA[<b>Alternative 3</b><br/>Salvage<br/>Year 2057 (30 years after construction)<br/>Cost in the year: $-318,513]]></description>
+      <description><![CDATA[<b>Alternative 3</b><br/>Salvage<br/>Year 2057 (30 years after construction)<br/>Cost in the year: $-955,538]]></description>
       <TimeSpan><begin>2057-01-01</begin><end>2057-12-31</end></TimeSpan>
       <styleUrl>#event</styleUrl>
       <Point><coordinates>-88.911444,35.608303,0.0</coordinates></Point>
@@ -280,11 +280,11 @@
       <styleUrl>#alt</styleUrl>
       <Polygon><extrude>1</extrude><altitudeMode>relativeToGround</altitudeMode>
         <outerBoundaryIs><LinearRing><coordinates>
-          -88.904460,35.599880,542.6
-          -88.903582,35.599880,542.6
-          -88.903582,35.599166,542.6
-          -88.904460,35.599166,542.6
-          -88.904460,35.599880,542.6
+          -88.904460,35.599880,550.3
+          -88.903582,35.599880,550.3
+          -88.903582,35.599166,550.3
+          -88.904460,35.599166,550.3
+          -88.904460,35.599880,550.3
       </coordinates></LinearRing></outerBoundaryIs></Polygon>
     </Placemark>
     <Placemark>

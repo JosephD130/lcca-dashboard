@@ -132,12 +132,28 @@ SECTIONS = [
  ], 'This is the airport-side counterpart of the road user delay cost in the Caltrans and FHWA RealCost method.'),
 
  ('7. Step 6: salvage value', [
+  ['The rule', 'Maintenance Policies D32 and D46',
+   "=MAX(0,MIN(1,(placed+life-%s!$D$33)/life))" % GI,
+   'Remaining life over expected life, times the cost of the asset being salvaged. Both terms are live: the credit is '
+   'taken at the analysis period and the HMA overlay happens in the year the policy sheet names, so the fraction is '
+   'computed, never typed. The expected life it divides by sits in column F beside each salvage row.',
+   'AAPTP 06-06 and FAA remaining-life salvage; v1.2.0 made it a formula'],
   ['New HMA', 'Alt sheet D51', "=-%s!D32*AV22" % MP,
-   '12.5 percent of the mill-and-overlay cost, credited at the end of the analysis period. The policy sheet describes '
-   'it as two years of remaining life on a 16-year overlay.', 'Maintenance Policies row 32'],
+   'A share of the mill-and-overlay cost. The overlay is laid in year 20 and lasts 16 years, so at a 30-year period '
+   '6 of 16 years remain and the credit is 37.5 percent. Through v1.2.0 this cell held a fixed 12.5 percent, which is '
+   'what 16 years of life would leave from an overlay laid in year 16, not year 20.', 'Maintenance Policies row 32'],
   ['New PCC', 'Alt sheet D42', "=-%s!D46*G27" % MP,
-   '25 percent of the whole initial construction cost, credited at the end of the analysis period. The policy sheet '
-   'describes it as ten years of remaining life.', 'Maintenance Policies row 46'],
+   'A share of the whole initial construction cost, on a 40-year life from year 0. At a 30-year period 10 of 40 years '
+   'remain and the credit is 25 percent, which is what the cell held as a constant; it was right at 30 years and at no '
+   'other period.', 'Maintenance Policies row 46'],
+  ['What it does at other periods', 'Maintenance Policies D32, D46', '',
+   'At 25 years the credits become 68.8 and 37.5 percent; at 20 years the HMA overlay is laid in the salvage year '
+   'itself, so 100 and 50 percent; at 36 years the overlay is fully consumed and HMA credits nothing. A period that '
+   'ends before the overlay is ever laid credits nothing for HMA, because there is no overlay to salvage.',
+   'v1.2.0'],
+  ['The two rehabilitation tables', 'Maintenance Policies D71 and D85', '0',
+   'Tables 3 and 4 credit no salvage at all. That is a stated policy, "need for reconstruction", not a remaining-life '
+   'calculation, and it is left as it was.', 'Pre-existing policy'],
   ['When it is credited', 'Alt sheet C51 (HMA), C42 (PCC)', "=%s!D33" % GI,
    'Always at the last year of the analysis period, so it is discounted the hardest of any line.',
    'General Information D33'],
@@ -201,15 +217,14 @@ SECTIONS = [
    'v1.2.0 charges engineering on initial construction as well as on later work. It raises every initial cost by the '
    'engineering percentage against v1.1.2 results, and it affects PCC more than HMA because PCC salvage is a share of '
    'initial cost.', 'v1.2.0 fix 2'],
-  ['Salvage is not symmetric', 'Maintenance Policies D32 and D46', '',
-   'Concrete recovers 25 percent of total initial cost, asphalt 12.5 percent of one overlay. Concrete therefore '
-   'carries a large year-30 credit that moves with the discount rate in step with its costs, which is why the concrete '
-   'curves in chart 2 are nearly flat while the asphalt curve falls. In some projects this line alone decides the '
-   'answer. The method is the remaining-life rule in AAPTP 06-06 and FAA guidance; the two fractions are this '
-   'workbook\'s own. PCC checks out: 10 of 40 years left at year 30 is 25 percent. HMA does not. Table 1 places the '
-   'mill and overlay at year 20, so a 16-year overlay life leaves 6 of 16 years at year 30, which is 37.5 percent, '
-   'not 12.5. Two of 16 is what an overlay placed at year 16 would leave, the rehab year in Table 3.',
-   'Pre-existing policy; flagged for decision'],
+  ['Salvage is not symmetric, but it is now computed', 'Maintenance Policies D32 and D46', '',
+   'Concrete salvages a share of its whole initial construction; asphalt salvages a share of one overlay. Concrete '
+   'therefore carries a large end-of-period credit that moves with the discount rate in step with its costs, which is '
+   'why the concrete curves in chart 2 are nearly flat while the asphalt curve falls. The asymmetry of the basis is a '
+   'real modelling choice and is unchanged. What changed in v1.2.0 is that both fractions are now computed from '
+   'remaining life instead of being typed in: the HMA figure had been 12.5 percent against a table that places the '
+   'overlay at year 20, where 37.5 percent is the arithmetic, and the PCC figure had been right only at exactly a '
+   '30-year period.', 'Corrected in v1.2.0; the basis remains a policy choice'],
   ['Lost revenue is gross revenue', 'RevenueData; Alt sheet F2', '',
    'The whole of the airport\'s fuel, tenant and other revenue is treated as lost for every closure day. A percentage '
    'lost by category would be more defensible.', 'Pre-existing; flagged for decision'],

@@ -498,6 +498,9 @@ def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs, mbt_mode
     # ---- the two reference sheets a user passes through while setting a project up
     reference_sheets(work, rd, wr, btn_dark, btn_blue)
 
+    # ---- salvage: remaining life, computed rather than frozen
+    salvage_fix(work, rd, wr)
+
     # ---- the TDOT mark, one band in row 1 of every sheet
     logo_band(work, rd, wr)
 
@@ -1043,6 +1046,68 @@ def pricing_pass(work, rd, wr, template_parts):
 
 def gi_part_name():
     return 'xl/worksheets/sheet4.xml'
+
+
+
+
+# ---------------------------------------------------------------------------------------------
+# Salvage: remaining life, computed, not a constant.
+GI_Q = "'General Information'"
+SALVAGE = [
+    # row, expected life, the year the salvaged asset is placed (None = initial construction, year 0)
+    (32, 16, 22, 'the mill and overlay'),      # Table 1, New HMA: overlay placed at E22
+    (46, 40, None, 'the initial construction'),  # Table 2, New PCC: initial construction, year 0
+]
+SALVAGE_ROWS = [32, 46, 71, 85]
+SALVAGE_HDRS = [9, 36, 50, 75]
+
+
+def salvage_fix(work, rd, wr):
+    """Make the salvage fractions follow the remaining-life rule they claim to use.
+
+    The rule is remaining life over expected life, times the cost of the asset being salvaged. Both
+    terms of "remaining" are already live in the workbook: the salvage is taken at the analysis
+    period (General Information D33, an input) and the HMA overlay happens in the year Maintenance
+    Policies E22 names (a policy input). Only the fraction was frozen, so the sheet could be right at
+    one combination and was not right even at the default one: it carried 2 of 16 years left on an
+    overlay that its own table places at year 20, which at 30 years has 6 left.
+
+    D32 and D46 become formulas, the expected life each one divides by moves into column F where it
+    can be read and changed, and the sentence in column C restates itself from the numbers so it
+    cannot go stale again. Tables 3 and 4 keep their zero: that is a stated policy ("need for
+    reconstruction"), not an arithmetic slip.
+    """
+    x = rd('xl/worksheets/sheet7.xml')
+    s_hdr = style_of(x, 'E9')
+    s_life = style_of(x, 'E32')
+    s_rate = style_of(x, 'D32')
+    s_desc = style_of(x, 'C32')
+
+    x = pricing_patch.set_col(x, 6, 6, width='11.7109375', customWidth='1')
+    for r in SALVAGE_HDRS:
+        x = put_cell(x, 'F%d' % r, '<c r="F%d" s="%s" t="inlineStr"><is><t>Asset life (yrs)</t></is></c>' % (r, s_hdr))
+        x = row_height(x, r, 30)     # these headers wrap to two lines and were clipping at 20pt
+
+    for row, life, placed, what in SALVAGE:
+        x = put_cell(x, 'F%d' % row, '<c r="F%d" s="%s"><v>%d</v></c>' % (row, s_life, life))
+        age = 'E%d' % placed if placed else '0'
+        frac = 'MAX(0,MIN(1,(%s+F%d-%s!$D$33)/F%d))' % (age, row, GI_Q, row)
+        if placed:
+            # an analysis period that ends before the overlay is ever laid has no overlay to salvage
+            frac = 'IF(E%d>%s!$D$33,0,%s)' % (placed, GI_Q, frac)
+        x = put_cell(x, 'D%d' % row, '<c r="D%d" s="%s"><f>%s</f></c>' % (row, s_rate, esc(frac)))
+        yrs = 'TEXT(D%d*F%d,"0.#")' % (row, row)
+        pct = 'TEXT(D%d,"0.0%%")' % row
+        where = ('" placed in year "&amp;E%d&amp;" ("' % placed) if placed else '" ("'
+        sentence = ('"Salvage value: "&amp;%s&amp;" of %d years left on %s"&amp;%s&amp;%s&amp;" of its cost) at the "'
+                    '&amp;%s!$D$33&amp;"-year analysis period"' % (yrs, life, what, where, pct, GI_Q))
+        x = put_cell(x, 'C%d' % row, '<c r="C%d" s="%s" t="str"><f>%s</f></c>' % (row, s_desc, sentence))
+
+    # the Year Applied shown on the salvage rows is where the credit is actually taken, which is the
+    # analysis period, not a fixed 30
+    for row in SALVAGE_ROWS:
+        x = put_cell(x, 'E%d' % row, '<c r="E%d" s="%s"><f>%s!$D$33</f></c>' % (row, s_life, esc(GI_Q)))
+    wr('xl/worksheets/sheet7.xml', x)
 
 
 if __name__ == '__main__':

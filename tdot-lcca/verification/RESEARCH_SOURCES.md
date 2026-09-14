@@ -37,10 +37,13 @@ the sheet carries its URL. Confirm the primary paragraphs before quoting them to
 - AAPTP 06-06 (Auburn/NCAT): NPW, 4%, 20 years, remaining-life salvage; user cost includes lost airport revenue.
   Remaining-life salvage is a prorated share of the last treatment: remaining life divided by expected life,
   times the cost of that treatment. That method is AAPTP's and FAA's, and it is the form the workbook uses.
-  The two fractions in the workbook are not theirs: they came with the 2022 APTech framework. Checked against
-  the workbook's own schedules, PCC holds (10 of 40 years left at year 30 is 25%) and HMA does not: Table 1
-  places the mill and overlay at year 20, so a 16-year overlay life leaves 6 of 16 years at year 30, or 37.5%,
-  not the 12.5% the sheet carries. 2 of 16 corresponds to an overlay at year 16, which is Table 3's rehab year.
+  The two fractions the workbook carried were not theirs: they came with the 2022 APTech framework as constants.
+  Checked against the workbook's own schedules, the concrete one held at the default period (10 of 40 years left
+  at year 30 is 25%) and the asphalt one did not: Table 1 places the mill and overlay at year 20, so a 16-year
+  overlay life leaves 6 of 16 years at year 30, or 37.5%, not the 12.5% the sheet carried. 2 of 16 corresponds to
+  an overlay at year 16. v1.2.0 computes both from remaining life instead, so they follow the analysis period and
+  the overlay year rather than being typed; the expected lives they divide by (16 years for an overlay, 40 for
+  concrete) are the workbook's own and are now shown in their own column for review.
   Direct fetches of eng.auburn.edu and faa.gov were blocked by the egress proxy; the method wording is from
   search-engine excerpts of the report. Confirm against the PDF before quoting it.
 - Caltrans LCCA manual (2013): 4% real; 20/35/55-year periods; RealCost reports agency and user cost as

@@ -22,12 +22,12 @@
   <Style id="airport"><IconStyle><scale>1.2</scale></IconStyle><LabelStyle><scale>1.0</scale></LabelStyle></Style>
   <Placemark>
     <name>Gatlinburg-Pigeon Forge Airport (GKT)</name>
-    <description><![CDATA[<h3>Gatlinburg-Pigeon Forge Airport (GKT)</h3><p>Sevierville, East region<br/>Runway 10-28, Reconstruction<br/>Construction 2028, 30 years at 3%</p><table border="1" cellpadding="4" cellspacing="0"><tr><th>Alternative</th><th>Type</th><th>Initial</th><th>Net present worth</th><th>Closure days</th><th>Section</th></tr><tr><td>Alternative 1</td><td>HMA-New</td><td align="right">$4,285,512</td><td align="right">$6,156,578</td><td align="right">56</td><td>8" P401 on 6" P209 on 6" P154</td></tr><tr><td>Alternative 2</td><td>PCC-New</td><td align="right">$5,918,906</td><td align="right">$6,065,225</td><td align="right">24</td><td>9" P501 on 6" P209 on 6" P154</td></tr><tr><td>Alternative 3</td><td>PCC-New</td><td align="right">$5,681,474</td><td align="right">$5,852,247</td><td align="right">24</td><td>11" P501 on 6" P209</td></tr></table><p><b>Lowest present worth: Alternative 3   |   margin to next: $212,978   |   3% over 30 years   |   lost revenue: Yes</b><br/>Same lowest-cost alternative at 2% (OMB A-94 real rate, FAA PGL 22-01)   |   changes at 7% (pre-2022 AIP rule): see chart 2</p>]]></description>
+    <description><![CDATA[<h3>Gatlinburg-Pigeon Forge Airport (GKT)</h3><p>Sevierville, East region<br/>Runway 10-28, Reconstruction<br/>Construction 2028, 30 years at 3%</p><table border="1" cellpadding="4" cellspacing="0"><tr><th>Alternative</th><th>Type</th><th>Initial</th><th>Net present worth</th><th>Closure days</th><th>Section</th></tr><tr><td>Alternative 1</td><td>HMA-New</td><td align="right">$4,285,512</td><td align="right">$6,036,217</td><td align="right">56</td><td>8" P401 on 6" P209 on 6" P154</td></tr><tr><td>Alternative 2</td><td>PCC-New</td><td align="right">$5,918,906</td><td align="right">$6,065,225</td><td align="right">24</td><td>9" P501 on 6" P209 on 6" P154</td></tr><tr><td>Alternative 3</td><td>PCC-New</td><td align="right">$5,681,474</td><td align="right">$5,852,247</td><td align="right">24</td><td>11" P501 on 6" P209</td></tr></table><p><b>Lowest present worth: Alternative 3   |   margin to next: $183,970   |   3% over 30 years   |   lost revenue: Yes</b><br/>Same lowest-cost alternative at 2% (OMB A-94 real rate, FAA PGL 22-01)   |   changes at 7% (pre-2022 AIP rule): see chart 2</p>]]></description>
     <styleUrl>#airport</styleUrl>
     <Point><coordinates>-83.528700,35.857760,0</coordinates></Point>
   </Placemark>
   <Folder>
-    <name>Alternative 1 - $6,156,578</name>
+    <name>Alternative 1 - $6,036,217</name>
     <Placemark>
       <name>Alternative 1 footprint</name>
       <description><![CDATA[8" P401 on 6" P209 on 6" P154<br/>Schematic footprint: 5,506 x 75 ft from the area entered, turned to the runway number. Not survey geometry.]]></description>
@@ -41,15 +41,15 @@
       </coordinates></LinearRing></outerBoundaryIs></Polygon>
     </Placemark>
     <Placemark>
-      <name>Alternative 1: $6,156,578</name>
+      <name>Alternative 1: $6,036,217</name>
       <styleUrl>#alt</styleUrl>
       <Polygon><extrude>1</extrude><altitudeMode>relativeToGround</altitudeMode>
         <outerBoundaryIs><LinearRing><coordinates>
-          -83.524632,35.857760,700.0
-          -83.523751,35.857760,700.0
-          -83.523751,35.857046,700.0
-          -83.524632,35.857046,700.0
-          -83.524632,35.857760,700.0
+          -83.524632,35.857760,696.7
+          -83.523751,35.857760,696.7
+          -83.523751,35.857046,696.7
+          -83.524632,35.857046,696.7
+          -83.524632,35.857760,696.7
       </coordinates></LinearRing></outerBoundaryIs></Polygon>
     </Placemark>
     <Placemark>
@@ -110,7 +110,7 @@
     </Placemark>
     <Placemark>
       <name>Alt 1 Salvage 2058</name>
-      <description><![CDATA[<b>Alternative 1</b><br/>Salvage<br/>Year 2058 (30 years after construction)<br/>Cost in the year: $-146,074]]></description>
+      <description><![CDATA[<b>Alternative 1</b><br/>Salvage<br/>Year 2058 (30 years after construction)<br/>Cost in the year: $-438,221]]></description>
       <TimeSpan><begin>2058-01-01</begin><end>2058-12-31</end></TimeSpan>
       <styleUrl>#event</styleUrl>
       <Point><coordinates>-83.518397,35.857208,0.0</coordinates></Point>
@@ -135,11 +135,11 @@
       <styleUrl>#alt</styleUrl>
       <Polygon><extrude>1</extrude><altitudeMode>relativeToGround</altitudeMode>
         <outerBoundaryIs><LinearRing><coordinates>
-          -83.522260,35.857760,689.6
-          -83.521378,35.857760,689.6
-          -83.521378,35.857046,689.6
-          -83.522260,35.857046,689.6
-          -83.522260,35.857760,689.6
+          -83.522260,35.857760,700.0
+          -83.521378,35.857760,700.0
+          -83.521378,35.857046,700.0
+          -83.522260,35.857046,700.0
+          -83.522260,35.857760,700.0
       </coordinates></LinearRing></outerBoundaryIs></Polygon>
     </Placemark>
     <Placemark>
@@ -190,11 +190,11 @@
       <styleUrl>#altLow</styleUrl>
       <Polygon><extrude>1</extrude><altitudeMode>relativeToGround</altitudeMode>
         <outerBoundaryIs><LinearRing><coordinates>
-          -83.519887,35.857760,665.4
-          -83.519005,35.857760,665.4
-          -83.519005,35.857046,665.4
-          -83.519887,35.857046,665.4
-          -83.519887,35.857760,665.4
+          -83.519887,35.857760,675.4
+          -83.519005,35.857760,675.4
+          -83.519005,35.857046,675.4
+          -83.519887,35.857046,675.4
+          -83.519887,35.857760,675.4
       </coordinates></LinearRing></outerBoundaryIs></Polygon>
     </Placemark>
     <Placemark>

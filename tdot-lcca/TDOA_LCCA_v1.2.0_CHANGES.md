@@ -22,6 +22,43 @@ formulas and charts only; no VBA was added or changed.
 | 9 | Indirect templates F4:F10 | closure days = 0, users re-typed production-rate formulas in each file | pre-filled with the production-rate defaults used in the MBT and SRB runs (15,000 SY/day surface treatment, 3,800 SY/day mill & overlay, PCC joint/slab rates); still gray input cells, override as needed |
 | 10 | General Information D9 dropdown | `$L$9:$L$84`, last four airports unreachable | `$L$10:$L$88` |
 | 11 | TMP(HMARehab) C42, D44 | C42 added the construction year to the policy year (discounted to ~0); D44 pointed at an empty cell | fixed, in case the rehab option is re-enabled |
+| 12 | Maintenance Policies D32 (New HMA salvage) | fixed `0.125`, described as "2 years of mill and overlay" against a table that places that overlay at year 20 | `=IF(E22>D33,0,MAX(0,MIN(1,(E22+F32-D33)/F32)))`, remaining life over a 16-year overlay life. 37.5% at the default 30-year period |
+| 13 | Maintenance Policies D46 (New PCC salvage) | fixed `0.25`, correct at exactly a 30-year period and nowhere else | `=MAX(0,MIN(1,(0+F46-D33)/F46))`, remaining life over a 40-year life. Still 25% at 30 years |
+
+### Salvage, fixes 12 and 13 in detail
+
+The workbook says what rule it uses on each salvage row: remaining life over expected life, times the
+cost of the asset being salvaged. Both terms of "remaining" were already live. The credit is taken at
+the analysis period (`General Information` D33, an input) and the HMA overlay happens in the year
+`Maintenance Policies` E22 names (a policy input). Only the fraction was frozen, so the sheet could be
+right at one combination of the two and was not right even at the default: it carried two of sixteen
+years left on an overlay its own table places at year 20, which at thirty years has six left. The
+concrete figure had the same shape and happened to be correct at exactly thirty years.
+
+Both are now computed. The expected life each one divides by has moved out of the formula into a new
+**Asset life (yrs)** column beside the salvage row, 16 for the overlay and 40 for concrete, where it can
+be read and changed. The sentence in column C is built from the numbers, so it restates itself instead
+of going stale: at thirty years it reads "Salvage value: 6 of 16 years left on the mill and overlay
+placed in year 20 (37.5% of its cost) at the 30-year analysis period". The Year Applied shown on all
+four salvage rows now reads the analysis period rather than a fixed 30, which is where the credit was
+always actually taken.
+
+| Analysis period | HMA credit | PCC credit |
+|---|---|---|
+| 20 years (the overlay is laid in the salvage year) | 100% | 50% |
+| 25 years | 68.8% | 37.5% |
+| 30 years (default) | 37.5% | 25% |
+| 36 years (the overlay is fully consumed) | 0% | 10% |
+
+A period that ends before the overlay is ever laid credits nothing for HMA, because there is no overlay
+to salvage. Tables 3 and 4 keep their zero: "need for reconstruction" is a stated policy, not a
+remaining-life calculation, and it is left alone.
+
+**This moves published results.** At Murfreesboro, 3% over 30 years, the HMA alternative goes from
+$8,809,266.42 to $8,572,110.60 and concrete is unchanged at $8,028,734.49, so the margin narrows from
+$780,532 to $543,376. Concrete is still the lower of the two. What remains a policy choice, and is
+recorded as one on the Method sheet, is the asymmetry of the *basis*: concrete salvages a share of its
+whole initial construction while asphalt salvages a share of one overlay. That was not changed here.
 
 ## 2. Chart data (alternative worksheets)
 
@@ -270,32 +307,12 @@ them. They are read from v1.2.0.
 
 - Overview text: Neel-Schaffer's rewrite (2022 APTech / 2026 NS+ARA history, the four airport
   criteria) is in their review doc; paste it once Mat approves the wording.
-- Salvage asymmetry: PCC recovers 25% of total initial cost (incl. mobilization), HMA 12.5% of one
-  mill-and-overlay. At Murfreesboro that line alone decides the answer: PCC wins by $780,532 as the
-  workbook stands, and putting both alternatives on the HMA rule turns it into HMA by $63,633. At
-  Upper Cumberland HMA wins under every variant, so there the rule moves the margin (from $586K to
-  $2.1M on a common rule) but not the winner. Left as policy; the decision workbook's salvage
-  multiplier and the new sensitivity block make it visible.
-  The *method* is not ours: AAPTP 06-06 and FAA guidance prescribe remaining-life salvage, a prorated
-  share of the last treatment. The two *fractions* are the workbook's own, inherited from the 2022
-  APTech framework. PCC's checks out arithmetically: 10 of 40 years left at year 30 is 25%. HMA's does
-  not. Table 1 places the mill and overlay at year 20, so a 16-year overlay life leaves 6 of 16 years
-  at year 30, which is 37.5%, not 12.5%. Two of 16 is what an overlay placed at **year 16** would
-  leave, the rehabilitation year in Table 3 rather than Table 1. Correcting HMA to 37.5% narrows
-  Murfreesboro from PCC by $780,532 to PCC by $543,376. The winner does not change, but the number is
-  wrong on its own terms and should be either corrected or deliberately restated as a policy haircut.
-  Two things make it worse than a single wrong constant. First, the salvage *year* is
-  `='General Information'!D33`, a user input, and the overlay *year* is `='Maintenance Policies'!E22`,
-  a policy input, while the fraction is a fixed constant: three quantities that have to agree, only
-  one of them frozen. So the sheet can be right at only one combination, and HMA is not right even
-  there. Second, PCC's 25 percent is a constant for the same reason; it is correct at exactly 30 years
-  and nowhere else. Recomputed on Murfreesboro at 3 percent: at 30 years HMA should credit 37.5 percent
-  (not 12.5) and PCC 25 percent, margin $780,532 to $543,376; at 25 years HMA should credit 68.8 percent
-  and PCC 37.5 percent, margin $880,950 to $764,458; at 20 years the overlay is placed in the salvage
-  year itself, so HMA should credit 100 percent and PCC 50 percent, margin $755,381 to $804,006. The
-  direction of the error is not even stable: correcting it narrows the margin at 30 years and widens it
-  at 20, so the current figure cannot be defended as conservative toward either pavement. The
-  Neel-Schaffer review ran at 20 years. `verification/salvage_impact.py` reproduces this table.
+- Salvage basis, not the fraction. The fractions are fixed (section 1, items 12 and 13) and are now
+  computed from remaining life. What is left is the choice of *basis*: concrete salvages a share of its
+  whole initial construction, asphalt a share of one mill and overlay. That asymmetry is a real
+  modelling decision, it is what makes the concrete curves in chart 2 nearly flat while the asphalt
+  curve falls, and Aeronautics should either confirm it or move both to a common basis. The decision
+  workbook's salvage multiplier and the Summary sensitivity block make the effect visible.
 - Lost revenue counts gross fuel sales and tenant rent as lost during a runway closure. A per-category
   "% lost during closure" factor on RevenueData would be more defensible.
 - FAA AIP discount rate: PGL 22-01 (June 2022) replaced the fixed 7% with OMB A-94 real rates (2.0% for
@@ -311,7 +328,10 @@ them. They are read from v1.2.0.
    verdict line and five charts should populate with no #N/A.
 3. On an Alt sheet check that columns L:N sum to the NPW table (sum of N = Net Present Worth) and
    that the chart axis shows 2027 to 2057.
-4. Set D33 = 20 and confirm Maintenance 5 and 6 drop to $0 discounted and the chart ends at 2047.
+4. Set D33 = 20 and confirm Maintenance 5 and 6 drop to $0 discounted and the chart ends at 2047. On
+   Maintenance Policies, the salvage row of Table 1 should now read "16 of 16 years left on the mill
+   and overlay placed in year 20 (100.0% of its cost) at the 20-year analysis period", and Table 2's
+   should read 20 of 40 (50.0%). Set D33 back to 30 and they return to 37.5% and 25%.
 5. Pick an airport outside the 17 with D38 = Yes: G2 on each Alt sheet should show the warning and
    lost revenue should be $0, not #N/A.
 6. Click the navigation buttons on General Information, on the Summary and on an alternative sheet.
@@ -342,7 +362,8 @@ is selected on open.
 
 Verification done here (LibreOffice Calc, full recalculation): the template workbook recalculates
 with 2,240 formulas and 0 errors (v1.1.2 shows 99 error cells under the same recalc). The same
-patch applied to the populated MBT workbook leaves NPW unchanged at $8,809,266 and $8,028,734,
+patch applied to the populated MBT workbook gives NPW $8,572,110 and $8,028,734 (asphalt moves only
+because of the salvage fix, items 12 and 13; every other line is unchanged),
 the year-indexed columns reconcile to the NPW to the dollar, and the Summary table, verdict line
 and six charts populate from the MBT data (render in `Summary_sheet_MBT_render.png`). Not
 verified: the charts on the alternative worksheets in Excel itself (LibreOffice does not render

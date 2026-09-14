@@ -110,8 +110,8 @@ METHOD AND TYPICAL VALUES
 PASS  Method sheet has its navigation buttons
 PASS  Method sheet states it feeds nothing
 PASS  eleven sections, in order   |   ['1. The answer the workbook produces', '2. Step 1: initial construction cost', '3. Step 2: when the later work happens', '4. Step 3: what each maintenance and 
-PASS  the live block reads the workbook (period, rate, CRF, discount factor, alternatives)   |   14
-PASS  documented formulas are stored as text, not evaluated   |   30
+PASS  the live block reads the workbook (period, rate, CRF, discount factor, alternatives)   |   15
+PASS  documented formulas are stored as text, not evaluated   |   31
 PASS  assumptions section names the four open questions
 PASS  Typical Values sources are plain text, not hyperlinks   |   45
 PASS  only the original tn.gov hyperlink object remains
@@ -151,7 +151,8 @@ PASS  its Table2 is still declared over C2:I59
 PASS  Pay_Items says what the empty division columns mean and how many items carry no cost   |   29 of the 56 pay items carry no unit cost. An alte
 PASS  Pay_Items part headings band the left of the table
 PASS  Pay_Items freezes the header and repeats the band and the header in print   |   A3
-PASS  Maintenance Policies says it is reference and which table drives which alternative   |   Table 1 drives a New HMA alternative, Table 2 a New PCC alte
+PASS  Maintenance Policies says it is live, and which table drives which alternative   |   What each alternative type does to the pavement and when. This sheet i
+PASS  and that is true: the templates read both its Rate and Year Applied columns   |   ['D', 'E']
 PASS  the four maintenance tables carry a header band   |   ['Asphalt Maintenance', 'Concrete Maintenance', 'Asphalt Maintenance', 'Concrete Maintenance']
 
 ==============================================================================
@@ -186,5 +187,18 @@ PASS  the always-blank Airport Owner row now carries the county   |   ('County:'
 PASS  and State Region below it is unmoved, so the Summary still finds it
 
 ==============================================================================
-139 checks, 0 failed
+SALVAGE
+==============================================================================
+PASS  the HMA salvage fraction is a formula, not a constant   |   =IF(E22>'General Information'!$D$33,0,MAX(0,MIN(1,(E22+F32-'General Information'!$D$33)/F32)))
+PASS  and it divides remaining life by an expected life you can see and change   |   (16, 40)
+PASS  the PCC salvage fraction is a formula too   |   =MAX(0,MIN(1,(0+F46-'General Information'!$D$33)/F46))
+PASS  both read the analysis period rather than assuming 30 years
+PASS  the HMA fraction is guarded for a period that ends before the overlay
+PASS  the sentence on each salvage row restates itself from the numbers
+PASS  the two rehabilitation tables keep their stated zero salvage
+PASS  every salvage row shows the year the credit is actually taken
+PASS  the alternative templates still multiply that fraction by the salvaged cost
+
+==============================================================================
+149 checks, 0 failed
 ALL PASS
