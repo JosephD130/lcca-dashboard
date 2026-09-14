@@ -30,7 +30,12 @@ def setv(sh, r, v):
 
 fails = []
 def check(label, got, want):
-    ok = (abs(got - want) < 1e-6) if isinstance(want, float) else (got == want)
+    if want is True:
+        ok = bool(got)
+    elif isinstance(want, float):
+        ok = abs(got - want) < 1e-6
+    else:
+        ok = got == want
     print(('PASS  ' if ok else 'FAIL  ') + label + '   |   got %r want %r' % (got, want))
     if not ok: fails.append(label)
 
@@ -65,7 +70,25 @@ check('East, with no regional costs filled, prices everything at Unit Cost',
 setv(sh, 'C11', ''); doc.calculateAll()
 check('an empty picker falls back to Regular rather than erroring', num(sh, 'F13'), a_reg)
 
+
+# --- the note beside the picker has to explain why nothing moved
+setv(sh, 'C11', 'Regular'); doc.calculateAll()
+check('at Regular the note names the statewide column',
+      txt(sh, 'D11').startswith('Regular is the statewide'), True)
+setv(pay, 'G%d' % A, a_reg * 2)
+setv(sh, 'C11', 'Middle'); doc.calculateAll()
+print('      note reads:', txt(sh, 'D11'))
+check('with one of two items priced regionally the note says exactly that',
+      '1 of 2 pay items' in txt(sh, 'D11') and 'Middle cost' in txt(sh, 'D11'), True)
+setv(pay, 'G%d' % A, ''); doc.calculateAll()
+print('      note reads:', txt(sh, 'D11'))
+check('with the column empty it says none, which is why no unit cost moved',
+      '0 of 2 pay items' in txt(sh, 'D11'), True)
+setv(sh, 'C11', ''); doc.calculateAll()
+check('an empty picker reads as Regular in the note as well as in the arithmetic',
+      txt(sh, 'D11').startswith('Regular is the statewide'), True)
+
 doc.close(True)
-print('\n%d checks, %d failed' % (9, len(fails)))
+print('\n%d checks, %d failed' % (13, len(fails)))
 print('ALL PASS' if not fails else 'FAILED: ' + '; '.join(fails))
 sys.exit(1 if fails else 0)

@@ -104,9 +104,10 @@ check('the sensitivity block names the lowest alternative at each of its rates',
       and str(ws.cell(SENS0, 28).value).startswith('=IF(COUNTIF(')
       and str(ws.cell(SENS1, 28).value).startswith('=IF(COUNTIF('),
       ws.cell(SENS0 - 1, 28).value)
+TILE_C = [7, 10, 14]        # G:I, J:M, N:Q - even widths over the table's own column widths
 check('the rate-sensitivity tile tests every rate in that block, not just its ends',
-      'COUNTIF($AB$%d:$AB$%d' % (SENS0, SENS1) in str(ws.cell(KPI0 + 5, 15).value),
-      str(ws.cell(KPI0 + 5, 15).value)[:90])
+      'COUNTIF($AB$%d:$AB$%d' % (SENS0, SENS1) in str(ws.cell(KPI0 + 5, TILE_C[2]).value),
+      str(ws.cell(KPI0 + 5, TILE_C[2]).value)[:90])
 check('an alternative that does not exist gets no name', all('""' in str(ws.cell(4, c).value) for c in range(24, 28)),
       ws.cell(4, 24).value)
 wbx = rd('xl/workbook.xml')
@@ -137,21 +138,22 @@ check('the alternative-sheet charts keep calendar years on the category axis',
       all('Calendar year' in rd(n) for n in charts[:5]))
 
 print(); print('=' * 78); print('DASHBOARD STRIP'); print('=' * 78)
-labels = [ws.cell(KPI0 + 4 * (k // 3), 7 + 4 * (k % 3)).value for k in range(6)]
+labels = [ws.cell(KPI0 + 4 * (k // 3), TILE_C[k % 3]).value for k in range(6)]
 check('six KPI tiles above the results table',
       labels == ['LOWEST PRESENT WORTH', 'MARGIN TO NEXT', 'EQUIVALENT ANNUAL COST', 'INITIAL CONSTRUCTION',
                  'UNIT COST', 'RATE SENSITIVITY'], labels)
-vals = [str(ws.cell(KPI0 + 1 + 4 * (k // 3), 7 + 4 * (k % 3)).value) for k in range(6)]
+vals = [str(ws.cell(KPI0 + 1 + 4 * (k // 3), TILE_C[k % 3]).value) for k in range(6)]
 check('every tile is a formula over cells that already exist', all(v.startswith('=') for v in vals), vals[:2])
-check('the tiles are merged across four columns each',
-      sum(1 for m in ws.merged_cells.ranges if m.min_row in (KPI0, KPI0 + 1, KPI0 + 2, KPI0 + 4, KPI0 + 5, KPI0 + 6)
-          and m.max_col - m.min_col == 3) == 18,
-      sum(1 for m in ws.merged_cells.ranges if m.max_col - m.min_col == 3))
+tile_rows = (KPI0, KPI0 + 1, KPI0 + 2, KPI0 + 4, KPI0 + 5, KPI0 + 6)
+spans = sorted({(m.min_col, m.max_col) for m in ws.merged_cells.ranges if m.min_row in tile_rows})
+check('the six tiles are even: three columns then four then four, not four each',
+      spans == [(7, 9), (10, 13), (14, 17)]
+      and sum(1 for m in ws.merged_cells.ranges if m.min_row in tile_rows) == 18, spans)
 sx = rd('xl/worksheets/sheet14.xml')
 cfs = dict(re.findall(r'<conditionalFormatting sqref="([^"]+)"><cfRule type="(\w+)"', sx))
 check('bars inside the net present worth column', cfs.get('O%d:O%d' % (T0, T1)) == 'dataBar', cfs)
 check('the margin tile turns amber only when the two best are within five percent',
-      cfs.get('K%d:N%d' % (KPI0, KPI0 + 2)) == 'expression'
+      cfs.get('J%d:M%d' % (KPI0, KPI0 + 2)) == 'expression'
       and '<0.05' in sx.replace('&lt;', '<'), cfs)
 check('lowest-cost row still highlighted in both tables',
       cfs.get('G%d:R%d' % (T0, T1)) == 'expression' and cfs.get('G%d:P%d' % (CMP0, CMP0 + 3)) == 'expression', cfs)
@@ -379,9 +381,11 @@ check('the three names those lookups read are defined', len(nm) == 3, nm)
 check('the grid is the four unit cost columns of Table2', nm.get('UnitCostGrid') == 'Table2[[Unit Cost]:[East]]')
 TPL = ['xl/worksheets/sheet%d.xml' % i for i in (1, 8, 10, 11, 12)]
 old = sum(rd(p).count('Table2[Pay Item Description],Table2[Unit Cost]') for p in TPL)
-new = sum(rd(p).count('INDEX(UnitCostGrid,MATCH(') for p in TPL)
+new = sum(rd(p).count('"N/A",IF(INDEX(UnitCostGrid,MATCH(') for p in TPL)
+flags = sum(rd(p).count('="","",IF(INDEX(UnitCostGrid,MATCH(') for p in TPL)
 check('all 156 unit cost lookups on the five templates read the chosen column',
-      new == 156 * 3 and old == 0, (new, old))
+      new == 156 and old == 0, (new, old))
+check('and each of the fifty pay item lines flags whether that division prices it', flags == 50, flags)
 check('Pay_Items marks Middle, West and East as fillable',
       all(wb['Pay_Items'].cell(r, c).fill.fgColor.rgb == 'FFEDEDED' for r in (3, 30, 59) for c in (7, 8, 9)))
 check('TMP(HMARehab) hides its working columns like every other template',
@@ -415,6 +419,41 @@ check('every salvage row shows the year the credit is actually taken',
 check('the alternative templates still multiply that fraction by the salvaged cost',
       all("-'Maintenance Policies'!D32*AV22" in rd(p_) for p_ in
           ('xl/worksheets/sheet8.xml', 'xl/worksheets/sheet10.xml')))
+
+print(); print('=' * 78); print('THE FIRST SHEET, AND WHAT OPENS WHERE'); print('=' * 78)
+gi = wb['General Information']
+check('no sheet opens scrolled away from its own top-left',
+      not [n for n in names if re.match(r'xl/worksheets/sheet\d+\.xml$', n)
+           and 'topLeftCell' in (re.search(r'<sheetView\b[^>]*?(/>|>)', rd(n)) or type('', (), {'group': lambda *a: ''})()).group(0)],
+      [n for n in names if re.match(r'xl/worksheets/sheet\d+\.xml$', n)
+       and 'topLeftCell' in (re.search(r'<sheetView\b[^>]*?(/>|>)', rd(n)) or type('', (), {'group': lambda *a: ''})()).group(0)])
+check('a frozen row split is a bottom-LEFT pane, which is what Excel honours',
+      all('activePane="bottomLeft"' in m for m in re.findall(r'<pane\b[^>]*xSplit="0"[^>]*/>|<pane\b(?![^>]*xSplit)[^>]*/>',
+                                                             ''.join(rd(n) for n in names if re.match(r'xl/worksheets/sheet\d+\.xml$', n)))))
+check('the how-to card and the status line have room to render',
+      all(round(gi.column_dimensions[c].width, 1) == 13.0 for c in 'FGHIJ')
+      and all(gi.row_dimensions[r].height == 22 for r in range(3, 8)),
+      {c: gi.column_dimensions[c].width for c in 'FGHIJ'})
+check('the step line moved off row 1 to make room for the button',
+      gi['B1'].value is None and str(gi['C1'].value).startswith('STEP 2 of 5'))
+check('the New Study button is on the sheet and wired to the macro',
+      'macro="NewStudy"' in rd('xl/drawings/drawing4.xml') and 'btnNewStudy' in rd('xl/drawings/drawing4.xml'))
+check('and the sheet says how to enable it', 'LCCA_NewStudy.bas' in str(gi['B2'].value))
+check('the free-text inputs carry a border so they stop reading as one grey block',
+      all(gi.cell(r, 4).border.left.style for r in list(range(14, 18)) + list(range(21, 25))))
+check('the salvage note is out of the input column', gi['D35'].value is None and 'Remaining service life' in str(gi['F35'].value))
+check('the pavement section waits for a mainline area rather than dividing by zero',
+      all("N('General Information'!$D$26)<=0" in str(ws.cell(r, c).value)
+          for r in range(SEC_T + 3, SEC_T + 7) for c in (8, 9, 10, 13, 16)))
+# the locator map is excluded on purpose: its axes carry no tick labels (numFmt ';;;') and forcing a
+# plot-area layout on a geographic scatter would stretch Tennessee out of shape
+dash = [n for n in charts if 'Summary' in rd(n) and '<valAx>' in rd(n) and 'scatterChart' not in rd(n)]
+check('every dashboard chart reserves its margins so axis titles clear the tick labels',
+      len(dash) >= 6 and all('manualLayout' in rd(n) for n in dash),
+      [n for n in dash if 'manualLayout' not in rd(n)] or len(dash))
+check('and no legend is drawn over its plot',
+      all('<overlay val="0"/>' in rd(n) for n in charts if '<legend>' in rd(n)),
+      [n for n in charts if '<legend>' in rd(n) and '<overlay val="0"/>' not in rd(n)])
 
 print(); print('=' * 78)
 print('%d checks, %d failed' % (checks, len(fails)))

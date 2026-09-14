@@ -283,6 +283,59 @@ them. They are read from v1.2.0.
   populated for every airport. State Region below it has not moved, so the Summary still finds it.
 
 
+## 3g. What the first real Excel session turned up
+
+Opening the delivered file in Excel found five defects that no amount of recalculation here would have
+caught, because they are about what Excel shows rather than what it computes.
+
+- **Five sheets opened scrolled away from their own content.** Excel saves the last scroll position in
+  each sheet's `sheetView`, and the source workbook carried stale ones: Maintenance Policies opened at
+  A51, so its first fifty rows and all four policy tables were above the fold and the sheet looked
+  empty; Instructions opened at A22, Overview at A16, TMP(PCCRehab) at A8, and Pay_Items at B1, which
+  put column A and the navigation button in it off the left edge. Every sheet now opens at its own
+  top-left. The frozen-row split was also written as `activePane="bottomRight"` with no column split;
+  it is `bottomLeft`, which is what a row-only freeze actually is.
+- **`#DIV/0!` on the Summary as soon as an alternative existed.** Twenty cells in the pavement-section
+  block (rows 93 to 96, columns H, I, J, M and Q) divide by the mainline area with no guard. Anyone who
+  adds an alternative before filling in General Information D26 gets errors across the block, and they
+  travel through the section string into the headline tile. The block now waits for a positive area.
+- **The pricing source looked broken.** It was not: Middle, West and East ship empty, so choosing one
+  changes no unit cost and the sheet appeared to ignore the control. The note beside it now counts the
+  items for that sheet, for example "Prices from the Middle column on Pay_Items: 0 of 4 pay items used
+  here have a Middle cost, the rest fall back to Unit Cost." A hidden flag per pay item line drives it.
+- **Axis titles sat on the tick labels and legends were drawn over the plots.** The charts carried no
+  plot-area layout, so Excel filled the frame edge to edge. Each dashboard chart now reserves its
+  margins explicitly and sets the legend to reserve space rather than overlay; tick labels are 8pt,
+  axis titles 9pt, chart titles 11pt. The locator map is deliberately left alone: its axes carry no
+  tick labels and a forced layout would stretch the state out of shape.
+- **The dashboard tiles were uneven.** Each merged four columns, but G and H are sized for the results
+  table below (worksheet name, alternative name), so the first tile was 72 characters against 56 for
+  the other two and the strip read as three bands of different length. They are now G:I, J:M and N:Q,
+  which is 58 / 56 / 56, with a taller value row. No column width changes, so the table is untouched.
+
+### General Information
+
+- The how-to card was cut off mid-sentence: five numbered lines wrap to nine inside a 43-character
+  merge over five 8.7-wide columns. F to J go to 13 characters and rows 3 to 7 to 22 points, and it
+  fits. The status line, which was losing its second line for the same reason, now fits on one.
+- The empty input cells shared one grey fill with no edges, so four separate fields read as a single
+  block. Each free-text input carries a box border. No cell moved: every input keeps its address.
+- The salvage note sat in the input column, where it read as a value to overwrite. It is a hint beside
+  the row now, like the others.
+- Column E was an 8.7-wide empty gutter between the inputs and their hints; it is 2.4.
+
+### New Study
+
+Row 1 carries a **New Study** button. It saves a clean copy of the workbook beside the current one as
+`<name>_1.xlsm`, `_2` and so on, with every input cleared, the workbook defaults restored (30 years, 3
+percent, 10 and 5 percent, indirect cost off) and every alternative worksheet and its Database and
+Summary rows removed. The open study is not touched.
+
+Because the VBA project is carried through byte for byte, the macro ships beside the workbook as
+`LCCA_NewStudy.bas` and is imported once (Alt+F11, File, Import File), the same arrangement the KML
+export already uses. General Information says so next to the button. Until it is imported the button
+reports that the macro cannot be found.
+
 ## 4. Housekeeping
 
 - Instructions text box: ActiveX "blocked content" steps added (Trust Center > ActiveX Settings,

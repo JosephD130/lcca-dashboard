@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #8A8F98; font-family: Arial, Helvetica, sans-serif; color: #1D2733; }
+    a { color: #2A78D6; } a:hover { color: #1D5BA6; }
+    .win { background: #FFFFFF; min-height: 100%; display: flex; flex-direction: column; }
+    .colstrip { display: flex; height: 17px; background: #F2F3F5; border-bottom: 1px solid #D7DBE0; font-size: 10px; flex: none; }
+    .colstrip .c { justify-content: center; border-right: 1px solid #E3E6EA; color: #77808C; }
+    .grid { counter-reset: row; flex: 1 1 auto; }
+    .r { display: flex; counter-increment: row; }
+    .rh { width: 30px; flex: none; background: #F2F3F5; border-right: 1px solid #D7DBE0; color: #77808C; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+    .rh::before { content: counter(row); }
+    .colstrip .rh::before { content: ""; }
+    .c { display: flex; align-items: center; padding: 0 5px; box-sizing: border-box; font-size: 12.5px; line-height: 1.15; overflow: hidden; flex: none; }
+    .nw { white-space: nowrap; }
+    .inp { background: #D9D9D9; border: 1px solid #9AA6B4; }
+    .blob { background: #D9D9D9; }
+    .grey { color: #6B7280; } .right { justify-content: flex-end; } .b { font-weight: bold; }
+    .band { background: #EAF2FB; border-bottom: 2px solid #2A78D6; font-weight: bold; }
+    .cardt { background: #1D2733; color: #FFFFFF; font-weight: bold; font-size: 11.5px; letter-spacing: .02em; }
+    .cardb { background: #EAF2FB; color: #1D2733; font-size: 11px; white-space: pre-line; align-items: flex-start; padding: 7px 10px; line-height: 1.6; }
+    .status { font-weight: bold; font-size: 12px; border-bottom: 2px solid #2A78D6; white-space: pre-line; line-height: 1.3; padding: 0 9px; }
+    .ok { background: #E8F6EC; color: #186A3B; } .todo { background: #FFF3CD; color: #7F6000; }
+    .btn { background: #1D2733; color: #FFFFFF; font-weight: bold; font-size: 11px; justify-content: center; border-right: 1px solid #38424F; }
+    .btn.blue { background: #2A78D6; border-right: 1px solid #2A78D6; }
+    .btn.new { background: #0F7B4F; border-right: 1px solid #0F7B4F; }
+    .note { color: #595959; font-style: italic; font-size: 11px; }
+    .logo { display: flex; align-items: center; gap: 7px; padding-left: 10px; }
+    .logo .mark { width: 30px; height: 30px; background: #E31837; color: #FFFFFF; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+    .logo .t1 { font-size: 13px; font-weight: bold; color: #16243A; }
+    .logo .t2 { font-size: 8.5px; color: #4A5568; }
+    .tabs { display: flex; gap: 3px; padding: 5px 8px 6px; background: #F2F3F5; border-top: 1px solid #D7DBE0; align-items: flex-end; flex: none; }
+    .tab { font-size: 11px; padding: 4px 9px 3px; background: #E7EAEE; color: #4A525E; border-radius: 3px 3px 0 0; white-space: nowrap; }
+    .tab.on { background: #FFFFFF; color: #1D2733; font-weight: bold; }
+    .cap { position: absolute; font-size: 11px; font-weight: bold; color: #FFFFFF; background: #0F7B4F; padding: 2px 7px; border-radius: 2px; }
+    .bad { background: #B3261E; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="colstrip"><div class="rh"></div><div class="c" style="width:56px;justify-content:center;border-right:1px solid #E3E6EA;color:#77808C">A</div><div class="c" style="width:56px;justify-content:center;border-right:1px solid #E3E6EA;color:#77808C">B</div><div class="c" style="width:186px;justify-content:center;border-right:1px solid #E3E6EA;color:#77808C">C</div><div class="c" style="width:248px;justify-content:center;border-right:1px solid #E3E6EA;color:#77808C">D</div><div class="c" style="width:60px;justify-content:center;border-right:1px solid #E3E6EA;color:#77808C">E</div><div class="c" style="width:61px;justify-content:center;border-right:1px solid #E3E6EA;color:#77808C">F</div><div class="c" style="width:61px;justify-content:center;border-right:1px solid #E3E6EA;color:#77808C">G</div><div class="c" style="width:61px;justify-content:center;border-right:1px solid #E3E6EA;color:#77808C">H</div><div class="c" style="width:61px;justify-content:center;border-right:1px solid #E3E6EA;color:#77808C">I</div><div class="c" style="width:61px;justify-content:center;border-right:1px solid #E3E6EA;color:#77808C">J</div></div>
+  <div class="grid">
+    <div class="r" style="height:38px"><div class="rh"></div><div class="c btn new nw" style="width:112px;">+  New Study</div><div class="c note nw" style="width:494px;">STEP 2 of 5: the project and the LCCA parameters. Fill in the grey cells below.</div><div class="c " style="width:183px;"></div><div class="c logo" style="width:122px;"><div class="mark">TN</div><div><div class="t1">TDOT</div><div class="t2">Department of Transportation</div></div></div></div>
+    <div class="r" style="height:6px"><div class="rh"></div><div class="c " style="width:606px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:606px;"></div><div class="c cardt" style="width:305px;">HOW TO USE THIS WORKBOOK</div></div>
+    <div class="r" style="height:105px"><div class="rh"></div><div class="c " style="width:606px;"></div><div class="c cardb" style="width:305px;align-self:flex-start;height:105px;overflow:hidden">1.  Overview and Instructions: what the framework does and the rules behind it.
+2.  General Information (this sheet): fill in the grey cells, D9 to D39.
+3.  Pay_Items: check the unit costs your alternatives will be priced from.
+4.  Alternative Setup: add each alternative, then enter its quantities on the sheet it creates.
+5.  Summary: read the comparison. It updates by itself.
+Grey cells are yours; white cells calculate. Typical Values has the usual ranges, Method every formula.</div></div>
+    <div class="r" style="height:8px"><div class="rh"></div><div class="c " style="width:606px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c band nw" style="width:606px;">Airport Information:</div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:26px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Airport Name:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c status todo" style="width:305px;align-self:flex-start;height:26px;overflow:hidden">Still needed: Airport Name, Construction Year, Mainline Area, Markings Area</div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Airport ID:</div><div class="c grey" style="width:248px;">N/A</div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">City:</div><div class="c grey" style="width:248px;">N/A</div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">County:</div><div class="c grey" style="width:248px;">N/A</div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">State Region:</div><div class="c grey" style="width:248px;">N/A</div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Design Consultant:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Project Number:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Project Name:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Date of LCCA:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:8px"><div class="rh"></div><div class="c " style="width:606px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c band nw" style="width:606px;">Project Information:</div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Branch Type:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Branch Name:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Project Type:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Project Description:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Initial Construction Year:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Mainline Area, S.Y.:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Shoulder Area, S.Y.:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Markings, S.F.:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Markings, Type:</div><div class="c blob" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:8px"><div class="rh"></div><div class="c " style="width:606px;"></div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c band nw" style="width:606px;">LCCA Parameters:</div><div class="c " style="width:305px;"></div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Analysis Period, years:</div><div class="c blob right" style="width:248px;">30</div><div class="c " style="width:60px;"></div><div class="c note nw" style="width:305px;">TDOT policy 30 years; FAA leaves the period to the engineer.</div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Discount Rate, percent:</div><div class="c blob right" style="width:248px;">3</div><div class="c " style="width:60px;"></div><div class="c note nw" style="width:305px;">TDOT 3%. FAA uses the OMB A-94 real rate, 2.0% in 2026.</div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Salvage Value, $:</div><div class="c blob right" style="width:248px;"></div><div class="c " style="width:60px;"></div><div class="c note nw" style="width:305px;">Remaining service life at the end of the analysis period; computed on Maintenance Policies.</div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Mobilization, percent:</div><div class="c blob right" style="width:248px;">10</div><div class="c " style="width:60px;"></div><div class="c note nw" style="width:305px;">Percent of pay items; workbook default 10.</div></div>
+    <div class="r" style="height:19px"><div class="rh"></div><div class="c " style="width:112px;"></div><div class="c nw" style="width:186px;">Engineering, percent:</div><div class="c blob right" style="width:248px;">5</div><div class="c " style="width:60px;"></div><div class="c note nw" style="width:305px;">Percent of pay items; now applied to initial construction too.</div></div>
+  </div>
+  <div class="tabs"><div class="tab">Overview</div><div class="tab">Instructions</div><div class="tab on">General Information</div><div class="tab">Pay_Items</div><div class="tab">Maintenance Policies</div><div class="tab">Summary</div><div class="tab">Typical Values</div><div class="tab">Method</div></div>
+</div>
+</x-dc>
+</body>
+</html>

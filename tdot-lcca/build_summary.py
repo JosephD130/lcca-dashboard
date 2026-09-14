@@ -26,6 +26,10 @@ from openpyxl.chart.series import SeriesLabel
 from openpyxl.chart.label import DataLabelList
 from openpyxl.chart.marker import DataPoint
 from openpyxl.chart.shapes import GraphicalProperties
+from openpyxl.chart.layout import Layout, ManualLayout
+from openpyxl.chart.text import RichText
+from openpyxl.drawing.text import (RichTextProperties, Paragraph, ParagraphProperties,
+                                   CharacterProperties)
 import geo_data
 from openpyxl.utils import get_column_letter as L
 
@@ -119,7 +123,11 @@ def build_scratch(path):
     F_KVAL = Font(name='Arial', size=16, bold=True, color='1D2733')
     F_KVAL_W = Font(name='Arial', size=16, bold=True, color='7F6000')
     F_KSUB = Font(name='Arial', size=9, color='595959')
-    TILE_COLS = [(7, 10), (11, 14), (15, 18)]          # G:J, K:N, O:R
+    # G and H are sized for the results table below (worksheet name, alternative name), so four
+    # columns each made the first tile 72 characters against 56 for the other two and the row read
+    # as three bands of different length. Three-then-four-then-four is 58 / 56 / 56: even, and the
+    # table underneath keeps its column widths.
+    TILE_COLS = [(7, 9), (10, 13), (14, 17)]           # G:I, J:M, N:Q
     top = Side(style='thin', color='BFC7D1')
     NONE_ANY = f'COUNT($O${T0}:$O${T1})=0'
     LOWNAME = f'INDEX($H${T0}:$H${T1},MATCH(MIN($O${T0}:$O${T1}),$O${T0}:$O${T1},0))'
@@ -170,10 +178,10 @@ def build_scratch(path):
                 if fill: cell.fill = fill
                 cell.border = Border(top=top if rr == r0 else None, bottom=top if rr == r0 + 2 else None,
                                      left=top if cc == c0 else None, right=top if cc == c1 else None)
-        ws.row_dimensions[r0].height = 14
-        ws.row_dimensions[r0 + 1].height = 24
-        ws.row_dimensions[r0 + 2].height = 15
-    ws.row_dimensions[KPI0 + 3].height = 6         # the gap between the two bands of tiles
+        ws.row_dimensions[r0].height = 15
+        ws.row_dimensions[r0 + 1].height = 29
+        ws.row_dimensions[r0 + 2].height = 16
+    ws.row_dimensions[KPI0 + 3].height = 7         # the gap between the two bands of tiles
 
     # the margin tile turns amber when the two best alternatives are within five percent of each other
     KPI_FLAG = (f'AND(COUNT($O${T0}:$O${T1})>1,'
@@ -248,10 +256,35 @@ def build_scratch(path):
             c = ws.cell(r, DC + 2 + 2 * NALT + i, f'=IF({g}="",0,IF({yr}>{GI}!$D$33,0,{days}))'); c.number_format = '0'; c.font = F_DATA
 
     # ---- charts, two per row under the results table
+    def type_size(sz):
+        """Point size for an axis's tick labels or for a title, in the RichText both of them carry."""
+        rpr = CharacterProperties(sz=sz)
+        return RichText(bodyPr=RichTextProperties(),
+                        p=[Paragraph(pPr=ParagraphProperties(defRPr=rpr), endParaRPr=rpr)])
+
+    def title_size(t, sz):
+        if t is None or t.tx is None or t.tx.rich is None: return
+        for para in t.tx.rich.p:
+            if para.pPr is None: para.pPr = ParagraphProperties()
+            para.pPr.defRPr = CharacterProperties(sz=sz, b=False)
+
     def style(ch, title, h=8.0, w=16.5, xt='Alternative', yt='Present worth ($)'):
-        ch.title = title; ch.width = w; ch.height = h; ch.legend.position = 'r'; ch.y_axis.numFmt = '$#,##0.0,,"M"'; ch.y_axis.majorGridlines = None
+        ch.title = title; ch.width = w; ch.height = h; ch.y_axis.numFmt = '$#,##0.0,,"M"'; ch.y_axis.majorGridlines = None
         ch.x_axis.delete = False; ch.y_axis.delete = False
         ch.x_axis.title = xt; ch.y_axis.title = yt
+        # Left to itself Excel draws the plot edge to edge, so the axis titles land on top of the tick
+        # labels and the legend is painted over the plot. Reserve the margins explicitly: 11% on the
+        # left for the value labels and their title, 13% at the top for the chart title, 20% on the
+        # right for the legend and 19% at the bottom for the category labels and their title.
+        ch.layout = Layout(manualLayout=ManualLayout(xMode='edge', yMode='edge',
+                                                     x=0.11, y=0.13, w=0.69, h=0.68))
+        ch.legend.position = 'r'
+        ch.legend.overlay = False          # reserve the space instead of drawing the legend over the plot
+        ch.legend.txPr = type_size(800)
+        for ax in (ch.x_axis, ch.y_axis):
+            ax.txPr = type_size(800)
+            title_size(ax.title, 900)
+        title_size(ch.title, 1100)
     def color(ch, line=False):
         for s, rgb in zip(ch.series, ALT_COLORS):
             if line: s.graphicalProperties.line.solidFill = rgb; s.graphicalProperties.line.width = 22000; s.marker.symbol = 'none'; s.smooth = False
@@ -313,6 +346,10 @@ def build_scratch(path):
     ws.row_dimensions[SEC_T + 2].height = 27
     for i in range(NALT):
         r = SEC_T + 3 + i; g = f'$G${T0+i}'
+        # every thickness below divides by the mainline area. Someone who adds an alternative before
+        # filling in General Information D26 would otherwise get #DIV/0! across this block, and the
+        # error travels into the section string and from there into the headline tile on the dashboard.
+        off = f'OR({g}="",N({AREA})<=0)'
         B, C, D, E = rng(g, 'B', 13, 22), rng(g, 'C', 13, 22), rng(g, 'D', 13, 22), rng(g, 'E', 13, 22)
         tons = f'SUMIFS({E},{D},"TON")'
         cy = lambda pat: f'SUMIFS({E},{D},"C.Y.",{B},"{pat}")'
@@ -321,18 +358,18 @@ def build_scratch(path):
         pcc = f'IFERROR(VALUE(TRIM(SUBSTITUTE(MID({desc},FIND(",",{desc})+1,99),"-inch",""))),0)'
         item = lambda pat: f'IFERROR(SUBSTITUTE(LEFT(INDEX({B},MATCH("{pat}",{B},0)),5),"-",""),"")'
         ws.cell(r, 7, f'=IF({g}="","",$H${T0+i})')
-        ws.cell(r, 8, f'=IF({g}="","",IF({tons}>0,{tons}*2666.6667/({PCF}*{AREA}),{pcc}))')
-        ws.cell(r, 9, f'=IF({g}="","",36*{agg}/{AREA})')
-        ws.cell(r, 10, f'=IF({g}="","",36*{cy("P-154*")}/{AREA})')
-        ws.cell(r, 11, f'=IF({g}="","",IF(SUMIFS({E},{D},"S.Y.",{B},"P-155*")+SUMIFS({E},{D},"S.Y.",{B},"P-156*")+SUMIFS({E},{D},"S.Y.",{B},"P-157*")+SUMIFS({E},{D},"S.Y.",{B},"P-158*")>0,"yes","-"))')
-        ws.cell(r, 12, f'=IF({g}="","",H{r}+I{r}+J{r})')
-        ws.cell(r, 13, f'=IF({g}="","",36*{cy("P-152*")}/{AREA})')
-        ws.cell(r, 14, f'=IF({g}="","",IF(M{r}=0,"no excavation item",IF(ABS(M{r}-L{r})<=0.5,"agrees","differs by "&TEXT(M{r}-L{r},"0.0")&" in")))')
-        ws.cell(r, 16, f'=IF({g}="","",TEXT(H{r},"0")&"\"\" "&IF({tons}>0,{item("P-4*")},{item("P-501*")})'
+        ws.cell(r, 8, f'=IF({off},"",IF({tons}>0,{tons}*2666.6667/({PCF}*{AREA}),{pcc}))')
+        ws.cell(r, 9, f'=IF({off},"",36*{agg}/{AREA})')
+        ws.cell(r, 10, f'=IF({off},"",36*{cy("P-154*")}/{AREA})')
+        ws.cell(r, 11, f'=IF({off},"",IF(SUMIFS({E},{D},"S.Y.",{B},"P-155*")+SUMIFS({E},{D},"S.Y.",{B},"P-156*")+SUMIFS({E},{D},"S.Y.",{B},"P-157*")+SUMIFS({E},{D},"S.Y.",{B},"P-158*")>0,"yes","-"))')
+        ws.cell(r, 12, f'=IF({off},"",H{r}+I{r}+J{r})')
+        ws.cell(r, 13, f'=IF({off},"",36*{cy("P-152*")}/{AREA})')
+        ws.cell(r, 14, f'=IF({off},"",IF(M{r}=0,"no excavation item",IF(ABS(M{r}-L{r})<=0.5,"agrees","differs by "&TEXT(M{r}-L{r},"0.0")&" in")))')
+        ws.cell(r, 16, f'=IF({off},"",TEXT(H{r},"0")&"\"\" "&IF({tons}>0,{item("P-4*")},{item("P-501*")})'
                        f'&IF(I{r}>0," on "&TEXT(I{r},"0")&"\"\" "&{item("P-2*")},"")'
                        f'&IF(J{r}>0," on "&TEXT(J{r},"0")&"\"\" P154",""))')
         fs = f'{AREA}/({AREA}+{SHLD})'   # shoulder reading: bound layers thin out over the larger area, concrete keeps its named thickness
-        ws.cell(r, 17, f'=IF(OR({g}="",{SHLD}=0),"",TEXT(IF({tons}>0,H{r}*{fs},H{r}),"0")&"\"\" "&IF({tons}>0,{item("P-4*")},{item("P-501*")})'
+        ws.cell(r, 17, f'=IF(OR({off},{SHLD}=0),"",TEXT(IF({tons}>0,H{r}*{fs},H{r}),"0")&"\"\" "&IF({tons}>0,{item("P-4*")},{item("P-501*")})'
                        f'&IF(I{r}>0," on "&TEXT(I{r}*{fs},"0")&"\"\" "&{item("P-2*")},"")'
                        f'&IF(J{r}>0," on "&TEXT(J{r}*{fs},"0")&"\"\" P154",""))')
         for c2 in range(8, 14): ws.cell(r, c2).number_format = '0.00'
@@ -406,6 +443,12 @@ def build_scratch(path):
     ch.x_axis.delete = False; ch.y_axis.delete = False
     ch.x_axis.title = 'Alternative'; ch.y_axis.title = 'Initial construction / mainline S.Y.'
     ch.y_axis.numFmt = '$#,##0'; ch.y_axis.majorGridlines = None
+    # same margins and type sizes as the other charts, so chart 8 does not read as a different family
+    ch.layout = Layout(manualLayout=ManualLayout(xMode='edge', yMode='edge', x=0.17, y=0.16, w=0.78, h=0.66))
+    for ax in (ch.x_axis, ch.y_axis):
+        ax.txPr = type_size(800)
+        title_size(ax.title, 900)
+    title_size(ch.title, 1100)
     ws.add_chart(ch, f'N{C3}')
     ws[f'G{BMN}'] = ('Chart 8 divides each alternative\'s initial construction by the mainline area. The band is the all-in '
                        'range for recent Tennessee runway work, $210 to $280 per S.Y. on Typical Values, which covers pavement, '
@@ -538,9 +581,12 @@ def build_scratch(path):
                                               color='FFBBD4EE', showValue=True, minLength=None, maxLength=None))
     dxf_flag = DifferentialStyle(fill=PatternFill(bgColor='FFFFF3CD'), font=Font(bold=True, color='FF7F6000'))
     dxf_hold = DifferentialStyle(font=Font(bold=True, color='FF2E8B1F'))
-    ws.conditional_formatting.add(f'K{KPI0}:N{KPI0+2}', Rule(type='expression', formula=[KPI_FLAG], stopIfTrue=False, dxf=dxf_flag))
-    ws.conditional_formatting.add(f'O{KPI0+4+1}', Rule(type='expression', formula=[KPI_HOLD], stopIfTrue=True, dxf=dxf_hold))
-    ws.conditional_formatting.add(f'O{KPI0+4+1}', Rule(type='expression', formula=[KPI_TURN], stopIfTrue=False, dxf=dxf_flag))
+    # both rules address their tile through TILE_COLS, so they follow it if the spans ever move again
+    mg0, mg1 = (L(TILE_COLS[1][0]), L(TILE_COLS[1][1]))       # the margin tile
+    rs0 = L(TILE_COLS[2][0])                                   # the rate-sensitivity tile
+    ws.conditional_formatting.add(f'{mg0}{KPI0}:{mg1}{KPI0+2}', Rule(type='expression', formula=[KPI_FLAG], stopIfTrue=False, dxf=dxf_flag))
+    ws.conditional_formatting.add(f'{rs0}{KPI0+4+1}', Rule(type='expression', formula=[KPI_HOLD], stopIfTrue=True, dxf=dxf_hold))
+    ws.conditional_formatting.add(f'{rs0}{KPI0+4+1}', Rule(type='expression', formula=[KPI_TURN], stopIfTrue=False, dxf=dxf_flag))
     for sqref, f in [(f'G{T0}:R{T1}', f'AND($G{T0}<>"",COUNT($O${T0}:$O${T1})>0,$O{T0}=MIN($O${T0}:$O${T1}))'),
                      (f'G{CMP0}:P{CMP1}', f'AND($G{CMP0}<>"",COUNT($L${CMP0}:$L${CMP1})>0,$L{CMP0}=MIN($L${CMP0}:$L${CMP1}))')]:
         rule = Rule(type='expression', formula=[f], stopIfTrue=False, dxf=dxf_low)

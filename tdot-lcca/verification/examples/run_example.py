@@ -151,7 +151,7 @@ S['section'] = [{c: (txt(sm, f'{c}{r}') if c in 'GKNPQ' else num(sm, f'{c}{r}'))
 S['unit_weight'] = num(sm, f'J{SEC_T + 1}')
 S['chart_mainline'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(76, 80)}
 S['chart_shoulder'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(83, 87)}
-S['kpi'] = [txt(sm, f'{c}{r}') for r in (3, 4, 5, 7, 8, 9) for c in ('G', 'K', 'O')]
+S['kpi'] = [txt(sm, f'{c}{r}') for r in (3, 4, 5, 7, 8, 9) for c in ('G', 'J', 'N')]
 S['benchmark'] = [num(sm, f'{c}{BM + 3}') for c in ['X', 'Y', 'Z', 'AA'][:N]] + [num(sm, f'AB{BM + 2}'), num(sm, f'AB{BM + 3}')]
 
 npws = [a['NPW'] for a in out['alternatives']]

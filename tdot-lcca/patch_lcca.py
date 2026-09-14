@@ -5,6 +5,7 @@ tables and data validations are preserved (openpyxl would drop them).
 """
 import re, html, sys, os, zipfile, shutil
 from xml.dom import minidom
+import glob
 import pricing_patch
 from build_summary import transplant, add_plain_sheet, add_style, add_dxf, FONT, FILL, BORDER_BOTTOM, BORDER_BOX
 import build_helpers, helpers_content, build_method
@@ -327,6 +328,8 @@ def main(src, out, mbt_mode=False):
     for p in ['xl/calcChain.xml']:
         if os.path.exists(P(p)): os.remove(P(p))
     if os.path.isdir(P('xl/externalLinks')): shutil.rmtree(P('xl/externalLinks'))
+    scrolled = open_at_the_top(work, rd, wr)
+    if scrolled: print('sheets reset to open at the top: %s' % ', '.join('%s was %s' % (os.path.basename(a), b) for a, b in scrolled))
     spelling_fixes(rd, wr)
     package_hygiene(work, P, rd, wr)
     # --- repack
@@ -501,6 +504,10 @@ def design_pass(work, rd, wr, gi_part, summ_part, template_parts, tabs, mbt_mode
     # ---- salvage: remaining life, computed rather than frozen
     salvage_fix(work, rd, wr)
 
+    # ---- General Information: the card, the input fields and the New Study button
+    if not mbt_mode:
+        general_information_pass(work, rd, wr)
+
     # ---- the TDOT mark, one band in row 1 of every sheet
     logo_band(work, rd, wr)
 
@@ -544,8 +551,10 @@ def sheet_view(x, freeze=None, gridlines=None):
         sv = sv.replace('<sheetView', '<sheetView showGridLines="0"', 1)
     if freeze:
         col, r = split_ref(freeze)
-        pane = ('<pane xSplit="%d" ySplit="%d" topLeftCell="%s" activePane="bottomRight" state="frozen"/>'
-                % (colnum(col) - 1, r - 1, freeze))
+        xs = colnum(col) - 1
+        active = 'bottomRight' if xs else 'bottomLeft'   # with no column split it is the bottom-LEFT pane
+        pane = ('<pane%s ySplit="%d" topLeftCell="%s" activePane="%s" state="frozen"/>'
+                % (' xSplit="%d"' % xs if xs else '', r - 1, freeze, active))
         sv = re.sub(r'<pane\b[^>]*/>', '', sv)
         sv = sv[:-2] + '>' + pane + '</sheetView>' if sv.endswith('/>') else sv.replace('>', '>' + pane, 1)
     return x[:m.start()] + sv + x[m.end():]
@@ -876,6 +885,28 @@ def spelling_fixes(rd, wr):
         wr(part, x)
 
 
+def open_at_the_top(work, rd, wr):
+    """Every sheet opens where it was last scrolled to, because Excel saves that in the sheetView.
+    Maintenance Policies was saved at A51, so it opened with its first fifty rows above the fold and
+    looked like the tables were missing; Pay_Items was saved at B1, which hid column A and the
+    navigation button in it. Drop the remembered scroll position from every sheet, and the stale
+    selection with it, so each one opens at its own top-left."""
+    fixed = []
+    for part in sorted(glob.glob(os.path.join(work, 'xl', 'worksheets', 'sheet*.xml'))):
+        rel = 'xl/worksheets/' + os.path.basename(part)
+        x = rd(rel)
+        m = re.search(r'<sheetView\b[^>]*?(/>|>)', x)
+        if not m: continue
+        head = m.group(0)
+        at = re.search(r' topLeftCell="([^"]*)"', head)
+        if not at: continue
+        fixed.append((rel, at.group(1)))
+        x = x[:m.start()] + head.replace(at.group(0), '') + x[m.end():]
+        x = re.sub(r'<selection\b[^>]*/>', '', x)
+        wr(rel, x)
+    return fixed
+
+
 def package_hygiene(work, P, rd, wr):
     """Strip what does not belong in a distributed workbook: cached printer drivers, the empty Power Query
     (DataMashup) stub, the author names and the SharePoint path Excel cached in the package."""
@@ -939,14 +970,21 @@ def pricing_pass(work, rd, wr, template_parts):
                        alignment='horizontal="left" vertical="center" indent="1"')
     s_note = add_style(work, font=FONT(9, i=True, color=GREY),
                        alignment='horizontal="left" vertical="center"')
+    s_wrapnote = add_style(work, font=FONT(9, i=True, color=GREY),
+                           alignment='horizontal="left" vertical="center" wrapText="1"')
     s_hide = add_style(work, font=FONT(8, color=GREY), alignment='horizontal="left"')
     dv = ('<dataValidation type="list" allowBlank="0" showInputMessage="1" showErrorMessage="1"'
           ' errorTitle="Pricing source" error="Choose Regular, Middle, West or East."'
           ' promptTitle="Price from" prompt="Which unit cost column on Pay_Items this alternative is'
           ' priced from. Regular is the statewide Unit Cost column." sqref="C11">'
           '<formula1>&quot;%s&quot;</formula1></dataValidation>' % ','.join(pricing_patch.PRICE_SOURCES))
-    note = ('"%s"&amp;IF(\'General Information\'!$D$13="N/A","Pick an airport to see its division.",'
-            '"This airport is in the "&amp;\'General Information\'!$D$13&amp;" division.")' % PRICE_NOTE)
+    # A picker that silently does nothing reads as broken. The Middle, West and East columns ship
+    # empty, so choosing one changes no unit cost at all; the note has to say so, in this sheet's own
+    # terms, rather than leaving the user to guess.
+    note = ('IF(OR($C$11="Regular",$C$11=""),"Regular is the statewide Unit Cost column on Pay_Items.",'
+            '"Prices from the "&amp;$C$11&amp;" column on Pay_Items: "&amp;SUM($I$13:$I$22)&amp;" of "'
+            '&amp;COUNT($I$13:$I$22)&amp;" pay items used here have a "&amp;$C$11&amp;" cost, the rest fall '
+            'back to Unit Cost.")')
 
     for part in template_parts:
         x = rd(part)
@@ -970,14 +1008,18 @@ def pricing_pass(work, rd, wr, template_parts):
         x = put_cell(x, 'C11', '<c r="C11" s="%s" t="inlineStr"><is><t>%s</t></is></c>'
                      % (s_pick, pricing_patch.PRICE_SOURCES[0]))
         x = put_cell(x, 'D11', '<c r="D11" s="%s" t="str"><f>%s</f><v>%s</v></c>'
-                     % (s_note, note, html.escape(PRICE_NOTE + 'Pick an airport to see its division.',
-                                                  quote=False)))
+                     % (s_wrapnote, note,
+                        html.escape('Regular is the statewide Unit Cost column on Pay_Items.', quote=False)))
         for col in 'EFG':
             x = put_cell(x, '%s11' % col, '<c r="%s11" s="%s"/>' % (col, s_note))
         x = put_cell(x, 'I10', '<c r="I10" s="%s" t="inlineStr"><is><t>Price column: 1 Regular, 2 Middle, 3 West, 4 East</t></is></c>' % s_hide)
         x = put_cell(x, 'I11', '<c r="I11" s="%s"><f>%s</f><v>1</v></c>'
                      % (s_hide, esc('IFERROR(MATCH($C$11,PriceSources,0),1)')))
-        x = row_height(x, 11, 18)
+        # one flag per pay item line: does the chosen division actually carry a cost for it?
+        for r in range(13, 23):
+            f = ('IF(C%d="","",IF(INDEX(UnitCostGrid,MATCH(C%d,PayItemKeys,0),$I$11)="",0,1))' % (r, r))
+            x = put_cell(x, 'I%d' % r, '<c r="I%d" s="%s"><f>%s</f></c>' % (r, s_hide, esc(f)))
+        x = row_height(x, 11, 28)
         # --- an empty pay item line used to print a 0 under "Pay Item", right beside its line
         # number. Blank reads better, and the item cost tests the description instead.
         for r in range(13, 23):
@@ -1108,6 +1150,92 @@ def salvage_fix(work, rd, wr):
     for row in SALVAGE_ROWS:
         x = put_cell(x, 'E%d' % row, '<c r="E%d" s="%s"><f>%s!$D$33</f></c>' % (row, s_life, esc(GI_Q)))
     wr('xl/worksheets/sheet7.xml', x)
+
+
+
+
+# ---------------------------------------------------------------------------------------------
+# General Information: the sheet a user opens first, and the one that looked worst.
+NEW_STUDY_MACRO = 'NewStudy'
+
+
+def button_shape(macro, name, text, col, row, w_emu, h_emu, shape_id, off_x=0, off_y=0):
+    """A clickable shape wired to a VBA macro, as a one-cell anchor."""
+    return (
+        '<xdr:oneCellAnchor><xdr:from><xdr:col>%d</xdr:col><xdr:colOff>%d</xdr:colOff>'
+        '<xdr:row>%d</xdr:row><xdr:rowOff>%d</xdr:rowOff></xdr:from>'
+        '<xdr:ext cx="%d" cy="%d"/>'
+        '<xdr:sp macro="%s" textlink="">'
+        '<xdr:nvSpPr><xdr:cNvPr id="%d" name="%s"/><xdr:cNvSpPr/></xdr:nvSpPr>'
+        '<xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="%d" cy="%d"/></a:xfrm>'
+        '<a:prstGeom prst="roundRect"><a:avLst><a:gd name="adj" fmla="val 14000"/></a:avLst></a:prstGeom>'
+        '<a:solidFill><a:srgbClr val="0F7B4F"/></a:solidFill>'
+        '<a:ln w="9525"><a:solidFill><a:srgbClr val="0B5C3B"/></a:solidFill></a:ln></xdr:spPr>'
+        '<xdr:txBody><a:bodyPr vertOverflow="clip" horzOverflow="clip" rtlCol="0" anchor="ctr"/>'
+        '<a:lstStyle/><a:p><a:pPr algn="ctr"/>'
+        '<a:r><a:rPr lang="en-US" sz="1000" b="1"><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill>'
+        '<a:latin typeface="Calibri"/></a:rPr><a:t>%s</a:t></a:r></a:p></xdr:txBody>'
+        '</xdr:sp><xdr:clientData fPrintsWithSheet="0"/></xdr:oneCellAnchor>'
+        % (col, off_x, row, off_y, w_emu, h_emu, macro, shape_id, name, w_emu, h_emu,
+           html.escape(text, quote=False)))
+
+
+def general_information_pass(work, rd, wr):
+    """The first sheet a user opens, and the one the review called out.
+
+    Four things were wrong and none of them were taste. The how-to card was clipped mid-sentence,
+    because five numbered lines wrap to nine inside a 43-character merge over five 8.7-wide columns.
+    The status line lost its second line for the same reason. The empty input cells ran together into
+    one grey rectangle, so a reader could not see where one field ended and the next began. And every
+    button that leaves this sheet sat at rows 44 to 52, below the fold on an ordinary screen.
+    """
+    GREY, GREEN = 'FF595959', 'FF0F7B4F'
+    x = rd('xl/worksheets/sheet4.xml')
+
+    # --- the card and the status line get room: F to J go from 8.7 to 13 characters each
+    for col in range(6, 11):
+        x = pricing_patch.set_col(x, col, col, width='13.0', customWidth='1')
+    x = pricing_patch.set_col(x, 5, 5, width='2.4', customWidth='1')     # E was an 8.7-wide empty gutter
+    for r in range(3, 8):
+        x = row_height(x, r, 22)
+
+    # --- the step line moves off row 1 to make room for the button
+    s_note = add_style(work, font=FONT(9, i=True, color=GREY),
+                       alignment='horizontal="left" vertical="center"')
+    cur = cell_re('B1').search(x)
+    step = 'STEP 2 of 5: the project and the LCCA parameters. Fill in the grey cells below.'
+    if cur: x = remove_cell(x, 'B1')
+    x = ensure_row(x, 2)
+    x = put_cell(x, 'C1', '<c r="C1" s="%s" t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>'
+                 % (s_note, html.escape(step, quote=False)))
+
+    # --- the button runs a macro that ships beside the workbook, the same arrangement the KML
+    # export already uses, because the VBA project itself is carried through untouched
+    x = ensure_row(x, 2)
+    x = put_cell(x, 'B2', '<c r="B2" s="%s" t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>'
+                 % (s_note, html.escape('New Study needs LCCA_NewStudy.bas imported once: Alt+F11, File, '
+                                        'Import File. It then saves a cleared copy for the next project.',
+                                        quote=False)))
+
+    # --- the two runs of free-text inputs were reading as one grey block
+    s_field = add_style(work, font=FONT(10), fill=FILL('FFD9D9D9'), border=BORDER_BOX,
+                        alignment='horizontal="left" vertical="center" indent="1"')
+    x = restyle(x, list(range(14, 18)) + list(range(21, 25)), 'D', s_field)
+
+    # --- the salvage note sat in the input column, where it read as a value to overwrite
+    note = 'Remaining service life at the end of the analysis period; computed on Maintenance Policies.'
+    x = remove_cell(x, 'D35')
+    x = put_cell(x, 'F35', '<c r="F35" s="%s" t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>'
+                 % (s_note, html.escape(note, quote=False)))
+    wr('xl/worksheets/sheet4.xml', x)
+
+    # --- the New Study button, over A1:B1 in the band
+    d = rd('xl/drawings/drawing4.xml')
+    ids = [int(i) for i in re.findall(r'<xdr:cNvPr id="(\d+)"', d)]
+    shape = button_shape(NEW_STUDY_MACRO, 'btnNewStudy', '+  New Study', 0, 0,
+                         1200150, 342900, max(ids + [100]) + 1, off_x=57150, off_y=57150)
+    d = d.replace('</xdr:wsDr>', shape + '</xdr:wsDr>', 1)
+    wr('xl/drawings/drawing4.xml', d)
 
 
 if __name__ == '__main__':

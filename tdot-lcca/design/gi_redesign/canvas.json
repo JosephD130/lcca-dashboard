@@ -1,0 +1,13 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "General Information - proposed", "x": 0, "y": 0, "w": 1316, "h": 770 },
+    { "file": "Current.dc.html", "title": "General Information - as it ships today", "x": 1416, "y": 0, "w": 941, "h": 750 },
+    { "file": "SummaryTiles.dc.html", "title": "Summary dashboard - tile proportions", "x": 0, "y": 900, "w": 1286, "h": 350 }
+  ],
+  "annotations": [
+    { "id": "note-button", "x": 0, "y": -160, "w": 470, "text": "Row 1 gains a New Study button: it saves a clean copy of the workbook, every input cleared and every alternative removed, so the next project starts from a blank form. The sheet buttons stay where they are at rows 44 to 52." },
+    { "id": "note-card", "x": 520, "y": -160, "w": 400, "text": "The how-to card is cut off mid-sentence today because columns F to J are 8.7 characters each, so five numbered lines wrap to nine inside a 43-character merge. F to J go to 13 characters and the rows get taller." },
+    { "id": "note-fields", "x": 1416, "y": -160, "w": 430, "text": "Today the empty input cells share one grey fill with no edges, so four separate fields read as a single block. Giving each a box border separates them without moving any cell: every input keeps its address." }
+  ],
+  "launch": { "view": "canvas" }
+}

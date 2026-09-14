@@ -55,14 +55,14 @@ PASS  chart3.xml names both axes   |   ['Alternative 1', 'Calendar year', 'Cost 
 PASS  chart4.xml names both axes   |   ['Alternative 2', 'Calendar year', 'Cost ($)']
 PASS  chart5.xml names both axes   |   ['Alternative 3', 'Calendar year', 'Cost ($)']
 PASS  chart6.xml names both axes   |   ['Alternatives Comparison', 'Alternative', 'Cost ($)']
-PASS  chart7.xml names both axes   |   ['1. Present worth by category (salvage below zero)', 'Alternative', 'Present worth ($)']
-PASS  chart8.xml names both axes   |   ['2. Net present worth vs. discount rate (TDOT 3%, FAA 2%, pre-2022 rule 7%)', 'Discount rate (%)', 'Net present worth ($)']
-PASS  chart9.xml names both axes   |   ['3. Expenditure stream by calendar year (undiscounted)', 'Calendar year', 'Spend, undiscounted ($)']
-PASS  chart10.xml names both axes   |   ['4. Cumulative discounted cost', 'Calendar year', 'Cumulative discounted cost ($)']
-PASS  chart11.xml names both axes   |   ['5. Runway closure days by calendar year', 'Calendar year', 'Closure days']
-PASS  chart12.xml names both axes   |   ['6. Pavement section, mainline (inches, surface on top)', 'Alternative', 'Thickness (inches)']
-PASS  chart13.xml names both axes   |   ['7. Pavement section with the shoulder (empty unless a shoulder area is entered)', 'Alternative', 'Thickness (inches)']
-PASS  chart14.xml names both axes   |   ['8. Unit cost against published Tennessee runway work', 'Alternative', 'Initial construction / mainline S.Y.']
+PASS  chart7.xml names both axes   |   ['1. Present worth by category (salvage below zero)', 'Alternative', '', 'Present worth ($)']
+PASS  chart8.xml names both axes   |   ['2. Net present worth vs. discount rate (TDOT 3%, FAA 2%, pre-2022 rule 7%)', 'Discount rate (%)', '', 'Net present worth ($)']
+PASS  chart9.xml names both axes   |   ['3. Expenditure stream by calendar year (undiscounted)', 'Calendar year', '', 'Spend, undiscounted ($)']
+PASS  chart10.xml names both axes   |   ['4. Cumulative discounted cost', 'Calendar year', '', 'Cumulative discounted cost ($)']
+PASS  chart11.xml names both axes   |   ['5. Runway closure days by calendar year', 'Calendar year', '', 'Closure days']
+PASS  chart12.xml names both axes   |   ['6. Pavement section, mainline (inches, surface on top)', 'Alternative', '', 'Thickness (inches)']
+PASS  chart13.xml names both axes   |   ['7. Pavement section with the shoulder (empty unless a shoulder area is entered)', 'Alternative', '', 'Thickness (inches)']
+PASS  chart14.xml names both axes   |   ['8. Unit cost against published Tennessee runway work', 'Alternative', '', 'Initial construction / mainline S.Y.']
 PASS  chart15.xml names both axes   |   ['Longitude', 'Latitude']
 PASS  the seven Summary charts put the legend beside the plot   |   [['r'], ['r'], ['r'], ['r'], ['r'], ['r'], ['r']]
 PASS  money axes read to one decimal in millions
@@ -74,10 +74,10 @@ DASHBOARD STRIP
 ==============================================================================
 PASS  six KPI tiles above the results table   |   ['LOWEST PRESENT WORTH', 'MARGIN TO NEXT', 'EQUIVALENT ANNUAL COST', 'INITIAL CONSTRUCTION', 'UNIT COST', 'RATE SENSITIVITY']
 PASS  every tile is a formula over cells that already exist   |   ['=IF(COUNT($O$12:$O$15)=0,"-",TEXT(MIN($O$12:$O$15),"$#,##0"))', '=IF(COUNT($O$12:$O$15)<2,"-",TEXT(IF(COUNT($O$12:$O$15)<2,0,SMALL($O$12:$O$15,2)-MIN($O$12:$O
-PASS  the tiles are merged across four columns each   |   21
-PASS  bars inside the net present worth column   |   {'O12:O15': 'dataBar', 'K3:N5': 'expression', 'O8': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
-PASS  the margin tile turns amber only when the two best are within five percent   |   {'O12:O15': 'dataBar', 'K3:N5': 'expression', 'O8': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
-PASS  lowest-cost row still highlighted in both tables   |   {'O12:O15': 'dataBar', 'K3:N5': 'expression', 'O8': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
+PASS  the six tiles are even: three columns then four then four, not four each   |   [(7, 9), (10, 13), (14, 17)]
+PASS  bars inside the net present worth column   |   {'O12:O15': 'dataBar', 'J3:M5': 'expression', 'N8': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
+PASS  the margin tile turns amber only when the two best are within five percent   |   {'O12:O15': 'dataBar', 'J3:M5': 'expression', 'N8': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
+PASS  lowest-cost row still highlighted in both tables   |   {'O12:O15': 'dataBar', 'J3:M5': 'expression', 'N8': 'expression', 'G12:R15': 'expression', 'G22:P25': 'expression'}
 PASS  chart 8 is the unit-cost benchmark: a stacked bar whose first series is invisible   |   (1, True, True)
 PASS  the published band is one grey point carrying its own value label   |   (1, 1)
 PASS  the band comes from cells, so it can be moved without touching the chart   |   (210, 70)
@@ -101,7 +101,7 @@ PASS  map axes are named and their degree labels suppressed
 PASS  project block names airport, county, region, coordinates, elevation   |   ['Airport', 'City / county', 'TDOT Grand Division', 'Coordinates', 'Elevation', 'Branch / project', 'Mainline area']
 PASS  the sheet says where the coordinates come from and how to export KML
 PASS  runway width for the export footprint is an input cell   |   ('Runway width, ft', 100)
-PASS  the three notes beside the map are merged so they do not run into the chart data   |   ['O4:R4', 'G3:J3', 'K8:N8', 'G5:J5']
+PASS  the three notes beside the map are merged so they do not run into the chart data   |   ['J4:M4', 'G8:I8', 'J7:M7', 'G7:I7']
 PASS  print area widened to take the map
 
 ==============================================================================
@@ -179,7 +179,8 @@ PASS  and resolves it to a column number, falling back to Regular when the cell 
 PASS  C11 is a list, not free text
 PASS  the three names those lookups read are defined   |   {'PriceSources': '{&quot;Regular&quot;,&quot;Middle&quot;,&quot;West&quot;,&quot;East&quot;}', 'UnitCostGrid': 'Table2[[Unit Cost]:[East]]', 'PayItemKeys': 'Tab
 PASS  the grid is the four unit cost columns of Table2
-PASS  all 156 unit cost lookups on the five templates read the chosen column   |   (468, 0)
+PASS  all 156 unit cost lookups on the five templates read the chosen column   |   (156, 0)
+PASS  and each of the fifty pay item lines flags whether that division prices it   |   50
 PASS  Pay_Items marks Middle, West and East as fillable
 PASS  TMP(HMARehab) hides its working columns like every other template
 PASS  and its chart still plots them
@@ -200,5 +201,20 @@ PASS  every salvage row shows the year the credit is actually taken
 PASS  the alternative templates still multiply that fraction by the salvaged cost
 
 ==============================================================================
-149 checks, 0 failed
+THE FIRST SHEET, AND WHAT OPENS WHERE
+==============================================================================
+PASS  no sheet opens scrolled away from its own top-left
+PASS  a frozen row split is a bottom-LEFT pane, which is what Excel honours
+PASS  the how-to card and the status line have room to render   |   {'F': 13.0, 'G': 13.0, 'H': 13.0, 'I': 13.0, 'J': 13.0}
+PASS  the step line moved off row 1 to make room for the button
+PASS  the New Study button is on the sheet and wired to the macro
+PASS  and the sheet says how to enable it
+PASS  the free-text inputs carry a border so they stop reading as one grey block
+PASS  the salvage note is out of the input column
+PASS  the pavement section waits for a mainline area rather than dividing by zero
+PASS  every dashboard chart reserves its margins so axis titles clear the tick labels   |   8
+PASS  and no legend is drawn over its plot
+
+==============================================================================
+161 checks, 0 failed
 ALL PASS
