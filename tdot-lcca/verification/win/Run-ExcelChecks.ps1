@@ -231,29 +231,52 @@ try {
   # -------------------------------------------------------------------------- 2. macros
   Guard 'the macro check' {
     Section 'MACROS'
-    $vbeOk = $false
-    try { $null = $script:wb.VBProject.Name; $vbeOk = $true } catch { }
-    if (-not $vbeOk) {
-      Check 'Trust access to the VBA project object model is on' $false `
-        'Excel > File > Options > Trust Center > Trust Center Settings > Macro Settings. Without it these checks are skipped.'
+    # The definitive answer to whether Trust access to the VBA project object model is on. Excel
+    # can hand back a VBProject object whose VBComponents collection is simply empty when it is
+    # off, which looks like a workbook with no macros rather than a permissions problem.
+    $ver = "$(Prop $excel 'Version')"
+    $trust = $null
+    foreach ($k in @("HKCU:\Software\Microsoft\Office\$ver\Excel\Security",
+                     'HKCU:\Software\Microsoft\Office\16.0\Excel\Security')) {
+      try { $trust = (Get-ItemProperty -Path $k -Name AccessVBOM -ErrorAction Stop).AccessVBOM; break } catch { }
+    }
+    Check 'Trust access to the VBA project object model is on' ($trust -eq 1) `
+      ("AccessVBOM=$trust (Excel > File > Options > Trust Center > Trust Center Settings > Macro Settings)")
+
+    $proj = $null
+    try { $proj = $script:wb.VBProject } catch { }
+    if (-not $proj) {
+      Check 'the macro project can be read' $false 'Workbook.VBProject is not available'
     } else {
-      $comps = @(); $procs = @()
-      foreach ($c in $script:wb.VBProject.VBComponents) {
-        $comps += $c.Name
-        $cm = $c.CodeModule
-        for ($i = 1; $i -le $cm.CountOfLines; $i++) {
-          if ($cm.Lines($i, 1) -match '^\s*(?:Public\s+|Private\s+|Friend\s+)?(Sub|Function)\s+(\w+)') {
-            $procs += $Matches[2]
-          }
+      $count = 0
+      try { $count = $proj.VBComponents.Count } catch { }
+      Check 'the macro project lists its modules' ($count -gt 0) `
+        ("VBComponents.Count=$count, Protection=" + (Prop $proj 'Protection' '?'))
+      if ($count -gt 0) {
+        # index rather than foreach: PowerShell does not always get an enumerator for this collection
+        $comps = @(); $procs = @()
+        for ($i = 1; $i -le $count; $i++) {
+          $c = $null
+          try { $c = $proj.VBComponents.Item($i) } catch { continue }
+          $comps += "$($c.Name)"
+          try {
+            $cm = $c.CodeModule
+            for ($j = 1; $j -le $cm.CountOfLines; $j++) {
+              if ($cm.Lines($j, 1) -match '^\s*(?:Public\s+|Private\s+|Friend\s+)?(Sub|Function)\s+(\w+)') {
+                $procs += $Matches[2]
+              }
+            }
+          } catch { }
         }
+        Check 'the Alternative Setup form and the New Study module are in the project' `
+          (($comps -contains 'frmAlternativeSetup') -and ($comps -contains 'LCCA_NewStudy')) `
+          ("$($comps.Count) modules: " + (($comps | Select-Object -First 12) -join ', '))
+        foreach ($m in @('NewStudy', 'ClearStudy', 'SetupSummaryWs', 'LoadAlternativeList')) {
+          Check "$m is defined" ($procs -contains $m) "$($procs.Count) procedures found"
+        }
+        Check 'no module or procedure mentions the tool that wrote it' `
+          (@($comps + $procs | Where-Object { $_ -match '(?i)claude|anthropic' }).Count -eq 0) ''
       }
-      Check 'the Alternative Setup form and the New Study module are in the project' `
-        (($comps -contains 'frmAlternativeSetup') -and ($comps -contains 'LCCA_NewStudy')) ($comps -join ', ')
-      foreach ($m in @('NewStudy', 'ClearStudy', 'SetupSummaryWs', 'LoadAlternativeList')) {
-        Check "$m is defined" ($procs -contains $m) ''
-      }
-      Check 'no module or procedure mentions the tool that wrote it' `
-        (@($comps + $procs | Where-Object { $_ -match '(?i)claude|anthropic' }).Count -eq 0) ''
     }
   }
 
@@ -276,15 +299,20 @@ try {
           Check 'it is filled from the Pay_Items list' `
             ("$(Prop $o 'ListFillRange')" -match 'Pay_Item') ("ListFillRange='" + (Prop $o 'ListFillRange') + "'")
           $n = Prop $o 'ListCount' 0
+          Check 'the list has rows in it' ($n -gt 0) "ListCount=$n"
           if ($n -gt 0) {
-            $sample = @()
-            for ($k = 0; $k -lt [Math]::Min(2, (Prop $o 'ColumnCount' 1)); $k++) {
-              try { $sample += "$($o.List(0, $k))" } catch { $sample += '' }
+            # the first entry is deliberately blank, the "Default" row of the picker, so look down
+            $rows = @(); $both = $false
+            for ($r = 0; $r -lt [Math]::Min(6, $n); $r++) {
+              $cells = @()
+              for ($k = 0; $k -lt [Math]::Min(2, (Prop $o 'ColumnCount' 1)); $k++) {
+                try { $cells += "$($o.List($r, $k))" } catch { $cells += '' }
+              }
+              $rows += ($cells -join ' / ')
+              if (@($cells | Where-Object { "$_" -ne '' }).Count -ge 2) { $both = $true }
             }
-            Check 'and the first row of the list reads back with both columns filled' `
-              (@($sample | Where-Object { "$_" -ne '' }).Count -ge 2) ($sample -join ' | ')
-          } else {
-            Check 'the list has rows in it' $false 'ListCount = 0 (the sheet may not have been activated yet)'
+            Check 'the list reads back with the item number and the description together' `
+              $both ((($rows | Select-Object -First 4) -join '   ') + "   (row 1 is the blank Default entry)")
           }
         }
         $checked++

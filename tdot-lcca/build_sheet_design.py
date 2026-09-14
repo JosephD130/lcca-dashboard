@@ -317,7 +317,9 @@ def move_textbox(sheet_part, rd, wr, first_row):
 # every ActiveX picker, so no row is inserted above it: the canvas's "29 without a unit cost"
 # tile becomes a live status line in the band, and the amber flag moves onto the cells themselves,
 # where it is what a user actually needs to see.
-PAY_WIDTHS = {1: 22, 2: 16, 3: 14, 4: 64, 5: 7, 6: 11, 7: 10, 8: 10, 9: 10, 10: 18}
+# B is 18 so "Stabilized Base Course" fits; A and J give it back, and the band comes in
+# at the 1,267 px the other sheets measure.
+PAY_WIDTHS = {1: 19, 2: 18, 3: 13, 4: 63, 5: 7, 6: 11, 7: 10, 8: 10, 9: 10, 10: 15}
 PAY_FIRST, PAY_LAST = 4, 59
 
 
@@ -736,9 +738,11 @@ def reference_sheets(rd, wr, st):
 # supporting charts were anchored at column offsets that overlapped each other. Both are fixed
 # here: the block moves to the foot of the band, and every chart is re-anchored to an even grid.
 SUM_PART = 'xl/worksheets/sheet14.xml'
-SUM_WIDTHS = {7: 16, 8: 20, 9: 12, 10: 13, 11: 13, 12: 13, 13: 13, 14: 13, 15: 13,
-              16: 21, 17: 21, 18: 12}
-BAND_PX = 1260
+# G is 18 so "General Information" is not clipped by the button beside it; P and Q give the two
+# characters back so the band still fits.
+SUM_WIDTHS = {7: 18, 8: 19, 9: 12, 10: 13, 11: 13, 12: 13, 13: 13, 14: 13, 15: 13,
+              16: 19, 17: 19, 18: 12}
+BAND_PX = sum(int(((256 * w + int(128 / 7)) / 256) * 7) for w in SUM_WIDTHS.values())
 KEY_ROW, SUP_ROW, SEC_ROW = 30, 48, 59     # the three chart rows, 1-based
 LOC_ROW = 98                               # where the locator block starts
 # where each cell of the old right-hand block lands in the band
