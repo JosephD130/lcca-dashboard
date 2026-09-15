@@ -97,7 +97,7 @@ for r in range(3, 80):
 
 # what the Alternative Setup form does
 db = doc.Sheets.getByName('Database'); sm = doc.Sheets.getByName('Summary')
-setv(sm, 'Q18', SC['rw_width'])          # runway width, on the project-location rail
+setv(sm, 'P18', SC['rw_width'])          # runway width, on the project-location rail
 sheets, n0 = [], doc.Sheets.getCount()
 for i, (kind, desc, items) in enumerate(ALTS):
     name = f'Alt {i+1} (New {kind})'
@@ -156,7 +156,7 @@ S['chart_mainline'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y',
 S['chart_shoulder'] = {txt(sm, f'W{r}'): [num(sm, f'{c}{r}') for c in ['X', 'Y', 'Z', 'AA'][:N]] for r in range(83, 87)}
 # one row of six tiles, two columns each, so the strip fills the band exactly
 S['kpi'] = [txt(sm, f'{c}{r}') for r in (3, 4, 5) for c in ('G', 'I', 'K', 'M', 'O', 'Q')]
-S['rail'] = [(txt(sm, f'P{r}'), txt(sm, f'Q{r}')) for r in range(RAIL0, RAIL0 + 6)]
+S['rail'] = [(txt(sm, f'O{r}'), txt(sm, f'P{r}')) for r in range(RAIL0, RAIL0 + 6)]
 S['benchmark'] = [num(sm, f'{c}{BM + 3}') for c in ['X', 'Y', 'Z', 'AA'][:N]] + [num(sm, f'AB{BM + 2}'), num(sm, f'AB{BM + 3}')]
 
 npws = [a['NPW'] for a in out['alternatives']]

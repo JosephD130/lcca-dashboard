@@ -861,6 +861,14 @@ def plot_nothing_for_absent(x, st):
         if new == cell: continue
         x = x[:m.start()] + new + x[m.end():]
 
+    # Twenty-five rate labels on a 494 px axis are unreadable, and tickLblSkip is a hint a
+    # renderer may ignore - LibreOffice does. Blanking the label itself is not a hint: chart 2
+    # reads its categories from AD, which carries the rate only every whole percentage point.
+    s_lblcol = st.add(font=FONT(9, color=MUTED))
+    x = D.text(x, 'AD%d' % (SENS_ROW - 1), 'axis label, one a point', s_lblcol)
+    for r in range(SENS_ROW, SENS_ROW + SENS_ROWS):
+        x = D.formula(x, 'AD%d' % r, 'IF(MOD($W%d,1)=0,$W%d,"")' % (r, r), s_lblcol)
+
     # The lowest alternative at each rate counted the zeros and stepped past them, which an empty
     # slot no longer produces. AGGREGATE would ignore the #N/A in one call but LibreOffice does not
     # carry it, and the verification harness runs there, so the smallest number that is actually
@@ -1015,7 +1023,7 @@ A_RAIL_ROW0 = A_KEY + 6                    # the facts start here; the map has r
 def option_a(x, st):
     """Turn the built Summary into the approved Option A layout."""
     band = [D.colname(c) for c in range(BAND_FIRST, BAND_LAST + 1)]
-    rail = [D.colname(c) for c in range(BAND_FIRST + 9, BAND_LAST + 1)]      # P, Q, R
+    rail = [D.colname(c) for c in range(BAND_FIRST + 8, BAND_LAST + 1)]      # O .. R
 
     # ---- the band takes in the width the screen already offers, in six even pairs of 247 px so
     # the tile strip divides cleanly
@@ -1094,19 +1102,19 @@ def option_a(x, st):
         bs = re.search(r' s="(\d+)"', bm.group(0))
         if bs: x = D.restyle(x, [A_VERDICT], band[1:], int(bs.group(1)))
     x = D.restyle(x, [A_KEY], rail, s_head)
-    x = D.text(x, 'P%d' % A_KEY, 'PROJECT LOCATION', s_head)
+    x = D.text(x, 'O%d' % A_KEY, 'PROJECT LOCATION', s_head)
     for i, (label, src) in enumerate(A_FACTS):
         r = A_RAIL_ROW0 + i
         last = i == len(A_FACTS) - 1
-        x = D.text(x, 'P%d' % r, label, s_lbl)
-        x = D.restyle(x, [r], ['Q', 'R'], s_in if last else s_val)
+        x = D.text(x, 'O%d' % r, label, s_lbl)
+        x = D.restyle(x, [r], ['P', 'Q', 'R'], s_in if last else s_val)
         cell = keep.get(label)
         if cell:
-            body = re.sub(r'<c r="[A-Z]+\d+"', '<c r="Q%d"' % r, cell, count=1)
+            body = re.sub(r'<c r="[A-Z]+\d+"', '<c r="P%d"' % r, cell, count=1)
             body = re.sub(r' s="\d+"', ' s="%d"' % (s_in if last else s_val), body, count=1)
-            x = D.put_cell(x, 'Q%d' % r, body)
-    x = D.merges(x, ['P%d:R%d' % (A_KEY, A_KEY)]
-                 + ['Q%d:R%d' % (A_RAIL_ROW0 + i, A_RAIL_ROW0 + i) for i in range(len(A_FACTS))])
+            x = D.put_cell(x, 'P%d' % r, body)
+    x = D.merges(x, ['O%d:R%d' % (A_KEY, A_KEY)]
+                 + ['P%d:R%d' % (A_RAIL_ROW0 + i, A_RAIL_ROW0 + i) for i in range(len(A_FACTS))])
 
     # ---- one colour key for the six charts above it, in place of six legends saying the same
     # two things over and over. The alternative names come off the results table, so a slot
@@ -1372,27 +1380,27 @@ def chart_parts(drawing, rd):
     return ['xl/charts/' + t.rsplit('/', 1)[-1] for t in ids]
 
 
+# A chart anchored at a pixel offset assumes a pixel model of the columns, and that model is a
+# guess: it takes 7 px per width unit, which is Excel's number for Calibri 11. LibreOffice lays the
+# same columns out at 9.33, so every chart placed by pixel landed a third of the band too far right
+# and the plots drifted apart down the row. Anchoring between two COLUMNS removes the assumption:
+# from column G to column K is from column G to column K, whatever either program thinks that is.
+# The band divides into three exact thirds on column boundaries, G:J, K:N and O:R, so the whole
+# dashboard is one three-column grid and the panels tile by construction.
+A_GRID = [(6, 10), (10, 14), (14, 18)]      # the three thirds, as 0-based from-column and to-column
+
+
 def summary_charts(rd, wr, offs, band_px):
-    """Three bands of plots that touch. The 10 px gutter every chart used to carry put 30 px of
-    grey between instruments across the supporting row; flush edges read as one panel and hand
-    the width back to the plots."""
-    key_h = A_KEY_ROWS * ROW_PX
-    sup_h, sec_h = A_SUP_ROWS * ROW_PX, A_SEC_ROWS * ROW_PX
-    half = A_RAIL_PX / 2.0              # the two key plots share everything left of the rail
-    third = band_px / 3.0
-    # Three across, twice. Four across left each panel 370 px wide for a category axis that
-    # always carries four slots, so a three-alternative study drew three bars and a gap; the
-    # benchmark moves down to even the rows out and every plot gains a third of its width.
     plan = {
-        'Summary Chart 1': (0, A_KEY, half, key_h),
-        'Summary Chart 2': (half, A_KEY, half, key_h),
-        'Summary Chart 3': (0, A_SUP, third, sup_h),
-        'Summary Chart 4': (third, A_SUP, third, sup_h),
-        'Summary Chart 5': (2 * third, A_SUP, third, sup_h),
-        'Summary Chart 6': (0, A_SEC, third, sec_h),
-        'Summary Chart 7': (third, A_SEC, third, sec_h),
-        'Summary Chart 8': (2 * third, A_SEC, third, sec_h),
-        'Summary Chart 9': (A_RAIL_PX, A_KEY + 1, A_RAIL_W, 5 * ROW_PX),   # the locator map
+        'Summary Chart 1': (0, A_KEY, A_SUP),
+        'Summary Chart 2': (1, A_KEY, A_SUP),
+        'Summary Chart 9': (2, A_KEY + 1, A_RAIL_ROW0),     # the locator map, inside the rail
+        'Summary Chart 3': (0, A_SUP, A_SEC),
+        'Summary Chart 4': (1, A_SUP, A_SEC),
+        'Summary Chart 5': (2, A_SUP, A_SEC),
+        'Summary Chart 6': (0, A_SEC, A_KEYROW),
+        'Summary Chart 7': (1, A_SEC, A_KEYROW),
+        'Summary Chart 8': (2, A_SEC, A_KEYROW),
     }
     drawing = drawing_of(SUM_PART, rd)
     d = rd(drawing)
@@ -1402,16 +1410,14 @@ def summary_charts(rd, wr, offs, band_px):
         nm = re.search(r'name="([^"]*)"', body)
         if not nm or nm.group(1) not in plan:
             return body
-        px_x, row, w, h = plan[nm.group(1)]
-        c, off = at_px(offs, px_x)
-        body = re.sub(r'<xdr:from><xdr:col>\d+</xdr:col><xdr:colOff>\d+</xdr:colOff>'
-                      r'<xdr:row>\d+</xdr:row>',
-                      '<xdr:from><xdr:col>%d</xdr:col><xdr:colOff>%d</xdr:colOff><xdr:row>%d</xdr:row>'
-                      % (c, off, row - 1), body)
-        body = re.sub(r'<xdr:ext cx="\d+" cy="\d+"',
-                      '<xdr:ext cx="%d" cy="%d"'
-                      % (int(round(w * D.EMU_PX)), int(round(h * D.EMU_PX))), body)
-        return body
+        i, r0, r1 = plan[nm.group(1)]
+        c0, c1 = A_GRID[i]
+        frame = re.sub(r'^.*?<xdr:ext[^/]*/>', '', body, flags=re.S)
+        frame = frame.replace('</xdr:oneCellAnchor>', '')
+        cell = lambda c, r: ('<xdr:col>%d</xdr:col><xdr:colOff>0</xdr:colOff>'
+                             '<xdr:row>%d</xdr:row><xdr:rowOff>0</xdr:rowOff>' % (c, r - 1))
+        return ('<xdr:twoCellAnchor><xdr:from>%s</xdr:from><xdr:to>%s</xdr:to>%s</xdr:twoCellAnchor>'
+                % (cell(c0, r0), cell(c1, r1), frame))
 
     d = re.sub(r'<xdr:oneCellAnchor>.*?</xdr:oneCellAnchor>', place, d, flags=re.S)
     # 'Chart 1', the one the Alternative Setup form maintains, is parked below the dashboard with
@@ -1465,6 +1471,9 @@ def one_panel(c, name):
                    '', c, flags=re.S)
     if name == 'chart8.xml':
         c = c.replace(D.esc(SHORT_TITLE[0]), D.esc(SHORT_TITLE[1]))
+        # read the thinned label column, and drop the skip hint it replaces
+        c = c.replace("'Summary'!$W$12:$W$36", "'Summary'!$AD$12:$AD$36")
+        c = re.sub(r'<tickLblSkip val="\d+"/>', '', c)
     if name in KEY_CHARTS:
         # a legend standing beside a plot costs width the plot could use
         c = c.replace('<legendPos val="r"/>', '<legendPos val="b"/>')

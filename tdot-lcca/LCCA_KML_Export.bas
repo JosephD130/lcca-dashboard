@@ -22,7 +22,7 @@ Private Const DEFAULT_WIDTH_FT As Double = 100#   ' used if the runway-width cel
 ' went stale with it. Nothing below assumes a row number any more: the results table and the
 ' pavement section are found by their own headings, so this keeps working when the sheet moves
 ' again. The runway width sits beside the plots now; the older addresses are still tried.
-Private Const WIDTH_CELLS As String = "Q18,O107,T27"
+Private Const WIDTH_CELLS As String = "P18,Q18,O107,T27"
 Private Const FALLBACK_ROW0 As Long = 39          ' the v1.2.0 layout, if a heading is renamed
 Private Const FALLBACK_SEC As Long = 58
 Private Const TALLEST_BAR_M As Double = 700#      ' the largest present worth stands this high

@@ -28,7 +28,7 @@ TITLE = 39                                      # THE NUMBERS
 SEC_T, CH67, NOTE67, MAP0, A0 = 57, 67, 72, 130, 132
 VBACH = 76        # the chart the Alternative Setup form maintains, under its own note
 SENS0, SENS1 = 12, 36
-RAIL_C = 16       # column P: the project-location rail, beside the two key plots
+RAIL_C = 15       # column O: the project-location rail, one whole third of the band
 RAIL0 = 13        # its first fact row
 BM = 89           # unit-cost benchmark data block, in the chart-data columns
 fails = []
@@ -105,40 +105,37 @@ draw = rd('xl/drawings/drawing10.xml')
 anchors = [(int(c), int(r)) for c, r in
            re.findall(r'<xdr:from><xdr:col>(\d+)</xdr:col><xdr:colOff>\d+</xdr:colOff>'
                       r'<xdr:row>(\d+)</xdr:row>', draw)]
-# Three bands of plots that touch. The plots are pixel-anchored rather than snapped to columns,
-# so what matters is the count on each row and that none of them runs past the band.
-_rows = [r for c, r in anchors]
-check('the eight Summary charts stand two, three and three across the chart rows',
-      [_rows.count(C1 - 1), _rows.count(C2 - 1), _rows.count(C3 - 1)] == [2, 3, 3],
-      sorted(set(anchors)))
-check('the project location shares the key-chart rows, to the right of both plots',
-      (RAIL_C - 1, C1) in anchors and str(ws.cell(C1, RAIL_C).value) == 'PROJECT LOCATION',
-      (ws.cell(C1, RAIL_C).value, [a for a in anchors if a[0] == RAIL_C - 1]))
-check('no chart starts beyond the dashboard band (column R)',
-      all(c <= 17 for c, r in anchors if r in (C1 - 1, C2 - 1, C3 - 1)),
-      sorted(c for c, r in anchors if r in (C1 - 1, C2 - 1, C3 - 1)))
-# Each band of charts has to cover exactly the rows it is drawn over. The rows the key charts now
-# sit on used to carry the results table, and its 27- and 44-point rows left a dead strip under
-# them until the heights were put back to the sheet's own 15.
-def band_px(lo, hi):
-    return sum((ws.row_dimensions[r].height or 15.0) for r in range(lo, hi + 1)) * 4 / 3
-
-A_KEY_H = 260     # the key plots and the project-location rail share these thirteen rows
-
-# Pair each chart with the row it starts on, so the dashboard's own eight can be checked apart
-# from the locator map and the chart the setup form maintains.
-_drawn = []
-for _a in re.findall(r'<xdr:oneCellAnchor>.*?</xdr:oneCellAnchor>', draw, re.S):
-    _r = re.search(r'<xdr:row>(\d+)</xdr:row>', _a)
-    _e = re.search(r'<xdr:ext cx="\d+" cy="(\d+)"', _a)
-    if _r and _e: _drawn.append((int(_r.group(1)), int(_e.group(1)) / 9525.0))
-_want = {C1 - 1: A_KEY_H, C2 - 1: 180, C3 - 1: 160}   # the section row leaves a key row under it
-check('and every chart drawn on them is exactly that tall',
-      all(abs(cy - _want[r]) < 1 for r, cy in _drawn if r in _want)
-      and len([1 for r, _ in _drawn if r in _want]) == 8,
-      [(r + 1, round(cy)) for r, cy in _drawn if r in _want])
-check('the chart the form maintains follows its own note below the dashboard',
-      (6, VBACH - 1) in anchors, [a for a in anchors if a[0] == 6])
+# THE CHECK THAT SHOULD HAVE EXISTED FIRST. A chart anchored at a pixel offset assumes 7 px per
+# column width unit - Excel's number for Calibri 11. LibreOffice uses 9.33, so pixel-anchored
+# charts drifted a third of the band apart and the plots never touched. Anchored between two
+# COLUMNS there is nothing to assume, so the panels tile in either program.
+GRID = [(6, 10), (10, 14), (14, 18)]            # G:J, K:N, O:R - the three thirds of the band
+two = {}
+for _a in re.findall(r'<xdr:twoCellAnchor.*?</xdr:twoCellAnchor>', draw, re.S):
+    _n = re.search(r'name="([^"]*)"', _a)
+    _c = re.findall(r'<xdr:col>(\d+)</xdr:col><xdr:colOff>(\d+)</xdr:colOff>'
+                    r'<xdr:row>(\d+)</xdr:row>', _a)
+    if _n and len(_c) == 2:
+        two[_n.group(1)] = (int(_c[0][0]), int(_c[1][0]), int(_c[0][2]) + 1, int(_c[1][2]) + 1,
+                            int(_c[0][1]) + int(_c[1][1]))
+BANDS = {'Summary Chart 1': (0, C1, C2), 'Summary Chart 2': (1, C1, C2),
+         'Summary Chart 3': (0, C2, C3), 'Summary Chart 4': (1, C2, C3),
+         'Summary Chart 5': (2, C2, C3), 'Summary Chart 6': (0, C3, C3 + 8),
+         'Summary Chart 7': (1, C3, C3 + 8), 'Summary Chart 8': (2, C3, C3 + 8)}
+check('every plot is anchored between two columns, not at a pixel offset',
+      all(n in two for n in BANDS) and all(two[n][4] == 0 for n in BANDS),
+      [n for n in BANDS if n not in two or two[n][4] != 0])
+check('and the eight of them tile the band in three even thirds',
+      all(two[n][:2] == GRID[i] for n, (i, a, b) in BANDS.items()),
+      {n: two.get(n, ('?',))[:2] for n, (i, a, b) in BANDS.items() if two.get(n, ('?',))[:2] != GRID[i]})
+check('on the three chart rows the row map says',
+      all(two[n][2:4] == (a, b) for n, (i, a, b) in BANDS.items()),
+      {n: two.get(n, (0, 0, '?', '?'))[2:4] for n, (i, a, b) in BANDS.items()
+       if two.get(n, (0, 0, 0, 0))[2:4] != (a, b)})
+check('the project location fills the last third, beside both key plots',
+      two.get('Summary Chart 9', (0, 0))[:2] == GRID[2]
+      and str(ws.cell(C1, RAIL_C).value) == 'PROJECT LOCATION',
+      (ws.cell(C1, RAIL_C).value, two.get('Summary Chart 9')))
 check('chart-data block labelled do not edit', 'do not edit' in str(ws.cell(1, 23).value))
 check('the sensitivity block names the lowest alternative at each of its rates',
       ws.cell(SENS0 - 1, 23 + 1 + 4).value == 'Lowest at this rate'
@@ -309,7 +306,7 @@ check('and the macro finds the tables by their headings rather than by row numbe
       all(t in open('LCCA_KML_Export.bas', encoding='utf-8').read()
           for t in ('Private Function ResultsRow', 'Private Function SectionRow', 'HeadingRow')))
 check('the map sits between the rail header and its facts',
-      (RAIL_C - 1, C1) in anchors, [a for a in anchors if a[0] == RAIL_C - 1])
+      two.get('Summary Chart 9', (0, 0, 0, 0))[2] == C1 + 1, two.get('Summary Chart 9'))
 # One key row under the six lower charts, in place of six legends repeating the same two colour
 # sets. The alternative names come off the results table, so an empty slot prints nothing.
 KEYROW = C3 + 8
@@ -562,10 +559,12 @@ check('the alternative templates still multiply that fraction by the salvaged co
       all("-'Maintenance Policies'!D32*AV22" in rd(p_) for p_ in
           ('xl/worksheets/sheet8.xml', 'xl/worksheets/sheet10.xml')))
 
-print(); print('=' * 78); print('THE CHART GRID, AGAINST THE SHEET\'S OWN COLUMN WIDTHS'); print('=' * 78)
-# The chart anchors are (column, offset) pairs, so they only land on an even grid if the widths
-# they were computed from are the widths the sheet actually has. Recompute the grid from <cols>
-# here rather than trusting the build script's copy of them.
+print(); print('=' * 78); print("THE CHART GRID, AGAINST THE SHEET'S OWN COLUMNS"); print('=' * 78)
+# This used to recompute a pixel model of the columns and check the charts against it. That model
+# was the bug: it assumed 7 px per width unit, which is Excel's number and not LibreOffice's, and
+# the charts were positioned from it. They are anchored between columns now, so the grid is
+# checked where it is actually written - in the anchors - by the block further up. What is left
+# to check here is that the three thirds really are equal in the sheet's own widths.
 _sx = rd('xl/worksheets/sheet14.xml')
 _cols = re.search(r'<cols>(.*?)</cols>', _sx, re.S).group(1)
 _wpx = {}
@@ -575,47 +574,9 @@ for _cm in re.finditer(r'<col\b[^>]*/>', _cols):
     _w = re.search(r'width="([\d.]+)"', _cm.group(0))
     _px = 0 if 'hidden="1"' in _cm.group(0) else int(((256 * float(_w.group(1)) + int(128 / 7)) / 256) * 7)
     for _i in range(_lo, _hi + 1): _wpx[_i] = _px
-_off, _acc = {}, 0
-for _c in range(7, 19):
-    _off[_c] = _acc; _acc += _wpx.get(_c, 0)
-_band = _acc
-_dpart = 'xl/' + re.search(r'Target="\.\./(drawings/drawing\d+\.xml)"',
-                           rd('xl/worksheets/_rels/sheet14.xml.rels')).group(1)
-_d = rd(_dpart)
-_at = {}
-for _m in re.finditer(r'<xdr:oneCellAnchor>.*?</xdr:oneCellAnchor>', _d, re.S):
-    _nm = re.search(r'name="([^"]*)"', _m.group(0))
-    _f = re.search(r'<xdr:col>(\d+)</xdr:col><xdr:colOff>(\d+)</xdr:colOff><xdr:row>(\d+)</xdr:row>', _m.group(0))
-    _e = re.search(r'<xdr:ext cx="(\d+)"', _m.group(0))
-    if not (_nm and _f): continue
-    _at[_nm.group(1)] = (_off.get(int(_f.group(1)) + 1, 0) + int(_f.group(2)) / 9525.0,
-                         int(_f.group(3)) + 1, int(_e.group(1)) / 9525.0 if _e else 0)
-# The plots touch: no gutter, and each band divides its own width evenly. They are pixel-anchored
-# rather than snapped to columns, so the test is that the edges add up, not that they land on a
-# column boundary. The two key plots share everything left of the project-location rail.
-_rail = sum(_wpx.get(_c, 0) for _c in range(RAIL_C, 19))
-_keyw = (_band - _rail) / 2.0
-_t = _band / 3.0
-_want = {'Summary Chart 1': (0.0, _keyw), 'Summary Chart 2': (_keyw, _keyw),
-         'Summary Chart 3': (0.0, _t), 'Summary Chart 4': (_t, _t), 'Summary Chart 5': (2 * _t, _t),
-         'Summary Chart 6': (0.0, _t), 'Summary Chart 7': (_t, _t), 'Summary Chart 8': (2 * _t, _t),
-         'Summary Chart 9': (_band - _rail, _rail)}
-_bad = [(k, round(_at[k][0], 1), round(v[0], 1)) for k, v in _want.items()
-        if k in _at and abs(_at[k][0] - v[0]) > 2]
-check('every chart starts where the sheet\'s own widths say it should',
-      not _bad and len(_at) >= 9, {'band px': _band, 'off by more than 2 px': _bad})
-# a gutter anywhere would show up as a plot that stops short of its neighbour's left edge
-_gap = [(k, round(_at[k][0] + _at[k][2], 1), round(v[0] + v[1], 1)) for k, v in _want.items()
-        if k in _at and abs(_at[k][0] + _at[k][2] - v[0] - v[1]) > 2]
-check('and ends flush against the next one, with no gutter between plots',
-      not _gap, _gap)
-# the locator map is not one of the eight: it shares the key row but starts a row lower, under
-# the rail's own header
-_rows = sorted({_at[k][1] for k in _want if k in _at and k != 'Summary Chart 9'})
-check('and the eight of them sit on three rows, two then four then two',
-      len(_rows) == 3, _rows)
-_over = [(k, round(_at[k][0] + _at[k][2], 1)) for k in _want if k in _at and _at[k][0] + _at[k][2] > _band + 2]
-check('no chart runs past the right edge of the band', not _over, _over)
+_thirds = [sum(_wpx.get(c, 0) for c in range(a, b)) for a, b in ((7, 11), (11, 15), (15, 19))]
+check('the band divides into three equal thirds on column boundaries',
+      len(set(_thirds)) == 1 and sum(_thirds) == 6 * 247, _thirds)
 
 print(); print('=' * 78); print('WHAT EXCEL VALIDATES WHEN IT OPENS THE FILE'); print('=' * 78)
 # A table column carries the header text as its name. Change the header cell and leave the name,
