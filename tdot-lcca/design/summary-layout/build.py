@@ -386,7 +386,7 @@ C2 = lambda: panel('2. Net present worth vs. discount rate',
                    chart_rate() + ALT_LEGEND, key=True)
 SUP = [lambda: panel('3. Expenditure by year', 'Undiscounted, as it falls.', year_bars(SPEND)),
        lambda: panel('4. Cumulative discounted cost', 'Each line ends at its net present worth.',
-                     chart_cumulative() + ALT_LEGEND),
+                     chart_cumulative()),
        lambda: panel('5. Runway closure days', 'The years the runway is shut, and for how long.',
                      year_bars(CLOSURE, '#d98a2b'))]
 SEC = [lambda: panel('6. Section, mainline', 'Inches, read back from the quantities.', chart_section('m')),
@@ -394,6 +394,26 @@ SEC = [lambda: panel('6. Section, mainline', 'Inches, read back from the quantit
                      chart_section('s')),
        lambda: panel('8. Unit cost vs. published TN work', 'Against the 2024&#8211;25 all-in band.',
                      chart_benchmark())]
+
+
+LAYER_KEYS = [('#cdb894', 'Subbase (P-154)'), ('#c8a96e', 'Aggregate base'),
+              ('#3a3a3a', 'Asphalt'), ('#c6cbd0', 'Concrete')]
+BM_KEYS = [('#9aa7b4', 'West'), ('#9aa7b4', 'Middle'), ('#9aa7b4', 'East'), ('#bbd4ee', 'This project')]
+
+
+def key_row():
+    """The swatch carries the colour and the label stays ink: a pale series printed as pale text
+    cannot be read at eight points."""
+    def cell(c, t):
+        return ('<div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--muted);">'
+                '<span style="width:8px;height:8px;background:%s;display:inline-block;flex-shrink:0;"></span>'
+                '%s</div>' % (c, t))
+    left = ''.join(cell(c, t) for c, t in LAYER_KEYS)
+    right = ''.join(cell(c, t) for c, t in BM_KEYS)
+    return ('<div class="flush" style="grid-template-columns:2fr 1fr;height:%dpx;">'
+            '<div class="p" style="display:flex;align-items:center;gap:26px;">%s</div>'
+            '<div class="p" style="display:flex;align-items:center;gap:22px;">%s</div></div>'
+            % (ROW, left, right))
 
 
 def row(cols, height, cells):
@@ -410,7 +430,7 @@ def write(name, w, body, logic=True):
 MAIN_BODY = (fold(624) + HEADER + CONTEXT + tiles() + VERDICT + freeze_line()
              + row('%dpx %dpx %dpx' % (KEY_W, KEY_W, RAIL_W), 13 * ROW, [C1, C2, location_rail])
              + row('repeat(3,minmax(0,1fr))', 9 * ROW, SUP)
-             + row('repeat(3,minmax(0,1fr))', 9 * ROW, SEC)
+             + row('repeat(3,minmax(0,1fr))', 8 * ROW, SEC) + key_row()
              + tables())
 write('Main.dc.html', BAND_WIDE, MAIN_BODY)
 
@@ -604,7 +624,7 @@ write('DirectionB.dc.html', BAND_WIDE,
       fold(624) + HEADER + CONTEXT + freeze_line('Frozen here &#8212; only the band and the project line')
       + row('%dpx %dpx %dpx' % (RAIL_W, KEY_W, KEY_W), 17 * ROW, [decision_panel, C1, C2])
       + row('repeat(3,minmax(0,1fr))', 9 * ROW, SUP)
-      + row('repeat(3,minmax(0,1fr))', 9 * ROW, SEC)
+      + row('repeat(3,minmax(0,1fr))', 8 * ROW, SEC) + key_row()
       + tables())
 
 
@@ -637,81 +657,69 @@ write('DirectionC.dc.html', BAND_WIDE,
       + compact_results()
       + sectitle('Supporting detail', 'Charts 3 to 8 and the comparison block continue below.')
       + row('repeat(3,minmax(0,1fr))', 9 * ROW, SUP)
-      + row('repeat(3,minmax(0,1fr))', 9 * ROW, SEC))
+      + row('repeat(3,minmax(0,1fr))', 8 * ROW, SEC) + key_row())
 
 
-# ---------------------------------------------------------------- Review: what is still being paid for
-TWICE = [('1. Present worth by category', 'A category axis titled &#8220;Alternative&#8221; over labels '
-          'that already read Alternative 1, 2, 3', '20 px of height'),
-         ('1. Present worth by category', 'A value axis titled &#8220;Present worth ($)&#8221; under a '
-          'chart called Present worth by category', '18 px of width'),
-         ('2. Net present worth vs. rate', 'A 71-character title that wraps to two lines at 558 px',
-          '17 px of height'),
-         ('2. Net present worth vs. rate', 'A value axis titled &#8220;Net present worth ($)&#8221;, '
-          'again', '18 px of width'),
-         ('2. Net present worth vs. rate', 'A tick label every quarter point &#8212; twenty-five of them, '
-          'rotated', 'the bottom fifth'),
-         ('Locator map', '&#8220;Latitude&#8221; and &#8220;Longitude&#8221; on a 365 &#215; 100 panel',
-          'a quarter of the map')]
+# ---------------------------------------------------------------- Review: the spacing, measured
+GAPS = [('Side by side, on a 494 px panel', '56 px', '39 px',
+         'left plot&#8217;s right margin 10 &#8594; 5, two hairlines, right plot&#8217;s y labels 44 &#8594; 32'),
+        ('Stacked, between two chart rows', '69 px', '40 px',
+         'upper plot&#8217;s x labels and legend 40 &#8594; 20, two hairlines, lower plot&#8217;s title 27 &#8594; 18'),
+        ('Between the two key plots', '55 px', '46 px',
+         'chart 1&#8217;s right margin 14 &#8594; 8, chart 2&#8217;s y labels 39 &#8594; 36')]
 
-FOLD = [('Header band', 53, 53, 53), ('Project context', 20, 20, 20),
-        ('Six tiles', 60, 0, 60), ('Verdict banner', 40, 0, 40),
-        ('Decision panel with the key plots', 0, 340, 0),
-        ('Key plots and the project location', 260, 0, 240),
-        ('Results table', 0, 0, 129),
-        ('Supporting plots', 180, 180, 0)]
+LEVERS = [('Six legends became one key row', 'Charts 3, 4 and 5 each carried the four alternative '
+           'colours; 6 and 7 each carried the four layer colours. Six legends, two colour sets. '
+           'Chart 2 keeps its own and stands directly over the three that share it.',
+           '16 px inside every one of six charts'),
+          ('$6M, not $6.0M', 'A decimal that never carried information at this scale.',
+           '12 px off every left margin'),
+          ('No axis names an axis the title already names', 'A category axis titled Alternative over '
+           'labels reading Alternative 1. A value axis titled Present worth ($) under a chart called '
+           'Present worth by category. Latitude and Longitude on a 365 &#215; 100 map.',
+           '20 px of height, 18 px of width, a quarter of the map'),
+          ('Chart 2&#8217;s title on one line', '71 characters wrapping at 558 px.', '17 px of height'),
+          ('The plots take all of it back', 'Same fractional margins on every panel, so the grid '
+           'reads regular.', 'key plots 53 &#8594; 64% of their panel, small ones 56 &#8594; 72%')]
 
-TRADE = [('Main &#8212; quieter charts',
-          'Nothing moves. Every panel gains the space its own labels were holding, and the sheet '
-          'reads calmer for it.',
-          'The least it could be. If the tile strip or the reading order is what bothers you, this '
-          'does not touch either.'),
-         ('Direction B &#8212; one answer, then the evidence',
-          'The six tiles and the verdict banner say the same thing twice. Said once, in one panel '
-          'beside the plots, the top of the sheet gives 133 px back and the answer stops being a wall.',
-          'The answer no longer stays frozen while you scroll, and six separate numbers become one '
-          'block to read rather than six to scan.'),
-         ('Direction C &#8212; numbers on the first screen',
-          'The results table clears the fold, so the sheet opens on figures as well as pictures. '
-          'Everything else keeps its place.',
-          'Charts 3 to 8 all drop below the fold. The sheet stops reading picture-first, which is '
-          'the order it was rearranged into two rounds ago.')]
+REJECTED = [('Drop the y axis from charts 6 and 7, label the segments instead',
+             'Would take the horizontal gap to about 18 px &#8212; the lowest it can go &#8212; but four '
+             'stacked layer labels per bar at eight points is clutter, and the thicknesses are '
+             'already spelled out in the pavement-section table.'),
+            ('Put the shared key between the two chart rows rather than under them',
+             'A key row there re-opens the 40 px gap it was meant to close. At the foot it closes '
+             'the rows up and still reads as the panels&#8217; own caption.')]
 
 
-def fold_table():
-    rows = []
-    for label, a, b, c in FOLD:
-        rows.append((label, a or '&#8212;', b or '&#8212;', c or '&#8212;'))
-    tot = ['%d px' % sum(x[i] for x in FOLD) for i in range(1, 4)]
-    rows.append(('<b>Above the fold</b>', '<b>%s</b>' % tot[0], '<b>%s</b>' % tot[1], '<b>%s</b>' % tot[2]))
-    return tbl(['Band', 'Main', 'Direction B', 'Direction C'], rows, right_from=1)
+def rejected():
+    return ''.join('<div style="padding:8px 0;border-bottom:1px solid var(--line);">'
+                   '<div style="font-size:11.5px;font-weight:700;">%s</div>'
+                   '<div class="sub" style="margin-top:2px;">%s</div></div>' % r for r in REJECTED)
 
 
-def trades():
-    out = ''
-    for name, why, cost in TRADE:
-        out += ('<div style="padding:9px 0;border-bottom:1px solid var(--line);">'
-                '<div style="font-size:12px;font-weight:800;">%s</div>'
-                '<div style="font-size:11px;margin-top:2px;">%s</div>'
-                '<div class="sub" style="margin-top:3px;"><b>The cost:</b> %s</div></div>'
-                % (name, why, cost))
-    return out
+def levers():
+    return ''.join('<div style="display:flex;gap:11px;align-items:flex-start;padding:8px 0;'
+                   'border-bottom:1px solid var(--line);">'
+                   '<div style="flex-grow:1;"><div style="font-size:11.5px;font-weight:700;">%s</div>'
+                   '<div class="sub" style="margin-top:1px;">%s</div></div>'
+                   '<div style="font-size:10.5px;font-weight:700;color:var(--green);flex-shrink:0;'
+                   'width:210px;text-align:right;">%s</div></div>' % l for l in LEVERS)
 
 
 review_body = (
     '<div style="padding:18px 20px 22px;display:flex;flex-direction:column;gap:14px;">'
-    '<div><div style="font-size:19px;font-weight:800;">What the dashboard is still paying for</div>'
-    '<div class="sub" style="margin-top:3px;font-size:11px;">Measured from the workbook as built. '
-    'The layout is settled; what is left is labelling that repeats itself and one open question '
-    'about what belongs on the first screen.</div></div>'
-    + block('Said twice', 'Every one of these is a chart telling you something its own title '
-            'already told you, in space the plot could have had.',
-            tbl(['Chart', 'What it says twice', 'Costs'], TWICE, right_from=2))
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">'
-    + block('What clears a 624 px screen', 'The grid a 15.6 in laptop gives Excel at 125% scaling. '
-            'Each column is one of the three directions.', fold_table())
-    + block('And what each one costs', 'A set where only the favourite gets a case made for it is '
-            'not a choice.', trades())
+    '<div><div style="font-size:19px;font-weight:800;">Closing the space between the plots</div>'
+    '<div class="sub" style="margin-top:3px;font-size:11px;">The panels were already flush. What sat '
+    'between two plots was each chart&#8217;s own margins, and the largest single item in them was a '
+    'legend repeating what the chart above it had already said.</div></div>'
+    + block('The gap, before and after',
+            'Measured between plot areas, not between panels. The panels have touched since the '
+            'layout was settled.',
+            tbl(['Between', 'Was', 'Now', 'What is in it'], GAPS, right_from=1))
+    + '<div style="display:grid;grid-template-columns:3fr 2fr;gap:14px;">'
+    + block('What each move was worth', 'In the order of how much space it returned.', levers())
+    + block('And two that were not taken', 'Both would have closed more. Neither was worth it.',
+            rejected())
     + '</div></div>')
 
 open('Review.dc.html', 'w').write(HEAD + band(BAND_WIDE) + review_body + '\n</div>\n' + TAIL)

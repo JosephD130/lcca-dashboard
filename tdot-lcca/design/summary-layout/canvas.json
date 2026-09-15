@@ -1,38 +1,34 @@
 {
   "pages": [
-    { "id": "page-1", "name": "Refinements" },
-    { "id": "page-2", "name": "Decided" }
+    { "id": "page-1", "name": "Built" },
+    { "id": "page-2", "name": "Considered" }
   ],
   "artboards": [
     { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1482, "h": 1210, "page": "page-1",
-      "title": "Main — as built, with the labelling stripped back" },
-    { "file": "Review.dc.html", "x": 1600, "y": 0, "w": 1482, "h": 900, "page": "page-1",
-      "title": "What it is still paying for" },
-    { "file": "DirectionB.dc.html", "x": 0, "y": 1340, "w": 1482, "h": 1240, "page": "page-1",
-      "title": "Direction B — one answer, then the evidence" },
-    { "file": "DirectionC.dc.html", "x": 1600, "y": 1340, "w": 1482, "h": 1020, "page": "page-1",
-      "title": "Direction C — numbers on the first screen" },
+      "title": "The Summary as it now stands" },
+    { "file": "Review.dc.html", "x": 1600, "y": 0, "w": 1482, "h": 780, "page": "page-1",
+      "title": "Closing the space between the plots" },
 
-    { "file": "Grid.dc.html", "x": 0, "y": 0, "w": 1482, "h": 1340, "page": "page-2",
+    { "file": "DirectionB.dc.html", "x": 0, "y": 0, "w": 1482, "h": 1240, "page": "page-2",
+      "title": "Direction B — one answer, then the evidence" },
+    { "file": "DirectionC.dc.html", "x": 1600, "y": 0, "w": 1482, "h": 1020, "page": "page-2",
+      "title": "Direction C — numbers on the first screen" },
+    { "file": "Grid.dc.html", "x": 0, "y": 1400, "w": 1482, "h": 1340, "page": "page-2",
       "title": "The sizing review that settled the layout" },
-    { "file": "OptionB.dc.html", "x": 1600, "y": 0, "w": 1239, "h": 700, "page": "page-2",
+    { "file": "OptionB.dc.html", "x": 1600, "y": 1400, "w": 1239, "h": 700, "page": "page-2",
       "title": "Option B — rail inside today's 1,240 band" },
-    { "file": "OptionC.dc.html", "x": 1600, "y": 840, "w": 1239, "h": 760, "page": "page-2",
+    { "file": "OptionC.dc.html", "x": 1600, "y": 2240, "w": 1239, "h": 760, "page": "page-2",
       "title": "Option C — location in the frozen header" }
   ],
   "annotations": [
-    { "id": "t-round2", "x": 0, "y": -230, "w": 1000, "kind": "title1",
-      "text": "Refining the Summary dashboard" },
-    { "id": "note-round2", "x": 0, "y": -160, "w": 900,
-      "text": "WHERE THIS STARTS\nThe layout is settled and built: 1,482 px band, six tiles in one row, the two key plots with the project location beside them, then two rows of three, then the tables. What is left is not layout.\n\nWHAT MAIN CHANGES\nEvery chart is still telling you things its own title already told you — a category axis titled \"Alternative\" over labels that read Alternative 1, a value axis titled \"Present worth ($)\" under a chart called Present worth by category, twenty-five rotated tick labels where seven would do. Main strips all of it. Nothing moves; every plot gets bigger." },
-    { "id": "note-review", "x": 1600, "y": -160, "w": 700,
-      "text": "THE OPEN QUESTION\nMain is the safe change and I would take it either way. The question the other two artboards ask is what belongs on the first screen a reader gets.\n\nRight now that screen is: header, project line, six tiles, verdict, two key plots, three supporting plots. No figures until you scroll. B and C each answer that differently, and the table on this artboard adds up what clears 624 px in all three." },
-    { "id": "note-b2", "x": 0, "y": 2630, "w": 700,
-      "text": "DIRECTION B\nThe six tiles and the verdict banner say the same thing twice: the banner names the winner and its margin, and two of the tiles repeat both. Here it is said once, in one panel beside the plots, with the locator map at its foot.\n\nThat returns 133 px at the top of the sheet and makes the answer a paragraph rather than a wall of six numbers. The cost is that the answer no longer stays frozen while you scroll." },
-    { "id": "note-c2", "x": 1600, "y": 2410, "w": 700,
-      "text": "DIRECTION C\nThe results table clears the fold, so the sheet opens on figures as well as pictures. Tiles, verdict and the two key plots keep their places above it.\n\nThe cost is real: charts 3 to 8 all drop below the fold, and the sheet stops reading picture-first — which is the order it was deliberately rearranged into two rounds ago. Worth taking only if Mat's readers reach for the table first." },
-    { "id": "note-decided", "x": 0, "y": -160, "w": 700, "page": "page-2",
-      "text": "SETTLED LAST ROUND\nThe sizing review and the two alternates that were not taken. Option A — the 1,483 px band with the project location as a right-hand rail — is what got built, and Main on the Refinements page is that layout as it now stands.\n\nKept here because the tradeoffs are still the argument for the band being wider than a 150%-scaled window." }
+    { "id": "t-built", "x": 0, "y": -230, "w": 1000, "kind": "title1",
+      "text": "The LCCA Summary dashboard" },
+    { "id": "note-built", "x": 0, "y": -160, "w": 900,
+      "text": "WHAT IS IN THE WORKBOOK\nA 1,482 px band on six even pairs of 247. Frozen: the header, the project line, six tiles in one row, the verdict. Then the two key plots with the project location beside them, then two rows of three, then a key row, then every table. Header through the supporting plots is 613 px, inside the 624 a 15.6 in screen at 125% scaling gives Excel.\n\nTHE PLOTS\nThey touch, on one hairline. Six chart legends became the single key row under the section charts — charts 3, 4 and 5 all used chart 2's four alternative colours, and 6 and 7 the same four layer colours. No chart names an axis its own title already names." },
+    { "id": "note-spacing", "x": 1600, "y": -160, "w": 700,
+      "text": "WHAT CLOSING THE SPACE ACTUALLY TOOK\nThe panels have been flush since the layout was settled. What sat between two plots was each chart's own margins.\n\nSide by side that was 56 px and is now 39. Stacked it was 69 px and is now 40. The plots took the difference: a key plot fills 64 percent of its panel where it filled 53, a small one 72 where it filled 56.\n\nThe artboard beside this one lists every move and the two that were not taken." },
+    { "id": "note-considered", "x": 0, "y": -160, "w": 900, "page": "page-2",
+      "text": "NOT TAKEN, KEPT FOR THE ARGUMENT\nDirection B put the answer in one panel beside the plots instead of six tiles and a banner, which returns 133 px at the top but stops the answer being frozen while you scroll. Direction C lifted the results table above the fold, at the price of every chart but the key pair dropping below it.\n\nBelow them, the sizing review that settled the band width, and the two placements for the project location that lost to the right-hand rail." }
   ],
   "launch": { "view": "canvas", "page": "page-1" }
 }
