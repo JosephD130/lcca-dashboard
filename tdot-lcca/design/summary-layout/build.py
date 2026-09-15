@@ -724,3 +724,144 @@ review_body = (
 
 open('Review.dc.html', 'w').write(HEAD + band(BAND_WIDE) + review_body + '\n</div>\n' + TAIL)
 print('Review.dc.html         %d px wide' % BAND_WIDE)
+
+
+# ---------------------------------------------------------------- Spec: the layout as a system
+SCALE = 0.5                                   # the schematic draws the band at half size
+def s(v): return round(v * SCALE)
+
+BANDS = [('Header band', 53, '#1c2634', 'the sheet name, its step, the two nav buttons'),
+         ('Project context', 20, '#3a4757', 'airport, runway, area, period and rate, year'),
+         ('Six tiles, one row', 60, '#3e7cc0', 'each exactly a sixth of the band'),
+         ('Verdict', 40, '#0f7b4f', 'names the winner and the margin')]
+ROWS = [('Key plots and the project location', 260, 13),
+        ('Supporting plots', 180, 9),
+        ('Section plots', 160, 8),
+        ('Colour key', 20, 1)]
+
+RULES = [('Panels align to columns, never to pixels.',
+          'The band is twelve columns that sum to 1,482 px and divide into three exact thirds at '
+          'G:J, K:N and O:R. A panel spans one third, anchored column to column. Nothing is placed '
+          'at a pixel offset, because a pixel offset is a guess about how wide a column is.'),
+         ('Every panel in a row is the same size.',
+          'Same width by the grid, same height by the row band. Three panels across, never two and '
+          'a half.'),
+         ('Plot rectangles align across the row.',
+          'Same left inset, same top, same bottom in every panel, so three neighbouring y axes form '
+          'one vertical line and three baselines form one horizontal line. This is what reads as '
+          '&#8220;aligned&#8221;; equal panel widths alone do not.'),
+         ('Rows stack with no gap.',
+          'The bottom hairline of one row is the top hairline of the next. One rule between panels, '
+          'never a gutter.'),
+         ('Every band is a whole number of rows.',
+          'Rows are 15 pt, which is 20 px. 260, 180 and 160 are 13, 9 and 8 of them. A band that is '
+          'not a whole number of rows leaves a strip of nothing under its charts.'),
+         ('The tables start under the last chart row.',
+          'Full band width, on the same twelve columns, so the results table&#8217;s column edges land '
+          'on the panel edges above it.')]
+
+BREAKS = [('A pixel anchor', 'assumes 7 px per column width unit. Get that wrong and every chart '
+           'after the first drifts sideways; the plots never touch however you tune their margins.'),
+          ('A plot-area layout without layoutTarget', 'positions the box that includes the axis '
+           'labels, not the plot. The margins move and the plot stays where it was.'),
+          ('A legend per chart', 'is the same colour key printed six times, and it is the largest '
+           'single thing standing between two stacked plots.'),
+          ('An axis title', 'that repeats the chart title costs 20 px of height or 18 of width to '
+           'say nothing.')]
+
+
+def schematic():
+    out, y = [], 0
+    for label, px, col, note in BANDS:
+        out.append('<div style="display:flex;align-items:center;gap:9px;">'
+                   '<div style="width:%dpx;height:%dpx;background:%s;flex-shrink:0;"></div>'
+                   '<div style="font-size:10px;"><b>%s</b> <span style="color:var(--muted);">'
+                   '%d px &#183; %s</span></div></div>' % (s(1482), max(s(px), 6), col, label, px, note))
+        y += px
+    out.append('<div style="display:flex;align-items:center;gap:9px;margin:3px 0;">'
+               '<div style="width:%dpx;border-top:2px solid var(--navy);flex-shrink:0;"></div>'
+               '<div style="font-size:10px;font-weight:700;">Frozen at %d px</div></div>' % (s(1482), y))
+    for label, px, rows in ROWS:
+        cells = ''.join('<div style="background:#eef4fb;border:1px solid #9fb6d0;height:%dpx;"></div>'
+                        % max(s(px) - 2, 8) for _ in range(3))
+        out.append('<div style="display:flex;align-items:center;gap:9px;">'
+                   '<div style="width:%dpx;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;'
+                   'flex-shrink:0;">%s</div>'
+                   '<div style="font-size:10px;"><b>%s</b> <span style="color:var(--muted);">'
+                   '%d px &#183; %d rows &#183; three panels of 494 px</span></div></div>'
+                   % (s(1482), cells, label, px, rows))
+        y += px
+    out.append('<div style="display:flex;align-items:center;gap:9px;margin:3px 0;">'
+               '<div style="width:%dpx;border-top:2px dashed var(--red);flex-shrink:0;"></div>'
+               '<div style="font-size:10px;font-weight:700;color:var(--red);">'
+               'Fold on a 15.6 in screen at 125%%, 624 px. The sheet reaches %d px by here.</div></div>'
+               % (s(1482), y))
+    out.append('<div style="display:flex;align-items:center;gap:9px;">'
+               '<div style="width:%dpx;height:%dpx;background:#fff;border:1px solid var(--line);'
+               'flex-shrink:0;"></div><div style="font-size:10px;"><b>The tables</b> '
+               '<span style="color:var(--muted);">results, comparison, pavement section &#183; '
+               'full band, same twelve columns</span></div></div>' % (s(1482), s(300)))
+    return '<div style="display:flex;flex-direction:column;gap:2px;">%s</div>' % ''.join(out)
+
+
+def panel_anatomy():
+    return ('<svg width="100%" viewBox="0 0 470 210" style="display:block;">'
+            '<rect x="40" y="18" width="390" height="150" fill="#fff" stroke="#bcc6d2"/>'
+            '<rect x="40" y="18" width="390" height="150" fill="none" stroke="none"/>'
+            '<text x="235" y="36" font-size="11" font-weight="700" fill="#1c2634" '
+            'text-anchor="middle">Chart title, 8 pt, one line</text>'
+            '<rect x="62" y="44" width="360" height="104" fill="#f6f9fc" stroke="#9fb6d0" '
+            'stroke-dasharray="3 2"/>'
+            '<text x="242" y="100" font-size="10" fill="#5b6675" text-anchor="middle">the plot '
+            'rectangle, laid out with layoutTarget inner</text>'
+            '<line x1="40" y1="180" x2="62" y2="180" stroke="#c8102e"/>'
+            '<text x="51" y="194" font-size="9" fill="#c8102e" text-anchor="middle">27</text>'
+            '<line x1="422" y1="180" x2="430" y2="180" stroke="#c8102e"/>'
+            '<text x="426" y="194" font-size="9" fill="#c8102e" text-anchor="middle">5</text>'
+            '<line x1="18" y1="18" x2="18" y2="44" stroke="#c8102e"/>'
+            '<text x="12" y="34" font-size="9" fill="#c8102e" text-anchor="end">18</text>'
+            '<line x1="18" y1="148" x2="18" y2="168" stroke="#c8102e"/>'
+            '<text x="12" y="162" font-size="9" fill="#c8102e" text-anchor="end">22</text>'
+            '<text x="235" y="207" font-size="9.5" fill="#5b6675" text-anchor="middle">'
+            'Same four numbers on every panel, so the plots line up across the row.</text>'
+            '</svg>')
+
+
+def numbered(items):
+    out = ''
+    for i, (head, body) in enumerate(items):
+        out += ('<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);">'
+                '<div style="width:18px;height:18px;border-radius:50%%;background:var(--navy);color:#fff;'
+                'font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;'
+                'flex-shrink:0;">%d</div>'
+                '<div><div style="font-size:11.5px;font-weight:700;">%s</div>'
+                '<div class="sub" style="margin-top:1px;">%s</div></div></div>' % (i + 1, head, body))
+    return out
+
+
+def plain(items):
+    return ''.join('<div style="padding:6px 0;border-bottom:1px solid var(--line);font-size:11px;">'
+                   '<b>%s</b> <span style="color:var(--muted);">%s</span></div>' % it for it in items)
+
+
+spec_body = (
+    '<div style="padding:18px 20px 22px;display:flex;flex-direction:column;gap:14px;">'
+    '<div><div style="font-size:19px;font-weight:800;">The Summary, as a grid</div>'
+    '<div class="sub" style="margin-top:3px;font-size:11px;">What &#8220;the plots are aligned and the '
+    'tables are below them&#8221; means precisely enough to build from, and precisely enough to fail a '
+    'check against.</div></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">'
+    + block('The sheet, to scale', 'Half size. Every band is a whole number of 20 px rows and every '
+            'row of panels is three across.', schematic())
+    + block('Six rules', 'In order of how much they matter.', numbered(RULES))
+    + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">'
+    + block('One panel', 'The margins are the same fraction on every panel in a row, which is what '
+            'makes three neighbouring plots share a baseline.', panel_anatomy())
+    + block('And what breaks it', 'Each of these was in the file at some point in the last four '
+            'rounds. Each one moves the plots apart while every number in the XML still looks right.',
+            plain(BREAKS))
+    + '</div></div>')
+
+open('Spec.dc.html', 'w').write(HEAD + band(BAND_WIDE) + spec_body + '\n</div>\n' + TAIL)
+print('Spec.dc.html           %d px wide' % BAND_WIDE)

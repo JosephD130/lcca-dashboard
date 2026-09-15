@@ -1,34 +1,129 @@
 {
   "pages": [
-    { "id": "page-1", "name": "Built" },
-    { "id": "page-2", "name": "Considered" }
+    {
+      "id": "page-1",
+      "name": "Built"
+    },
+    {
+      "id": "page-2",
+      "name": "Considered"
+    }
   ],
   "artboards": [
-    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1482, "h": 1210, "page": "page-1",
-      "title": "The Summary as it now stands" },
-    { "file": "Review.dc.html", "x": 1600, "y": 0, "w": 1482, "h": 780, "page": "page-1",
-      "title": "Closing the space between the plots" },
-
-    { "file": "DirectionB.dc.html", "x": 0, "y": 0, "w": 1482, "h": 1240, "page": "page-2",
-      "title": "Direction B — one answer, then the evidence" },
-    { "file": "DirectionC.dc.html", "x": 1600, "y": 0, "w": 1482, "h": 1020, "page": "page-2",
-      "title": "Direction C — numbers on the first screen" },
-    { "file": "Grid.dc.html", "x": 0, "y": 1400, "w": 1482, "h": 1340, "page": "page-2",
-      "title": "The sizing review that settled the layout" },
-    { "file": "OptionB.dc.html", "x": 1600, "y": 1400, "w": 1239, "h": 700, "page": "page-2",
-      "title": "Option B — rail inside today's 1,240 band" },
-    { "file": "OptionC.dc.html", "x": 1600, "y": 2240, "w": 1239, "h": 760, "page": "page-2",
-      "title": "Option C — location in the frozen header" }
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1482,
+      "h": 1210,
+      "page": "page-1",
+      "title": "The Summary as it now stands"
+    },
+    {
+      "file": "Spec.dc.html",
+      "x": 1600,
+      "y": 0,
+      "w": 1482,
+      "h": 1180,
+      "page": "page-1",
+      "title": "The layout, as a grid"
+    },
+    {
+      "file": "Review.dc.html",
+      "x": 3200,
+      "y": 0,
+      "w": 1482,
+      "h": 780,
+      "page": "page-1",
+      "title": "Closing the space between the plots"
+    },
+    {
+      "file": "DirectionB.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1482,
+      "h": 1240,
+      "page": "page-2",
+      "title": "Direction B \u2014 one answer, then the evidence"
+    },
+    {
+      "file": "DirectionC.dc.html",
+      "x": 1600,
+      "y": 0,
+      "w": 1482,
+      "h": 1020,
+      "page": "page-2",
+      "title": "Direction C \u2014 numbers on the first screen"
+    },
+    {
+      "file": "Grid.dc.html",
+      "x": 0,
+      "y": 1400,
+      "w": 1482,
+      "h": 1340,
+      "page": "page-2",
+      "title": "The sizing review that settled the layout"
+    },
+    {
+      "file": "OptionB.dc.html",
+      "x": 1600,
+      "y": 1400,
+      "w": 1239,
+      "h": 700,
+      "page": "page-2",
+      "title": "Option B \u2014 rail inside today's 1,240 band"
+    },
+    {
+      "file": "OptionC.dc.html",
+      "x": 1600,
+      "y": 2240,
+      "w": 1239,
+      "h": 760,
+      "page": "page-2",
+      "title": "Option C \u2014 location in the frozen header"
+    }
   ],
   "annotations": [
-    { "id": "t-built", "x": 0, "y": -230, "w": 1000, "kind": "title1",
-      "text": "The LCCA Summary dashboard" },
-    { "id": "note-built", "x": 0, "y": -160, "w": 900,
-      "text": "WHAT IS IN THE WORKBOOK\nA 1,482 px band on six even pairs of 247. Frozen: the header, the project line, six tiles in one row, the verdict. Then the two key plots with the project location beside them, then two rows of three, then a key row, then every table. Header through the supporting plots is 613 px, inside the 624 a 15.6 in screen at 125% scaling gives Excel.\n\nTHE PLOTS\nThey touch, on one hairline. Six chart legends became the single key row under the section charts — charts 3, 4 and 5 all used chart 2's four alternative colours, and 6 and 7 the same four layer colours. No chart names an axis its own title already names." },
-    { "id": "note-spacing", "x": 1600, "y": -160, "w": 700,
-      "text": "WHAT CLOSING THE SPACE ACTUALLY TOOK\nThe panels have been flush since the layout was settled. What sat between two plots was each chart's own margins.\n\nSide by side that was 56 px and is now 39. Stacked it was 69 px and is now 40. The plots took the difference: a key plot fills 64 percent of its panel where it filled 53, a small one 72 where it filled 56.\n\nThe artboard beside this one lists every move and the two that were not taken." },
-    { "id": "note-considered", "x": 0, "y": -160, "w": 900, "page": "page-2",
-      "text": "NOT TAKEN, KEPT FOR THE ARGUMENT\nDirection B put the answer in one panel beside the plots instead of six tiles and a banner, which returns 133 px at the top but stops the answer being frozen while you scroll. Direction C lifted the results table above the fold, at the price of every chart but the key pair dropping below it.\n\nBelow them, the sizing review that settled the band width, and the two placements for the project location that lost to the right-hand rail." }
+    {
+      "id": "t-built",
+      "x": 0,
+      "y": -230,
+      "w": 1000,
+      "kind": "title1",
+      "text": "The LCCA Summary dashboard"
+    },
+    {
+      "id": "note-built",
+      "x": 0,
+      "y": -160,
+      "w": 900,
+      "text": "WHAT IS IN THE WORKBOOK\nA 1,482 px band on six even pairs of 247. Frozen: the header, the project line, six tiles in one row, the verdict. Then the two key plots with the project location beside them, then two rows of three, then a key row, then every table. Header through the supporting plots is 613 px, inside the 624 a 15.6 in screen at 125% scaling gives Excel.\n\nTHE PLOTS\nThey touch, on one hairline. Six chart legends became the single key row under the section charts \u2014 charts 3, 4 and 5 all used chart 2's four alternative colours, and 6 and 7 the same four layer colours. No chart names an axis its own title already names."
+    },
+    {
+      "id": "note-considered",
+      "x": 0,
+      "y": -160,
+      "w": 900,
+      "page": "page-2",
+      "text": "NOT TAKEN, KEPT FOR THE ARGUMENT\nDirection B put the answer in one panel beside the plots instead of six tiles and a banner, which returns 133 px at the top but stops the answer being frozen while you scroll. Direction C lifted the results table above the fold, at the price of every chart but the key pair dropping below it.\n\nBelow them, the sizing review that settled the band width, and the two placements for the project location that lost to the right-hand rail."
+    },
+    {
+      "id": "note-spec",
+      "x": 1600,
+      "y": -160,
+      "w": 700,
+      "text": "HOW TO SAY IT PRECISELY\nThe band is twelve columns summing to 1,482 px that divide into three exact thirds at G:J, K:N and O:R. A panel spans one third, anchored column to column. Three across, every row.\n\nAligned means more than equal panels: the plot rectangles inside them share a left inset, a top and a bottom, so three neighbouring y axes form one vertical line and three baselines form one horizontal line. That is the thing you look at and call aligned.\n\nThe tables start under the last chart row, on the same twelve columns, so their column edges land on the panel edges above them."
+    },
+    {
+      "id": "note-review2",
+      "x": 3200,
+      "y": -160,
+      "w": 700,
+      "text": "WHAT IT COST TO GET THERE\nThe gap between plots, measured off the rendered page rather than the file, before and after each move. Four of the things on the spec's failure list were in the workbook at some point in the last four rounds, and every one of them left the numbers in the XML looking correct."
+    }
   ],
-  "launch": { "view": "canvas", "page": "page-1" }
+  "launch": {
+    "view": "canvas",
+    "page": "page-1"
+  }
 }
