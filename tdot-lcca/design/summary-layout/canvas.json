@@ -1,27 +1,38 @@
 {
+  "pages": [
+    { "id": "page-1", "name": "Refinements" },
+    { "id": "page-2", "name": "Decided" }
+  ],
   "artboards": [
-    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1483, "h": 1160,
-      "title": "Proposal — right rail, 1,483 px band" },
-    { "file": "Grid.dc.html", "x": 1600, "y": 0, "w": 1483, "h": 1340,
-      "title": "The sizing and spacing review" },
-    { "file": "OptionB.dc.html", "x": 0, "y": 1480, "w": 1239, "h": 700,
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1482, "h": 1210, "page": "page-1",
+      "title": "Main — as built, with the labelling stripped back" },
+    { "file": "Review.dc.html", "x": 1600, "y": 0, "w": 1482, "h": 900, "page": "page-1",
+      "title": "What it is still paying for" },
+    { "file": "DirectionB.dc.html", "x": 0, "y": 1340, "w": 1482, "h": 1240, "page": "page-1",
+      "title": "Direction B — one answer, then the evidence" },
+    { "file": "DirectionC.dc.html", "x": 1600, "y": 1340, "w": 1482, "h": 1020, "page": "page-1",
+      "title": "Direction C — numbers on the first screen" },
+
+    { "file": "Grid.dc.html", "x": 0, "y": 0, "w": 1482, "h": 1340, "page": "page-2",
+      "title": "The sizing review that settled the layout" },
+    { "file": "OptionB.dc.html", "x": 1600, "y": 0, "w": 1239, "h": 700, "page": "page-2",
       "title": "Option B — rail inside today's 1,240 band" },
-    { "file": "OptionC.dc.html", "x": 1400, "y": 1480, "w": 1239, "h": 760,
+    { "file": "OptionC.dc.html", "x": 1600, "y": 840, "w": 1239, "h": 760, "page": "page-2",
       "title": "Option C — location in the frozen header" }
   ],
   "annotations": [
-    { "id": "t-brief", "x": 0, "y": -230, "w": 900, "kind": "title1",
-      "text": "Summary dashboard — sizing, spacing, and where the project location goes" },
-    { "id": "note-brief", "x": 0, "y": -160, "w": 900,
-      "text": "THE TARGET\nA 15.6 in FHD laptop at Windows' default 125% scaling gives Excel a grid of 1,488 x 624 px. That is the budget everything here is drawn against, and the red dashed line on each artboard is where it ends. The tweak chip above the artboard switches the line to 150% and 100%.\n\nTHREE THINGS CHANGED\nThe plots touch — a 1 px hairline instead of a 10 px gutter, so a row of charts reads as one instrument. The six tiles collapse from two rows of three into one row of six. And the project location moves off the bottom of the sheet onto the chart row, where it is the third panel beside the two key plots." },
-    { "id": "note-main", "x": 1600, "y": -160, "w": 700,
-      "text": "THE PROPOSAL\nThe band widens from 1,239 px to 1,483 by taking in the four empty columns right of R. That is 244 px, most but not all of the 371 px location card — the other 127 px comes off the two key plots, which go from about 615 px each to 555. It is space a 1,488 px screen already offers.\n\nFrozen band 160 px: header, project context strip, six tiles, verdict. Then 240 px of key plots with the location beside them, then 180 px of supporting plots. 580 px in all, inside the 624 budget. The section plots and every table sit below the fold.\n\nTHE TRADEOFF\nAt 150% scaling the window is only 1,232 px wide, so the rightmost 250 px would scroll sideways. Option B is the answer if that matters." },
-    { "id": "note-b", "x": 0, "y": 2230, "w": 620,
-      "text": "OPTION B — stay at 1,239 px\nSame three-panel chart row, same flush hairlines, but inside today's band: the two key plots drop from 556 to 434 px each to make room for the 371 px location card.\n\nIt holds at 125%, where the proposal's extra 244 px would otherwise be the only thing scrolling. It does not fully clear 150% either — that window is 1,232 px, so 1,239 still scrolls, but by 7 px rather than 250. The cost is the key plots, which lose about a fifth of their width; chart 2's rate curves are the ones that feel it." },
-    { "id": "note-c", "x": 1400, "y": 2290, "w": 620,
-      "text": "OPTION C — location in the frozen header\nThe project location becomes a 60 px strip inside the frozen band: map on the left, facts in two columns, runway width as the one editable cell on the right. The two key plots then keep the full band width.\n\nIt is the only option where the location never scrolls away. The cost is height: the frozen band grows to 220 px, so the supporting plots fall below the fold on a 624 px screen, and the map has to be small." },
-    { "id": "note-impl", "x": 3200, "y": 1480, "w": 620,
-      "text": "WORTH KNOWING BEFORE ANY OF THIS IS BUILT\nMoving the project location off the foot of the sheet moves the runway-width cell with it. The Google Earth export macro reads that cell by address, so it would need updating in step with the layout.\n\nThe panel edges are pixel anchors on the drawing layer, not column boundaries, so the plots can sit flush at any width without disturbing the column widths the tables below depend on." }
+    { "id": "t-round2", "x": 0, "y": -230, "w": 1000, "kind": "title1",
+      "text": "Refining the Summary dashboard" },
+    { "id": "note-round2", "x": 0, "y": -160, "w": 900,
+      "text": "WHERE THIS STARTS\nThe layout is settled and built: 1,482 px band, six tiles in one row, the two key plots with the project location beside them, then two rows of three, then the tables. What is left is not layout.\n\nWHAT MAIN CHANGES\nEvery chart is still telling you things its own title already told you — a category axis titled \"Alternative\" over labels that read Alternative 1, a value axis titled \"Present worth ($)\" under a chart called Present worth by category, twenty-five rotated tick labels where seven would do. Main strips all of it. Nothing moves; every plot gets bigger." },
+    { "id": "note-review", "x": 1600, "y": -160, "w": 700,
+      "text": "THE OPEN QUESTION\nMain is the safe change and I would take it either way. The question the other two artboards ask is what belongs on the first screen a reader gets.\n\nRight now that screen is: header, project line, six tiles, verdict, two key plots, three supporting plots. No figures until you scroll. B and C each answer that differently, and the table on this artboard adds up what clears 624 px in all three." },
+    { "id": "note-b2", "x": 0, "y": 2630, "w": 700,
+      "text": "DIRECTION B\nThe six tiles and the verdict banner say the same thing twice: the banner names the winner and its margin, and two of the tiles repeat both. Here it is said once, in one panel beside the plots, with the locator map at its foot.\n\nThat returns 133 px at the top of the sheet and makes the answer a paragraph rather than a wall of six numbers. The cost is that the answer no longer stays frozen while you scroll." },
+    { "id": "note-c2", "x": 1600, "y": 2410, "w": 700,
+      "text": "DIRECTION C\nThe results table clears the fold, so the sheet opens on figures as well as pictures. Tiles, verdict and the two key plots keep their places above it.\n\nThe cost is real: charts 3 to 8 all drop below the fold, and the sheet stops reading picture-first — which is the order it was deliberately rearranged into two rounds ago. Worth taking only if Mat's readers reach for the table first." },
+    { "id": "note-decided", "x": 0, "y": -160, "w": 700, "page": "page-2",
+      "text": "SETTLED LAST ROUND\nThe sizing review and the two alternates that were not taken. Option A — the 1,483 px band with the project location as a right-hand rail — is what got built, and Main on the Refinements page is that layout as it now stands.\n\nKept here because the tradeoffs are still the argument for the band being wider than a 150%-scaled window." }
   ],
-  "launch": { "view": "canvas" }
+  "launch": { "view": "canvas", "page": "page-1" }
 }

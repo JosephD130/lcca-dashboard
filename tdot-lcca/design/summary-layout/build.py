@@ -7,7 +7,10 @@ number of 20 px Excel rows. Panels sit in a 1 px hairline grid so the plots touc
 HEAD = open('_head.txt').read()
 TAIL = '</x-dc>\n</body>\n</html>\n'
 
-BAND_WIDE, BAND_NARROW = 1483, 1239      # G:V and G:R, in px, from the sheet's own column widths
+BAND_WIDE, BAND_NARROW = 1482, 1239      # the band as built, and as it was
+RAIL_W = 364                             # P:R, the project-location rail
+KEY_W = (BAND_WIDE - RAIL_W - 2) // 2    # 558: each key plot, less the two hairlines
+THIRD = (BAND_WIDE - 2) // 3             # 493: a panel on either of the lower rows
 ROW = 20                                 # one Excel row at 15 pt
 
 
@@ -17,7 +20,7 @@ def band(w):
 
 
 HEADER = '''
-  <div style="display:flex;align-items:center;gap:12px;background:var(--navy);height:40px;padding:0 16px;">
+  <div style="display:flex;align-items:center;gap:12px;background:var(--navy);height:53px;padding:0 16px;">
     <div style="display:flex;gap:6px;">
       <div style="color:#cdd6e2;font-size:11px;border:1px solid #3a4757;border-radius:4px;padding:4px 8px;">&#9664; General Information</div>
       <div style="color:#cdd6e2;font-size:11px;border:1px solid #3a4757;border-radius:4px;padding:4px 8px;">Instructions</div>
@@ -155,13 +158,14 @@ def chart_rate(h=176):
              'text-anchor="end">Alternative 1 takes over</text>')
     grid = ''.join('<line x1="68" y1="%d" x2="520" y2="%d" stroke="#eef2f6"/>' % (v, v)
                    for v in (y(6.2), y(6.0), y(5.8), y(5.6)))
+    # one label a percentage point, not one every quarter point: twenty-five rotated labels are
+    # unreadable and cost the plot its bottom fifth
+    ticks = ''.join('<text x="%d" y="166" font-size="9" fill="#9aa7b4" text-anchor="middle">%d%%</text>'
+                    % (68 + i * 75.3, 2 + i) for i in range(7))
     ax = ('<line x1="68" y1="150" x2="520" y2="150" stroke="#cdd6e2"/>'
           '<text x="62" y="%d" font-size="9" fill="#9aa7b4" text-anchor="end">$6.4M</text>'
           '<text x="62" y="%d" font-size="9" fill="#9aa7b4" text-anchor="end">$5.6M</text>'
-          '<text x="68" y="166" font-size="9" fill="#9aa7b4">2%%</text>'
-          '<text x="294" y="166" font-size="9" fill="#9aa7b4" text-anchor="middle">5%%</text>'
-          '<text x="520" y="166" font-size="9" fill="#9aa7b4" text-anchor="end">8%%</text>'
-          % (y(6.4) + 4, y(5.6) + 4))
+          % (y(6.4) + 4, y(5.6) + 4)) + ticks
     return svg(540, 190, grid + cross + lines + ax)
 
 
@@ -174,7 +178,7 @@ def year_bars(spikes, color='#3e7cc0', y0=None):
                   % (26 + yr * 9.4, 100 - h, h, color)
                   for yr, h in sorted(spikes.items()))
     ticks = ''.join('<text x="%d" y="112" font-size="8" fill="#9aa7b4" text-anchor="middle">%d</text>'
-                    % (26 + yr * 9.4 + 3, 2028 + yr) for yr in (0, 10, 20, 30))
+                    % (26 + yr * 9.4 + 3, 2028 + yr) for yr in (0, 5, 10, 15, 20, 25, 30))
     return svg(320, 118, '<line x1="20" y1="100" x2="316" y2="100" stroke="#cdd6e2"/>' + out + ticks)
 
 
@@ -370,19 +374,26 @@ class Component extends DCLogic {
 </script>'''
 
 
-C1 = lambda: panel('1. Present worth by category', 'Where the money goes. Salvage sits below the line.',
+# Titles say what the chart is; the axes should not say it again. Chart 1 carried an
+# "Alternative" category-axis title over labels that already read "Alternative 1", and a
+# "Present worth ($)" value-axis title under a chart called "Present worth by category". Both
+# come off, the second line of chart 2's title moves into its sub line, and the plot takes the room.
+C1 = lambda: panel('1. Present worth by category',
+                   'Where the money goes. Salvage sits below the line.',
                    chart_category() + CAT_LEGEND, key=True)
 C2 = lambda: panel('2. Net present worth vs. discount rate',
-                   'Does the winner hold? The axis starts at the data, not at zero.',
+                   'Does the winner hold? TDOT 3%, FAA 2%, pre-2022 rule 7%.',
                    chart_rate() + ALT_LEGEND, key=True)
 SUP = [lambda: panel('3. Expenditure by year', 'Undiscounted, as it falls.', year_bars(SPEND)),
        lambda: panel('4. Cumulative discounted cost', 'Each line ends at its net present worth.',
                      chart_cumulative() + ALT_LEGEND),
        lambda: panel('5. Runway closure days', 'The years the runway is shut, and for how long.',
-                     year_bars(CLOSURE, '#d98a2b')),
-       lambda: panel('8. Unit cost vs. published TN work', 'Against the 2024&#8211;25 all-in band.', chart_benchmark())]
+                     year_bars(CLOSURE, '#d98a2b'))]
 SEC = [lambda: panel('6. Section, mainline', 'Inches, read back from the quantities.', chart_section('m')),
-       lambda: panel('7. Section with shoulder', 'Combined mainline and shoulder area.', chart_section('s'))]
+       lambda: panel('7. Section with shoulder', 'Blank when the project has no paved shoulder.',
+                     chart_section('s')),
+       lambda: panel('8. Unit cost vs. published TN work', 'Against the 2024&#8211;25 all-in band.',
+                     chart_benchmark())]
 
 
 def row(cols, height, cells):
@@ -395,14 +406,13 @@ def write(name, w, body, logic=True):
     print('%-22s %d px wide' % (name, w))
 
 
-# ---------------------------------------------------------------- Main: the proposal
-write('Main.dc.html', BAND_WIDE,
-      fold(624) + HEADER + CONTEXT + tiles() + VERDICT
-      + freeze_line()
-      + row('555px 555px 371px', 12 * ROW, [C1, C2, location_rail])
-      + row('repeat(4,minmax(0,1fr))', 9 * ROW, SUP)
-      + row('repeat(2,minmax(0,1fr))', 8 * ROW, SEC)
-      + tables())
+# ---------------------------------------------------------------- Main: the refinement
+MAIN_BODY = (fold(624) + HEADER + CONTEXT + tiles() + VERDICT + freeze_line()
+             + row('%dpx %dpx %dpx' % (KEY_W, KEY_W, RAIL_W), 13 * ROW, [C1, C2, location_rail])
+             + row('repeat(3,minmax(0,1fr))', 9 * ROW, SUP)
+             + row('repeat(3,minmax(0,1fr))', 9 * ROW, SEC)
+             + tables())
+write('Main.dc.html', BAND_WIDE, MAIN_BODY)
 
 # ---------------------------------------------------------------- Option B: inside today's band
 write('OptionB.dc.html', BAND_NARROW,
@@ -551,3 +561,158 @@ grid_body = (
 
 open('Grid.dc.html', 'w').write(HEAD + band(BAND_WIDE) + grid_body + '\n</div>\n' + TAIL)
 print('Grid.dc.html           %d px wide' % BAND_WIDE)
+
+
+# ---------------------------------------------------------------- Direction B: one answer, then the evidence
+def decision_panel():
+    """The six tiles and the verdict banner say the same thing twice: the banner names the winner
+    and its margin, and two of the tiles repeat both. Said once, in one panel, the answer stops
+    being a wall of numbers and the top of the sheet gives 133 px back."""
+    rows = [('Margin to next', '$183,970', '3.1% &#183; under 5%, treat the two as tied'),
+            ('Equivalent annual', '$298,577', 'per year, 30 years at 3%'),
+            ('Initial construction', '$5,681,474', 'mobilisation and engineering in'),
+            ('Unit cost', '$124 / S.Y.', 'over the mainline area')]
+    body = ''.join('<div style="display:flex;justify-content:space-between;align-items:baseline;'
+                   'gap:8px;padding:5px 0;border-bottom:1px solid #eef1f5;">'
+                   '<div><div style="font-size:11px;font-weight:700;">%s</div>'
+                   '<div class="sub">%s</div></div>'
+                   '<div style="font-size:14px;font-weight:800;white-space:nowrap;">%s</div></div>'
+                   % (k, note, v) for k, v, note in rows)
+    return ('<div class="p" style="display:flex;flex-direction:column;background:var(--panel);">'
+            '<div style="display:flex;align-items:center;gap:8px;">'
+            '<div style="display:flex;align-items:center;justify-content:center;width:20px;height:20px;'
+            'border-radius:50%;background:var(--green);flex-shrink:0;">'
+            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3">'
+            '<path d="M20 6 9 17l-5-5"/></svg></div>'
+            '<div class="kicker" style="color:var(--green);">Lowest present worth</div></div>'
+            '<div style="font-size:26px;font-weight:800;line-height:1.1;margin-top:3px;">$5,852,247</div>'
+            '<div style="font-size:12px;font-weight:700;">Alternative 3 &#183; new concrete</div>'
+            '<div class="sub" style="margin-bottom:5px;">11&#8243; P-501 on 6&#8243; P-209</div>'
+            + body +
+            '<div style="display:flex;gap:7px;align-items:flex-start;margin-top:6px;padding:6px 8px;'
+            'background:#fdf6ea;border-left:3px solid var(--amber);">'
+            '<div style="font-size:10.5px;color:#7a5a20;">'
+            '<span style="font-weight:800;">The winner changes with the rate.</span> '
+            'Alternative 1 is lowest above about 6.5%. See chart 2.</div></div>'
+            '<div style="flex-grow:1;"></div>'
+            + svg(360, 76, TN + TN_DOTS, grow=False) +
+            '<div class="sub" style="text-align:center;">Sevierville, East division &#183; 45,883 S.Y. '
+            '&#183; runway 75 ft</div></div>')
+
+
+write('DirectionB.dc.html', BAND_WIDE,
+      fold(624) + HEADER + CONTEXT + freeze_line('Frozen here &#8212; only the band and the project line')
+      + row('%dpx %dpx %dpx' % (RAIL_W, KEY_W, KEY_W), 17 * ROW, [decision_panel, C1, C2])
+      + row('repeat(3,minmax(0,1fr))', 9 * ROW, SUP)
+      + row('repeat(3,minmax(0,1fr))', 9 * ROW, SEC)
+      + tables())
+
+
+# ---------------------------------------------------------------- Direction C: numbers on the first screen
+def compact_results():
+    head = ('<thead><tr style="background:var(--navy);"><th>Alternative</th><th>Initial</th>'
+            '<th>Maint PW</th><th>Rehab PW</th><th>Lost rev</th><th>Salvage</th><th>Net PW</th>'
+            '<th>vs. lowest</th><th>Closure</th></tr></thead>')
+    body = ''
+    for i, r in enumerate(RESULTS):
+        win = i == 2
+        cells = ''
+        for j, v in enumerate([r[0]] + list(r[2:])):
+            st = 'font-weight:800;' if (j == 0 and win) else ''
+            if j == 6: st = 'font-weight:800;color:var(--green);' if win else 'font-weight:700;'
+            if j == 7 and not win: st = 'color:var(--amber);'
+            cells += '<td style="%s">%s</td>' % (st, v)
+        body += ('<tr style="%s">%s</tr>'
+                 % ('background:var(--green-soft);' if win else 'border-bottom:1px solid var(--line);', cells))
+    return ('<div style="background:#fff;border-bottom:1px solid var(--line);">'
+            '<table style="width:100%;border-collapse:collapse;">' + head + '<tbody>' + body
+            + '</tbody></table></div>')
+
+
+write('DirectionC.dc.html', BAND_WIDE,
+      fold(624) + HEADER + CONTEXT + tiles() + VERDICT + freeze_line()
+      + row('%dpx %dpx %dpx' % (KEY_W, KEY_W, RAIL_W), 12 * ROW, [C1, C2, location_rail])
+      + sectitle('The numbers &#8212; every alternative, in full',
+                 'Above the fold, so the sheet opens on figures as well as pictures.')
+      + compact_results()
+      + sectitle('Supporting detail', 'Charts 3 to 8 and the comparison block continue below.')
+      + row('repeat(3,minmax(0,1fr))', 9 * ROW, SUP)
+      + row('repeat(3,minmax(0,1fr))', 9 * ROW, SEC))
+
+
+# ---------------------------------------------------------------- Review: what is still being paid for
+TWICE = [('1. Present worth by category', 'A category axis titled &#8220;Alternative&#8221; over labels '
+          'that already read Alternative 1, 2, 3', '20 px of height'),
+         ('1. Present worth by category', 'A value axis titled &#8220;Present worth ($)&#8221; under a '
+          'chart called Present worth by category', '18 px of width'),
+         ('2. Net present worth vs. rate', 'A 71-character title that wraps to two lines at 558 px',
+          '17 px of height'),
+         ('2. Net present worth vs. rate', 'A value axis titled &#8220;Net present worth ($)&#8221;, '
+          'again', '18 px of width'),
+         ('2. Net present worth vs. rate', 'A tick label every quarter point &#8212; twenty-five of them, '
+          'rotated', 'the bottom fifth'),
+         ('Locator map', '&#8220;Latitude&#8221; and &#8220;Longitude&#8221; on a 365 &#215; 100 panel',
+          'a quarter of the map')]
+
+FOLD = [('Header band', 53, 53, 53), ('Project context', 20, 20, 20),
+        ('Six tiles', 60, 0, 60), ('Verdict banner', 40, 0, 40),
+        ('Decision panel with the key plots', 0, 340, 0),
+        ('Key plots and the project location', 260, 0, 240),
+        ('Results table', 0, 0, 129),
+        ('Supporting plots', 180, 180, 0)]
+
+TRADE = [('Main &#8212; quieter charts',
+          'Nothing moves. Every panel gains the space its own labels were holding, and the sheet '
+          'reads calmer for it.',
+          'The least it could be. If the tile strip or the reading order is what bothers you, this '
+          'does not touch either.'),
+         ('Direction B &#8212; one answer, then the evidence',
+          'The six tiles and the verdict banner say the same thing twice. Said once, in one panel '
+          'beside the plots, the top of the sheet gives 133 px back and the answer stops being a wall.',
+          'The answer no longer stays frozen while you scroll, and six separate numbers become one '
+          'block to read rather than six to scan.'),
+         ('Direction C &#8212; numbers on the first screen',
+          'The results table clears the fold, so the sheet opens on figures as well as pictures. '
+          'Everything else keeps its place.',
+          'Charts 3 to 8 all drop below the fold. The sheet stops reading picture-first, which is '
+          'the order it was rearranged into two rounds ago.')]
+
+
+def fold_table():
+    rows = []
+    for label, a, b, c in FOLD:
+        rows.append((label, a or '&#8212;', b or '&#8212;', c or '&#8212;'))
+    tot = ['%d px' % sum(x[i] for x in FOLD) for i in range(1, 4)]
+    rows.append(('<b>Above the fold</b>', '<b>%s</b>' % tot[0], '<b>%s</b>' % tot[1], '<b>%s</b>' % tot[2]))
+    return tbl(['Band', 'Main', 'Direction B', 'Direction C'], rows, right_from=1)
+
+
+def trades():
+    out = ''
+    for name, why, cost in TRADE:
+        out += ('<div style="padding:9px 0;border-bottom:1px solid var(--line);">'
+                '<div style="font-size:12px;font-weight:800;">%s</div>'
+                '<div style="font-size:11px;margin-top:2px;">%s</div>'
+                '<div class="sub" style="margin-top:3px;"><b>The cost:</b> %s</div></div>'
+                % (name, why, cost))
+    return out
+
+
+review_body = (
+    '<div style="padding:18px 20px 22px;display:flex;flex-direction:column;gap:14px;">'
+    '<div><div style="font-size:19px;font-weight:800;">What the dashboard is still paying for</div>'
+    '<div class="sub" style="margin-top:3px;font-size:11px;">Measured from the workbook as built. '
+    'The layout is settled; what is left is labelling that repeats itself and one open question '
+    'about what belongs on the first screen.</div></div>'
+    + block('Said twice', 'Every one of these is a chart telling you something its own title '
+            'already told you, in space the plot could have had.',
+            tbl(['Chart', 'What it says twice', 'Costs'], TWICE, right_from=2))
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">'
+    + block('What clears a 624 px screen', 'The grid a 15.6 in laptop gives Excel at 125% scaling. '
+            'Each column is one of the three directions.', fold_table())
+    + block('And what each one costs', 'A set where only the favourite gets a case made for it is '
+            'not a choice.', trades())
+    + '</div></div>')
+
+open('Review.dc.html', 'w').write(HEAD + band(BAND_WIDE) + review_body + '\n</div>\n' + TAIL)
+print('Review.dc.html         %d px wide' % BAND_WIDE)
