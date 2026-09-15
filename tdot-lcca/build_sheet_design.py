@@ -912,7 +912,14 @@ A_TILE = 3                                 # kicker, value and caption on rows 3
 A_VERDICT = 6
 A_KEY, A_KEY_ROWS = 7, 13                  # 260 px, and the rail shares these rows
 A_SUP, A_SUP_ROWS = 20, 9                  # 180 px
-A_SEC, A_SEC_ROWS = 29, 9                  # 180 px
+A_SEC, A_SEC_ROWS = 29, 8                  # 160 px, with the shared key row under it
+A_KEYROW = A_SEC + A_SEC_ROWS              # 37: one colour key for the six charts above it
+# The alternative colours chart 2 uses, the layer colours charts 6 and 7 use, and the names to
+# print beside them. Six chart legends said these twice over; the key row says each once.
+ALT_KEYS = ('2A78D6', 'EB6834', '6DA7EC', 'F39C7A')
+BM_KEYS = ('9AA7B4', '9AA7B4', '9AA7B4', 'BBD4EE')      # the three division bands, then this project
+LAYER_KEYS = (('DCCBA0', 'Subbase (P-154)'), ('C8A96E', 'Aggregate base'),
+              ('3A3A3A', 'Asphalt'), ('C6CBD0', 'Concrete'))
 A_HEIGHTS = {2: 15, 3: 11, 4: 19, 5: 15, 6: 30}    # 53 + 20 + 60 + 40 = 173 px frozen,
                                                    # row 1 keeps the 40 pt band every sheet has
 A_FREEZE = 7
@@ -925,6 +932,7 @@ A_MOVE.update({112: 66, 114: 68, 115: 69, 116: 70, 120: 72, 122: 74})    # the c
 A_TABLE = 40                               # the results header, once moved
 A_NOTE = 38                                # the chart-8 note, under the last plot row
 A_HOWTO = 71                               # the how-to line, with the closing notes
+A_BMKEY = 66                               # where the benchmark key sat, under the map
 A_VBACH = 76                               # the chart the Alternative Setup form maintains
 A_LAST = 75                                # nothing below this
 
@@ -1099,6 +1107,34 @@ def option_a(x, st):
             x = D.put_cell(x, 'Q%d' % r, body)
     x = D.merges(x, ['P%d:R%d' % (A_KEY, A_KEY)]
                  + ['Q%d:R%d' % (A_RAIL_ROW0 + i, A_RAIL_ROW0 + i) for i in range(len(A_FACTS))])
+
+    # ---- one colour key for the six charts above it, in place of six legends saying the same
+    # two things over and over. The alternative names come off the results table, so a slot
+    # nobody filled prints nothing rather than a swatch with no label.
+    s_foot = st.add(font=FONT(8), fill=FILL(WHITE), border=BORDER(bottom=True, color='FFBCC6D2'),
+                    alignment=ALIGN(v='center', indent=1))
+    x = D.restyle(x, [A_KEYROW], band, s_foot)
+    # The layer key serves charts 6 and 7, so it spreads across both of them; the benchmark key
+    # sits under chart 8, which is the only chart that uses it. The alternatives are not here:
+    # chart 2 keeps its own legend and stands directly above the three charts that share its
+    # colours. Every entry is a coloured square with an ink label - a pale series printed as
+    # pale text cannot be read at eight points.
+    for i, (rgb, label) in enumerate(LAYER_KEYS):
+        ref = '%s%d' % (D.colname(BAND_FIRST + 2 * i), A_KEYROW)
+        x = D.rich(x, ref, [('\u25a0 ', 'FF' + rgb, 8), (label, 'FF' + D.MUTED[2:], 8)], s_foot)
+    x = D.merges(x, ['%s%d:%s%d' % (D.colname(BAND_FIRST + 2 * i), A_KEYROW,
+                                    D.colname(BAND_FIRST + 2 * i + 1), A_KEYROW) for i in range(4)])
+    # the benchmark key was already in cells, two screens below the chart it belongs to
+    for i in range(4):
+        src = '%s%d' % (D.colname(BAND_FIRST + i), A_BMKEY)
+        m = D.CELL_RE(src).search(x)
+        if not m: continue
+        txt = re.search(r'<t[^>]*>(.*?)</t>', m.group(0), re.S)
+        x = x[:m.start()] + x[m.end():]
+        if txt:
+            x = D.rich(x, '%s%d' % (D.colname(BAND_FIRST + 8 + i), A_KEYROW),
+                       [(html.unescape(txt.group(1))[:2], 'FF' + BM_KEYS[i], 8),
+                        (html.unescape(txt.group(1))[2:], 'FF' + D.MUTED[2:], 8)], s_foot)
 
     # ---- the frozen band, and the heights that make it exactly 160 px
     for r, ht in A_HEIGHTS.items():
@@ -1391,27 +1427,47 @@ def summary_charts(rd, wr, offs, band_px):
         # The chart data sits in the same rows as the old chart area, which is hidden now. Excel
         # leaves a hidden cell out of its series unless the chart says otherwise.
         c = c.replace('<plotVisOnly val="1"/>', '<plotVisOnly val="0"/>')
-        wr(part, one_panel(c))
+        wr(part, one_panel(c, part.rsplit('/', 1)[-1]))
 
 
 # The plots read as one instrument, so every chart carries the same hairline edge and no rounded
 # corner, and the plot inside it is given back the room its margins were holding. A key chart was
 # spending 53% of its frame on title, legend and padding; it spends 43% now.
-# A key plot spent 15% of its width on a legend standing beside it, and its neighbour another
-# 7.5% on axis labels, so 126 px of white sat between the two plots that matter most. Both
-# legends move underneath, which costs height once and buys the width back on every row.
+# Measured between two neighbouring plots: side by side, 10 px of right margin, two hairlines and
+# 44 px of y-axis labels = 56 px; stacked, 40 px of x labels and legend, two hairlines and 27 px of
+# title = 69 px. The legend is the biggest single item and six of them repeat the same two colour
+# keys, so the lower six charts share one key row at the foot and every plot takes the space back.
 PANEL_EDGE = 'BCC6D2'
-KEY_PLOT = {'x': 0.07, 'y': 0.13, 'w': 0.905, 'h': 0.58}     # legend underneath, as on the rest
-SMALL_PLOT = {'x': 0.09, 'y': 0.15, 'w': 0.89, 'h': 0.63}
-NOLEG_PLOT = {'x': 0.09, 'y': 0.15, 'w': 0.89, 'h': 0.76}
+KEY_PLOT = {'x': 0.065, 'y': 0.115, 'w': 0.92, 'h': 0.70}    # keeps its own legend underneath
+SMALL_PLOT = {'x': 0.065, 'y': 0.115, 'w': 0.925, 'h': 0.775}
 A = 'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"'
+KEY_CHARTS = ('chart7.xml', 'chart8.xml')
+# An axis title that only repeats the chart title is 20 px of height or 18 px of width spent
+# saying it twice. The locator map spent a quarter of a 365 x 100 panel on Latitude and Longitude.
+DROP_AXIS_TITLES = {'chart7.xml': ('Alternative', 'Present worth ($)'),
+                    'chart8.xml': ('Net present worth ($)', 'Discount rate (%)'),
+                    'chart15.xml': ('Latitude', 'Longitude')}
+SHORT_TITLE = ('2. Net present worth vs. discount rate (TDOT 3%, FAA 2%, pre-2022 rule 7%)',
+               '2. Net present worth vs. discount rate')
 
 
-def one_panel(c):
+def one_panel(c, name):
+    # the decimal on a millions axis never carries information and costs 12 px of left margin
+    c = c.replace('$#,##0.0,,&quot;M&quot;', '$#,##0,,&quot;M&quot;')
+    for t in DROP_AXIS_TITLES.get(name, ()):
+        c = re.sub(r'<title><tx><rich>(?:(?!</title>).)*?<a:t>%s</a:t>.*?</title>' % re.escape(t),
+                   '', c, flags=re.S)
+    if name == 'chart8.xml':
+        c = c.replace(D.esc(SHORT_TITLE[0]), D.esc(SHORT_TITLE[1]))
+    if name in KEY_CHARTS:
+        # a legend standing beside a plot costs width the plot could use
+        c = c.replace('<legendPos val="r"/>', '<legendPos val="b"/>')
+    else:
+        # charts 3 to 8 all key off the same two colour sets; one row of cells says it once
+        c = re.sub(r'<legend>.*?</legend>', '', c, flags=re.S)
+
     if '<plotArea>' not in c: return c
-    key = '<legendPos val="r"/>' in c
-    c = c.replace('<legendPos val="r"/>', '<legendPos val="b"/>')
-    lay = KEY_PLOT if key else (SMALL_PLOT if '<legendPos val="b"/>' in c else NOLEG_PLOT)
+    lay = KEY_PLOT if name in KEY_CHARTS else SMALL_PLOT
     def relayout(m):
         body = m.group(1)
         for k, v in lay.items():

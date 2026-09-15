@@ -431,3 +431,12 @@ def drop_merge(x, pred):
     return re.sub(r'<mergeCells count="\d+">.*?</mergeCells>',
                   '<mergeCells count="%d">%s</mergeCells>'
                   % (len(keep), ''.join('<mergeCell ref="%s"/>' % r for r in keep)), x, flags=re.S)
+
+
+def rich(x, ref, runs, style):
+    """A cell of several differently-coloured runs. A legend entry needs a coloured swatch and a
+    label dark enough to read: one colour for the whole string makes a pale series unreadable."""
+    body = ''.join('<r><rPr><sz val="%s"/><color rgb="%s"/><rFont val="Calibri"/>'
+                   '<family val="2"/></rPr><t xml:space="preserve">%s</t></r>'
+                   % (sz, color, esc(text)) for text, color, sz in runs)
+    return put_cell(x, ref, '<c r="%s" s="%d" t="inlineStr"><is>%s</is></c>' % (ref, style, body))

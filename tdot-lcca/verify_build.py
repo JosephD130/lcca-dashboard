@@ -132,7 +132,7 @@ for _a in re.findall(r'<xdr:oneCellAnchor>.*?</xdr:oneCellAnchor>', draw, re.S):
     _r = re.search(r'<xdr:row>(\d+)</xdr:row>', _a)
     _e = re.search(r'<xdr:ext cx="\d+" cy="(\d+)"', _a)
     if _r and _e: _drawn.append((int(_r.group(1)), int(_e.group(1)) / 9525.0))
-_want = {C1 - 1: A_KEY_H, C2 - 1: 180, C3 - 1: 180}
+_want = {C1 - 1: A_KEY_H, C2 - 1: 180, C3 - 1: 160}   # the section row leaves a key row under it
 check('and every chart drawn on them is exactly that tall',
       all(abs(cy - _want[r]) < 1 for r, cy in _drawn if r in _want)
       and len([1 for r, _ in _drawn if r in _want]) == 8,
@@ -169,18 +169,24 @@ check('print areas defined for the Summary and General Information',
 print(); print('=' * 78); print('CHARTS'); print('=' * 78)
 charts = sorted((n for n in names if re.match(r'xl/charts/chart\d+\.xml$', n)), key=lambda n: int(re.search(r'\d+', n.split('/')[-1]).group()))
 check('fifteen charts: six original, eight on the Summary, one locator map', len(charts) == 15, len(charts))
-# The six small multiples (charts 3 to 8) drop their axis titles on purpose: at
-# 3.1 in wide the title, the legend and two axis titles collide. Their own titles
-# say what the axes are. The large charts still name both.
+# No chart on the Summary names an axis any more. Each one was repeating its own title: an
+# "Alternative" category axis over labels reading Alternative 1, a "Present worth ($)" value axis
+# under a chart called Present worth by category, "Latitude" and "Longitude" on the locator map.
+# The alternative-sheet charts, which have room and no title of their own, still name theirs.
 SMALL = {'chart9.xml', 'chart10.xml', 'chart11.xml', 'chart12.xml', 'chart13.xml', 'chart14.xml'}
+SUMMARY_PARTS = {'chart6.xml', 'chart7.xml', 'chart8.xml', 'chart15.xml'} | SMALL
+check('no chart on the Summary spends space naming an axis its title already names',
+      all(not re.search(r'<(catAx|valAx)>[\s\S]*?<title>', rd('xl/charts/' + m))
+          for m in SUMMARY_PARTS),
+      [m for m in sorted(SUMMARY_PARTS)
+       if re.search(r'<(catAx|valAx)>[\s\S]*?<title>', rd('xl/charts/' + m))])
 for n in charts:
-    if n.split('/')[-1] in SMALL: continue
+    if n.split('/')[-1] in SUMMARY_PARTS: continue
     c = rd(n)
     ts = re.findall(r'<a:t>([^<]*)</a:t>', c)
-    has_x = any(t in ('Calendar year', 'Alternative', 'Discount rate (%)', 'Scenario', 'Longitude') for t in ts)
-    has_y = any(t in ('Cost ($)', 'Present worth ($)', 'Net present worth ($)', 'Spend, undiscounted ($)',
-                      'Cumulative discounted cost ($)', 'Closure days', 'Thickness (inches)', 'Latitude',
-                      'Initial construction / mainline S.Y.') for t in ts)
+    has_x = any(t in ('Calendar year', 'Alternative', 'Scenario') for t in ts)
+    has_y = any(t in ('Cost ($)', 'Present worth ($)', 'Cumulative discounted cost ($)',
+                      'Spend, undiscounted ($)', 'Closure days') for t in ts)
     check('%s names both axes' % n.split('/')[-1], has_x and has_y, ts[:4])
 check('the small multiples carry no axis titles and no type above 8 pt',
       all(not re.search(r'<(catAx|valAx)>[\s\S]*?<title>', rd('xl/charts/' + m)) and
@@ -188,16 +194,19 @@ check('the small multiples carry no axis titles and no type above 8 pt',
       {m: max(int(v) for v in re.findall(r'sz="(\d+)"', rd('xl/charts/' + m))) for m in SMALL})
 # A legend standing beside a plot costs width on every row it appears in, and on the key pair it
 # was 126 px of white between the two plots that decide the study. They all sit underneath now.
-check('the key charts put the legend under the plot too, so the pair sits together',
+check('the key charts put the legend under the plot, so the pair sits together',
       all('<legendPos val="b"/>' in rd('xl/charts/%s.xml' % m) for m in ('chart7', 'chart8')),
       [re.findall(r'<legendPos val="(\w)"/>', rd('xl/charts/%s.xml' % m)) for m in ('chart7', 'chart8')])
-check('the small multiples put the legend under the plot',
-      all('<legendPos val="b"/>' in rd('xl/charts/%s.xml' % m)
+check('the small multiples carry no legend of their own at all',
+      all('<legend>' not in rd('xl/charts/%s.xml' % m)
           for m in ('chart9', 'chart10', 'chart11', 'chart12', 'chart13')),
       [re.findall(r'<legendPos val="(\w)"/>', rd('xl/charts/%s.xml' % m))
        for m in ('chart9', 'chart10', 'chart11', 'chart12', 'chart13')])
-check('money axes read to one decimal in millions',
-      sum('$#,##0.0,,&quot;M&quot;' in rd(n) or '$#,##0.0,,"M"' in rd(n) for n in charts) >= 5)
+# the decimal on a millions axis never carried information and cost 12 px of left margin
+check('money axes on the Summary read in whole millions',
+      all('$#,##0.0,,' not in rd('xl/charts/' + m) for m in SUMMARY_PARTS)
+      and sum('$#,##0,,&quot;M&quot;' in rd('xl/charts/' + m) for m in SUMMARY_PARTS) >= 4,
+      [m for m in sorted(SUMMARY_PARTS) if '$#,##0.0,,' in rd('xl/charts/' + m)])
 c6 = rd([n for n in charts if n.endswith('chart6.xml')][0])
 check('the original Alternatives Comparison chart plots the hidden columns', 'plotVisOnly val="0"' in c6)
 check('the alternative-sheet charts keep calendar years on the category axis',
@@ -301,10 +310,27 @@ check('and the macro finds the tables by their headings rather than by row numbe
           for t in ('Private Function ResultsRow', 'Private Function SectionRow', 'HeadingRow')))
 check('the map sits between the rail header and its facts',
       (RAIL_C - 1, C1) in anchors, [a for a in anchors if a[0] == RAIL_C - 1])
-check('legend in cells, one per division plus this project',
-      [ws.cell(CH67 - 1, c).value for c in range(7, 11)] ==
-      ['\u25a0 West', '\u25a0 Middle', '\u25a0 East', '\u25a0 This project'],
-      [ws.cell(CH67 - 1, c).value for c in range(7, 11)])
+# One key row under the six lower charts, in place of six legends repeating the same two colour
+# sets. The alternative names come off the results table, so an empty slot prints nothing.
+KEYROW = C3 + 8
+check('one key row carries the layers and the benchmark bands',
+      [ws.cell(KEYROW, c).value for c in (7, 9, 11, 13)] ==
+          ['\u25a0 Subbase (P-154)', '\u25a0 Aggregate base', '\u25a0 Asphalt', '\u25a0 Concrete']
+      and [ws.cell(KEYROW, c).value for c in range(15, 19)] ==
+          ['\u25a0 West', '\u25a0 Middle', '\u25a0 East', '\u25a0 This project'],
+      [ws.cell(KEYROW, c).value for c in range(7, 19)])
+# a pale series printed as pale text cannot be read: the swatch carries the colour, the label ink
+_kx = rd('xl/worksheets/sheet14.xml')
+_krow = re.search(r'<row r="%d"(?=[ />])[^>]*?(?:/>|>.*?</row>)' % KEYROW, _kx, re.S).group(0)
+check('every key entry is a coloured swatch with an ink label',
+      len(re.findall(r'<color rgb="FF5B6675"/>', _krow)) == 8
+      and len(set(re.findall(r'<color rgb="(FF[0-9A-F]{6})"/>', _krow))) >= 6,
+      sorted(set(re.findall(r'<color rgb="(FF[0-9A-F]{6})"/>', _krow))))
+check('the alternatives are keyed by chart 2, which stands over the charts that share its colours',
+      '<legend>' in rd('xl/charts/chart8.xml') and C2 == C1 + 13)
+check('and it is the only legend left below the key pair',
+      not any('<legend>' in rd('xl/charts/' + m) for m in SMALL),
+      [m for m in sorted(SMALL) if '<legend>' in rd('xl/charts/' + m)])
 check('pricing basis, coordinate source and the KML recipe close the sheet',
       'Unit Cost' in str(ws.cell(CH67 + 1, 7).value)
       and 'embedded' in str(ws.cell(CH67 + 2, 7).value)
