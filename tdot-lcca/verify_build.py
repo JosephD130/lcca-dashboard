@@ -724,6 +724,12 @@ for n in dash:
     _l = re.search(r'<plotArea><layout>(.*?)</layout>', rd(n), re.S)
     _v = dict(re.findall(r'<([xywh]) val="([\d.]+)"/>', _l.group(1))) if _l else {}
     if _v: _area[n.split('/')[-1]] = round(float(_v['w']) * float(_v['h']), 3)
+# A manualLayout with no layoutTarget means "outer": the box INCLUDING the axis labels. Every
+# margin set on it positions that box while the plot rectangle stays inset by its own labels, so
+# the plots sit about 30 px further apart than the numbers suggest. "inner" is the plot itself.
+check('every dashboard chart lays out its plot rectangle, not the box around it',
+      all('<layoutTarget val="inner"/>' in rd(n) for n in dash),
+      [n.split('/')[-1] for n in dash if '<layoutTarget val="inner"/>' not in rd(n)])
 check('and the plot fills at least half the panel it sits in',
       _area and min(_area.values()) >= 0.5, sorted(_area.items(), key=lambda kv: kv[1])[:3])
 # every legend underneath, so no plot gives up width to one standing beside it

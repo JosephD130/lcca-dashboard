@@ -1438,8 +1438,14 @@ def summary_charts(rd, wr, offs, band_px):
 # title = 69 px. The legend is the biggest single item and six of them repeat the same two colour
 # keys, so the lower six charts share one key row at the foot and every plot takes the space back.
 PANEL_EDGE = 'BCC6D2'
-KEY_PLOT = {'x': 0.065, 'y': 0.115, 'w': 0.92, 'h': 0.70}    # keeps its own legend underneath
-SMALL_PLOT = {'x': 0.065, 'y': 0.115, 'w': 0.925, 'h': 0.775}
+# THE ONE THAT MATTERS. A plotArea manualLayout with no layoutTarget means "outer" - the box that
+# INCLUDES the axis tick labels and titles - so every margin set here was positioning that box and
+# the plot rectangle stayed inset inside it by the width of its own labels. Two neighbouring plots
+# were about 65 px apart, not the 39 the outer boxes suggested. With layoutTarget "inner" these
+# numbers describe the plot rectangle itself, and the labels live in the margin left for them.
+# Order is fixed by the schema: layoutTarget, then the modes, then x y w h.
+KEY_PLOT = {'x': 0.048, 'y': 0.085, 'w': 0.945, 'h': 0.755}  # 27 px for labels, 42 for x axis + legend
+SMALL_PLOT = {'x': 0.055, 'y': 0.10, 'w': 0.935, 'h': 0.78}  # 27 px for labels, 22 for the year row
 A = 'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"'
 KEY_CHARTS = ('chart7.xml', 'chart8.xml')
 # An axis title that only repeats the chart title is 20 px of height or 18 px of width spent
@@ -1472,6 +1478,8 @@ def one_panel(c, name):
         body = m.group(1)
         for k, v in lay.items():
             body = re.sub(r'<%s val="[\d.]+"/>' % k, '<%s val="%s"/>' % (k, v), body)
+        if 'layoutTarget' not in body:
+            body = body.replace('<manualLayout>', '<manualLayout><layoutTarget val="inner"/>', 1)
         return '<plotArea><layout>%s</layout>' % body
     c = re.sub(r'<plotArea><layout>(.*?)</layout>', relayout, c, count=1, flags=re.S)
 
