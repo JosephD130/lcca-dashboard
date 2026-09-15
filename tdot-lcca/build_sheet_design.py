@@ -910,22 +910,23 @@ A_RAIL_PX = sum(A_PX[:9])                  # 1,118: the left edge of P, where th
 A_RAIL_W = sum(A_PX[9:])                   # 365: P:R, the project-location rail
 A_TILE = 3                                 # kicker, value and caption on rows 3, 4, 5
 A_VERDICT = 6
-A_KEY, A_KEY_ROWS = 7, 12                  # 240 px, and the rail shares these rows
-A_SUP, A_SUP_ROWS = 19, 9                  # 180 px
-A_SEC, A_SEC_ROWS = 28, 8                  # 160 px
+A_KEY, A_KEY_ROWS = 7, 13                  # 260 px, and the rail shares these rows
+A_SUP, A_SUP_ROWS = 20, 9                  # 180 px
+A_SEC, A_SEC_ROWS = 29, 9                  # 180 px
 A_HEIGHTS = {2: 15, 3: 11, 4: 19, 5: 15, 6: 30}    # 53 + 20 + 60 + 40 = 173 px frozen,
                                                    # row 1 keeps the 40 pt band every sheet has
 A_FREEZE = 7
 # where each block of the built sheet lands. Only G:R moves; the chart data in W and beyond
 # shares these row numbers and stays where it is.
-A_MOVE = {52: 36, 54: 37}                                        # chart-8 note, THE NUMBERS title
-A_MOVE.update({r: r - 17 for r in range(55, 71)})                 # results table and comparison
-A_MOVE.update({r: r - 35 for r in range(90, 98)})                 # pavement section
-A_MOVE.update({112: 64, 114: 66, 115: 67, 116: 68, 120: 70, 122: 72})    # the closing notes
-A_TABLE = 38                               # the results header, once moved
-A_HOWTO = 69                               # the how-to line, with the closing notes
-A_VBACH = 74                               # the chart the Alternative Setup form maintains
-A_LAST = 73                                # nothing below this
+A_MOVE = {52: 38, 54: 39}                                        # chart-8 note, THE NUMBERS title
+A_MOVE.update({r: r - 15 for r in range(55, 71)})                 # results table and comparison
+A_MOVE.update({r: r - 33 for r in range(90, 98)})                 # pavement section
+A_MOVE.update({112: 66, 114: 68, 115: 69, 116: 70, 120: 72, 122: 74})    # the closing notes
+A_TABLE = 40                               # the results header, once moved
+A_NOTE = 38                                # the chart-8 note, under the last plot row
+A_HOWTO = 71                               # the how-to line, with the closing notes
+A_VBACH = 76                               # the chart the Alternative Setup form maintains
+A_LAST = 75                                # nothing below this
 
 
 def make_remapper(rowmap):
@@ -1102,7 +1103,7 @@ def option_a(x, st):
     # ---- the frozen band, and the heights that make it exactly 160 px
     for r, ht in A_HEIGHTS.items():
         x = D.row_height(x, r, ht)
-    x = D.row_height(x, 37, 22)
+    x = D.row_height(x, 39, 22)
     x = D.sheet_view(x, freeze='A%d' % A_FREEZE)
     return x
 
@@ -1342,16 +1343,19 @@ def summary_charts(rd, wr, offs, band_px):
     key_h = A_KEY_ROWS * ROW_PX
     sup_h, sec_h = A_SUP_ROWS * ROW_PX, A_SEC_ROWS * ROW_PX
     half = A_RAIL_PX / 2.0              # the two key plots share everything left of the rail
-    quarter, sec_w = band_px / 4.0, band_px / 2.0
+    third = band_px / 3.0
+    # Three across, twice. Four across left each panel 370 px wide for a category axis that
+    # always carries four slots, so a three-alternative study drew three bars and a gap; the
+    # benchmark moves down to even the rows out and every plot gains a third of its width.
     plan = {
         'Summary Chart 1': (0, A_KEY, half, key_h),
         'Summary Chart 2': (half, A_KEY, half, key_h),
-        'Summary Chart 3': (0, A_SUP, quarter, sup_h),
-        'Summary Chart 4': (quarter, A_SUP, quarter, sup_h),
-        'Summary Chart 5': (2 * quarter, A_SUP, quarter, sup_h),
-        'Summary Chart 8': (3 * quarter, A_SUP, quarter, sup_h),
-        'Summary Chart 6': (0, A_SEC, sec_w, sec_h),
-        'Summary Chart 7': (sec_w, A_SEC, sec_w, sec_h),
+        'Summary Chart 3': (0, A_SUP, third, sup_h),
+        'Summary Chart 4': (third, A_SUP, third, sup_h),
+        'Summary Chart 5': (2 * third, A_SUP, third, sup_h),
+        'Summary Chart 6': (0, A_SEC, third, sec_h),
+        'Summary Chart 7': (third, A_SEC, third, sec_h),
+        'Summary Chart 8': (2 * third, A_SEC, third, sec_h),
         'Summary Chart 9': (A_RAIL_PX, A_KEY + 1, A_RAIL_W, 5 * ROW_PX),   # the locator map
     }
     drawing = drawing_of(SUM_PART, rd)
@@ -1382,10 +1386,49 @@ def summary_charts(rd, wr, offs, band_px):
                d, count=1, flags=re.S)
     wr(drawing, d)
 
-    # The chart data sits in the same rows as the old chart area, which is hidden now. Excel
-    # leaves a hidden cell out of its series unless the chart says otherwise.
     for part in chart_parts(drawing, rd):
-        wr(part, rd(part).replace('<plotVisOnly val="1"/>', '<plotVisOnly val="0"/>'))
+        c = rd(part)
+        # The chart data sits in the same rows as the old chart area, which is hidden now. Excel
+        # leaves a hidden cell out of its series unless the chart says otherwise.
+        c = c.replace('<plotVisOnly val="1"/>', '<plotVisOnly val="0"/>')
+        wr(part, one_panel(c))
+
+
+# The plots read as one instrument, so every chart carries the same hairline edge and no rounded
+# corner, and the plot inside it is given back the room its margins were holding. A key chart was
+# spending 53% of its frame on title, legend and padding; it spends 43% now.
+# A key plot spent 15% of its width on a legend standing beside it, and its neighbour another
+# 7.5% on axis labels, so 126 px of white sat between the two plots that matter most. Both
+# legends move underneath, which costs height once and buys the width back on every row.
+PANEL_EDGE = 'BCC6D2'
+KEY_PLOT = {'x': 0.07, 'y': 0.13, 'w': 0.905, 'h': 0.58}     # legend underneath, as on the rest
+SMALL_PLOT = {'x': 0.09, 'y': 0.15, 'w': 0.89, 'h': 0.63}
+NOLEG_PLOT = {'x': 0.09, 'y': 0.15, 'w': 0.89, 'h': 0.76}
+A = 'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"'
+
+
+def one_panel(c):
+    if '<plotArea>' not in c: return c
+    key = '<legendPos val="r"/>' in c
+    c = c.replace('<legendPos val="r"/>', '<legendPos val="b"/>')
+    lay = KEY_PLOT if key else (SMALL_PLOT if '<legendPos val="b"/>' in c else NOLEG_PLOT)
+    def relayout(m):
+        body = m.group(1)
+        for k, v in lay.items():
+            body = re.sub(r'<%s val="[\d.]+"/>' % k, '<%s val="%s"/>' % (k, v), body)
+        return '<plotArea><layout>%s</layout>' % body
+    c = re.sub(r'<plotArea><layout>(.*?)</layout>', relayout, c, count=1, flags=re.S)
+
+    # one hairline edge, the same on every panel, so two neighbours read as a shared rule
+    edge = ('<spPr><a:solidFill %s><a:srgbClr val="FFFFFF"/></a:solidFill>'
+            '<a:ln %s w="9525"><a:solidFill><a:srgbClr val="%s"/></a:solidFill></a:ln></spPr>'
+            % (A, A, PANEL_EDGE))
+    c = re.sub(r'</chart>\s*<spPr>.*?</spPr>', '</chart>' + edge, c, count=1, flags=re.S)
+    if '</chart>' + edge not in c:
+        c = c.replace('</chart>', '</chart>' + edge, 1)
+    if '<roundedCorners' not in c:
+        c = re.sub(r'(<chartSpace[^>]*>)', r'\g<1><roundedCorners val="0"/>', c, count=1)
+    return c
 
 
 # ---------------------------------------------------------------------------- General Information

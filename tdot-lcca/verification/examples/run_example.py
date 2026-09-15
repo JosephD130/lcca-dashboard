@@ -139,7 +139,7 @@ for i, (sh, kind, last) in enumerate(sheets):
 # The Summary row map, Option A: the whole decision on one 15-inch screen. Frozen band of header,
 # project context, one row of six tiles and the verdict; then the key plots with the project
 # location beside them; then the supporting plots; then the tables.
-T0, VER, VER2, CMP0, SEC_T, BM = 39, 44, 45, 49, 55, 89
+T0, VER, VER2, CMP0, SEC_T, BM = 41, 46, 47, 51, 57, 89
 RAIL0 = 13        # the project-location facts, in columns P to R beside the key plots
 S = out['summary']
 S['results'] = [{c: (txt(sm, f'{c}{r}') if c in 'GHI' else num(sm, f'{c}{r}')) for c in 'GHIJKLMNOPQR'} for r in range(T0, T0 + N)]

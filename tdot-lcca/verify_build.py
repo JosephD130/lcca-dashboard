@@ -21,12 +21,12 @@ ws = wb['Summary']
 # context, one row of six tiles, verdict), then 240 px of key plots with the project location
 # beside them, then 180 px of supporting plots. 580 px in all. The tables sit below the fold.
 KPI0, BANNER = 3, 6                             # tile kicker row, verdict banner
-HDR, T0, T1 = 38, 39, 42                        # results header and its first and last alternative
-VER, VER2, CMP, CMPH, CMP0 = 44, 45, 47, 48, 49
-C1, C2, C3, BMN = 7, 19, 28, 36                 # the three chart rows, and the chart-8 note
-TITLE = 37                                      # THE NUMBERS
-SEC_T, CH67, NOTE67, MAP0, A0 = 55, 65, 70, 130, 132
-VBACH = 74        # the chart the Alternative Setup form maintains, under its own note
+HDR, T0, T1 = 40, 41, 44                        # results header and its first and last alternative
+VER, VER2, CMP, CMPH, CMP0 = 46, 47, 49, 50, 51
+C1, C2, C3, BMN = 7, 20, 29, 38                 # the three chart rows, and the chart-8 note
+TITLE = 39                                      # THE NUMBERS
+SEC_T, CH67, NOTE67, MAP0, A0 = 57, 67, 72, 130, 132
+VBACH = 76        # the chart the Alternative Setup form maintains, under its own note
 SENS0, SENS1 = 12, 36
 RAIL_C = 16       # column P: the project-location rail, beside the two key plots
 RAIL0 = 13        # its first fact row
@@ -75,7 +75,7 @@ check('column G onward visible', not ws.column_dimensions['G'].hidden)
 check('navigation buttons sit in the first visible column', 'HYPERLINK' in str(ws['G1'].value) and 'HYPERLINK' in str(ws['H1'].value),
       (ws['G1'].value, ws['H1'].value))
 check('title moved beside the buttons', ws['I1'].value == 'LCCA SUMMARY')
-HOW = 69          # the how-to line sits with the closing notes, not above the first plot
+HOW = 71          # the how-to line sits with the closing notes, not above the first plot
 check('note explains the hidden block', 'hidden' in str(ws.cell(HOW, 7).value) and 'unhide' in str(ws.cell(HOW, 7).value).lower())
 check('the verdict banner stays under the tiles and leads with the winner',
       str(ws.cell(BANNER, 7).value).startswith('=IF(COUNT($O$%d:$O$%d)=0' % (T0, T1))
@@ -108,8 +108,8 @@ anchors = [(int(c), int(r)) for c, r in
 # Three bands of plots that touch. The plots are pixel-anchored rather than snapped to columns,
 # so what matters is the count on each row and that none of them runs past the band.
 _rows = [r for c, r in anchors]
-check('the eight Summary charts stand two, four and two across the three chart rows',
-      [_rows.count(C1 - 1), _rows.count(C2 - 1), _rows.count(C3 - 1)] == [2, 4, 2],
+check('the eight Summary charts stand two, three and three across the chart rows',
+      [_rows.count(C1 - 1), _rows.count(C2 - 1), _rows.count(C3 - 1)] == [2, 3, 3],
       sorted(set(anchors)))
 check('the project location shares the key-chart rows, to the right of both plots',
       (RAIL_C - 1, C1) in anchors and str(ws.cell(C1, RAIL_C).value) == 'PROJECT LOCATION',
@@ -123,7 +123,7 @@ check('no chart starts beyond the dashboard band (column R)',
 def band_px(lo, hi):
     return sum((ws.row_dimensions[r].height or 15.0) for r in range(lo, hi + 1)) * 4 / 3
 
-A_KEY_H = 240     # the key plots and the project-location rail share these twelve rows
+A_KEY_H = 260     # the key plots and the project-location rail share these thirteen rows
 
 # Pair each chart with the row it starts on, so the dashboard's own eight can be checked apart
 # from the locator map and the chart the setup form maintains.
@@ -132,7 +132,7 @@ for _a in re.findall(r'<xdr:oneCellAnchor>.*?</xdr:oneCellAnchor>', draw, re.S):
     _r = re.search(r'<xdr:row>(\d+)</xdr:row>', _a)
     _e = re.search(r'<xdr:ext cx="\d+" cy="(\d+)"', _a)
     if _r and _e: _drawn.append((int(_r.group(1)), int(_e.group(1)) / 9525.0))
-_want = {C1 - 1: A_KEY_H, C2 - 1: 180, C3 - 1: 160}
+_want = {C1 - 1: A_KEY_H, C2 - 1: 180, C3 - 1: 180}
 check('and every chart drawn on them is exactly that tall',
       all(abs(cy - _want[r]) < 1 for r, cy in _drawn if r in _want)
       and len([1 for r, _ in _drawn if r in _want]) == 8,
@@ -186,10 +186,10 @@ check('the small multiples carry no axis titles and no type above 8 pt',
       all(not re.search(r'<(catAx|valAx)>[\s\S]*?<title>', rd('xl/charts/' + m)) and
           max(int(v) for v in re.findall(r'sz="(\d+)"', rd('xl/charts/' + m))) <= 800 for m in SMALL),
       {m: max(int(v) for v in re.findall(r'sz="(\d+)"', rd('xl/charts/' + m))) for m in SMALL})
-# the two key charts are wide enough for a legend beside the plot; the small
-# multiples put theirs underneath, where it costs height instead of width
-check('the two key charts keep the legend beside the plot',
-      all('<legendPos val="r"/>' in rd('xl/charts/%s.xml' % m) for m in ('chart7', 'chart8')),
+# A legend standing beside a plot costs width on every row it appears in, and on the key pair it
+# was 126 px of white between the two plots that decide the study. They all sit underneath now.
+check('the key charts put the legend under the plot too, so the pair sits together',
+      all('<legendPos val="b"/>' in rd('xl/charts/%s.xml' % m) for m in ('chart7', 'chart8')),
       [re.findall(r'<legendPos val="(\w)"/>', rd('xl/charts/%s.xml' % m)) for m in ('chart7', 'chart8')])
 check('the small multiples put the legend under the plot',
       all('<legendPos val="b"/>' in rd('xl/charts/%s.xml' % m)
@@ -569,10 +569,10 @@ for _m in re.finditer(r'<xdr:oneCellAnchor>.*?</xdr:oneCellAnchor>', _d, re.S):
 # column boundary. The two key plots share everything left of the project-location rail.
 _rail = sum(_wpx.get(_c, 0) for _c in range(RAIL_C, 19))
 _keyw = (_band - _rail) / 2.0
+_t = _band / 3.0
 _want = {'Summary Chart 1': (0.0, _keyw), 'Summary Chart 2': (_keyw, _keyw),
-         'Summary Chart 3': (0.0, _band / 4.0), 'Summary Chart 4': (_band / 4.0, _band / 4.0),
-         'Summary Chart 5': (_band / 2.0, _band / 4.0), 'Summary Chart 8': (3 * _band / 4.0, _band / 4.0),
-         'Summary Chart 6': (0.0, _band / 2.0), 'Summary Chart 7': (_band / 2.0, _band / 2.0),
+         'Summary Chart 3': (0.0, _t), 'Summary Chart 4': (_t, _t), 'Summary Chart 5': (2 * _t, _t),
+         'Summary Chart 6': (0.0, _t), 'Summary Chart 7': (_t, _t), 'Summary Chart 8': (2 * _t, _t),
          'Summary Chart 9': (_band - _rail, _rail)}
 _bad = [(k, round(_at[k][0], 1), round(v[0], 1)) for k, v in _want.items()
         if k in _at and abs(_at[k][0] - v[0]) > 2]
@@ -684,6 +684,34 @@ check('every dashboard chart reserves its margins so axis titles clear the tick 
 check('and no legend is drawn over its plot',
       all('<overlay val="0"/>' in rd(n) for n in charts if '<legend>' in rd(n)),
       [n for n in charts if '<legend>' in rd(n) and '<overlay val="0"/>' not in rd(n)])
+# The plots have to read as one instrument: the same hairline edge on every panel, square
+# corners, and a plot area that fills what is left rather than half of it.
+# the chart the setup form maintains is left out: it ships empty, with no plot area to style
+SUMCH = [n for n in charts if 'Summary' in rd(n) and '<plotArea>' in rd(n)]
+check('every panel carries the same hairline edge and square corners',
+      len(SUMCH) == 9
+      and all('<roundedCorners val="0"/>' in rd(n) and 'BCC6D2' in rd(n)
+              and 'w="9525"' in rd(n) for n in SUMCH),
+      [n for n in SUMCH if 'BCC6D2' not in rd(n) or '<roundedCorners val="0"/>' not in rd(n)])
+_area = {}
+for n in dash:
+    _l = re.search(r'<plotArea><layout>(.*?)</layout>', rd(n), re.S)
+    _v = dict(re.findall(r'<([xywh]) val="([\d.]+)"/>', _l.group(1))) if _l else {}
+    if _v: _area[n.split('/')[-1]] = round(float(_v['w']) * float(_v['h']), 3)
+check('and the plot fills at least half the panel it sits in',
+      _area and min(_area.values()) >= 0.5, sorted(_area.items(), key=lambda kv: kv[1])[:3])
+# every legend underneath, so no plot gives up width to one standing beside it
+check('no legend stands beside a plot, taking width the plot could use',
+      all('<legendPos val="b"/>' in rd(n) for n in charts if '<legend>' in rd(n)),
+      [n for n in charts if '<legend>' in rd(n) and '<legendPos val="b"/>' not in rd(n)])
+# the two plots that matter most have to sit next to each other, not either side of a legend
+_gapx = {}
+for n in dash:
+    _l = re.search(r'<plotArea><layout>(.*?)</layout>', rd(n), re.S)
+    _v = dict(re.findall(r'<([xywh]) val="([\d.]+)"/>', _l.group(1))) if _l else {}
+    if _v: _gapx[n.split('/')[-1]] = round(1 - float(_v['x']) - float(_v['w']), 3)
+check('and no panel leaves more than three percent of its width unused on the right',
+      _gapx and max(_gapx.values()) <= 0.03, sorted(_gapx.items(), key=lambda kv: -kv[1])[:3])
 
 print(); print('=' * 78)
 print('%d checks, %d failed' % (checks, len(fails)))
